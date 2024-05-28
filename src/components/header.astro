@@ -1,12 +1,12 @@
 ---
 import { Icon } from "astro-icon/components";
-import ThemeSwitcher from "~/components/theme-switcher.astro";
 import type { NavItem } from "~/types";
 
 const navItems: Array<NavItem> = [
-  { title: "Features", url: "#features" },
-  { title: "Compatibility", url: "#compatibility" },
-  { title: "Showcase", url: "#showcase" },
+  { title: "About", url: "#about" },
+  { title: "Schedule", url: "#schedule" },
+  { title: "Submission", url: "#submission" },
+  { title: "Contact", url: "#contact" },
 ];
 ---
 
@@ -14,11 +14,6 @@ const navItems: Array<NavItem> = [
   id="page-header"
   class="absolute bottom-0 z-20 flex w-full items-center justify-between border-b border-transparent px-8 py-4 text-white"
 >
-  <a class="flex items-center gap-3 hover:!text-default" href="#">
-    <h1 class="sr-only">Astro</h1>
-    <Icon name="logomark" class="size-10" />
-    <Icon name="wordmark" class="hidden h-4 sm:block" />
-  </a>
   <div>
     <div class="flex items-center gap-6">
       <nav class="hidden sm:block">
@@ -26,7 +21,7 @@ const navItems: Array<NavItem> = [
           {
             navItems.map(({ title, url }) => (
               <li>
-                <a class="text-sm" href={url}>
+                <a class="menu-link text-sm" href={url}>
                   {title}
                 </a>
               </li>
@@ -42,7 +37,6 @@ const navItems: Array<NavItem> = [
       >
         <Icon name="mdi:menu" class="size-8" />
       </button>
-      <ThemeSwitcher />
     </div>
     <div id="menu-modal" class="modal hidden" aria-hidden="true">
       <div class="fixed inset-0 bg-default px-8 py-4 text-default">
@@ -134,5 +128,17 @@ const navItems: Array<NavItem> = [
   }
   .modal.is-open {
     @apply block;
+  }
+
+  .menu-link {
+    color: white;
+    background: rgba(0, 0, 0, 0.75);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+  }
+
+  .menu-link:hover {
+    background: rgba(0, 0, 0, 0.9);
   }
 </style>

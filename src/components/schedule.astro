@@ -1,9 +1,11 @@
 ---
-import ContentSection from "./content-section.astro";
+import SectionLayout from "../layouts/section-layout.astro";
 ---
 
-<ContentSection title="Schedule" id="schedule">
-  <Fragment slot="lead">
-    <p>Stay tuned for our exciting lineup of comedy films and events. We're curating a fantastic selection of the funniest films and performances just for you. Check back soon for our detailed schedule, including screening times, live comedy acts, and interactive Q&A sessions.</p>
+<SectionLayout title="Schedule" id="schedule" headline="Stay tuned for our exciting lineup of comedy films and events.">
+  <Fragment slot="content">
+    <p>
+      We're curating a fantastic selection of the funniest films and performances just for you. Check back soon for our detailed schedule, including screening times, live comedy acts, and interactive Q&A sessions.
+    </p>
   </Fragment>
-</ContentSection>
+</SectionLayout>

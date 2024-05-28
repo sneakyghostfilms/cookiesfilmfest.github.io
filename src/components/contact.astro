@@ -1,17 +1,17 @@
 ---
-import ContentSection from "./content-section.astro";
+import SectionLayout from "../layouts/section-layout.astro";
 ---
-
-<ContentSection title="Contact Us" id="contact">
-  <Fragment slot="lead">
-    <h1>Have questions?</h1>
-    <p>
+<SectionLayout title="Contact Us" id="contact" headline="Have questions?">
+  <Fragment slot="content">
+    <p class="mb-4">
       We're here to help! Reach out to us at info@cookietablefilmfest.com or connect with us on social media:
-      <ul>
+    </p>
+    <div class="text-left">
+      <ul class="list-disc pl-5 font-roboto mb-4">
         <li>Facebook: @cookietablefilmfest</li>
         <li>Instagram: @cookietablefilmfest</li>
         <li>Twitter: @cookiefilmfest</li>
       </ul>
-    </p>
+    </div>
   </Fragment>
-</ContentSection>
+</SectionLayout>

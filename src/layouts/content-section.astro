@@ -1,0 +1,43 @@
+---
+export interface Props {
+  id: string;
+  title: string;
+}
+
+const { title, id } = Astro.props;
+---
+
+<section id={id} class="flex scroll-mt-24 flex-col items-center gap-4 space-y-8">
+  <div class="flex flex-col items-center gap-4">
+    <slot name="eyebrow" />
+    <h1 class="text-6xl font-extrabold text-center tracking-tight gradient-text">
+      {title}
+    </h1>
+  </div>
+  <div class="max-w-xl text-center text-2xl font-extrabold">
+    <slot name="lead" />
+  </div>
+  <slot />
+</section>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent p-5;
+    background: linear-gradient(45deg, #ff8a00, #e52e71);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Caveat', cursive;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .font-caveat {
+    font-family: 'Caveat', cursive;
+  }
+
+  .font-roboto {
+    font-family: 'Roboto', sans-serif;
+  }
+</style>

@@ -1,3 +1,4 @@
+/* Import the fonts */
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
 
@@ -5,10 +6,7 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Caveat', cursive;
-}
-
+/* General styles for a, .btn, etc., if any */
 a,
 .btn {
   transition: colors 0.2s;
@@ -23,10 +21,3 @@ a,
   }
 }
 
-.gradient-text {
-  background-clip: text;
-  color: transparent;
-  background-image: linear-gradient(135deg, #6366F1, #D946EF, #EC4899); /* Adjusted colors to match previous gradient */
-  font-family: 'Caveat', cursive; /* Apply Caveat font */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Optional: Add a text shadow for better readability */
-}

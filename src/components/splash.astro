@@ -3,7 +3,6 @@ import { Image } from 'astro:assets';
 import cookieTableImage from '../assets/cookie-table.jpg';
 const widths = [450, 800];
 const sizes = "(min-width: 640px) 42vw, 67vw";
-import "@fontsource/caveat"; // Add this line to import the new font
 ---
 
 <section class="relative h-screen">
@@ -26,19 +25,6 @@ import "@fontsource/caveat"; // Add this line to import the new font
 </noscript>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap'); /* Ensure the font is loaded */
-
-  .gradient-text {
-    background: linear-gradient(45deg, #ff8a00, #e52e71);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  }
-
-  .font-caveat {
-    font-family: 'Caveat', cursive;
-  }
-
   @keyframes float {
     0% {
       transform: translate3d(0, 0, 0);
@@ -52,5 +38,14 @@ import "@fontsource/caveat"; // Add this line to import the new font
     #splash-bg-fallback {
       @apply block;
     }
+  }
+  .gradient-text {
+    background: linear-gradient(45deg, #ff8a00, #e52e71);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Caveat', cursive;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    padding: 1.25rem;
   }
 </style>

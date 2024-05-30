@@ -3,16 +3,14 @@ import ContentSection from "./content-section.astro";
 export interface Props {
   id: string;
   title: string;
-  headline: string;
 }
 
-const { id, title, headline } = Astro.props;
+const { id, title } = Astro.props;
 ---
 
 <ContentSection title={title} id={id}>
   <Fragment slot="lead">
-    <h2 class="text-3xl font-caveat p-5">{headline}</h2>
-    <div class="font-roboto text-base">
+    <div class="font-open-sans text-base leading-8 px-4">
       <slot name="content" />
     </div>
   </Fragment>
@@ -20,13 +18,13 @@ const { id, title, headline } = Astro.props;
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&display=swap');
 
   .font-caveat {
     font-family: 'Caveat', cursive;
   }
 
-  .font-roboto {
-    font-family: 'Roboto', sans-serif;
+  .font-open-sans {
+    font-family: 'Open Sans', sans-serif;
   }
 </style>

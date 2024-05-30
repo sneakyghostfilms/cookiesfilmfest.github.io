@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Location</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script is:inline>
+        function initMap() {
+            const mapElement = document.getElementById('map');
+            if (!mapElement) {
+                console.error('Map container element not found');
+                return;
+            }
+            const centerCoords = { lat: 40.47011850398016, lng: -79.96100062014314 };
+            const mapOptions = {
+                center: centerCoords,
+                zoom: 15,
+                mapId: 'd20ea0b981a852e'
+            };
+
+            const map = new google.maps.Map(mapElement, mapOptions);
+
+            // Use AdvancedMarkerElement instead of Marker
+            const advancedMarker = new google.maps.marker.AdvancedMarkerElement({
+                map: map,
+                position: centerCoords,
+                title: 'Event Location'
+            });
+        }
+
+        function loadGoogleMapsAPI() {
+            const apiKey = "AIzaSyCWneVbHtjSSNQ540mj1b68ADwpZoQK2Jo";
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&loading=async&callback=initMap&libraries=marker&map_ids=d20ea0b981a852e`;
+            script.async = true;
+            script.defer = true;
+            script.onerror = (error) => console.error("Error loading the script:", error);
+            document.head.appendChild(script);
+        }
+
+        if (document.readyState === 'complete') {
+            loadGoogleMapsAPI();
+        } else {
+            window.onload = loadGoogleMapsAPI;
+        }
+    </script>
+</body>
+</html>

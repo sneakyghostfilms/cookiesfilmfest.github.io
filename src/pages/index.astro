@@ -1,10 +1,9 @@
 ---
 import "@fontsource-variable/inter";
-import Schedule from "../components/schedule.astro";
+import Event from "../components/event.astro";
 import Submission from "../components/submission.astro";
-import Footer from "../components/footer.astro";
 import Header from "../components/header.astro";
-import About from "../components/about.astro";
+import Mission from "../components/mission.astro";
 import Contact from "../components/contact.astro";
 import Splash from "../components/splash.astro";
 import "../styles/index.css";
@@ -18,7 +17,7 @@ const description = "Join us for a sweet celebration of comedy films in Pittsbur
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <meta name="generator" content={generator} />
 
     <title>Cookie Table Film Festival</title>
@@ -37,11 +36,10 @@ const description = "Join us for a sweet celebration of comedy films in Pittsbur
     <Header />
     <Splash />
     <div class="space-y-24 px-8 py-32">
-      <About />
-      <Schedule />
+      <Mission />
+      <Event />
       <Submission />
       <Contact />
     </div>
-    <Footer />
   </body>
 </html>

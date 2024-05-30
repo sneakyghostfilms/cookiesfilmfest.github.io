@@ -1,11 +1,16 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
+import Map from './map.astro';
 ---
 
-<SectionLayout title="Schedule" id="schedule" headline="Stay tuned for our exciting lineup of comedy films and events.">
+<SectionLayout title="The Event" id="event">
   <Fragment slot="content">
-    <p>
+    <p class="text-justify mb-8">
       We're curating a fantastic selection of the funniest films and performances just for you. Check back soon for our detailed schedule, including screening times, live comedy acts, and interactive Q&A sessions.
     </p>
+    <p class="text-justify mb-8">
+      <strong>Buy Tickets</strong>: <a href="https://www.example.com" class="text-blue-500 underline">Get your tickets here</a>
+    </p>
+    <Map />
   </Fragment>
 </SectionLayout>

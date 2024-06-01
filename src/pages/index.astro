@@ -10,7 +10,7 @@ import "../styles/index.css";
 
 const { generator, site } = Astro;
 const image = new URL("social.jpg", site);
-const description = "Join us for a sweet celebration of comedy films in Pittsburgh!";
+const description = "Join us for some cookie-crumbling comedy films in Pittsburgh!";
 ---
 <!doctype html>
 <html lang="en" class="h-full motion-safe:scroll-smooth" data-theme="dark"> <!-- Force dark mode -->
@@ -20,11 +20,11 @@ const description = "Join us for a sweet celebration of comedy films in Pittsbur
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <meta name="generator" content={generator} />
 
-    <title>Cookie Table Film Festival</title>
+    <title>Cookies and Comedy Film Festival</title>
     <meta name="description" content={description} />
 
     <!-- social media -->
-    <meta property="og:title" content="Cookie Table Film Festival" />
+    <meta property="og:title" content="Cookies and Comedy Film Festival" />
     <meta property="og:type" content="website" />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />

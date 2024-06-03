@@ -1,6 +1,10 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
 import Map from './map.astro';
+import { Image } from 'astro:assets';
+import mc1 from '../assets/comedians/amir-megheri.jpg';
+import mc2 from '../assets/comedians/kayleigh-dumas.jpg';
+import mc3 from '../assets/comedians/derek-minto.jpg';
 ---
 
 <SectionLayout title="The Event" id="event">
@@ -8,9 +12,34 @@ import Map from './map.astro';
     <p class="text-justify mb-8">
       We're curating a fantastic selection of the funniest films and performances just for you. Check back soon for our detailed schedule, including screening times, live comedy acts, and interactive Q&A sessions.
     </p>
-    <p class="text-justify mb-8">
-      <strong>Buy Tickets</strong>: <a href="https://www.example.com" class="text-blue-500 underline">Get your tickets here</a>
+    <p class="text-justify mb-12">
+      <strong>Buy Tickets</strong>: <span class="text-gray-500 underline cursor-not-allowed">Get your tickets here</span>
+      <br/>
+      <span class="text-gray-500 text-sm italic">Tickets will be available closer to the event date.</span>
     </p>
+
+    <h2 class="font-caveat text-xl p-5 text-center mb-4">Meet the MCs</h2>
+    <div class="flex justify-center items-center flex-wrap gap-8 mb-12">
+      <div class="text-center">
+        <Image src={mc1} alt="Amir Megheri" class="w-60 h-60 rounded-full object-cover mb-4"/>
+        <p class="font-bold">Amir Megheri</p>
+      </div>
+      <div class="text-center">
+        <Image src={mc2} alt="Kayleigh Dumas" class="w-60 h-60 rounded-full object-cover mb-4"/>
+        <p class="font-bold">Kayleigh Dumas</p>
+      </div>
+      <div class="text-center">
+        <Image src={mc3} alt="Derek Minto" class="w-60 h-60 rounded-full object-cover mb-4"/>
+        <p class="font-bold">Derek Minto</p>
+      </div>
+    </div>
+
+    <h2 class="font-caveat text-xl p-5 text-center mb-4">Map to the Row House Cinema</h2>
     <Map />
   </Fragment>
 </SectionLayout>
+<style>
+  .font-caveat {
+    font-family: 'Caveat', cursive;
+  }
+</style>

@@ -48,5 +48,13 @@
         alert('There was a problem submitting your form. Please try again.');
       });
     }
+  
+    // Attach the event listener to the form
+    document.addEventListener('DOMContentLoaded', (event) => {
+      const form = document.getElementById('contact-form');
+      if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+      }
+    });
   </script>
   

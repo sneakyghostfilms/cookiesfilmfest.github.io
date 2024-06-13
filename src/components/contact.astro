@@ -1,10 +1,15 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
+import ContactForm from "../components/contactform.astro";
 ---
 <SectionLayout title="Contact Us" id="contact">
   <Fragment slot="content">
-    <p class="mb-4">
-      Reach out to us at info@cookiesfilmfest.com or on Facebook @cookiesfilmfest
+    <p class="mb-4 text-left text-white">
+      You can reach out to us via email or use the contact form below. Don't forget to like our <a href="https://www.facebook.com/profile.php?id=61560854338084" class="text-blue-400 underline">Facebook page</a> for updates!
     </p>
+    <p class="mb-8 text-left text-white">
+      Email: <a href="mailto:info@cookiesfilmfest.com" class="text-blue-400 underline">info@cookiesfilmfest.com</a>
+    </p>
+    <ContactForm />
   </Fragment>
 </SectionLayout>

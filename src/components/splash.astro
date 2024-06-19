@@ -1,18 +1,13 @@
 ---
 import { Image } from 'astro:assets';
 import cookieTableImage from '../assets/cookie-table.jpg';
-const widths = [450, 800];
-const sizes = "(min-width: 640px) 42vw, 67vw";
+import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
 ---
-
 <section class="relative h-screen">
   <div class="relative h-full w-full">
     <Image src={cookieTableImage} alt="Cookie Table" class="w-full h-full object-cover" />
-    <div class="absolute inset-0 flex flex-col items-center justify-center text-white bg-black bg-opacity-50">
-      <h2 class="gradient-text text-center font-extrabold tracking-tighter text-8xl md:text-10xl lg:text-12xl font-caveat  leading-tight md:leading-snug lg:leading-snug p-5">
-        The<br />Cookies and Comedy<br />Film Festival
-      </h2>
-    </div>
+    <div class="overlay"></div>
+    <Image src={filmFestivalText} alt="Film Festival" class="absolute center top-half left-half" />
   </div>
 </section>
 
@@ -36,9 +31,10 @@ const sizes = "(min-width: 640px) 42vw, 67vw";
 
   @media (prefers-reduced-motion: reduce) {
     #splash-bg-fallback {
-      @apply block;
+      display: block;
     }
   }
+
   .gradient-text {
     background: linear-gradient(45deg, #ff8a00, #e52e71);
     background-clip: text;
@@ -47,5 +43,33 @@ const sizes = "(min-width: 640px) 42vw, 67vw";
     font-family: 'Caveat', cursive;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     padding: 1.25rem;
+  }
+
+  .absolute {
+    position: absolute;
+  }
+
+  .center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .top-half {
+    top: 50%;
+  }
+
+  .left-half {
+    left: 50%;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(2px);
   }
 </style>

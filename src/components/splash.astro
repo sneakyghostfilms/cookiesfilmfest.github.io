@@ -7,47 +7,16 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
   <div class="relative h-full w-full">
     <Image src={cookieTableImage} alt="Cookie Table" class="w-full h-full object-cover" />
     <div class="overlay"></div>
-    <Image src={filmFestivalText} alt="Film Festival" class="absolute center top-half left-half" />
-    <div class="absolute bottom-60 w-full text-center text-3xl text-white font-caveat">
-      Come for the laughs! Stay for the cookies!
+    <div class="absolute center responsive-container">
+      <Image src={filmFestivalText} alt="Film Festival" class="responsive-image" />
+      <div class="tagline responsive-text">
+        Come for the laughs! Stay for the cookies!
+      </div>
     </div>
   </div>
 </section>
 
-<noscript>
-  <style>
-    #splash-bg-fallback {
-      display: block;
-    }
-  </style>
-</noscript>
-
 <style>
-  @keyframes float {
-    0% {
-      transform: translate3d(0, 0, 0);
-    }
-    100% {
-      transform: translate3d(0, 30px, 0);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #splash-bg-fallback {
-      display: block;
-    }
-  }
-
-  .gradient-text {
-    background: linear-gradient(45deg, #ff8a00, #e52e71);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-family: 'Caveat', 'Comic Sans MS', cursive;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    padding: 1.25rem;
-  }
-
   .absolute {
     position: absolute;
   }
@@ -56,14 +25,6 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-  }
-
-  .top-half {
-    top: 50%;
-  }
-
-  .left-half {
-    left: 50%;
   }
 
   .overlay {
@@ -76,7 +37,54 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
     backdrop-filter: blur(2px);
   }
 
-  .font-caveat {
+  .responsive-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .responsive-image {
+    width: 80%;
+    max-width: 600px;
+  }
+
+  .tagline {
     font-family: 'Caveat', 'Comic Sans MS', cursive;
+    font-size: 1.5rem;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  @media (max-width: 768px) {
+    .responsive-image {
+      width: 90%;
+      max-width: 700px;
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+    }
+  }
+
+  @media (orientation: landscape) and (max-width: 768px) {
+    .responsive-container {
+      gap: 2rem;
+    }
+
+    .tagline {
+      font-size: 1.3rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .responsive-image {
+      max-width: 1200px;
+    }
+
+    .tagline {
+      font-size: 2rem;
+    }
   }
 </style>

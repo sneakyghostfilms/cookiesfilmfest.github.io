@@ -1,0 +1,189 @@
+---
+import mc1 from '../assets/comedians/amir-megheri.jpg';
+import mc2 from '../assets/comedians/kayleigh-dumas.jpg';
+import mc3 from '../assets/comedians/derek-minto.jpg';
+---
+
+<section id="schedule" class="schedule-section">
+  <h2 class="schedule-title">Schedule</h2>
+
+  <!-- Derek Minto Block -->
+  <div class="schedule-block">
+    <div class="block-header">
+      <img src={mc3.src} alt="Derek Minto" class="mc-photo" />
+      <h3 class="block-name">The Derek Minto Block</h3>
+      <p class="block-time">(12pm – 2:20pm)</p>
+    </div>
+    <div class="block-content">
+      <div class="event-note"><em>Live Standup by Derek Minto</em></div>
+      <ul class="block-list">
+        <li>Convicts &amp; Chocolate <em>(11:00)</em></li>
+        <li>Lil' Somethin' in: Clash with the Cube Demon <em>(3:25)</em></li>
+        <li>Slasher Sessions <em>(19:59)</em></li>
+        <li>Chocolate Chip <em>(12:15)</em></li>
+        <li>GNOME$ <em>(3:35)</em></li>
+      </ul>
+      <div class="event-note"><em>Intermission with Derek Minto</em></div>
+      <ul class="block-list">
+        <li>Pizza Man <em>(4:20)</em></li>
+        <li>You Guy's "Haircut" <em>(3:03)</em></li>
+        <li>Goodbye Beard <em>(6:27)</em></li>
+        <li>Ted Gold Did It <em>(7:08)</em></li>
+        <li>Rysy <em>(4:02)</em></li>
+        <li>Latte For Jim <em>(7:07)</em></li>
+        <li>Dr. Taker's Every-Ailment Strips <em>(10:37)</em></li>
+        <li>The Allergy Table <em>(6:20)</em></li>
+      </ul>
+      <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
+    </div>
+  </div>
+
+  <!-- Amir Megheri Block -->
+  <div class="schedule-block">
+    <div class="block-header">
+      <img src={mc1.src} alt="Amir Megheri" class="mc-photo" />
+      <h3 class="block-name">The Amir Megheri Block</h3>
+      <p class="block-time">(2:40pm – 5pm)</p>
+    </div>
+    <div class="block-content">
+      <div class="event-note"><em>Live Standup by Amir Megheri</em></div>
+      <ul class="block-list">
+        <li>Senior Software Engineer <em>(15:00)</em></li>
+        <li>Bernie <em>(15:51)</em></li>
+        <li>Glazed Over <em>(8:13)</em></li>
+        <li>Lucky Saturday <em>(3:06)</em></li>
+        <li>SUPERCRITICAL <em>(7:18)</em></li>
+      </ul>
+      <div class="event-note"><em>Intermission with Amir Megheri</em></div>
+      <ul class="block-list">
+        <li>This is not Norway <em>(17:59)</em></li>
+        <li>Dr. Pepper Movie Trailer <em>(2:18)</em></li>
+        <li>Wheel <em>(9:15)</em></li>
+        <li>The Trouble With Cake...And Eating It Too <em>(7:41)</em></li>
+        <li>The Ten Commandments <em>(4:55)</em></li>
+        <li>The Double Life of Hugh <em>(8:57)</em></li>
+      </ul>
+      <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
+    </div>
+  </div>
+
+  <!-- Kayleigh Dumas Block -->
+  <div class="schedule-block">
+    <div class="block-header">
+      <img src={mc2.src} alt="Kayleigh Dumas" class="mc-photo" />
+      <h3 class="block-name">The Kayleigh Dumas Block</h3>
+      <p class="block-time">(5:40pm – 8pm)</p>
+    </div>
+    <div class="block-content">
+      <div class="event-note"><em>Live Standup by Kayleigh Dumas</em></div>
+      <ul class="block-list">
+        <li>Badmouth Grandma <em>(5:38)</em></li>
+        <li>Cowboy Love Songs <em>(4:59)</em></li>
+        <li>Turkey Lover <em>(9:00)</em></li>
+        <li>Silent, But Deadly <em>(6:00)</em></li>
+        <li>With Tits <em>(3:00)</em></li>
+        <li>ILY, BYE <em>(13:28)</em></li>
+        <li>To Pee or Not To Pee <em>(8:43)</em></li>
+      </ul>
+      <div class="event-note"><em>Intermission with Kayleigh Dumas</em></div>
+      <ul class="block-list">
+        <li>Beethoven's Great Great Great Great Great Grandchild <em>(12:30)</em></li>
+        <li>The One <em>(3:21)</em></li>
+        <li>Ms. Rossi 2: Ms. Rossi Takes The Cake <em>(17:58)</em></li>
+        <li>Mama Rose's Pound Cake <em>(11:07)</em></li>
+        <li>Gynie on the Go <em>(2:29)</em></li>
+        <li>Brush Me <em>(2:00)</em></li>
+      </ul>
+      <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
+    </div>
+  </div>
+
+  <!-- Awards -->
+  <div class="schedule-block">
+    <h3 class="block-name">Awards (8pm)</h3>
+    <p class="block-description">
+      Celebrate the best films with delicious <strong class="highlight">cookies</strong> and networking!
+    </p>
+  </div>
+</section>
+
+<style>
+  .schedule-section {
+    padding: 2rem;
+    background-color: #1a1a1a;
+    color: #f5f5f5;
+    border-radius: 1rem;
+  }
+
+  .schedule-title {
+    font-family: 'Caveat', cursive;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #ff7f50;
+  }
+
+  .block-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .mc-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto;
+    border: 4px solid #ff7f50;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .block-name {
+    font-family: 'Caveat', cursive;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff7f50;
+  }
+
+  .block-time {
+    font-size: 1rem;
+    color: #f5f5f5;
+    margin-top: -0.5rem;
+  }
+
+  .schedule-block {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(145deg, #2c2c2c, #383838);
+    border-radius: 1rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .block-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .block-list li {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+
+  .event-note {
+    font-style: italic;
+    text-align: center;
+    margin: 1rem 0;
+    color: #ff9f50;
+  }
+
+  .block-description {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 1rem;
+  }
+
+  .highlight {
+    color: #ff7f50;
+    font-weight: bold;
+  }
+</style>

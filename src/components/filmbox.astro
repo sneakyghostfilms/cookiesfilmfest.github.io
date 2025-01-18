@@ -136,24 +136,30 @@ const safeTitle = title.replace(/[^a-zA-Z0-9]/g, '');
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const filmBoxes = document.querySelectorAll('.film-box');
+document.addEventListener("DOMContentLoaded", () => {
+  const filmBoxes = document.querySelectorAll('.film-box');
+  const allPopups = document.querySelectorAll('.film-popup');
 
-    filmBoxes.forEach(box => {
-      const safeTitle = box.dataset.safetitle;
-      const popup = document.getElementById(`popup-${safeTitle}`);
-      if (!popup) return;
+  filmBoxes.forEach(box => {
+    const safeTitle = box.dataset.safetitle;
+    const popup = document.getElementById(`popup-${safeTitle}`);
+    if (!popup) return;
 
-      box.addEventListener('click', () => {
-        popup.classList.remove('hidden');
-      });
+    box.addEventListener('click', () => {
+      // Hide any open popups
+      allPopups.forEach(p => p.classList.add('hidden'));
 
-      const closeBtn = popup.querySelector('.close-btn');
-      if (!closeBtn) return;
+      // Show the clicked popup
+      popup.classList.remove('hidden');
+    });
 
-      closeBtn.addEventListener('click', () => {
-        popup.classList.add('hidden');
-      });
+    const closeBtn = popup.querySelector('.close-btn');
+    if (!closeBtn) return;
+
+    closeBtn.addEventListener('click', () => {
+      popup.classList.add('hidden');
     });
   });
+});
+
 </script>

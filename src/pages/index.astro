@@ -10,6 +10,9 @@ import "../styles/index.css";
 
 const { generator, site } = Astro;
 const image = new URL("/splash_screen_thumbnail.jpg", site).href;
+const wwwimage = image.startsWith("https://cookiesfilmfest.com")
+    ? image.replace("https://", "https://www.")
+    : image;
 const description = "Join us for some cookie-crumbling comedy films in Pittsburgh!";
 ---
 <!doctype html>
@@ -27,7 +30,7 @@ const description = "Join us for some cookie-crumbling comedy films in Pittsburg
     <meta property="og:title" content="Cookies and Comedy Film Festival" />
     <meta property="og:type" content="website" />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={image} />
+    <meta property="og:image" content={wwwimage} />
     <meta property="og:url" content={site} />
     <meta name="twitter:card" content="summary_large_image" />
 

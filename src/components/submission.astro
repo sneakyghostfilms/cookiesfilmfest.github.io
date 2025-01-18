@@ -4,56 +4,90 @@ import SectionLayout from "../layouts/section-layout.astro";
 
 <SectionLayout title="Film Submission" id="submission">
   <Fragment slot="content">
-    <p class="text-center mb-14">Filmmakers around the world, submit your comedy films to the Cookies and Comedy Film Festival!</p>
-    <div class="mb-8 flex justify-center">
-      <a href="https://filmfreeway.com/festivals/81910?utm_campaign=Cookies+and+Comedy+Film+Festival&utm_medium=External&utm_source=Submission+Button" target="_blank" title="Click to submit on FilmFreeway">
-        <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" title="Click to submit on FilmFreeway" width="263" height="102">
-      </a>
+    <!-- Notice for Submissions Closed -->
+    <div class="submissions-closed-banner">
+      <h2>Submissions Closed</h2>
+      <p class="text-center">The submission deadline for the Cookies and Comedy Film Festival has passed. Thank you to all who submitted their films!</p>
     </div>
-    <h2 class="font-caveat text-xl p-5">Submission Guidelines:</h2>
-    <div class="text-left">
-      <ul class="list-disc pl-6 space-y-4 mb-8">
-        <li><strong>Genre:</strong> Films must be primarily comedy.</li>
-        <li><strong>Completion Date:</strong> Films should have been completed after January 1, 2022.</li>
-        <li><strong>Language:</strong> Non-English films must include English subtitles.</li>
-        <li><strong>Length:</strong> Films should not exceed 20 minutes.</li>
-      </ul>
+
+    <!-- Original Content (grayed out and inactive) -->
+    <div class="submission-content-disabled">
+      <p class="text-center mb-14">Filmmakers around the world, submit your comedy films to the Cookies and Comedy Film Festival!</p>
+      <div class="mb-8 flex justify-center">
+        <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" title="Submissions Closed" width="263" height="102" class="disabled-button">
+      </div>
+      <h2 class="font-caveat text-xl p-5 subheader-orange">Submission Guidelines:</h2>
+      <div class="text-left">
+        <ul class="list-disc pl-6 space-y-4 mb-8">
+          <li><strong>Genre:</strong> Films must be primarily comedy.</li>
+          <li><strong>Completion Date:</strong> Films should have been completed after January 1, 2022.</li>
+          <li><strong>Language:</strong> Non-English films must include English subtitles.</li>
+          <li><strong>Length:</strong> Films should not exceed 20 minutes.</li>
+        </ul>
+      </div>
+      
+      <h2 class="font-caveat text-xl p-5 subheader-orange">Submission Requirements:</h2>
+      <div class="text-left">
+        <ul class="list-disc pl-6 space-y-4 mb-8">
+          <li>Film Synopsis (50 words max)</li>
+          <li>Country of Origin</li>
+          <li>Languages Spoken</li>
+          <li>Genres (if any in addition to comedy)</li>
+          <li>Length of Film</li>
+          <li>Prior Festival Screenings</li>
+          <li>Honors and Awards</li>
+          <li>Filmmaker Contact Information</li>
+          <li>Director’s Bio (100 words max, optional)</li>
+          <li>Personal Statement (100 words max, optional)</li>
+        </ul>
+      </div>
+      
+      <h2 class="font-caveat text-xl p-5 subheader-orange">Key Dates:</h2>
+      <div class="text-left">
+        <ul class="list-disc pl-6 space-y-4 mb-14">
+          <li><strong>Submission Deadline:</strong> December 31, 2024</li>
+          <li><strong>Notification Date:</strong> January 12, 2025</li>
+          <li><strong>Festival Date:</strong> March 8, 2025</li>
+        </ul>
+      </div>
     </div>
-    
-    <h2 class="font-caveat text-xl p-5">Submission Requirements:</h2>
-    <div class="text-left">
-      <ul class="list-disc pl-6 space-y-4 mb-8">
-        <li>Film Synopsis (50 words max)</li>
-        <li>Country of Origin</li>
-        <li>Languages Spoken</li>
-        <li>Genres (if any in addition to comedy)</li>
-        <li>Length of Film</li>
-        <li>Prior Festival Screenings</li>
-        <li>Honors and Awards</li>
-        <li>Filmmaker Contact Information</li>
-        <li>Director’s Bio (100 words max, optional)</li>
-        <li>Personal Statement (100 words max, optional)</li>
-      </ul>
-    </div>
-    
-    <h2 class="font-caveat text-xl p-5">Key Dates:</h2>
-    <div class="text-left">
-      <ul class="list-disc pl-6 space-y-4 mb-14">
-        <li><strong>Submission Deadline:</strong> December 31, 2024</li>
-        <li><strong>Notification Date:</strong> January 12, 2025</li>
-        <li><strong>Festival Date:</strong> March 8, 2025</li>
-      </ul>
-    </div>
-    <div class="mb-14 flex justify-center">
-      <a href="https://filmfreeway.com/festivals/81910?utm_campaign=Cookies+and+Comedy+Film+Festival&utm_medium=External&utm_source=Submission+Button" target="_blank" title="Click to submit on FilmFreeway">
-        <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" title="Click to submit on FilmFreeway" width="263" height="102">
-      </a>
-    </div>
-    <p class="text-center">For more information, contact us at <a href="mailto:info@cookiesfilmfest.com" class="text-blue-500 underline">info@cookiesfilmfest.com</a>.</p>
   </Fragment>
 </SectionLayout>
+
 <style>
   .font-caveat {
     font-family: 'Caveat', cursive;
+  }
+
+  .subheader-orange {
+    color: #ff7f50;
+  }
+
+  /* Banner Styling */
+  .submissions-closed-banner {
+    background: linear-gradient(145deg, #2c2c2c, #383838); /* Matches schedule/awards sections */
+    color: #ff7f50; /* Consistent with the orange headers */
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .submissions-closed-banner h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Disabled Submission Content */
+  .submission-content-disabled {
+    opacity: 0.6; /* Faded effect */
+    pointer-events: none; /* Disable interaction */
+  }
+
+  .disabled-button {
+    filter: grayscale(100%);
+    cursor: not-allowed;
   }
 </style>

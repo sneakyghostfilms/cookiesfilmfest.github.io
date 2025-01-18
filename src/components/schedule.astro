@@ -2,6 +2,7 @@
 import mc1 from '../assets/comedians/amir-megheri.jpg';
 import mc2 from '../assets/comedians/kayleigh-dumas.jpg';
 import mc3 from '../assets/comedians/derek-minto.jpg';
+import FilmBox from '../components/filmbox.astro';
 ---
 
 <section id="schedule" class="schedule-section">
@@ -12,30 +13,28 @@ import mc3 from '../assets/comedians/derek-minto.jpg';
     <div class="block-content">
       <div class="block-header">
         <img src={mc3.src} alt="Derek Minto" class="mc-photo" />
-        <div class="header-details">
-          <h3 class="block-name">The Derek Minto Block</h3>
-          <p class="block-time">(12pm – 2:20pm)</p>
-        </div>
+        <h3 class="block-name">The Derek Minto Block</h3>
+        <p class="block-time">12:00PM – 2:20PM</p>
       </div>
       <div class="block-lists-container">
         <div class="event-note"><em>Comedy Kickoff with Derek Minto</em></div>
         <div class="film-grid">
-          <div class="film-box">Convicts &amp; Chocolate <em>(11:00)</em></div>
-          <div class="film-box">Lil' Somethin' in: Clash with the Cube Demon <em>(3:25)</em></div>
-          <div class="film-box">Slasher Sessions <em>(19:59)</em></div>
-          <div class="film-box">Chocolate Chip <em>(12:15)</em></div>
-          <div class="film-box">GNOME$ <em>(3:35)</em></div>
+          <FilmBox title="Convicts & Chocolate" />
+          <FilmBox title="Lil' Somethin' in: Clash with the Cube Demon" />
+          <FilmBox title="Slasher Sessions" />
+          <FilmBox title="Chocolate Chip" />
+          <FilmBox title="GNOME$" />
         </div>
         <div class="event-note"><em>Intermission with Derek Minto</em></div>
         <div class="film-grid">
-          <div class="film-box">Pizza Man <em>(4:20)</em></div>
-          <div class="film-box">You Guy's "Haircut" <em>(3:03)</em></div>
-          <div class="film-box">Goodbye Beard <em>(6:27)</em></div>
-          <div class="film-box">Ted Gold Did It <em>(7:08)</em></div>
-          <div class="film-box">Rysy <em>(4:02)</em></div>
-          <div class="film-box">Latte For Jim <em>(7:07)</em></div>
-          <div class="film-box">Dr. Taker's Every-Ailment Strips <em>(10:37)</em></div>
-          <div class="film-box">The Allergy Table <em>(6:20)</em></div>
+          <FilmBox title="Pizza Man" />
+          <FilmBox title="You Guy's &quot;Haircut&quot;" />
+          <FilmBox title="Goodbye Beard" />
+          <FilmBox title="Ted Gold Did It" />
+          <FilmBox title="Rysy" />
+          <FilmBox title="Latte For Jim" />
+          <FilmBox title="Dr. Taker's Every-Ailment Strips" />
+          <FilmBox title="The Allergy Table" />
         </div>
         <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
       </div>
@@ -47,28 +46,26 @@ import mc3 from '../assets/comedians/derek-minto.jpg';
     <div class="block-content">
       <div class="block-header">
         <img src={mc1.src} alt="Amir Megheri" class="mc-photo" />
-        <div class="header-details">
-          <h3 class="block-name">The Amir Megheri Block</h3>
-          <p class="block-time">(2:40pm – 5pm)</p>
-        </div>
+        <h3 class="block-name">The Amir Megheri Block</h3>
+        <p class="block-time">2:40PM – 5:00PM</p>
       </div>
       <div class="block-lists-container">
         <div class="event-note"><em>Comedy Kickoff with Amir Megheri</em></div>
         <div class="film-grid">
-          <div class="film-box">Senior Software Engineer <em>(15:00)</em></div>
-          <div class="film-box">Bernie <em>(15:51)</em></div>
-          <div class="film-box">Glazed Over <em>(8:13)</em></div>
-          <div class="film-box">Lucky Saturday <em>(3:06)</em></div>
-          <div class="film-box">SUPERCRITICAL <em>(7:18)</em></div>
+          <FilmBox title="Senior Software Engineer" />
+          <FilmBox title="Bernie" />
+          <FilmBox title="Glazed Over" />
+          <FilmBox title="Lucky Saturday" />
+          <FilmBox title="SUPERCRITICAL" />
         </div>
         <div class="event-note"><em>Intermission with Amir Megheri</em></div>
         <div class="film-grid">
-          <div class="film-box">This is not Norway <em>(17:59)</em></div>
-          <div class="film-box">Dr. Pepper Movie Trailer <em>(2:18)</em></div>
-          <div class="film-box">Wheel <em>(9:15)</em></div>
-          <div class="film-box">The Trouble With Cake...And Eating It Too <em>(7:41)</em></div>
-          <div class="film-box">The Ten Commandments <em>(4:55)</em></div>
-          <div class="film-box">The Double Life of Hugh <em>(8:57)</em></div>
+          <FilmBox title="This is not Norway" />
+          <FilmBox title="Dr. Pepper Movie Trailer" />
+          <FilmBox title="Wheel" />
+          <FilmBox title="The Trouble With Cake...And Eating It Too" />
+          <FilmBox title="The Ten Commandments" />
+          <FilmBox title="The Double Life of Hugh" />
         </div>
         <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
       </div>
@@ -80,56 +77,48 @@ import mc3 from '../assets/comedians/derek-minto.jpg';
     <div class="block-content">
       <div class="block-header">
         <img src={mc2.src} alt="Kayleigh Dumas" class="mc-photo" />
-        <div class="header-details">
-          <h3 class="block-name">The Kayleigh Dumas Block</h3>
-          <p class="block-time">(5:40pm – 8pm)</p>
-        </div>
+        <h3 class="block-name">The Kayleigh Dumas Block</h3>
+        <p class="block-time">5:40PM – 8:00PM</p>
       </div>
       <div class="block-lists-container">
         <div class="event-note"><em>Comedy Kickoff with Kayleigh Dumas</em></div>
         <div class="film-grid">
-          <div class="film-box">Badmouth Grandma <em>(5:38)</em></div>
-          <div class="film-box">Cowboy Love Songs <em>(4:59)</em></div>
-          <div class="film-box">Turkey Lover <em>(9:00)</em></div>
-          <div class="film-box">Silent, But Deadly <em>(6:00)</em></div>
-          <div class="film-box">With Tits <em>(3:00)</em></div>
-          <div class="film-box">ILY, BYE <em>(13:28)</em></div>
-          <div class="film-box">To Pee or Not To Pee <em>(8:43)</em></div>
+          <FilmBox title="Badmouth Grandma" />
+          <FilmBox title="Cowboy Love Songs" />
+          <FilmBox title="Turkey Lover" />
+          <FilmBox title="Silent, But Deadly" />
+          <FilmBox title="With Tits" />
+          <FilmBox title="ILY, BYE" />
+          <FilmBox title="To Pee or Not To Pee" />
         </div>
         <div class="event-note"><em>Intermission with Kayleigh Dumas</em></div>
         <div class="film-grid">
-          <div class="film-box">Beethoven's Great Great Great Great Great Grandchild <em>(12:30)</em></div>
-          <div class="film-box">The One <em>(3:21)</em></div>
-          <div class="film-box">Ms. Rossi 2: Ms. Rossi Takes The Cake <em>(17:58)</em></div>
-          <div class="film-box">Mama Rose's Pound Cake <em>(11:07)</em></div>
-          <div class="film-box">Gynie on the Go <em>(2:29)</em></div>
-          <div class="film-box">Brush Me <em>(2:00)</em></div>
+          <FilmBox title="Beethoven's Great Great Great Great Great Grandchild" />
+          <FilmBox title="The One" />
+          <FilmBox title="Ms. Rossi 2: Ms. Rossi Takes The Cake" />
+          <FilmBox title="Mama Rose's Pound Cake" />
+          <FilmBox title="Gynie on the Go" />
+          <FilmBox title="Brush Me" />
         </div>
         <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
       </div>
     </div>
   </div>
 
-<!-- Awards -->
-<div class="schedule-block">
-  <div class="block-content">
-    <div class="block-header">
-      <div class="header-details">
-        <h3 class="block-name">Awards</h3>
-        <p class="block-time">(8pm)</p>
-      </div>
-    </div>
-    <div class="block-lists-container">
-      <p class="block-description">
-        Celebrate the best films with delicious <strong class="highlight">cookies</strong> and networking!
+  <!-- Awards Section -->
+  <div class="awards-block">
+    <div class="awards-content">
+      <h3 class="awards-title">Awards Ceremony and Networking</h3>
+      <p class="awards-time">8:00PM</p>
+      <p class="awards-description">
+        Join us as we honor this year’s standouts! Then try to connect with filmmakers and movie lovers while enjoying the cookie table!
       </p>
     </div>
   </div>
-</div>
-
 </section>
 
 <style>
+  /* General Styling */
   .schedule-section {
     padding: 2rem;
     background-color: #1a1a1a;
@@ -146,7 +135,7 @@ import mc3 from '../assets/comedians/derek-minto.jpg';
   }
 
   .schedule-block {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     padding: 1rem;
     background: linear-gradient(145deg, #2c2c2c, #383838);
     border-radius: 1rem;
@@ -154,44 +143,58 @@ import mc3 from '../assets/comedians/derek-minto.jpg';
   }
 
   .block-content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+    position: relative;
   }
 
   .block-header {
-    flex: 1 1 250px;
-    text-align: center;
-  }
-
-  .header-details {
-    margin-top: 0.5rem;
+    position: relative; /* Allows absolutely positioned child elements */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem; /* Creates spacing after the block */
   }
 
   .mc-photo {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
+    width: 100%;
+    height: auto;
+    border-radius: 1rem;
     object-fit: cover;
-    margin: 0 auto;
-    border: 3px solid #ff7f50;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    position: relative;
+    z-index: 1; /* Ensures it stays behind the block-name */
   }
 
   .block-name {
     font-family: 'Caveat', cursive;
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 2rem;
     color: #ff7f50;
+    position: absolute; /* Positioned relative to the .block-header */
+    bottom: 100px; /* Moves the header to overlap the bottom of the image */
+    background: rgba(76, 76, 76, 0.8);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    z-index: 2; /* Ensures it appears above the image */
+    text-align: center;
   }
 
   .block-time {
-    font-size: 0.9rem;
+    margin-top: 2rem; /* Pushes it below the overlapping header */
+    font-size: 1.1rem;
     color: #f5f5f5;
+    text-align: center;
   }
 
   .block-lists-container {
-    flex: 2 1 350px;
+    margin-top: 2rem; /* Ensures space after overlapping header */
+  }
+
+  .event-note {
+    text-align: center;
+    margin: 1rem 0;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: #f5f5f5;
   }
 
   .film-grid {
@@ -211,12 +214,7 @@ import mc3 from '../assets/comedians/derek-minto.jpg';
     font-weight: bold;
     color: #555;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-
-  .film-box em {
-    font-weight: normal;
-    font-size: 0.85rem;
-    color: #777;
+    cursor: pointer;
   }
 
   .film-box:hover {
@@ -225,21 +223,33 @@ import mc3 from '../assets/comedians/derek-minto.jpg';
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .event-note {
-    font-style: italic;
+  /* Awards Section */
+  .awards-block {
+    margin-top: 2rem;
     text-align: center;
-    margin: 0.5rem 0;
-    color: #ff9f50;
+    padding: 2rem;
+    background: linear-gradient(145deg, #2c2c2c, #383838);
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
-  .block-description {
-    text-align: center;
-    font-size: 0.9rem;
-    margin-top: 1rem;
-  }
-
-  .highlight {
+  .awards-title {
+    font-family: 'Caveat', cursive;
+    font-size: 2.2rem;
     color: #ff7f50;
+    margin-bottom: 0.5rem;
+  }
+
+  .awards-time {
+    font-size: 1.4rem;
     font-weight: bold;
+    color: #f5f5f5;
+    margin-bottom: 1rem;
+  }
+
+  .awards-description {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #eaeaea;
   }
 </style>

@@ -51,16 +51,26 @@ const safeTitle = title.replace(/[^a-zA-Z0-9]/g, '');
 <style>
   /* Film Box Styling */
   .film-box {
+    /* Use flex to center text vertically and horizontally */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
     padding: 0.75rem;
     background: linear-gradient(145deg, #2c2c2c, #383838);
     border-radius: 0.5rem;
-    text-align: center;
     font-size: 1rem;
     font-weight: bold;
     color: #f5f5f5;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    /* Help long words wrap and stay centered */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .film-box:hover {

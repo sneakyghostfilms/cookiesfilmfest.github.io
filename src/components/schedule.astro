@@ -7,6 +7,8 @@ import FilmBox from '../components/filmbox.astro';
 
 <section id="schedule" class="schedule-section">
   <h2 class="schedule-title">Schedule</h2>
+  <!-- Subtle click hint -->
+  <p class="click-hint">Click a film title for more info</p>
 
   <!-- Derek Minto Block -->
   <div class="schedule-block">
@@ -130,8 +132,17 @@ import FilmBox from '../components/filmbox.astro';
     font-family: 'Caveat', cursive;
     font-size: 2.5rem;
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     color: #ff7f50;
+  }
+
+  /* Subtle click hint styling */
+  .click-hint {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #bbb;
+    margin-bottom: 1.5rem;
+    font-style: italic;
   }
 
   .schedule-block {
@@ -231,6 +242,11 @@ import FilmBox from '../components/filmbox.astro';
     background: linear-gradient(145deg, #2c2c2c, #383838);
     border-radius: 1rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .awards-content {
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   .awards-title {

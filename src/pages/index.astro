@@ -9,7 +9,7 @@ import Splash from "../components/splash.astro";
 import "../styles/index.css";
 
 const { generator, site } = Astro;
-const image = "/splash_screen_thumbnail.jpg";
+const image = new URL("/splash_screen_thumbnail.jpg", site).href;
 const description = "Join us for some cookie-crumbling comedy films in Pittsburgh!";
 ---
 <!doctype html>

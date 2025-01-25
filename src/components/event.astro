@@ -9,11 +9,36 @@ import Schedule from "./schedule.astro";
     <p class="text-justify mb-8">
       We're curating a fantastic selection of the funniest films and performances just for you. Below is the detailed schedule, including screening times, live comedy acts, and interactive Q&A sessions. Don't miss out!
     </p>
-    <p class="text-justify mb-12">
-      <strong>Buy Tickets</strong>: <span class="text-gray-500 underline cursor-not-allowed">Get your tickets here</span>
-      <br />
-      <span class="text-gray-500 text-sm italic">Tickets will be available closer to the event date.</span>
+    
+    <p class="text-justify mb-12 flex justify-center">
+      <a 
+        href="https://buytickets.at/cookiesandcomedyfilmfestival/1547101" 
+        title="Buy tickets for Cookies and Comedy Film Festival"
+        class="inline-block bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg hover:scale-105 transition-all duration-300 border-2 border-white animate-glow"
+      >
+        Buy Tickets Now
+      </a>
     </p>
+    
+    
+    <style>
+      @keyframes pulse-glow {
+        0% {
+          box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+        }
+        100% {
+          box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        }
+      }
+    
+      .animate-glow {
+        animation: pulse-glow 2s infinite ease-in-out;
+      }
+    </style>
+    
 
     <!-- Schedule -->
     <Schedule />

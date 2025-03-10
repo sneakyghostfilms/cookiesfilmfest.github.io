@@ -1,6 +1,7 @@
 ---
 import "@fontsource-variable/inter";
 import Event from "../components/event.astro";
+import Awards from "../components/awards.astro";
 import Submission from "../components/submission.astro";
 import Header from "../components/header.astro";
 import Mission from "../components/mission.astro";
@@ -16,7 +17,7 @@ const wwwimage = image.startsWith("https://cookiesfilmfest.com")
 const description = "Join us for some cookie-crumbling comedy films in Pittsburgh!";
 ---
 <!doctype html>
-<html lang="en" class="h-full motion-safe:scroll-smooth" data-theme="dark"> <!-- Force dark mode -->
+<html lang="en" class="h-full motion-safe:scroll-smooth" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
@@ -44,6 +45,7 @@ const description = "Join us for some cookie-crumbling comedy films in Pittsburg
     <div class="mx-auto max-w-3xl px-8 py-32 space-y-24">
       <Mission />
       <Event />
+      <Awards />
       <Submission />
       <Contact />
     </div>

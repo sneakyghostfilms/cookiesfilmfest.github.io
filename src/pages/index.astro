@@ -17,7 +17,7 @@ const wwwimage = image.startsWith("https://cookiesfilmfest.com")
 const description = "Join us for some cookie-crumbling comedy films in Pittsburgh!";
 ---
 <!doctype html>
-<html lang="en" class="h-full motion-safe:scroll-smooth" data-theme="dark">
+<html lang="en" class="h-full motion-safe:scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
@@ -35,14 +35,15 @@ const description = "Join us for some cookie-crumbling comedy films in Pittsburg
     <meta property="og:url" content={site} />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
   </head>
 
   <body class="h-full overflow-x-hidden bg-default text-default text-base selection:bg-secondary selection:text-white">
     <Header />
     <Splash />
-    <div class="mx-auto max-w-3xl px-8 py-32 space-y-24">
+    <div class="mx-auto max-w-5xl px-8 py-24 space-y-16">
       <Mission />
       <Event />
       <Awards />

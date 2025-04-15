@@ -4,88 +4,175 @@ import SectionLayout from "../layouts/section-layout.astro";
 ---
 <SectionLayout title="Awards" id="awards">
   <Fragment slot="content">
-    <p class="text-center mb-8 text-base">
-      Here are the award-winning films from our 2025 festival! Huge thanks to all the talented filmmakers who made this such a fantastic lineup.
-    </p>
-    <div class="awards-list-box">
-      <div class="space-y-8">
-        <div class="text-center">
-          <h2 class="award-name text-2xl mb-2">Short Film</h2>
-          <p class="text-base">
-            <strong>Best:</strong> ILY, BYE <em>(Taylor James)</em>
-          </p>
-          <p class="text-base">
-            <strong>Second to One:</strong> The Wheel <em>(Thea Lux)</em>
-          </p>
+    <div class="awards-container">
+      <div class="awards-text">
+        <h3 class="awards-subtitle">2026 Awards Categories</h3>
+        <p class="awards-intro mb-6">
+          In our upcoming festival, we'll be celebrating the best in comedy filmmaking across multiple categories. 
+          Winners will receive custom certificates, festival laurels, recognition on IMDB, and of course - cookies!
+        </p>
+        <div class="awards-categories">
+          <div class="category-item">
+            <div class="category-icon">🏆</div>
+            <div class="category-content">
+              <h4 class="category-title">Best Short Film <span class="prize-highlight">$500 Cash Prize</span></h4>
+              <p>For outstanding comedy shorts between 5-20 minutes</p>
+            </div>
+          </div>
+          <div class="category-item">
+            <div class="category-icon">🏆</div>
+            <div class="category-content">
+              <h4 class="category-title">Best Super Short</h4>
+              <p>For hilarious micro-films under 5 minutes</p>
+            </div>
+          </div>
+          <div class="category-item">
+            <div class="category-icon">🏆</div>
+            <div class="category-content">
+              <h4 class="category-title">Best Foreign Film</h4>
+              <p>For excellent non-US comedy entries</p>
+            </div>
+          </div>
+          <div class="category-item">
+            <div class="category-icon">🏆</div>
+            <div class="category-content">
+              <h4 class="category-title">Best Comedic Acting</h4>
+              <p>For standout comedic performances</p>
+            </div>
+          </div>
+          <div class="category-item">
+            <div class="category-icon">🏆</div>
+            <div class="category-content">
+              <h4 class="category-title">Best Local Film</h4>
+              <p>For the best Pittsburgh-area submissions</p>
+            </div>
+          </div>
         </div>
-        <div class="text-center">
-          <h2 class="award-name text-2xl mb-2">Super Short</h2>
-          <p class="text-base">
-            <strong>Best:</strong> The One <em>(Molly Parsons and Ellery Stocker)</em>
-          </p>
-          <p class="text-base">
-            <strong>Second to <span style="font-size: 0.5rem;">The</span> One:</strong> Pizza Man <em>(Nathan Miller)</em>
-          </p>
-        </div>
-        <div class="text-center">
-          <h2 class="award-name text-2xl mb-2">Foreign Film</h2>
-          <p class="text-base">
-            <strong>Best:</strong> This is Not Norway <em>(Alicia Albares and Paco Cavero)</em>
-          </p>
-          <p class="text-base">
-            <strong>Second to One:</strong> Ms Rossi 2: Ms. Rossi Takes the Cake <em>(Pat Battistini)</em>
-          </p>
-        </div>
-        <div class="text-center">
-          <h2 class="award-name text-2xl mb-2">Comedic Acting</h2>
-          <p class="text-base">
-            <strong>Best:</strong> The Wheel <em>(Thea Lux)</em>
-          </p>
-          <p class="text-base">
-            <strong>Second to One:</strong> Turkey Lover <em>(Ted Omo)</em>
-          </p>
-        </div>
-        <div class="text-center">
-          <h2 class="award-name text-2xl mb-2">Local Short</h2>
-          <p class="text-base">
-            <strong>Best:</strong> Pizza Man <em>(Nathan Miller)</em>
-          </p>
-          <p class="text-base">
-            <strong>Second to One:</strong> Bernie <em>(Caroline Collins)</em>
-          </p>
-        </div>
-        <div class="text-center">
-          <h2 class="award-name text-2xl mb-2">Local Comedic Acting</h2>
-          <p class="text-base">
-            <strong>Best:</strong> Bernie <em>(Caroline Collins)</em>
-          </p>
-          <p class="text-base">
-            <strong>Second to One:</strong> Glazed Over <em>(Lucas Esteves)</em>
-          </p>
-        </div>
-        <div class="text-center">
-          <h2 class="award-name text-2xl mb-2">Honorable Mentions</h2>
-          <p class="text-base">Beethoven’s Great Great Great Great Great Grandchild <em>(Daniel Maggio)</em></p>
-          <p class="text-base">Goodbye Beard <em>(Ryan Iverson)</em></p>
-          <p class="text-base">SUPERCRITICAL <em>(John Osment)</em></p>
-          <p class="text-base">To Pee or Not To Pee <em>(Jamen Meistrich)</em></p>
-          <p class="text-base">With Tits <em>(Delia Morchesky)</em></p>
-        </div>
+      </div>
+      <div class="awards-image">
+        <img 
+          src="/assets/2025-event-photos/darin-performing-music.jpeg" 
+          alt="Musical performance at Cookies & Comedy Film Festival" 
+          class="rounded-lg shadow-xl awards-img"
+        />
       </div>
     </div>
   </Fragment>
 </SectionLayout>
 
 <style>
-  .award-name {
-    font-family: 'Caveat', cursive;
-    color: #ff8a00;
+  .awards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
   }
-  .awards-list-box {
-    background: linear-gradient(145deg, #2c2c2c, #383838);
-    color: #f5f5f5;
-    padding: 1.5rem;
+
+  .awards-text {
+    flex: 1;
+  }
+
+  .awards-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .awards-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .awards-subtitle {
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.01em;
+  }
+
+  .awards-intro {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  .awards-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .category-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .category-content {
+    flex: 1;
+  }
+
+  .category-title {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    color: var(--color-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .prize-highlight {
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 0.5rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    display: inline-block;
+    font-weight: 600;
+  }
+
+  .category-content p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  @media (min-width: 768px) {
+    .awards-container {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .awards-image {
+      max-width: 55%;
+    }
+    
+    .awards-img {
+      min-width: 500px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .awards-image {
+      max-width: 60%;
+    }
+    
+    .awards-img {
+      min-width: 550px;
+    }
   }
 </style>

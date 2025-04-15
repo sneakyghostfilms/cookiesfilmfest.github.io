@@ -6,34 +6,49 @@ const navItems: Array<NavItem> = [
   { title: "Our Mission", url: "#mission" },
   { title: "The Event", url: "#event" },
   { title: "Awards", url: "#awards" },
-  { title: "Submission", url: "#submission" },
+  { title: "Submit", url: "#submission" },
   { title: "Contact", url: "#contact" },
+];
+
+const pastEvents = [
+  { href: "/past-events/2025", text: "2025 Festival" },
+  // Add more past events here as needed
 ];
 ---
 
 <header
   id="page-header"
-  class="absolute bottom-0 z-20 flex w-full items-center justify-between border-b border-transparent px-8 py-4 text-white"
+  class="absolute bottom-0 z-20 flex w-full items-end justify-between px-6 sm:px-10 pb-8 text-white animate-slide-down"
 >
-  <div>
-    <div class="flex items-center gap-6">
-      <nav class="hidden sm:block">
-        <ul class="flex items-center gap-6">
+  <div class="flex items-end flex-grow-0">
+    <div class="flex items-end gap-3">
+      <nav class="block max-sm:hidden">
+        <ul class="flex flex-wrap items-end gap-3 m-0 p-0">
           {
             navItems.map(({ title, url }) => (
-              <li>
+              <li class="mb-0 mx-1 pb-0.5">
                 <a class="menu-link text-sm" href={url}>
                   {title}
                 </a>
               </li>
             ))
           }
+          <li class="dropdown-container mb-0 mx-1 pb-0.5">
+            <button id="pastEventsDropdown" class="menu-link text-sm dropdown-button">
+              Past Events <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="dropdown-content" id="pastEventsContent">
+              {pastEvents.map((event) => (
+                <a href={event.href} class="dropdown-item">{event.text}</a>
+              ))}
+            </div>
+          </li>
         </ul>
       </nav>
       <button
         id="open-nav-button"
         type="button"
-        class="btn sm:hidden"
+        class="btn btn-nav hidden max-sm:block mb-0 pb-0.5"
         aria-label="Navigation"
       >
         <Icon name="mdi:menu" class="size-8" />
@@ -46,7 +61,7 @@ const navItems: Array<NavItem> = [
             <button
               id="close-nav-button"
               type="button"
-              class="btn"
+              class="btn btn-nav"
               aria-label="Close navigation"
             >
               <Icon name="mdi:close" class="size-8" />
@@ -63,15 +78,25 @@ const navItems: Array<NavItem> = [
                   </li>
                 ))
               }
+              <li class="mobile-dropdown">
+                <span class="block py-4 text-center text-xl mobile-dropdown-title">Past Events</span>
+                <div class="mobile-dropdown-content">
+                  {pastEvents.map((event) => (
+                    <a class="block py-3 text-center text-lg" href={event.href}>
+                      {event.text}
+                    </a>
+                  ))}
+                </div>
+              </li>
             </ul>
           </nav>
         </div>
       </div>
     </div>
   </div>
-  <div class="flex items-center gap-2">
-    <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">
-      Follow us on Facebook
+  <div class="flex-shrink-0 ml-auto flex items-end">
+    <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="social-btn mb-0 pb-0.5">
+      <Icon name="mdi:facebook" class="size-5" /> Follow us 
     </a>
   </div>
 </header>
@@ -114,6 +139,98 @@ const navItems: Array<NavItem> = [
       closeMenu();
     }
   });
+
+  // Dropdown functionality for desktop
+  const dropdownButton = document.getElementById('pastEventsDropdown');
+  const dropdownContent = document.getElementById('pastEventsContent');
+  const dropdownContainer = document.querySelector('.dropdown-container');
+  
+  if (dropdownButton && dropdownContent && dropdownContainer) {
+    dropdownButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownContent.classList.toggle('show');
+      
+      // Check if there's enough space below
+      const buttonRect = dropdownButton.getBoundingClientRect();
+      const dropdownHeight = 120; // Approximate height of dropdown
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - buttonRect.bottom;
+      
+      // If not enough space below, position above
+      if (spaceBelow < dropdownHeight) {
+        dropdownContainer.classList.add('position-top');
+        dropdownContent.style.animation = 'fadeInUp 0.3s ease';
+      } else {
+        dropdownContainer.classList.remove('position-top');
+        dropdownContent.style.animation = 'fadeIn 0.3s ease';
+      }
+      
+      const arrow = dropdownButton.querySelector('.dropdown-arrow');
+      if (arrow) {
+        arrow.textContent = dropdownContent.classList.contains('show') ? '▲' : '▼';
+      }
+    });
+    
+    document.addEventListener('click', (event) => {
+      if (!dropdownButton.contains(event.target as Node)) {
+        dropdownContent.classList.remove('show');
+        const arrow = dropdownButton.querySelector('.dropdown-arrow');
+        if (arrow) {
+          arrow.textContent = '▼';
+        }
+      }
+    });
+
+    // Also check on resize and scroll
+    function checkDropdownPosition() {
+      const content = document.getElementById('pastEventsContent');
+      const container = document.querySelector('.dropdown-container');
+      const button = document.getElementById('pastEventsDropdown');
+      
+      if (content && container && button && content.classList.contains('show')) {
+        const buttonRect = button.getBoundingClientRect();
+        const dropdownHeight = 120; // Approximate height of dropdown
+        const viewportHeight = window.innerHeight;
+        const spaceBelow = viewportHeight - buttonRect.bottom;
+        
+        if (spaceBelow < dropdownHeight) {
+          container.classList.add('position-top');
+          content.style.animation = 'fadeInUp 0.3s ease';
+        } else {
+          container.classList.remove('position-top');
+          content.style.animation = 'fadeIn 0.3s ease';
+        }
+      }
+    }
+    
+    window.addEventListener('resize', checkDropdownPosition);
+    window.addEventListener('scroll', checkDropdownPosition);
+  }
+  
+  // Mobile dropdown functionality
+  const mobileDropdown = document.querySelector('.mobile-dropdown-title');
+  const mobileDropdownContent = document.querySelector('.mobile-dropdown-content');
+  
+  if (mobileDropdown && mobileDropdownContent) {
+    mobileDropdown.addEventListener('click', () => {
+      mobileDropdownContent.classList.toggle('show-mobile');
+      mobileDropdown.classList.toggle('active');
+    });
+  }
+  
+  // Ensure the header and buttons stay properly positioned
+  window.addEventListener('resize', () => {
+    if (header) {
+      if (window.innerWidth < 768) {
+        header.classList.add('mobile-header');
+      } else {
+        header.classList.remove('mobile-header');
+      }
+    }
+  });
+  
+  // Trigger once on load
+  window.dispatchEvent(new Event('resize'));
 </script>
 
 <noscript>
@@ -128,20 +245,275 @@ const navItems: Array<NavItem> = [
   .fixed-header {
     @apply fixed bottom-auto top-0;
     @apply border-default bg-default text-default;
+    animation: slideDown 0.3s ease forwards;
+    box-shadow: var(--shadow-md);
   }
+  
   .modal.is-open {
     @apply block;
   }
 
   .menu-link {
-    color: white;
-    background: rgba(0, 0, 0, 0.75);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
+    color: var(--color-secondary);
+    background-color: var(--color-background);
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
     text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    margin-bottom: 0;
+    border: 2px solid transparent;
+    font-size: 0.875rem;
+    vertical-align: middle;
+    line-height: 1.5;
   }
 
   .menu-link:hover {
-    background: rgba(0, 0, 0, 0.9);
+    background-color: var(--color-background-offset);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  .social-btn {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    max-width: 100%;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0;
+    line-height: 1.5;
+    vertical-align: middle;
+    position: relative;
+    top: -5px;
+  }
+
+  .social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background-color: var(--color-primary-dark);
+    top: -7px;
+  }
+  
+  /* Button styling */
+  .btn-nav {
+    background-color: var(--color-primary);
+    color: white;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  .btn-nav:hover {
+    background-color: var(--color-primary-dark);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Dropdown Styles */
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-button {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dropdown-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--color-background);
+    min-width: 200px;
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+    border-radius: 1rem;
+    overflow: hidden;
+    left: 0;
+    /* Automatically check if there's enough space below; if not, position above */
+    bottom: auto;
+    top: calc(100% + 0.5rem);
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+    border: 2px solid var(--color-primary);
+  }
+
+  /* Style for when dropdown should be placed above */
+  .dropdown-container.position-top .dropdown-content {
+    top: auto;
+    bottom: calc(100% + 0.5rem);
+  }
+
+  .dropdown-content.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .dropdown-item {
+    color: var(--color-secondary);
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    display: block;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .dropdown-item:hover {
+    background-color: var(--color-background-offset);
+    border-left-color: var(--color-primary);
+    padding-left: 1.25rem;
+  }
+  
+  /* Animation for dropdown */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Reverse animation for dropup */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Animation for header when it becomes fixed */
+  @keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+  
+  /* Header animation when it first appears */
+  .animate-slide-down {
+    animation: slideDown 0.5s ease-out;
+  }
+  
+  /* Mobile dropdown styles */
+  .mobile-dropdown {
+    position: relative;
+  }
+  
+  .mobile-dropdown-title {
+    position: relative;
+    cursor: pointer;
+    color: var(--color-secondary);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    margin: 0.5rem 0;
+    background-color: var(--color-background-offset);
+    border-radius: 0.75rem;
+  }
+  
+  .mobile-dropdown-title::after {
+    content: '▼';
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+    transition: transform 0.2s ease;
+  }
+  
+  .mobile-dropdown-title.active::after {
+    content: '▲';
+  }
+  
+  .mobile-dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    margin: 0 2rem;
+  }
+  
+  .mobile-dropdown-content.show-mobile {
+    max-height: 200px;
+    padding: 0.75rem 0;
+    border: 1px solid var(--color-background-offset);
+  }
+  
+  .mobile-dropdown-content a {
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+  
+  .mobile-dropdown-content a:hover {
+    background-color: var(--color-background-offset);
+    border-left-color: var(--color-primary);
+    padding-left: 1rem;
+  }
+  
+  /* Ensure menu items wrap properly */
+  .menu-link, .social-btn {
+    margin: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  /* Add styling for mobile header class */
+  .mobile-header {
+    padding-bottom: 2.5rem !important;
+  }
+  
+  /* Mobile and responsive adjustments */
+  @media (max-width: 640px) {
+    #page-header {
+      padding-bottom: 1.5rem;
+    }
+    
+    .social-btn {
+      font-size: 0.85rem;
+      padding: 0.6rem 1rem;
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 768px) {
+    #page-header {
+      padding-bottom: 2rem;
+    }
+  }
+
+  /* Show/hide navigation based on screen size */
+  @media (max-width: 639px) {
+    #open-nav-button {
+      display: block !important;
+    }
+    
+    #page-header nav {
+      display: none !important;
+    }
+  }
+  
+  @media (min-width: 640px) {
+    #open-nav-button {
+      display: none !important;
+    }
+    
+    #page-header nav {
+      display: block !important;
+    }
   }
 </style>

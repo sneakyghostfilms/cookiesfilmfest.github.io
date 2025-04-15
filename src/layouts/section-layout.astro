@@ -10,21 +10,16 @@ const { id, title } = Astro.props;
 
 <ContentSection title={title} id={id}>
   <Fragment slot="lead">
-    <div class="font-open-sans text-base leading-8 px-4">
+    <div class="section-content px-4">
       <slot name="content" />
     </div>
   </Fragment>
 </ContentSection>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&display=swap');
-
-  .font-caveat {
-    font-family: 'Caveat', cursive;
-  }
-
-  .font-open-sans {
-    font-family: 'Open Sans', sans-serif;
+  .section-content {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
   }
 </style>

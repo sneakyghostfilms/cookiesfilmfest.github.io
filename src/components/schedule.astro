@@ -3,123 +3,66 @@ import mc1 from '../assets/comedians/amir-megheri.jpg';
 import mc2 from '../assets/comedians/kayleigh-dumas.jpg';
 import mc3 from '../assets/comedians/derek-minto.jpg';
 import FilmBox from '../components/filmbox.astro';
+import { festival2025 } from '../data/festival2025.js';
+
+const blocks = festival2025.blocks;
+const awardsInfo = festival2025.awardsInfo;
+
+// Helper to map host name to image import
+const hostImages: { [key: string]: ImageMetadata } = {
+  "Derek Minto": mc3,
+  "Amir Megheri": mc1,
+  "Kayleigh Dumas": mc2,
+};
 ---
 
 <section id="schedule" class="schedule-section">
   <h2 class="schedule-title">Schedule</h2>
   <p class="click-hint">Click a film title for more info</p>
 
-  <!-- Derek Minto Block -->
-  <div class="schedule-block">
-    <div class="block-content">
-      <div class="block-header">
-        <!-- We wrap the image and the overlay text in .image-wrapper -->
-        <div class="image-wrapper">
-          <img src={mc3.src} alt="Derek Minto" class="mc-photo" />
-          <h3 class="block-name">The Derek Minto Block</h3>
-        </div>
-        <p class="block-time">12:00PM – 2:20PM</p>
-      </div>
-      <div class="block-lists-container">
-        <div class="event-note"><em>Comedy Kickoff with Derek Minto</em></div>
-        <div class="film-grid">
-          <FilmBox title="Convicts & Chocolate" />
-          <FilmBox title="Lil' Somethin' in: Clash with the Cube Demon" />
-          <FilmBox title="Slasher Sessions" />
-          <FilmBox title="Chocolate Chip" />
-          <FilmBox title="GNOME$" />
-        </div>
-        <div class="event-note"><em>Intermission with Derek Minto</em></div>
-        <div class="film-grid">
-          <FilmBox title="Pizza Man" />
-          <FilmBox title="Haircut" />
-          <FilmBox title="Goodbye Beard" />
-          <FilmBox title="Ted Gold Did It" />
-          <FilmBox title="Rysy" />
-          <FilmBox title="Latte For Jim" />
-          <FilmBox title="Dr. Taker's Every-Ailment Strips" />
-          <FilmBox title="The Allergy Table" />
-        </div>
-        <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
-      </div>
-    </div>
-  </div>
+  {blocks.map((block, blockIndex) => {
+    // Find the film index for intermission
+    const intermissionIndex = block.intermissionAfterFilm - 1;
+    const filmsBeforeIntermission = block.films.slice(0, intermissionIndex + 1);
+    const filmsAfterIntermission = block.films.slice(intermissionIndex + 1);
 
-  <!-- Amir Megheri Block -->
-  <div class="schedule-block">
-    <div class="block-content">
-      <div class="block-header">
-        <div class="image-wrapper">
-          <img src={mc1.src} alt="Amir Megheri" class="mc-photo" />
-          <h3 class="block-name">The Amir Megheri Block</h3>
+    return (
+      <div class="schedule-block">
+        <div class="block-content">
+          <div class="block-header">
+            <div class="image-wrapper">
+              <img src={hostImages[block.host].src} alt={block.host} class="mc-photo" />
+              <h3 class="block-name">{block.name}</h3>
+            </div>
+            <p class="block-time">{block.time}</p>
+          </div>
+          <div class="block-lists-container">
+            {block.kickoff && <div class="event-note"><em>{block.kickoff}</em></div>}
+            {filmsBeforeIntermission.length > 0 && (
+              <div class="film-grid">
+                {filmsBeforeIntermission.map(film => <FilmBox film={film} />)}
+              </div>
+            )}
+            {block.intermission && <div class="event-note"><em>{block.intermission}</em></div>}
+            {filmsAfterIntermission.length > 0 && (
+              <div class="film-grid">
+                {filmsAfterIntermission.map(film => <FilmBox film={film} />)}
+              </div>
+            )}
+            {block.qa && <div class="event-note"><strong>{block.qa}</strong></div>}
+          </div>
         </div>
-        <p class="block-time">2:40PM – 5:00PM</p>
       </div>
-      <div class="block-lists-container">
-        <div class="event-note"><em>Comedy Kickoff with Amir Megheri</em></div>
-        <div class="film-grid">
-          <FilmBox title="Senior Software Engineer" />
-          <FilmBox title="Bernie" />
-          <FilmBox title="Glazed Over" />
-          <FilmBox title="Lucky Saturday" />
-          <FilmBox title="SUPERCRITICAL" />
-        </div>
-        <div class="event-note"><em>Intermission with Amir Megheri</em></div>
-        <div class="film-grid">
-          <FilmBox title="This is not Norway" />
-          <FilmBox title="Dr. Pepper Movie Trailer" />
-          <FilmBox title="Wheel" />
-          <FilmBox title="The Trouble With Cake...And Eating It Too" />
-          <FilmBox title="The Ten Commandments" />
-          <FilmBox title="The Double Life of Hugh" />
-        </div>
-        <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Kayleigh Dumas Block -->
-  <div class="schedule-block">
-    <div class="block-content">
-      <div class="block-header">
-        <div class="image-wrapper">
-          <img src={mc2.src} alt="Kayleigh Dumas" class="mc-photo" />
-          <h3 class="block-name">The Kayleigh Dumas Block</h3>
-        </div>
-        <p class="block-time">5:40PM – 8:00PM</p>
-      </div>
-      <div class="block-lists-container">
-        <div class="event-note"><em>Comedy Kickoff with Kayleigh Dumas</em></div>
-        <div class="film-grid">
-          <FilmBox title="Badmouth Grandma" />
-          <FilmBox title="Cowboy Love Songs" />
-          <FilmBox title="Turkey Lover" />
-          <FilmBox title="Silent, But Deadly" />
-          <FilmBox title="With Tits" />
-          <FilmBox title="ILY, BYE" />
-          <FilmBox title="To Pee or Not To Pee" />
-        </div>
-        <div class="event-note"><em>Intermission with Kayleigh Dumas</em></div>
-        <div class="film-grid">
-          <FilmBox title="Beethoven's Great Great Great Great Great Grandchild" />
-          <FilmBox title="The One" />
-          <FilmBox title="Ms. Rossi 2: Ms. Rossi Takes The Cake" />
-          <FilmBox title="Mama Rose's Pound Cake" />
-          <FilmBox title="Gynie on the Go" />
-          <FilmBox title="Brush Me" />
-        </div>
-        <div class="event-note"><strong>Filmmaker Q&amp;A session</strong></div>
-      </div>
-    </div>
-  </div>
+    );
+  })}
 
   <!-- Awards Section -->
   <div class="awards-block">
     <div class="awards-content">
       <h3 class="awards-title">Awards Ceremony and Networking</h3>
-      <p class="awards-time">8:00PM</p>
+      <p class="awards-time">{awardsInfo.ceremony}</p>
       <p class="awards-description">
-        Join us as we honor this year’s standouts! Then try to connect with filmmakers and movie lovers while enjoying the cookie table!
+        {awardsInfo.description}
       </p>
     </div>
   </div>
@@ -135,12 +78,10 @@ import FilmBox from '../components/filmbox.astro';
   }
 
   .schedule-title {
-    font-family: 'Caveat', cursive;
-    /* clamp() ensures the title doesn’t blow up on wide screens */
     font-size: clamp(2rem, 6vw, 2.5rem);
     text-align: center;
     margin-bottom: 0.5rem;
-    color: #ff7f50;
+    color: var(--color-accent);
   }
 
   .click-hint {
@@ -149,6 +90,7 @@ import FilmBox from '../components/filmbox.astro';
     color: #bbb;
     margin-bottom: 1.5rem;
     font-style: italic;
+    font-weight: 500; /* Increased for readability */
   }
 
   /* Schedule Blocks */
@@ -200,10 +142,8 @@ import FilmBox from '../components/filmbox.astro';
     /* Avoid text-wrapping unless truly necessary */
     white-space: nowrap;
 
-    /* clamp the font so it doesn’t get too big on wide screens */
-    font-family: 'Caveat', cursive;
     font-size: clamp(1.2rem, 3vw, 1.8rem);
-    color: #ff7f50;
+    color: var(--color-accent);
 
     background: rgba(76, 76, 76, 0.8);
     padding: 0.3rem 0.8rem;
@@ -228,6 +168,7 @@ import FilmBox from '../components/filmbox.astro';
     font-style: italic;
     font-size: 1.2rem;
     color: #f5f5f5;
+    font-weight: 500; /* Increased for readability */
   }
 
   /* Film Grid */
@@ -245,8 +186,8 @@ import FilmBox from '../components/filmbox.astro';
     border-radius: 0.5rem;
     text-align: center;
     font-size: 0.9rem;
-    font-weight: bold;
-    color: #555;
+    font-weight: 600; /* Increased from bold (700) for less intense bolding */
+    color: var(--color-text); /* Use main text color for better contrast */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     cursor: pointer;
   }
@@ -273,15 +214,15 @@ import FilmBox from '../components/filmbox.astro';
   }
 
   .awards-title {
-    font-family: 'Caveat', cursive;
     font-size: clamp(1.8rem, 5vw, 2.2rem);
-    color: #ff7f50;
+    color: var(--color-accent);
     margin-bottom: 0.5rem;
+    letter-spacing: 0.01em;
   }
 
   .awards-time {
     font-size: 1.4rem;
-    font-weight: bold;
+    font-weight: 700; /* Increased from bold */
     color: #f5f5f5;
     margin-bottom: 1rem;
   }
@@ -290,5 +231,73 @@ import FilmBox from '../components/filmbox.astro';
     font-size: 1rem;
     line-height: 1.5;
     color: #eaeaea;
+    font-weight: 500; /* Increased for better readability */
+  }
+
+  .schedule-subtitle {
+    font-family: 'Comic Neue', cursive;
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.01em; /* Improved readability */
+  }
+
+  .schedule-description {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    font-weight: 500; /* Increased for better readability */
+  }
+
+  .schedule-box-title {
+    font-family: 'Comic Neue', cursive;
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.01em; /* Improved readability */
+  }
+
+  .schedule-box-time {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    font-weight: 600; /* Increased for better readability */
+  }
+
+  .schedule-events {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .schedule-event {
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+  }
+
+  .event-time {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .event-title {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.25rem;
+  }
+
+  .event-description {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9); /* Increased from 0.8 for better readability */
+    line-height: 1.4;
+    font-weight: 500; /* Increased for better readability */
   }
 </style>

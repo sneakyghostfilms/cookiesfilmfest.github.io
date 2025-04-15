@@ -4,17 +4,145 @@ import ContactForm from "../components/contactform.astro";
 ---
 <SectionLayout title="Contact Us" id="contact">
   <Fragment slot="content">
-    <div class="flex justify-center items-center mb-8">
-      <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">
-        Follow us on Facebook
-      </a>
+    <div class="contact-container">
+      <div class="contact-info">
+        <h3 class="contact-heading">Get in Touch</h3>
+        <p class="contact-text">
+          Have questions about our film festival? Want to volunteer or sponsor? We'd love to hear from you!
+        </p>
+        <div class="contact-methods">
+          <div class="contact-method">
+            <div class="method-icon">✉️</div>
+            <div class="method-details">
+              <h4>Email Us</h4>
+              <a href="mailto:info@cookiesfilmfest.com" class="method-link">
+                info@cookiesfilmfest.com
+              </a>
+            </div>
+          </div>
+          <div class="contact-method">
+            <div class="method-icon">📱</div>
+            <div class="method-details">
+              <h4>Social Media</h4>
+              <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="method-link">
+                Follow us on Facebook
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form-container">
+        <h3 class="contact-heading">Send a Message</h3>
+        <ContactForm />
+      </div>
     </div>
-    <p class="mb-4 text-left text-white">
-      You can reach out to us via email or use the contact form below.
-    </p>
-    <p class="mb-8 text-left text-white">
-      Email: <a href="mailto:info@cookiesfilmfest.com" class="text-blue-400 underline">info@cookiesfilmfest.com</a>
-    </p>
-    <ContactForm />
   </Fragment>
 </SectionLayout>
+
+<style>
+  .contact-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .contact-heading {
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 1.25rem;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .contact-heading::after {
+    content: "";
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    background-color: var(--color-primary);
+    border-radius: 3px;
+  }
+  
+  .contact-info {
+    flex: 1;
+  }
+  
+  .contact-text {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .contact-method {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+  }
+  
+  .contact-method:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .method-icon {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background-color: rgba(215, 155, 88, 0.15);
+    border-radius: 50%;
+  }
+  
+  .method-details {
+    flex: 1;
+  }
+  
+  .method-details h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    color: var(--color-secondary);
+  }
+  
+  .method-link {
+    color: var(--color-secondary);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .method-link:hover {
+    color: var(--color-primary);
+  }
+  
+  .contact-form-container {
+    flex: 1;
+  }
+  
+  @media (min-width: 768px) {
+    .contact-container {
+      flex-direction: row;
+    }
+    
+    .contact-info {
+      padding-right: 2rem;
+    }
+  }
+</style>

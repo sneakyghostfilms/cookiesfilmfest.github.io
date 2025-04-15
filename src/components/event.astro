@@ -1,47 +1,435 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
 import Map from "./map.astro";
-import Schedule from "./schedule.astro";
+import { Image } from 'astro:assets';
 ---
 
 <SectionLayout title="The Event" id="event">
   <Fragment slot="content">
-    <p class="text-justify mb-8">
-      We're curating a fantastic selection of the funniest films and performances just for you. Below is the detailed schedule, including screening times, live comedy acts, and interactive Q&A sessions. Don't miss out!
-    </p>
-    
-    <p class="text-justify mb-12 flex justify-center">
+    <div class="event-layout">
+      <div class="event-header">
+        <h3 class="event-subtitle">Next Festival - Spring 2026</h3>
+        <p class="event-description">
+          Mark your calendars! We're planning the next Cookies & Comedy Film Festival for <strong>Saturday, March 14, 2026</strong>. We'll be curating another fantastic selection of the funniest films from around the world, along with live comedy performances and of course - cookies!
+        </p>
+      </div>
 
-      <span 
-        title="Tickets are no longer available"
-        class="inline-block bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xl font-bold py-4 px-10 rounded-full shadow-lg opacity-50 pointer-events-none cursor-not-allowed"
-      >
-        Tickets Unavailable
-      </span>
-    </p>    
-    
-    <style>
-      @keyframes pulse-glow {
-        0% {
-          box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-        }
-        50% {
-          box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
-        }
-        100% {
-          box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-        }
-      }
-    
-      .animate-glow {
-        animation: pulse-glow 2s infinite ease-in-out;
-      }
-    </style>
-    
+      <div class="event-main">
+        <div class="event-details">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <h4 class="timeline-title">Film Submissions</h4>
+                <p>Opening June 1, 2025</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <h4 class="timeline-title">Schedule Announcement</h4>
+                <p>January 14, 2026</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <h4 class="timeline-title">Festival Weekend</h4>
+                <p>Saturday, March 14, 2026</p>
+              </div>
+            </div>
+          </div>
+          
+          <p class="text-justify">
+            The festival will be held at the Harris Theater in downtown Pittsburgh's Cultural District.
+          </p>
+        </div>
+        
+        <div class="event-image-container">
+          <img 
+            src="/assets/2025-event-photos/audience-2.jpeg" 
+            alt="Audience enjoying comedy films at our festival" 
+            class="event-img"
+          />
+        </div>
+      </div>
 
-    <!-- Schedule -->
-    <Schedule />
+      <div class="experience-section">
+        <h3 class="experience-title">What to Expect at Our Festival</h3>
+        <div class="photo-gallery">
+          <div class="gallery-item">
+            <img src="/assets/2025-event-photos/kayleigh-performing.jpeg" alt="Live comedy performance" class="gallery-img kayleigh-img" />
+            <p>Live comedy between film blocks</p>
+          </div>
+          <div class="gallery-item">
+            <img src="/assets/2025-event-photos/q-and-a-session.jpeg" alt="Q&A with filmmakers" class="gallery-img" />
+            <p>Engaging Q&A sessions with filmmakers</p>
+          </div>
+          <div class="gallery-item">
+            <img src="/assets/2025-event-photos/cookie-table.jpeg" alt="Cookie table at the festival" class="gallery-img" />
+            <p>Our famous cookie table</p>
+          </div>
+          <div class="gallery-item">
+            <img src="/assets/2025-event-photos/networking.jpeg" alt="Attendees networking" class="gallery-img" />
+            <p>Connect with fellow film enthusiasts</p>
+          </div>
+        </div>
+      </div>
 
-    <Map />
+      <Map />
+    </div>
+
+    <div class="testimonial-section">
+      <h3 class="testimonial-title">What Our Filmmakers Say</h3>
+      <div class="testimonial-container">
+        <div class="testimonial-image">
+          <img 
+            src="/assets/2025-event-photos/audience-1.jpeg" 
+            alt="Happy audience at Cookies & Comedy Film Festival" 
+            class="testimonial-img"
+          />
+        </div>
+        <div class="testimonial-content">
+          <p class="testimonial-quote">
+            "This was such a fun time full of truly lovely people and good films! Scott was very communicative and friendly, and the event went off without a hitch. Thanks so much for including us!"
+          </p>
+          <p class="testimonial-attribution">— Katherine Coleman, 2025 Filmmaker</p>
+          <p class="testimonial-quote">
+            "We hope to be back! Just a great experience to have as a filmmaker. The communication, venue, and crowds were great."
+          </p>
+          <p class="testimonial-attribution">— Pat Battistini, 2025 Filmmaker</p>
+        </div>
+      </div>
+      <div class="archive-link-container">
+        <p class="archive-link">Check out our <a href="/past-events/2025" class="highlight-link">2025 festival archive</a> to see what you missed!</p>
+      </div>
+    </div>
   </Fragment>
 </SectionLayout>
+
+<style>
+  .event-layout {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .event-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .event-subtitle {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 1rem;
+  }
+  
+  .event-description {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .event-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    align-items: center;
+  }
+  
+  .event-details {
+    flex: 1;
+    width: 100%;
+    max-width: 550px;
+  }
+  
+  .event-image-container {
+    flex: 1;
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .event-img {
+    width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+  
+  .timeline {
+    margin: 2rem 0;
+  }
+  
+  .timeline-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .timeline-dot {
+    width: 20px;
+    height: 20px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    margin-top: 0.25rem;
+  }
+  
+  .timeline-content {
+    flex: 1;
+  }
+  
+  .timeline-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-secondary);
+    margin-bottom: 0.25rem;
+  }
+  
+  .button-container {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+  
+  .event-btn {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.85rem 2rem;
+    border-radius: 2rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+  
+  .event-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    background-color: #c68c4a;
+  }
+  
+  /* Experience Section */
+  .experience-section {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+  
+  .experience-title {
+    font-family: 'Comic Neue', cursive;
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .photo-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .gallery-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .gallery-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .gallery-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .gallery-item p {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    color: var(--color-secondary);
+    margin-top: 0.5rem;
+  }
+  
+  /* Adjust Kayleigh's image to show her face better */
+  .kayleigh-img {
+    object-position: center 30%;
+  }
+  
+  @media (min-width: 768px) {
+    .event-main {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    
+    .event-details {
+      max-width: 42%;
+    }
+    
+    .event-image-container {
+      max-width: 55%;
+    }
+    
+    .photo-gallery {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .testimonial-container {
+      flex-direction: row;
+      align-items: center;
+    }
+    
+    .testimonial-image {
+      max-width: 65%;
+    }
+    
+    .testimonial-img {
+      min-width: 600px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .photo-gallery {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+    
+    .gallery-img {
+      min-height: 250px;
+    }
+  }
+
+  /* Testimonial section styling */
+  .testimonial-section {
+    margin-top: 3rem;
+  }
+
+  .testimonial-title {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .testimonial-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .testimonial-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .testimonial-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .testimonial-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .testimonial-quote {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-style: italic;
+    position: relative;
+    padding-left: 1.5rem;
+    font-weight: 500;
+  }
+
+  .testimonial-quote::before {
+    content: '"';
+    position: absolute;
+    left: 0;
+    top: -0.5rem;
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    opacity: 0.7;
+  }
+
+  .testimonial-attribution {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    text-align: right;
+    color: var(--color-secondary);
+  }
+
+  @media (min-width: 768px) {
+    .testimonial-container {
+      flex-direction: row;
+      align-items: center;
+    }
+    
+    .testimonial-image {
+      max-width: 65%;
+    }
+    
+    .testimonial-img {
+      min-width: 650px;
+      height: auto;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .testimonial-image {
+      max-width: 68%;
+    }
+    
+    .testimonial-img {
+      min-width: 700px;
+    }
+  }
+
+  /* Archive link styling */
+  .archive-link-container {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .archive-link {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+  }
+
+  .highlight-link {
+    color: var(--color-primary);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+  }
+
+  .highlight-link:hover {
+    color: var(--color-secondary);
+  }
+</style>

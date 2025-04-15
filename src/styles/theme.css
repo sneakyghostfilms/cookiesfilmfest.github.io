@@ -1,9 +1,55 @@
+/* Cookie-themed color palette */
+:root {
+  /* Base colors */
+  --color-primary: #d79b58; /* Soft brown/golden cookie hue */
+  --color-primary-light: #e3b882; /* Lighter version of primary */
+  --color-primary-dark: #c68c4a; /* Darker version of primary */
+  
+  --color-secondary: #2b2244; /* Warm navy/dark blueberry */
+  --color-secondary-light: #3d3161; /* Lighter version of secondary */
+  --color-secondary-dark: #221a35; /* Darker version of secondary */
+  
+  /* Text and background colors */
+  --color-text: #221a35; /* Darker text color for better readability */
+  --color-text-offset: #4a3968; /* Slightly darker version for better contrast */
+  --color-text-light: #645681; /* Lighter text for less emphasis */
+  
+  --color-background: #fbe3c4; /* Light cookie-dough beige */
+  --color-background-offset: #f5d6a8; /* Slightly darker beige for contrast */
+  --color-background-darker: #ebc88e; /* Even darker beige for additional contrast */
+  
+  /* Other UI colors */
+  --color-border: #d79b58; /* Cookie brown for borders */
+  --color-accent: #b8864b; /* Richer brown for accents, replacing orange */
+  --color-success: #5cb85c; /* Green for success messages */
+  --color-warning: #f0ad4e; /* Yellow for warnings */
+  --color-error: #d9534f; /* Red for errors */
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Keep dark theme for reference but we'll use light theme by default */
 [data-theme="dark"] {
-  --color-primary: theme("colors.pink.400");
-  --color-secondary: theme("colors.indigo.400");
-  --color-text: theme("colors.gray.50");
-  --color-text-offset: theme("colors.gray.400");
-  --color-background: theme("colors.gray.900");
-  --color-background-offset: theme("colors.gray.800");
-  --color-border: theme("colors.gray.50" / 10%);
+  --color-primary: #d79b58;
+  --color-primary-light: #e3b882;
+  --color-primary-dark: #c68c4a;
+  
+  --color-secondary: #2b2244;
+  --color-secondary-light: #3d3161;
+  --color-secondary-dark: #221a35;
+  
+  --color-text: #fbe3c4;
+  --color-text-offset: #f5d6a8;
+  --color-text-light: #d7bb8c;
+  
+  --color-background: #2b2244;
+  --color-background-offset: #3a2d5a;
+  --color-background-darker: #221a35;
+  
+  --color-border: #d79b58;
+  --color-accent: #e3b882;
 }

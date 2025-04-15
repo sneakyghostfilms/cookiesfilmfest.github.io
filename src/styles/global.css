@@ -1,23 +1,269 @@
 /* Import the fonts */
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Fredoka', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-weight: 500;
+  line-height: 1.6;
+  font-size: 1.05rem;
 }
 
-/* General styles for a, .btn, etc., if any */
-a,
-.btn {
-  transition: colors 0.2s;
-  &:hover {
-    color: var(--color-secondary);
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Nunito Sans', sans-serif;
+  color: var(--color-secondary);
+  margin-bottom: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+/* Section title styles */
+h1 {
+  font-size: 3.5rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
+/* Specific styling for h2 to match the old orange header look */
+h2.subheader-orange {
+  font-family: 'Nunito Sans', sans-serif;
+  color: var(--color-accent);
+  font-weight: 800;
+  font-size: 1.75rem;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+h2.subheader-orange::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background-color: var(--color-primary);
+  border-radius: 3px;
+}
+
+/* Button styles */
+.btn, button {
+  background-color: var(--color-primary);
+  color: white;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn:hover, button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background-color: #c68c4a;
+}
+
+.btn:active, button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Links */
+a {
+  color: var(--color-secondary);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-weight: 600;
+  position: relative;
+}
+
+a:not(.btn):not(.menu-link):not(.social-btn)::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--color-primary);
+  transition: width 0.3s ease;
+}
+
+a:not(.btn):not(.menu-link):not(.social-btn):hover::after {
+  width: 100%;
+}
+
+a:hover {
+  color: var(--color-primary);
+}
+
+/* Focus styles */
+a:focus, .btn:focus, button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(184, 134, 75, 0.5);
+}
+
+/* Containers and sections */
+section, .container {
+  padding: 3rem 2rem;
+  margin-bottom: 3rem;
+  border-radius: 1.25rem;
+  background-color: var(--color-background-offset);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+section:hover, .container:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Card styles */
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Typography adjustments */
+p {
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+}
+
+strong {
+  font-weight: 700;
+  color: var(--color-text-offset);
+}
+
+/* Improved readability for small text */
+.small-text, small, .text-sm {
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Two-column layout helper classes */
+.two-column-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.column-text {
+  flex: 1;
+}
+
+.column-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.rounded-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rounded-image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+@media (min-width: 768px) {
+  .two-column-container {
+    flex-direction: row;
+    align-items: center;
   }
-  &:focus {
-    outline: none;
-    ring: 2px var(--color-secondary);
-    ring-offset: 2px;
-    ring-offset-color: transparent;
+}
+
+/* Transitions */
+* {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: 0.3s;
+}
+
+/* Improved caption and smaller text styles */
+.caption, figcaption, .image-caption {
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text-offset);
+  font-style: italic;
+  margin-top: 0.75rem;
+}
+
+/* Enhanced heading styles for better readability */
+h4, h5, h6, .smaller-heading {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* Animation classes */
+.animate-fade-in {
+  animation: fadeIn 1s ease forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+
+/* Responsive text sizing */
+@media (max-width: 768px) {
+  h1 { font-size: 2.75rem; }
+  h2 { font-size: 2rem; }
+  h3 { font-size: 1.5rem; }
+  body { font-size: 1rem; }
+  
+  section, .container {
+    padding: 2rem 1.5rem;
   }
 }
 

@@ -4,33 +4,139 @@ import SectionLayout from "../layouts/section-layout.astro";
 
 <SectionLayout title="Our Mission" id="mission">
   <Fragment slot="content">
-    <p class="text-justify mb-8">
-      We're turning Pittsburgh into a comedy powerhouse! Our festival is packed with top-notch comedy short films from our own yinzers and funny folks from all over the globe. Expect more laughs than you can shake a pierogi at! Here’s what’s comin’ dahn the road:
-    </p>
-    <div class="text-left mb-8">
-      <ul class="list-disc pl-6 space-y-4">
-        <li><strong>Hilarious Screenings:</strong> A curated selection of the funniest films from around the world and from our talented local filmmakers.</li>
-        <li><strong>Live Comedy Acts:</strong> Film blocks hosted by Pittsburgh's top standup comics.</li>
-        <li><strong>Insightful Q&As:</strong> Interactive sessions with filmmakers.</li>
-        <li><strong>Networking Opportunities:</strong> Connect with industry professionals, fellow filmmakers, and comedy enthusiasts.</li>
-        <li><strong>Cookies:</strong> Enjoy a Pittsburgh-style cookie table at the award ceremony.</li>
-      </ul>
+    <div class="mission-layout">
+      <div class="mission-content">
+        <div class="mission-intro">
+          <p>
+            We're turning Pittsburgh into a comedy powerhouse! Our festival is packed with top-notch comedy short films from our own yinzers and funny folks from all over the globe. Expect more laughs than you can shake a pierogi at! Here's what's comin' dahn the road:
+          </p>
+        </div>
+        
+        <div class="mission-features">
+          <img 
+            src="/assets/2025-event-photos/audience-3.jpeg" 
+            alt="Audience at our comedy film festival" 
+            class="mission-image"
+          />
+          
+          <div class="features-list">
+            <ul class="list-disc space-y-3">
+              <li><strong>Hilarious Screenings:</strong> A curated selection of the funniest films from around the world and from our talented local filmmakers.</li>
+              <li><strong>Live Comedy Acts:</strong> Film blocks hosted by Pittsburgh's top standup comics.</li>
+              <li><strong>Insightful Q&As:</strong> Interactive sessions with filmmakers.</li>
+              <li><strong>Networking Opportunities:</strong> Connect with industry professionals, fellow filmmakers, and comedy enthusiasts.</li>
+              <li><strong>Cookies:</strong> Enjoy a Pittsburgh-style cookie table at the award ceremony.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <p class="tagline">
+          Come for the laughs! Stay for the cookies!
+        </p>
+      </div>
     </div>
-    <p class="text-center text-xl mt-16">
-      The Cookies and Comedy Film Festival
-    </p>
-    <p class="text-center text-2xl font-caveat highlight-text mt-8">
-      Come for the laughs! Stay for the cookies!
-    </p>
   </Fragment>
 </SectionLayout>
 
 <style>
-  .font-caveat {
-    font-family: 'Caveat', cursive;
+  .mission-layout {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-
-  .highlight-text {
-    color: #ff7f50; /* Matching color for emphasized text */
+  
+  .mission-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .mission-intro {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .mission-features {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+  }
+  
+  .mission-image {
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+  
+  .features-list {
+    width: 100%;
+    max-width: 800px;
+    padding: 0 1rem;
+  }
+  
+  .features-list ul {
+    padding-left: 1.5rem;
+  }
+  
+  .tagline {
+    font-family: 'Comic Neue', cursive;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  ul strong {
+    color: var(--color-secondary);
+    font-weight: 700;
+  }
+  
+  @media (min-width: 768px) {
+    .mission-features {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 3rem;
+    }
+    
+    .mission-image {
+      flex: 1;
+      max-width: 50%;
+    }
+    
+    .features-list {
+      flex: 1;
+      max-width: 50%;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .mission-features {
+      gap: 4rem;
+    }
+    
+    .mission-image {
+      max-width: 600px;
+    }
+    
+    .features-list {
+      max-width: calc(100% - 600px - 4rem);
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .mission-image {
+      max-width: 650px;
+    }
+    
+    .features-list {
+      max-width: calc(100% - 650px - 4rem);
+    }
   }
 </style>

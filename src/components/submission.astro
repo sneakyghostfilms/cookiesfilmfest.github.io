@@ -14,19 +14,20 @@ import SectionLayout from "../layouts/section-layout.astro";
     <div class="submission-content-disabled">
       <p class="text-center mb-14">Filmmakers around the world, submit your comedy films to the Cookies and Comedy Film Festival!</p>
       <div class="mb-8 flex justify-center">
-        <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" title="Submissions Closed" width="263" height="102" class="disabled-button">
+        <div class="submissions-closed-tag">Submissions Closed</div>
+        <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" width="263" height="102" class="disabled-button">
       </div>
-      <h2 class="font-caveat text-xl p-5 subheader-orange">Submission Guidelines:</h2>
+      <h2 class="subheader-orange">Submission Guidelines:</h2>
       <div class="text-left">
         <ul class="list-disc pl-6 space-y-4 mb-8">
           <li><strong>Genre:</strong> Films must be primarily comedy.</li>
-          <li><strong>Completion Date:</strong> Films should have been completed after January 1, 2022.</li>
+          <li><strong>Completion Date:</strong> Films should have been completed after January 1, 2023.</li>
           <li><strong>Language:</strong> Non-English films must include English subtitles.</li>
           <li><strong>Length:</strong> Films should not exceed 20 minutes.</li>
         </ul>
       </div>
       
-      <h2 class="font-caveat text-xl p-5 subheader-orange">Submission Requirements:</h2>
+      <h2 class="subheader-orange">Submission Requirements:</h2>
       <div class="text-left">
         <ul class="list-disc pl-6 space-y-4 mb-8">
           <li>Film Synopsis (50 words max)</li>
@@ -37,17 +38,17 @@ import SectionLayout from "../layouts/section-layout.astro";
           <li>Prior Festival Screenings</li>
           <li>Honors and Awards</li>
           <li>Filmmaker Contact Information</li>
-          <li>Director’s Bio (100 words max, optional)</li>
+          <li>Director's Bio (100 words max, optional)</li>
           <li>Personal Statement (100 words max, optional)</li>
         </ul>
       </div>
       
-      <h2 class="font-caveat text-xl p-5 subheader-orange">Key Dates:</h2>
+      <h2 class="subheader-orange">Key Dates:</h2>
       <div class="text-left">
         <ul class="list-disc pl-6 space-y-4 mb-14">
-          <li><strong>Submission Deadline:</strong> December 31, 2024</li>
-          <li><strong>Notification Date:</strong> January 12, 2025</li>
-          <li><strong>Festival Date:</strong> March 8, 2025</li>
+          <li><strong>Submission Deadline:</strong> December 31, 2025</li>
+          <li><strong>Notification Date:</strong> January 14, 2026</li>
+          <li><strong>Festival Date:</strong> March 14, 2026</li>
         </ul>
       </div>
     </div>
@@ -56,17 +57,15 @@ import SectionLayout from "../layouts/section-layout.astro";
 
 <style>
   .font-caveat {
-    font-family: 'Caveat', cursive;
+    /* Deprecated - Caveat font removed */
   }
 
-  .subheader-orange {
-    color: #ff7f50;
-  }
+  /* .subheader-orange now handled globally */
 
   /* Banner Styling */
   .submissions-closed-banner {
-    background: linear-gradient(145deg, #2c2c2c, #383838); /* Matches schedule/awards sections */
-    color: #ff7f50; /* Consistent with the orange headers */
+    background: linear-gradient(145deg, var(--color-primary), #c68c4a);
+    color: white;
     text-align: center;
     padding: 1.5rem;
     border-radius: 0.5rem;
@@ -75,19 +74,34 @@ import SectionLayout from "../layouts/section-layout.astro";
   }
 
   .submissions-closed-banner h2 {
-    font-family: 'Caveat', cursive;
     font-size: 2rem;
     margin-bottom: 0.5rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   /* Disabled Submission Content */
   .submission-content-disabled {
-    opacity: 0.6; /* Faded effect */
-    pointer-events: none; /* Disable interaction */
+    opacity: 0.7;
+    pointer-events: none;
   }
 
   .disabled-button {
     filter: grayscale(100%);
-    cursor: not-allowed;
+  }
+  
+  .submissions-closed-tag {
+    position: absolute;
+    background-color: var(--color-primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-top: -10px;
+    margin-left: 15px;
+  }
+
+  @media (min-width: 768px) {
+    /* No special styles needed */
   }
 </style>

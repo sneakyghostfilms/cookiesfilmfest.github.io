@@ -15,9 +15,8 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
       <div class="scroll-indicator animate-fade-in animate-delay-600">
         <a href="#mission" aria-label="Scroll to learn more" class="scroll-button">
           <span class="scroll-text">Scroll to learn more</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bounce">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bounce">
             <path d="M7 13l5 5 5-5"></path>
-            <path d="M7 7l5 5 5-5"></path>
           </svg>
         </a>
       </div>
@@ -71,20 +70,20 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
   }
 
   .scroll-indicator {
-    margin-top: 3rem;
+    margin-top: 2rem;
   }
 
   .scroll-indicator a {
     color: #fbe3c4;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     gap: 0.5rem;
     transition: transform 0.3s ease;
   }
 
   .scroll-button {
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     border-radius: 2rem;
     background-color: rgba(215, 155, 88, 0.3);
     backdrop-filter: blur(3px);
@@ -98,9 +97,8 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
   }
 
   .scroll-text {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    margin-bottom: 0.25rem;
   }
 
   .bounce {
@@ -112,10 +110,10 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
       transform: translateY(0);
     }
     40% {
-      transform: translateY(-10px);
+      transform: translateY(-5px);
     }
     60% {
-      transform: translateY(-5px);
+      transform: translateY(-3px);
     }
   }
   
@@ -158,7 +156,7 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
     }
     
     .scroll-indicator {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
     }
   }
 
@@ -168,7 +166,7 @@ import filmFestivalText from '../assets/cookies-and-comedy-text.svg';
     }
     
     .scroll-indicator {
-      margin-top: 1rem;
+      margin-top: 0.5rem;
     }
   }
 

@@ -18,7 +18,7 @@ const pastEvents = [
 
 <header
   id="page-header"
-  class="absolute bottom-0 z-20 flex w-full items-end justify-between px-6 sm:px-10 pb-8 text-white animate-slide-down"
+  class="absolute bottom-0 z-20 flex w-full items-end justify-between px-6 sm:px-10 pb-4 text-white animate-slide-down"
 >
   <div class="flex items-end flex-grow-0">
     <div class="flex items-end gap-3">
@@ -55,41 +55,43 @@ const pastEvents = [
       </button>
     </div>
     <div id="menu-modal" class="modal hidden" aria-hidden="true">
-      <div class="fixed inset-0 bg-default px-8 py-4 text-default">
-        <div class="space-y-4" role="dialog" aria-modal="true">
-          <header class="text-right">
+      <div class="mobile-menu-overlay">
+        <div class="mobile-menu-container">
+          <div class="mobile-menu-header">
             <button
               id="close-nav-button"
               type="button"
-              class="btn btn-nav"
+              class="btn btn-nav mobile-close-btn"
               aria-label="Close navigation"
             >
               <Icon name="mdi:close" class="size-8" />
             </button>
-          </header>
-          <nav>
-            <ul class="flex flex-col">
+          </div>
+          <div class="mobile-menu-content">
+            <ul class="mobile-menu-list">
               {
                 navItems.map(({ title, url }) => (
-                  <li>
-                    <a class="block py-4 text-center text-xl" href={url}>
+                  <li class="mobile-menu-item">
+                    <a class="mobile-menu-link" href={url}>
                       {title}
                     </a>
                   </li>
                 ))
               }
-              <li class="mobile-dropdown">
-                <span class="block py-4 text-center text-xl mobile-dropdown-title">Past Events</span>
-                <div class="mobile-dropdown-content">
-                  {pastEvents.map((event) => (
-                    <a class="block py-3 text-center text-lg" href={event.href}>
-                      {event.text}
-                    </a>
-                  ))}
+              <li class="mobile-menu-item">
+                <div class="mobile-dropdown">
+                  <button class="mobile-dropdown-title">Past Events <span class="dropdown-arrow">▼</span></button>
+                  <div class="mobile-dropdown-content">
+                    {pastEvents.map((event) => (
+                      <a class="mobile-menu-link mobile-submenu-link" href={event.href}>
+                        {event.text}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </li>
             </ul>
-          </nav>
+          </div>
         </div>
       </div>
     </div>
@@ -218,6 +220,59 @@ const pastEvents = [
     });
   }
   
+  // MicroModal configuration
+  MicroModal.init({
+    onShow: (modal) => {
+      document.body.style.overflow = 'hidden';
+      if (modal && modal.id) {
+        const modalElement = document.getElementById(modal.id);
+        if (modalElement) {
+          const fixedElement = modalElement.querySelector('.fixed') as HTMLElement;
+          if (fixedElement) {
+            fixedElement.scrollTop = 0;
+          }
+        }
+      }
+    },
+    onClose: (_modal) => {
+      document.body.style.overflow = '';
+    },
+    openTrigger: 'data-micromodal-trigger',
+    closeTrigger: 'data-micromodal-close',
+    disableScroll: true,
+    disableFocus: false,
+    awaitOpenAnimation: false,
+    awaitCloseAnimation: false,
+    debugMode: false
+  });
+
+  // Ensure the menu modal properly displays
+  const initializeMenuModal = () => {
+    const menuModal = document.getElementById(menuModalId);
+    if (menuModal) {
+      const menuContent = menuModal.querySelector('.fixed') as HTMLElement;
+      if (menuContent) {
+        menuContent.style.maxHeight = '100vh';
+        menuContent.style.overflowY = 'auto';
+      }
+    }
+  };
+
+  // Run on page load
+  initializeMenuModal();
+  
+  // Ensure proper scrolling in modal for landscape
+  window.addEventListener('orientationchange', () => {
+    const menuModal = document.getElementById(menuModalId);
+    if (menuModal && menuModal.classList.contains('is-open')) {
+      const menuContent = menuModal.querySelector('.fixed') as HTMLElement;
+      if (menuContent) {
+        menuContent.style.maxHeight = '100vh';
+        menuContent.style.overflowY = 'auto';
+      }
+    }
+  });
+
   // Ensure the header and buttons stay properly positioned
   window.addEventListener('resize', () => {
     if (header) {
@@ -227,6 +282,9 @@ const pastEvents = [
         header.classList.remove('mobile-header');
       }
     }
+    
+    // Also check menu modal sizing
+    initializeMenuModal();
   });
   
   // Trigger once on load
@@ -415,29 +473,47 @@ const pastEvents = [
   
   /* Mobile dropdown styles */
   .mobile-dropdown {
-    position: relative;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
   
   .mobile-dropdown-title {
-    position: relative;
-    cursor: pointer;
-    color: var(--color-secondary);
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    margin: 0.5rem 0;
-    background-color: var(--color-background-offset);
-    border-radius: 0.75rem;
+    display: flex !important;
+    width: 100% !important;
+    padding: 1rem !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    color: var(--color-secondary) !important;
+    background-color: var(--color-background-offset) !important;
+    border-radius: 2rem !important;
+    cursor: pointer !important;
+    border: 2px solid transparent !important;
+    position: relative !important;
+    font-family: 'Fredoka', sans-serif !important;
+    transition: all 0.2s ease !important;
+    box-shadow: var(--shadow-md) !important;
+    margin: 0 !important;
+    text-align: center !important;
   }
   
-  .mobile-dropdown-title::after {
-    content: '▼';
-    font-size: 0.7rem;
-    margin-left: 0.5rem;
-    transition: transform 0.2s ease;
+  .mobile-dropdown-title:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border-color: var(--color-primary) !important;
   }
   
-  .mobile-dropdown-title.active::after {
-    content: '▲';
+  .mobile-dropdown-title .dropdown-arrow {
+    display: inline-block !important;
+    margin-left: 0.5rem !important;
+    font-size: 0.7rem !important;
+    transition: transform 0.2s ease !important;
+  }
+  
+  .mobile-dropdown-title.active .dropdown-arrow {
+    transform: rotate(180deg) !important;
   }
   
   .mobile-dropdown-content {
@@ -476,23 +552,46 @@ const pastEvents = [
   /* Add styling for mobile header class */
   .mobile-header {
     padding-bottom: 2.5rem !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0;
+    right: 0;
+    background-color: transparent;
   }
   
   /* Mobile and responsive adjustments */
   @media (max-width: 640px) {
     #page-header {
-      padding-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      position: fixed !important; 
+      bottom: 0 !important;
+      left: 0;
+      right: 0;
+      background-color: transparent;
+      display: flex;
+      justify-content: space-between;
+      z-index: 50;
     }
     
     .social-btn {
       font-size: 0.85rem;
       padding: 0.6rem 1rem;
     }
+    
+    .btn-nav {
+      position: relative;
+      z-index: 51;
+    }
+    
+    .modal .fixed {
+      max-height: 100vh;
+      overflow-y: auto;
+    }
   }
   
   @media (min-width: 641px) and (max-width: 768px) {
     #page-header {
-      padding-bottom: 2rem;
+      padding-bottom: 1rem;
     }
   }
 
@@ -515,5 +614,171 @@ const pastEvents = [
     #page-header nav {
       display: block !important;
     }
+  }
+
+  /* Completely revised mobile menu styling */
+  .modal.is-open {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    overflow: hidden !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+  
+  .mobile-menu-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10000 !important;
+  }
+  
+  .mobile-menu-container {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: var(--color-background) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 1rem !important;
+    box-sizing: border-box !important;
+  }
+  
+  .mobile-menu-header {
+    position: sticky !important;
+    top: 0 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+    padding: 0.5rem !important;
+    background-color: var(--color-background) !important;
+    z-index: 1 !important;
+  }
+  
+  .mobile-close-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .mobile-menu-content {
+    flex: 1 !important;
+    width: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  
+  .mobile-menu-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 1rem 0.5rem !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    row-gap: 0 !important;
+  }
+  
+  .mobile-menu-item {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    margin: 0 0 1rem 0 !important;
+    padding: 0 !important;
+  }
+  
+  .mobile-menu-item:last-child {
+    margin-bottom: 0 !important;
+  }
+  
+  .mobile-menu-link {
+    display: block !important;
+    width: 100% !important;
+    padding: 1rem !important;
+    text-align: center !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    color: var(--color-secondary) !important;
+    background-color: var(--color-background-offset) !important;
+    border-radius: 2rem !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+    border: 2px solid transparent !important;
+    transition: all 0.2s ease !important;
+    box-shadow: var(--shadow-md) !important;
+    margin: 0 !important;
+  }
+  
+  .mobile-dropdown-content {
+    display: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin-top: 1rem !important;
+  }
+  
+  .mobile-dropdown-content.show-mobile {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+  
+  .mobile-dropdown-content.show-mobile a {
+    margin-bottom: 1rem !important;
+  }
+  
+  .mobile-dropdown-content.show-mobile a:last-child {
+    margin-bottom: 0 !important;
+  }
+  
+  /* Extra styles for extremely narrow screens */
+  @media (max-width: 320px) {
+    .mobile-menu-container {
+      padding: 0.5rem !important;
+    }
+    
+    .mobile-menu-link, 
+    .mobile-dropdown-title {
+      padding: 0.75rem !important;
+      font-size: 1rem !important;
+    }
+  }
+  
+  /* Mobile-first approach for the menu modal */
+  @media screen {
+    #menu-modal.is-open .mobile-menu-overlay,
+    #menu-modal.is-open .mobile-menu-container,
+    #menu-modal.is-open .mobile-menu-content,
+    #menu-modal.is-open .mobile-menu-list,
+    #menu-modal.is-open .mobile-menu-item,
+    #menu-modal.is-open .mobile-menu-link,
+    #menu-modal.is-open .mobile-dropdown,
+    #menu-modal.is-open .mobile-dropdown-title,
+    #menu-modal.is-open .mobile-dropdown-content.show-mobile {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+  }
+
+  .mobile-submenu-link {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 1rem !important;
   }
 </style>

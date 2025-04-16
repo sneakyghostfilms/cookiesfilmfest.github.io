@@ -15,7 +15,7 @@ import SectionLayout from "../layouts/section-layout.astro";
           <div class="category-item">
             <div class="category-icon">🏆</div>
             <div class="category-content">
-              <h4 class="category-title">Best Short Film <span class="prize-highlight">$500 Cash Prize</span></h4>
+              <h4 class="category-title">Best Short Film <span class="prize-highlight"><span class="new-badge">NEW!</span>$500 Cash Prize</span></h4>
               <p>For outstanding comedy shorts between 5-20 minutes</p>
             </div>
           </div>
@@ -136,13 +136,37 @@ import SectionLayout from "../layouts/section-layout.astro";
   .prize-highlight {
     background-color: var(--color-primary);
     color: white;
-    font-size: 0.8rem;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 0.5rem;
     margin-left: 0.5rem;
     vertical-align: middle;
     display: inline-block;
     font-weight: 600;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: prize-pulse 2s infinite;
+  }
+  
+  @keyframes prize-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  .new-badge {
+    background-color: #ff5c35;
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.3rem;
+    margin-right: 0.35rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    vertical-align: text-top;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   }
 
   .category-content p {

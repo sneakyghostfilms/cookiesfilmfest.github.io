@@ -14,9 +14,9 @@
   --color-text-offset: #4a3968; /* Slightly darker version for better contrast */
   --color-text-light: #645681; /* Lighter text for less emphasis */
   
-  --color-background: #fbe3c4; /* Light cookie-dough beige */
-  --color-background-offset: #f5d6a8; /* Slightly darker beige for contrast */
-  --color-background-darker: #ebc88e; /* Even darker beige for additional contrast */
+  --color-background: #ffffff; /* White background for clean look */
+  --color-background-offset: #fbe3c4; /* Light cookie-dough beige for content boxes */
+  --color-background-darker: #f5d6a8; /* Slightly darker beige for additional contrast */
   
   /* Other UI colors */
   --color-border: #d79b58; /* Cookie brown for borders */

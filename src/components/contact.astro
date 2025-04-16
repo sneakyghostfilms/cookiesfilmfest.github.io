@@ -1,6 +1,7 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
 import ContactForm from "../components/contactform.astro";
+import { Icon } from "astro-icon/components";
 ---
 <SectionLayout title="Contact Us" id="contact">
   <Fragment slot="content">
@@ -21,7 +22,9 @@ import ContactForm from "../components/contactform.astro";
             </div>
           </div>
           <div class="contact-method">
-            <div class="method-icon">📱</div>
+            <div class="method-icon">
+              <Icon name="mdi:facebook" class="size-6" />
+            </div>
             <div class="method-details">
               <h4>Social Media</h4>
               <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="method-link">

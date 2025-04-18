@@ -338,8 +338,8 @@ const pastEvents = [
   }
 
   .social-btn {
-    background-color: rgba(215, 155, 88, 0.3);
-    color: #fbe3c4;
+    background-color: rgba(215, 155, 88, 0.8);
+    color: var(--color-secondary);
     padding: 0.75rem 1.5rem;
     border-radius: 2rem;
     font-family: 'Fredoka', sans-serif;
@@ -359,20 +359,20 @@ const pastEvents = [
     position: relative;
     top: -5px;
     backdrop-filter: blur(3px);
-    border: 1px solid rgba(215, 155, 88, 0.5);
+    border: 1px solid rgba(215, 155, 88, 1);
   }
 
   .social-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
-    background-color: rgba(215, 155, 88, 0.5);
+    background-color: rgba(215, 155, 88, 1);
     top: -7px;
   }
   
   /* Button styling */
   .btn-nav {
-    background-color: rgba(215, 155, 88, 0.3);
-    color: #fbe3c4;
+    background-color: rgba(215, 155, 88, 0.8);
+    color: var(--color-secondary);
     box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
@@ -380,11 +380,11 @@ const pastEvents = [
     border-radius: 0.5rem;
     padding: 0.5rem;
     backdrop-filter: blur(3px);
-    border: 1px solid rgba(215, 155, 88, 0.5);
+    border: 1px solid rgba(215, 155, 88, 1);
   }
   
   .btn-nav:hover {
-    background-color: rgba(215, 155, 88, 0.5);
+    background-color: rgba(215, 155, 88, 1);
     box-shadow: var(--shadow-lg);
   }
 
@@ -679,6 +679,11 @@ const pastEvents = [
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    background-color: rgba(215, 155, 88, 0.8) !important;
+    color: var(--color-secondary) !important;
+    border: 1px solid rgba(215, 155, 88, 1) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.5rem !important;
   }
   
   .mobile-menu-content {

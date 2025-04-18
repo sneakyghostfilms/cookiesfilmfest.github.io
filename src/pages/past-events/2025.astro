@@ -87,21 +87,22 @@ const scheduleBlocks = festival2025.blocks;
       
       .back-link {
         display: inline-block;
-        background-color: var(--color-primary);
-        color: white;
+        background-color: rgba(215, 155, 88, 0.3);
+        color: var(--color-secondary);
         padding: 0.75rem 1.5rem;
         border-radius: 2rem;
         margin-top: 1rem;
         font-weight: 600;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-md);
         transition: all 0.3s ease;
+        border: 1px solid rgba(215, 155, 88, 0.5);
       }
       
       .back-link:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        background-color: #c68c4a;
-        color: white;
+        box-shadow: var(--shadow-lg);
+        background-color: rgba(215, 155, 88, 0.5);
+        color: var(--color-secondary);
       }
       
       /* Highlights section */
@@ -258,30 +259,31 @@ const scheduleBlocks = festival2025.blocks;
       
       /* Schedule blocks */
       .schedule-block {
-        background: linear-gradient(145deg, var(--color-primary), #c68c4a);
+        background-color: rgba(255, 255, 255, 0.4);
         border-radius: 1rem;
         margin-bottom: 2rem;
         overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border: none;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        color: white;
+        box-shadow: none;
+        color: var(--color-secondary);
+        border: 1px solid #b25d45;
+        transition: transform 0.3s ease;
       }
       
       .schedule-block:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: none;
+        background-color: rgba(255, 255, 255, 0.5);
       }
       
       .block-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: rgba(255, 255, 255, 0.15);
+        background-color: rgba(255, 255, 255, 0.6);
         padding: 1rem 1.5rem;
         border-top-left-radius: 1rem;
         border-top-right-radius: 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        border-bottom: 1px solid rgba(215, 155, 88, 0.2);
       }
       
       .block-info {
@@ -290,15 +292,15 @@ const scheduleBlocks = festival2025.blocks;
       
       .block-title {
         font-size: 1.5rem;
-        color: white;
+        color: var(--color-secondary);
         margin-bottom: 0.25rem;
         font-weight: 600;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        text-shadow: none;
       }
       
       .block-time {
         font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--color-text);
         font-weight: 600;
       }
       
@@ -414,9 +416,9 @@ const scheduleBlocks = festival2025.blocks;
         text-align: center;
         padding: 1rem;
         font-weight: 600;
-        background-color: rgba(255, 255, 255, 0.15);
-        color: white;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.5);
+        color: var(--color-text);
+        border-bottom: 1px solid rgba(215, 155, 88, 0.1);
       }
       
       /* Film grid styling */
@@ -425,7 +427,7 @@ const scheduleBlocks = festival2025.blocks;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 1rem;
         padding: 1rem;
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--color-background-offset);
         margin-bottom: 0;
       }
       
@@ -434,21 +436,21 @@ const scheduleBlocks = festival2025.blocks;
         padding: 0.75rem;
         font-style: italic;
         font-weight: 600;
-        background-color: rgba(255, 255, 255, 0.15);
+        background-color: rgba(255, 255, 255, 0.5);
         margin: 0;
-        color: white;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--color-text);
+        border-top: 1px solid rgba(215, 155, 88, 0.1);
+        border-bottom: 1px solid rgba(215, 155, 88, 0.1);
       }
       
       .qa-section {
         text-align: center;
         padding: 1rem;
         font-style: italic;
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--color-background-offset);
         border-bottom-left-radius: 1rem;
         border-bottom-right-radius: 1rem;
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--color-text-offset);
       }
       
       /* Awards section */
@@ -478,20 +480,21 @@ const scheduleBlocks = festival2025.blocks;
       }
       
       .award-card {
-        background: linear-gradient(145deg, var(--color-primary), #c68c4a);
+        background-color: rgba(255, 255, 255, 0.4);
         border-radius: 1rem;
         padding: 1.5rem;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        color: white;
+        box-shadow: var(--shadow-md);
+        color: var(--color-secondary);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         position: relative;
         overflow: hidden;
-        border: none;
+        border: 1px solid rgba(215, 155, 88, 0.1);
       }
       
       .award-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: var(--shadow-lg);
+        background-color: rgba(255, 255, 255, 0.5);
       }
       
       .award-card::before {
@@ -506,15 +509,15 @@ const scheduleBlocks = festival2025.blocks;
       
       .award-category-title {
         font-size: 1.5rem;
-        color: white;
+        color: var(--color-secondary);
         margin-bottom: 1rem;
         text-align: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        border-bottom: 1px solid rgba(215, 155, 88, 0.2);
         padding-bottom: 0.5rem;
         letter-spacing: 0.01em;
         position: relative;
         z-index: 1;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        text-shadow: none;
       }
       
       .category-awards {
@@ -526,18 +529,18 @@ const scheduleBlocks = festival2025.blocks;
       .award-item {
         padding: 0.75rem;
         border-radius: 0.5rem;
-        background-color: rgba(32, 22, 16, 0.9); /* Dark chocolate color */
+        background-color: var(--color-background-offset);
         transition: background-color 0.2s ease;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(215, 155, 88, 0.1);
       }
       
       .award-item:hover {
-        background-color: rgba(46, 30, 18, 0.95);
+        background-color: var(--color-background-darker);
       }
       
       .award-title {
         font-weight: 700;
-        color: white;
+        color: var(--color-secondary);
         margin-bottom: 0.25rem;
         font-size: 1.05rem;
       }
@@ -545,15 +548,15 @@ const scheduleBlocks = festival2025.blocks;
       .award-winner-name {
         font-size: 1.2rem;
         font-weight: 600;
-        color: white;
+        color: var(--color-secondary);
         margin-bottom: 0.25rem;
-        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        text-shadow: none;
       }
       
       .award-creator-name {
         font-size: 0.9rem;
         font-style: italic;
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--color-text-offset);
         font-weight: 500;
       }
 
@@ -767,26 +770,55 @@ const scheduleBlocks = festival2025.blocks;
         margin-bottom: 2rem;
         font-weight: 600;
         font-size: 1.1rem;
-        color: white;
-        background: linear-gradient(145deg, var(--color-primary), #c68c4a);
+        color: var(--color-secondary);
+        background-color: rgba(255, 255, 255, 0.4);
         padding: 1rem;
         border-radius: 0.75rem;
         max-width: 600px;
         margin-left: auto;
         margin-right: auto;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(215, 155, 88, 0.1);
       }
 
+      /* Film box styling */
+      .film-box {
+        position: relative;
+        padding: 0.75rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(215, 155, 88, 0.3);
+        border-radius: 0.75rem;
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        color: var(--color-secondary);
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 4rem;
+      }
+      
+      .film-box:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        background-color: rgba(255, 255, 255, 0.8);
+        border-color: var(--color-primary);
+      }
+      
+      .film-box-title {
+        font-size: 1rem;
+        line-height: 1.3;
+      }
+      
       /* Award indicator for film boxes */
       .film-box[data-has-award="true"] {
-        background-color: rgba(46, 30, 18, 0.95);
+        background-color: rgba(255, 255, 255, 0.7);
         border: 2px solid var(--color-primary);
       }
-      
-      .film-box[data-has-award="true"]:hover {
-        background-color: rgba(60, 40, 25, 0.95);
-      }
-      
+
       .film-box[data-has-award="true"]::after {
         content: "🏆";
         position: absolute;
@@ -1004,40 +1036,5 @@ const scheduleBlocks = festival2025.blocks;
         });
       });
     </script>
-    
-    <style is:global>
-      /* Film box styling */
-      .film-box {
-        position: relative;
-        padding: 0.75rem;
-        background-color: rgba(32, 22, 16, 0.9); /* Dark chocolate color */
-        border: 1px solid var(--color-primary);
-        border-radius: 0.75rem;
-        text-align: center;
-        font-family: 'Fredoka', sans-serif;
-        font-weight: 600;
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 4rem;
-      }
-      
-      .film-box:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        background-color: rgba(46, 30, 18, 0.95);
-        border-color: var(--color-primary);
-      }
-      
-      .film-box-title {
-        font-size: 1rem;
-        line-height: 1.3;
-      }
-    </style>
   </body>
 </html> 

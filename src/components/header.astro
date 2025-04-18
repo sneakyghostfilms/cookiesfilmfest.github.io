@@ -338,8 +338,8 @@ const pastEvents = [
   }
 
   .social-btn {
-    background-color: var(--color-primary);
-    color: white;
+    background-color: rgba(215, 155, 88, 0.3);
+    color: #fbe3c4;
     padding: 0.75rem 1.5rem;
     border-radius: 2rem;
     font-family: 'Fredoka', sans-serif;
@@ -358,29 +358,33 @@ const pastEvents = [
     vertical-align: middle;
     position: relative;
     top: -5px;
+    backdrop-filter: blur(3px);
+    border: 1px solid rgba(215, 155, 88, 0.5);
   }
 
   .social-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
-    background-color: var(--color-primary-dark);
+    background-color: rgba(215, 155, 88, 0.5);
     top: -7px;
   }
   
   /* Button styling */
   .btn-nav {
-    background-color: var(--color-primary);
-    color: white;
+    background-color: rgba(215, 155, 88, 0.3);
+    color: #fbe3c4;
     box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 0.5rem;
     padding: 0.5rem;
+    backdrop-filter: blur(3px);
+    border: 1px solid rgba(215, 155, 88, 0.5);
   }
   
   .btn-nav:hover {
-    background-color: var(--color-primary-dark);
+    background-color: rgba(215, 155, 88, 0.5);
     box-shadow: var(--shadow-lg);
   }
 

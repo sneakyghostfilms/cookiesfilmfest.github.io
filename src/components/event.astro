@@ -75,8 +75,6 @@ import { Image } from 'astro:assets';
           </div>
         </div>
       </div>
-
-      <Map />
     </div>
 
     <div class="testimonial-section">
@@ -101,9 +99,17 @@ import { Image } from 'astro:assets';
         </div>
       </div>
       <div class="archive-link-container">
+        <div class="cta-section">
+          <h3 class="cta-title">Join Us for 2026!</h3>
+          <p class="cta-description">
+            Be part of Pittsburgh's favorite comedy film festival. Submit your film, volunteer, or just mark your calendar!
+          </p>
+        </div>
         <p class="archive-link">Check out our <a href="/past-events/2025" class="highlight-link">2025 festival archive</a> to see what you missed!</p>
       </div>
     </div>
+    
+    <Map />
   </Fragment>
 </SectionLayout>
 
@@ -410,9 +416,33 @@ import { Image } from 'astro:assets';
     }
   }
 
+  /* Call to Action styling */
+  .cta-section {
+    margin: 2.5rem auto 1.5rem;
+    text-align: center;
+    max-width: 800px;
+    padding: 0 1rem;
+  }
+  
+  .cta-title {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 2.5rem;
+    color: var(--color-secondary);
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+  
+  .cta-description {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+  }
+
   /* Archive link styling */
   .archive-link-container {
-    margin-top: 2rem;
+    margin-top: 1rem;
     text-align: center;
   }
 

@@ -4,20 +4,13 @@ import SectionLayout from "../layouts/section-layout.astro";
 
 <SectionLayout title="Film Submission" id="submission">
   <Fragment slot="content">
-    <!-- Notice for Submissions Closed -->
-    <div class="submissions-closed-banner">
-      <h2>Submissions Not Yet Open</h2>
-      <p class="text-center submissions-notice">Submissions for the next Cookies and Comedy Film Festival will open soon. Check back later for updates!</p>
-    </div>
-
-    <!-- Original Content (grayed out and inactive) -->
-    <div class="submission-content-disabled">
+    <!-- Submission Content -->
+    <div class="submission-content">
       <p class="text-center mb-14">Filmmakers around the world, submit your comedy films to the Cookies and Comedy Film Festival!</p>
-      <div class="mb-8 flex justify-center relative">
-        <div class="filmfreeway-container">
-          <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" width="263" height="102" class="disabled-button">
-          <div class="coming-soon-ribbon">Coming Soon!</div>
-        </div>
+      <div class="mb-8 flex justify-center">
+        <a href="https://filmfreeway.com/festivals/81910?utm_campaign=Cookies+and+Comedy+Film+Festival&utm_medium=External&utm_source=Submission+Button" target="_blank" title="Click to submit on FilmFreeway">
+          <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" title="Click to submit on FilmFreeway" width="263" height="102">
+        </a>
       </div>
       <h2 class="subheader-orange">Submission Guidelines:</h2>
       <div class="text-left">
@@ -91,36 +84,9 @@ import SectionLayout from "../layouts/section-layout.astro";
     color: var(--color-text);
   }
 
-  /* Disabled Submission Content */
-  .submission-content-disabled {
-    opacity: 0.7;
-    pointer-events: none;
-  }
-
-  .disabled-button {
-    filter: grayscale(100%);
-    position: relative;
-  }
-  
-  .filmfreeway-container {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .coming-soon-ribbon {
-    position: absolute;
-    width: 200px;
-    top: 30px;
-    left: -40px;
-    text-align: center;
-    line-height: 30px;
-    background-color: var(--color-primary);
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-    transform: rotate(-35deg);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 1;
+  /* Submission Content */
+  .submission-content {
+    /* No special styling needed when enabled */
   }
 
   /* Remove the previous submission-closed-tag */

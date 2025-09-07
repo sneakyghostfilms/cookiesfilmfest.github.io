@@ -111,7 +111,7 @@ export const festivals = [
     city: "New Cumberland",
     month: "September",
     website: "https://musicandfilmfestival.com",
-    genre: "Music"
+    genre: null
   },
   {
     name: "Pottsville Film Festival",

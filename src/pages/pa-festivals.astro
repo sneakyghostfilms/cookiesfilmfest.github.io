@@ -119,6 +119,13 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
         margin-bottom: 3rem;
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
         border: 1px solid rgba(215, 155, 88, 0.1);
+        overflow: visible;
+        position: relative;
+      }
+      
+      .desktop-table {
+        overflow: visible;
+        position: relative;
       }
       
       .section-title {
@@ -143,13 +150,16 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
         border-collapse: collapse;
         background-color: white;
         border-radius: 0.5rem;
-        overflow: hidden;
+        overflow: visible; /* Changed from hidden to visible */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        position: relative;
       }
       
       thead tr {
         background-color: var(--color-primary);
         color: white;
+        position: relative;
+        z-index: 5;
       }
       
       th {
@@ -159,13 +169,23 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
         font-size: 1rem;
       }
       
+      tbody {
+        position: relative;
+      }
+      
       tbody tr {
         border-bottom: 1px solid rgba(215, 155, 88, 0.2);
-        transition: background-color 0.2s ease;
+        transition: all 0.3s ease;
+        position: relative;
+        background-color: white;
       }
       
       tbody tr:hover {
-        background-color: rgba(215, 155, 88, 0.05);
+        background-color: rgba(255, 255, 255, 1);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        border-radius: 0.5rem;
+        transform: translateY(-6px);
       }
       
       tbody tr:last-child {
@@ -183,14 +203,16 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
       }
       
       .our-festival-badge {
-        display: inline-block;
+        display: block;
         background-color: var(--color-secondary);
         color: white;
-        padding: 0.25rem 0.5rem;
+        padding: 0.2rem 0.4rem;
         border-radius: 0.25rem;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 700;
-        margin-right: 0.5rem;
+        margin-bottom: 0.3rem;
+        width: fit-content;
+        letter-spacing: 0.05em;
       }
       
       .festival-name {
@@ -346,7 +368,7 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
                 <tr class={index === 0 ? 'our-festival-row' : ''}>
                   <td>
                     {index === 0 && (
-                      <span class="our-festival-badge">OUR FESTIVAL</span>
+                      <div class="our-festival-badge">OUR FESTIVAL</div>
                     )}
                     <span class={index === 0 ? 'our-festival-name' : 'festival-name'}>
                       {festival.name}

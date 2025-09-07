@@ -144,6 +144,45 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
         color: var(--color-text);
       }
       
+      /* Sort controls */
+      .sort-controls {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+      
+      .sort-label {
+        display: inline-block;
+        margin-right: 1rem;
+        color: var(--color-text);
+        font-weight: 600;
+      }
+      
+      .sort-btn {
+        padding: 0.5rem 1.25rem;
+        margin: 0 0.25rem;
+        background-color: white;
+        color: var(--color-text);
+        border: 2px solid var(--color-primary);
+        border-radius: 2rem;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+      }
+      
+      .sort-btn:hover {
+        background-color: var(--color-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      
+      .sort-btn.active {
+        background-color: var(--color-primary);
+        color: white;
+      }
+      
       /* Table styles */
       table {
         width: 100%;
@@ -351,6 +390,12 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
           Discover the vibrant film festival scene across the Keystone State
         </p>
         
+        <div class="sort-controls">
+          <span class="sort-label">Sort by:</span>
+          <button class="sort-btn active" data-sort="alphabetical">Alphabetical</button>
+          <button class="sort-btn" data-sort="month">By Month</button>
+        </div>
+        
         <!-- Desktop Table -->
         <div class="desktop-table">
           <table>
@@ -428,5 +473,84 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
         </div>
       </section>
     </div>
+    
+    <script>
+      // Month order for sorting
+      const monthOrder = {
+        'January': 1, 'February': 2, 'March': 3, 'April': 4,
+        'May': 5, 'June': 6, 'July': 7, 'August': 8,
+        'September': 9, 'October': 10, 'November': 11, 'December': 12
+      };
+      
+      document.addEventListener('DOMContentLoaded', () => {
+        const sortButtons = document.querySelectorAll('.sort-btn');
+        const tableBody = document.querySelector('tbody');
+        const mobileCards = document.querySelector('.mobile-cards');
+        
+        // Store original order
+        const tableRows = Array.from(tableBody.querySelectorAll('tr'));
+        const cards = Array.from(mobileCards.querySelectorAll('.festival-card'));
+        
+        // Create arrays with sorting data
+        const festivalsData = tableRows.map((row, index) => {
+          const nameCell = row.querySelector('td:first-child');
+          const monthCell = row.querySelector('td:nth-child(3)');
+          const isOurFestival = row.classList.contains('our-festival-row');
+          const name = nameCell.querySelector('.festival-name, .our-festival-name').textContent.trim();
+          const month = monthCell.textContent.trim();
+          
+          return {
+            row: row,
+            card: cards[index],
+            name: name,
+            month: month,
+            monthNum: monthOrder[month] || 0,
+            isOurFestival: isOurFestival,
+            originalIndex: index
+          };
+        });
+        
+        function sortAlphabetically() {
+          return [...festivalsData].sort((a, b) => {
+            // Always put our festival first
+            if (a.isOurFestival) return -1;
+            if (b.isOurFestival) return 1;
+            return a.name.localeCompare(b.name);
+          });
+        }
+        
+        function sortByMonth() {
+          return [...festivalsData].sort((a, b) => {
+            const monthDiff = a.monthNum - b.monthNum;
+            if (monthDiff !== 0) return monthDiff;
+            return a.name.localeCompare(b.name);
+          });
+        }
+        
+        function updateDisplay(sorted) {
+          // Clear and re-append in new order
+          tableBody.innerHTML = '';
+          mobileCards.innerHTML = '';
+          
+          sorted.forEach(item => {
+            tableBody.appendChild(item.row);
+            mobileCards.appendChild(item.card);
+          });
+        }
+        
+        sortButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            // Update active state
+            sortButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Sort and update
+            const sortType = btn.dataset.sort;
+            const sorted = sortType === 'month' ? sortByMonth() : sortAlphabetically();
+            updateDisplay(sorted);
+          });
+        });
+      });
+    </script>
   </body>
 </html>

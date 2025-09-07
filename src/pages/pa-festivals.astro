@@ -409,13 +409,13 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
               </tr>
             </thead>
             <tbody>
-              {festivals.map((festival, index) => (
-                <tr class={index === 0 ? 'our-festival-row' : ''}>
+              {festivals.map((festival) => (
+                <tr class={festival.isOurFestival ? 'our-festival-row' : ''}>
                   <td>
-                    {index === 0 && (
+                    {festival.isOurFestival && (
                       <div class="our-festival-badge">OUR FESTIVAL</div>
                     )}
-                    <span class={index === 0 ? 'our-festival-name' : 'festival-name'}>
+                    <span class={festival.isOurFestival ? 'our-festival-name' : 'festival-name'}>
                       {festival.name}
                     </span>
                   </td>
@@ -444,9 +444,9 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
         
         <!-- Mobile Cards -->
         <div class="mobile-cards">
-          {festivals.map((festival, index) => (
-            <div class={`festival-card ${index === 0 ? 'our-festival' : ''}`}>
-              {index === 0 && (
+          {festivals.map((festival) => (
+            <div class={`festival-card ${festival.isOurFestival ? 'our-festival' : ''}`}>
+              {festival.isOurFestival && (
                 <span class="our-festival-badge">OUR FESTIVAL</span>
               )}
               <h3>{festival.name}</h3>
@@ -512,9 +512,6 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
         
         function sortAlphabetically() {
           return [...festivalsData].sort((a, b) => {
-            // Always put our festival first
-            if (a.isOurFestival) return -1;
-            if (b.isOurFestival) return 1;
             return a.name.localeCompare(b.name);
           });
         }

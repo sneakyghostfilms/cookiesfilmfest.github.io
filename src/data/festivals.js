@@ -1,14 +1,5 @@
 // Pennsylvania Film Festivals Data
 export const festivals = [
-  // Cookies and Comedy Film Festival - Listed First
-  {
-    name: "Cookies and Comedy Film Festival",
-    city: "Pittsburgh",
-    month: "March",
-    website: "https://cookiesfilmfest.com/",
-    genre: "Comedy"
-  },
-  // Other festivals in alphabetical order
   {
     name: "Allegheny Sport & Outdoor Film Festival",
     city: "Pittsburgh",
@@ -43,6 +34,14 @@ export const festivals = [
     month: "November",
     website: "https://centrefilm.org",
     genre: null
+  },
+  {
+    name: "Cookies and Comedy Film Festival",
+    city: "Pittsburgh",
+    month: "March",
+    website: "https://cookiesfilmfest.com/",
+    genre: "Comedy",
+    isOurFestival: true
   },
   {
     name: "Delaware Valley Filmmakers Showcase",

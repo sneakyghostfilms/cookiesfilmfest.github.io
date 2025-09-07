@@ -1,0 +1,410 @@
+---
+import "@fontsource-variable/inter";
+import { festivals } from "../data/festivals.js";
+
+const { generator } = Astro;
+const description = "A comprehensive list of film festivals across Pennsylvania";
+---
+
+<!doctype html>
+<html lang="en" class="h-full motion-safe:scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="generator" content={generator} />
+
+    <title>Film Festivals in Pennsylvania | Cookies and Comedy Film Festival</title>
+    <meta name="description" content={description} />
+
+    <!-- social media -->
+    <meta property="og:title" content="Film Festivals in Pennsylvania" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content={description} />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+      /* Reset and base styles - matching past events page */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      :root {
+        --color-primary: #d79b58;
+        --color-secondary: #2b2244;
+        --color-text: #221a35;
+        --color-text-offset: #4a3968;
+        --color-background: #ffffff;
+        --color-background-offset: #fbe3c4;
+        --color-background-darker: #f5d6a8;
+        --color-border: #d79b58;
+      }
+      
+      body {
+        font-family: 'Fredoka', sans-serif;
+        background-color: var(--color-background);
+        color: var(--color-text);
+        line-height: 1.5;
+        font-weight: 500;
+      }
+      
+      a {
+        color: var(--color-secondary);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      
+      a:hover {
+        color: var(--color-primary);
+      }
+      
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      
+      /* Header */
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-top: 2rem;
+      }
+      
+      .page-title {
+        font-size: 3rem;
+        color: var(--color-secondary);
+        margin-bottom: 1rem;
+        letter-spacing: 0.01em;
+      }
+      
+      .page-subtitle {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        margin-bottom: 2rem;
+        letter-spacing: 0.01em;
+      }
+      
+      .back-link {
+        display: inline-block;
+        background-color: rgba(215, 155, 88, 0.3);
+        color: var(--color-secondary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        margin-top: 1rem;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(215, 155, 88, 0.5);
+      }
+      
+      .back-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        background-color: rgba(215, 155, 88, 0.5);
+        color: var(--color-secondary);
+      }
+      
+      /* Table section */
+      .table-section {
+        background-color: var(--color-background-offset);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+      
+      .section-title {
+        font-size: 2.5rem;
+        color: var(--color-secondary);
+        text-align: center;
+        margin-bottom: 2rem;
+        letter-spacing: 0.01em;
+      }
+      
+      .section-subtitle {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--color-text);
+      }
+      
+      /* Table styles */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      thead tr {
+        background-color: var(--color-primary);
+        color: white;
+      }
+      
+      th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      
+      tbody tr {
+        border-bottom: 1px solid rgba(215, 155, 88, 0.2);
+        transition: background-color 0.2s ease;
+      }
+      
+      tbody tr:hover {
+        background-color: rgba(215, 155, 88, 0.05);
+      }
+      
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+      
+      td {
+        padding: 1rem 1.5rem;
+        color: var(--color-text);
+      }
+      
+      /* Special styling for our festival */
+      .our-festival-row {
+        background-color: rgba(215, 155, 88, 0.1);
+      }
+      
+      .our-festival-badge {
+        display: inline-block;
+        background-color: var(--color-secondary);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-right: 0.5rem;
+      }
+      
+      .festival-name {
+        font-weight: 600;
+      }
+      
+      .our-festival-name {
+        color: var(--color-primary);
+        font-weight: 700;
+      }
+      
+      /* Genre badges */
+      .genre-badge {
+        display: inline-block;
+        background-color: rgba(215, 155, 88, 0.2);
+        color: var(--color-text);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+      
+      /* Visit button */
+      .visit-btn {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--color-primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      .visit-btn:hover {
+        background-color: var(--color-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        color: white;
+      }
+      
+      .visit-btn svg {
+        margin-left: 0.25rem;
+        width: 0.75rem;
+        height: 0.75rem;
+      }
+      
+      /* Footer note */
+      .footer-note {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.9rem;
+        color: var(--color-text-offset);
+      }
+      
+      .footer-note a {
+        color: var(--color-primary);
+        text-decoration: underline;
+      }
+      
+      /* Mobile Card View */
+      .mobile-cards {
+        display: none;
+      }
+      
+      .festival-card {
+        background-color: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.2);
+      }
+      
+      .festival-card.our-festival {
+        background-color: rgba(215, 155, 88, 0.1);
+        border: 2px solid var(--color-primary);
+      }
+      
+      .festival-card h3 {
+        font-size: 1.25rem;
+        color: var(--color-secondary);
+        margin-bottom: 0.75rem;
+      }
+      
+      .festival-card .detail {
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+      }
+      
+      .festival-card .detail strong {
+        font-weight: 600;
+        color: var(--color-secondary);
+      }
+      
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+        
+        .page-title {
+          font-size: 2.5rem;
+        }
+        
+        .section-title {
+          font-size: 2rem;
+        }
+        
+        .desktop-table {
+          display: none;
+        }
+        
+        .mobile-cards {
+          display: block;
+        }
+        
+        th, td {
+          padding: 0.75rem;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1 class="page-title">Film Festivals in Pennsylvania</h1>
+        <a href="/" class="back-link">Back to Main Site</a>
+      </header>
+      
+      <section class="table-section">
+        <p class="section-subtitle">
+          Discover the vibrant film festival scene across the Keystone State
+        </p>
+        
+        <!-- Desktop Table -->
+        <div class="desktop-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Festival Name</th>
+                <th>City</th>
+                <th>Month</th>
+                <th>Genre</th>
+                <th style="text-align: center;">Website</th>
+              </tr>
+            </thead>
+            <tbody>
+              {festivals.map((festival, index) => (
+                <tr class={index === 0 ? 'our-festival-row' : ''}>
+                  <td>
+                    {index === 0 && (
+                      <span class="our-festival-badge">OUR FESTIVAL</span>
+                    )}
+                    <span class={index === 0 ? 'our-festival-name' : 'festival-name'}>
+                      {festival.name}
+                    </span>
+                  </td>
+                  <td>{festival.city}</td>
+                  <td>{festival.month}</td>
+                  <td>
+                    {festival.genre ? (
+                      <span class="genre-badge">{festival.genre}</span>
+                    ) : (
+                      <span style="color: #999;">—</span>
+                    )}
+                  </td>
+                  <td style="text-align: center;">
+                    <a href={festival.website} target="_blank" rel="noopener noreferrer" class="visit-btn">
+                      Visit
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Mobile Cards -->
+        <div class="mobile-cards">
+          {festivals.map((festival, index) => (
+            <div class={`festival-card ${index === 0 ? 'our-festival' : ''}`}>
+              {index === 0 && (
+                <span class="our-festival-badge">OUR FESTIVAL</span>
+              )}
+              <h3>{festival.name}</h3>
+              <div class="detail"><strong>City:</strong> {festival.city}</div>
+              <div class="detail"><strong>When:</strong> {festival.month}</div>
+              {festival.genre && (
+                <div class="detail"><strong>Genre:</strong> {festival.genre}</div>
+              )}
+              <div style="margin-top: 1rem;">
+                <a href={festival.website} target="_blank" rel="noopener noreferrer" class="visit-btn">
+                  Visit Website
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div class="footer-note">
+          Know of a Pennsylvania film festival not listed here? 
+          <a href="/#contact">Let us know!</a>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

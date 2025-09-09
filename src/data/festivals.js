@@ -79,6 +79,13 @@ export const festivals = [
     genre: "Animation"
   },
   {
+    name: "JFilm",
+    city: "Pittsburgh",
+    month: "April",
+    website: "https://filmpittsburgh.org",
+    genre: null
+  },
+  {
     name: "Lake Effect Film Festival",
     city: "Erie",
     month: "September",
@@ -112,6 +119,20 @@ export const festivals = [
     month: "September",
     website: "https://musicandfilmfestival.com",
     genre: null
+  },
+  {
+    name: "Northeast Pennsylvania Film Festival",
+    city: "Waverly",
+    month: "April",
+    website: "https://nepafilmfestival.com",
+    genre: null
+  },
+  {
+    name: "Poconos Horror Fest",
+    city: "East Stroudsburg",
+    month: "October",
+    website: "https://poconoshorrorfest.weebly.com",
+    genre: "Horror"
   },
   {
     name: "Pottsville Film Festival",
@@ -160,6 +181,20 @@ export const festivals = [
     city: "Williamsport",
     month: "September",
     website: "https://www.facebook.com/susquehannafilmfestival",
+    genre: null
+  },
+  {
+    name: "Three Rivers Film Festival",
+    city: "Pittsburgh",
+    month: "November",
+    website: "https://filmpittsburgh.org",
+    genre: null
+  },
+  {
+    name: "United We Heal Film Festival",
+    city: "Philadelphia",
+    month: "June",
+    website: "https://www.unitedwehealshort.com/filmfestival",
     genre: null
   },
   {

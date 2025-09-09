@@ -4,6 +4,16 @@ import { festivals } from "../data/festivals.js";
 
 const { generator } = Astro;
 const description = "A comprehensive list of film festivals across Pennsylvania";
+
+// Helper function to generate Google Maps URL for a city
+function getGoogleMapsUrl(city: string) {
+  // Handle special cases like "Lancaster/Lititz"
+  const cleanCity = city.split('/')[0].trim();
+  // Replace spaces with + for URL encoding
+  const encodedCity = cleanCity.replace(/ /g, '+');
+  // Simple search - let Google determine the best zoom level
+  return `https://www.google.com/maps/search/${encodedCity},+PA`;
+}
 ---
 
 <!doctype html>
@@ -263,6 +273,20 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
         font-weight: 700;
       }
       
+      /* City links */
+      .city-link {
+        color: var(--color-text);
+        text-decoration: none;
+        font-weight: 400;
+        transition: all 0.2s ease;
+        border-bottom: 1px dotted transparent;
+      }
+      
+      .city-link:hover {
+        color: var(--color-primary);
+        border-bottom-color: var(--color-primary);
+      }
+      
       /* Genre badges */
       .genre-badge {
         display: inline-block;
@@ -419,7 +443,15 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
                       {festival.name}
                     </span>
                   </td>
-                  <td>{festival.city}</td>
+                  <td>
+                    <a href={getGoogleMapsUrl(festival.city)} 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="city-link"
+                       title={`View ${festival.city} on Google Maps`}>
+                      {festival.city}
+                    </a>
+                  </td>
                   <td>{festival.month}</td>
                   <td>
                     {festival.genre ? (
@@ -450,7 +482,16 @@ const description = "A comprehensive list of film festivals across Pennsylvania"
                 <span class="our-festival-badge">OUR FESTIVAL</span>
               )}
               <h3>{festival.name}</h3>
-              <div class="detail"><strong>City:</strong> {festival.city}</div>
+              <div class="detail">
+                <strong>City:</strong>{' '}
+                <a href={getGoogleMapsUrl(festival.city)} 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="city-link"
+                   title={`View ${festival.city} on Google Maps`}>
+                  {festival.city}
+                </a>
+              </div>
               <div class="detail"><strong>When:</strong> {festival.month}</div>
               {festival.genre && (
                 <div class="detail"><strong>Genre:</strong> {festival.genre}</div>

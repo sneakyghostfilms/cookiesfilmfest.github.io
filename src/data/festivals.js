@@ -195,7 +195,7 @@ export const festivals = [
     city: "Philadelphia",
     month: "June",
     website: "https://www.unitedwehealshort.com/filmfestival",
-    genre: null
+    genre: "Social Justice"
   },
   {
     name: "West Chester Film Festival",

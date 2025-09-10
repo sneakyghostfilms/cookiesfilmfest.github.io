@@ -198,6 +198,13 @@ export const festivals = [
     genre: "Social Justice"
   },
   {
+    name: "Wellsboro Film Festival",
+    city: "Wellsboro",
+    month: "February",
+    website: "https://wellsborofilmfestival.com",
+    genre: null
+  },
+  {
     name: "West Chester Film Festival",
     city: "West Chester",
     month: "April",

@@ -56,22 +56,56 @@ import { Image } from 'astro:assets';
 
       <div class="experience-section">
         <h3 class="experience-title">What to Expect at Our Festival</h3>
-        <div class="photo-gallery">
-          <div class="gallery-item">
-            <img src="/assets/2025-event-photos/kayleigh-performing.jpeg" alt="Live comedy performance" class="gallery-img kayleigh-img" />
-            <p>Live comedy in each film block</p>
+
+        <!-- 2026 Comedians Section -->
+        <div class="comedians-section">
+          <h4 class="comedians-subtitle">2026 Featured Comedians</h4>
+          <div class="comedians-grid">
+            <div class="comedian-card">
+              <img
+                src="/assets/comedians/mike-zydel.jpg"
+                alt="Mike Zydel"
+                class="comedian-img mike-img"
+              />
+              <p class="comedian-name">Mike Zydel</p>
+            </div>
+            <div class="comedian-card">
+              <img
+                src="/assets/comedians/matty-malloy.jpg"
+                alt="Matty Malloy"
+                class="comedian-img matty-img"
+              />
+              <p class="comedian-name">Matty Malloy</p>
+            </div>
+            <div class="comedian-card">
+              <img
+                src="/assets/comedians/mary-warwick.jpg"
+                alt="Mary Warwick"
+                class="comedian-img mary-img"
+              />
+              <p class="comedian-name">Mary Warwick</p>
+            </div>
           </div>
-          <div class="gallery-item">
-            <img src="/assets/2025-event-photos/q-and-a-session.jpeg" alt="Q&A with filmmakers" class="gallery-img" />
-            <p>Engaging Q&A sessions with filmmakers</p>
+          <p class="comedians-description">Live comedy performances between film blocks</p>
+        </div>
+
+        <!-- Other Festival Features in Triangle Layout -->
+        <div class="features-triangle">
+          <div class="triangle-top">
+            <div class="gallery-item">
+              <img src="/assets/2025-event-photos/q-and-a-session.jpeg" alt="Q&A with filmmakers" class="gallery-img" />
+              <p>Engaging Q&A sessions with filmmakers</p>
+            </div>
           </div>
-          <div class="gallery-item">
-            <img src="/assets/2025-event-photos/cookie-table.jpeg" alt="Cookie table at the festival" class="gallery-img" />
-            <p>Our famous cookie table</p>
-          </div>
-          <div class="gallery-item">
-            <img src="/assets/2025-event-photos/networking.jpeg" alt="Attendees networking" class="gallery-img" />
-            <p>Connect with fellow film enthusiasts</p>
+          <div class="triangle-bottom">
+            <div class="gallery-item">
+              <img src="/assets/2025-event-photos/cookie-table.jpeg" alt="Cookie table at the festival" class="gallery-img" />
+              <p>Our famous cookie table</p>
+            </div>
+            <div class="gallery-item">
+              <img src="/assets/2025-event-photos/networking.jpeg" alt="Attendees networking" class="gallery-img" />
+              <p>Connect with fellow film enthusiasts</p>
+            </div>
           </div>
         </div>
       </div>
@@ -271,9 +305,133 @@ import { Image } from 'astro:assets';
     margin-top: 0.5rem;
   }
   
-  /* Adjust Kayleigh's image to show her face better */
-  .kayleigh-img {
-    object-position: center 30%;
+  /* Comedians section styling */
+  .comedians-section {
+    margin-bottom: 3rem;
+  }
+
+  .comedians-subtitle {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.4rem;
+    color: var(--color-secondary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .comedians-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .comedian-card {
+    text-align: center;
+  }
+
+  .comedian-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .comedian-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .mike-img {
+    object-position: center 20%;
+  }
+
+  .matty-img {
+    object-position: center 25%;
+  }
+
+  .mary-img {
+    object-position: center 20%;
+  }
+
+  .comedian-placeholder {
+    width: 100%;
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .comedian-placeholder::before {
+    content: '🎭';
+    position: absolute;
+    font-size: 3rem;
+    opacity: 0.2;
+  }
+
+  .placeholder-text {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    color: #999;
+    font-size: 1rem;
+    z-index: 1;
+  }
+
+  .comedian-placeholder:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .comedian-name {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    color: var(--color-secondary);
+    margin-top: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .comedians-description {
+    text-align: center;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  /* Triangle layout for other features */
+  .features-triangle {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .triangle-top {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .triangle-top .gallery-item {
+    max-width: 350px;
+  }
+
+  .triangle-bottom {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 700px;
+    margin: 0 auto;
   }
   
   @media (min-width: 768px) {
@@ -282,17 +440,17 @@ import { Image } from 'astro:assets';
       align-items: flex-start;
       justify-content: space-between;
     }
-    
+
     .event-details {
       max-width: 42%;
     }
-    
+
     .event-image-container {
       max-width: 55%;
     }
-    
-    .photo-gallery {
-      grid-template-columns: repeat(2, 1fr);
+
+    .comedians-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
     
     .testimonial-container {
@@ -310,13 +468,12 @@ import { Image } from 'astro:assets';
   }
   
   @media (min-width: 1024px) {
-    .photo-gallery {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
-    }
-    
     .gallery-img {
       min-height: 250px;
+    }
+
+    .triangle-bottom {
+      gap: 2rem;
     }
   }
 

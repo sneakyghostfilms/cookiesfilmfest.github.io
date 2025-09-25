@@ -39,40 +39,6 @@ const safeTitle = film.title.replace(/[^a-zA-Z0-9]/g, '');
   </div>
 </div>
 
-<div 
-  class="film-popup hidden" 
-  id={"popup-" + safeTitle}
-  data-safetitle={safeTitle}
->
-  <button class="close-btn" aria-label="Close Popup">&times;</button>
-  {film ? (
-    <>
-      <h3>{film['Project Title']}</h3>
-      <p><strong>Runtime:</strong> {film['Duration'] || 'Unknown'}</p>
-      {film['Genres'] && (
-        <p>
-          <strong>
-            {film['Genres'].includes(',') ? 'Comedy Subgenres:' : 'Comedy Subgenre:'}
-          </strong>{" "}
-          {film['Genres']}
-        </p>
-      )}
-      <p><strong>Synopsis:</strong> {film['Synopsis'] || 'No synopsis available.'}</p>
-      {film['Directors'] && (
-        <p>
-          <strong>
-            {film['Directors'].includes(',') ? 'Directors:' : 'Director:'}
-          </strong>{" "}
-          {film['Directors']}
-        </p>
-      )}
-      <p><strong>Country Filmed:</strong> {film['Country of Filming'] || 'Unknown'}</p>
-    </>
-  ) : (
-    <p>Details for this film are not available in the database.</p>
-  )}
-</div>
-
 <style>
   .film-box {
     position: relative;
@@ -147,62 +113,6 @@ const safeTitle = film.title.replace(/[^a-zA-Z0-9]/g, '');
     font-size: 0.85rem;
     line-height: 1.4;
     font-style: italic;
-  }
-
-  /* Popup Styling */
-  .film-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 500px;
-    background: #343434;
-    color: #f5f5f5;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    border: 2px solid #ff7f50; /* Accent Border */
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-  }
-
-  .film-popup.hidden {
-    display: none;
-  }
-
-  .film-popup h3 {
-    font-family: 'Caveat', cursive;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    color: #ff7f50; /* Accent color */
-    text-align: center;
-  }
-
-  .film-popup p {
-    margin: 0.75rem 0;
-    font-size: 1rem;
-    line-height: 1.4;
-  }
-
-  .film-popup p strong {
-    color: #ff7f50; /* Accent for headings */
-  }
-
-  .film-popup .close-btn {
-    background: none;
-    border: none;
-    font-size: 1.75rem;
-    font-weight: bold;
-    color: #f5f5f5;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    transition: color 0.2s ease;
-  }
-
-  .film-popup .close-btn:hover {
-    color: #ff7f50; /* Accent color on hover */
   }
 </style>
 

@@ -327,6 +327,31 @@ import { Image } from 'astro:assets';
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
+    position: relative;
+  }
+
+  .comedians-grid::before {
+    content: '';
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600%;
+    height: 600%;
+    background:
+      linear-gradient(0deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.1) 46%, rgba(255, 255, 255, 0.3) 48%, rgba(255, 255, 255, 0.6) 49%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.6) 51%, rgba(255, 255, 255, 0.3) 52%, rgba(255, 255, 255, 0.1) 54%, transparent 60%, transparent 100%),
+      linear-gradient(22.5deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0.25) 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.5) 51%, rgba(255, 255, 255, 0.25) 52%, rgba(255, 255, 255, 0.08) 54%, transparent 60%, transparent 100%),
+      linear-gradient(45deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0.25) 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.5) 51%, rgba(255, 255, 255, 0.25) 52%, rgba(255, 255, 255, 0.08) 54%, transparent 60%, transparent 100%),
+      linear-gradient(67.5deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0.25) 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.5) 51%, rgba(255, 255, 255, 0.25) 52%, rgba(255, 255, 255, 0.08) 54%, transparent 60%, transparent 100%),
+      linear-gradient(90deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.1) 46%, rgba(255, 255, 255, 0.3) 48%, rgba(255, 255, 255, 0.6) 49%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.6) 51%, rgba(255, 255, 255, 0.3) 52%, rgba(255, 255, 255, 0.1) 54%, transparent 60%, transparent 100%),
+      linear-gradient(112.5deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0.25) 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.5) 51%, rgba(255, 255, 255, 0.25) 52%, rgba(255, 255, 255, 0.08) 54%, transparent 60%, transparent 100%),
+      linear-gradient(135deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0.25) 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.5) 51%, rgba(255, 255, 255, 0.25) 52%, rgba(255, 255, 255, 0.08) 54%, transparent 60%, transparent 100%),
+      linear-gradient(157.5deg, transparent 0%, transparent 40%, rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0.25) 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.5) 51%, rgba(255, 255, 255, 0.25) 52%, rgba(255, 255, 255, 0.08) 54%, transparent 60%, transparent 100%),
+      radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.7) 10%, rgba(255, 255, 255, 0.4) 20%, rgba(255, 255, 255, 0.15) 30%, rgba(255, 255, 255, 0.05) 40%, transparent 50%, transparent 100%);
+    mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
+    z-index: -1;
+    pointer-events: none;
   }
 
   .comedian-card {

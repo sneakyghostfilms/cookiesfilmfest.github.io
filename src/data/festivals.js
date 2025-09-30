@@ -22,6 +22,13 @@ export const festivals = [
     genre: "Environmental"
   },
   {
+    name: "Backyard Docs Film Festival",
+    city: "Pittsburgh",
+    month: "September",
+    website: "https://www.backyarddocs.com/",
+    genre: "Documentaries"
+  },
+  {
     name: "Black Bear Film Festival",
     city: "Milford",
     month: "October",

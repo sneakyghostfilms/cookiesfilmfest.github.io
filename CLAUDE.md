@@ -53,6 +53,13 @@ The festival schedule, films, and awards are all managed through `src/data/festi
 
 **Note:** `src/data/films.json` is kept as a placeholder for the 2026 festival data. It uses a different structure (with "Project Title", "Directors", etc.) that comes from film submissions and will be transformed into the festival format when the 2026 lineup is finalized.
 
+### Pennsylvania Festivals List
+The PA festivals list is managed through `src/data/festivals.js` and displayed on the `/pa-festivals` page:
+- **Structure**: Simple array of festival objects, maintained in alphabetical order by festival name
+- **Fields**: `name` (string), `city` (string), `month` (string), `website` (string), `genre` (string or null), `isOurFestival` (optional boolean)
+- **Adding festivals**: Insert new entries in alphabetical position in the array
+- **Display**: The `src/pages/pa-festivals.astro` page automatically renders all festivals with client-side sorting by name or month
+
 ### Styling Approach
 - Uses Tailwind CSS utility classes throughout
 - Theme colors are CSS variables (--color-primary, --color-secondary, etc.)

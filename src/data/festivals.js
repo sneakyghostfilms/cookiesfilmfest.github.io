@@ -5,7 +5,7 @@ export const festivals = [
     city: "Pittsburgh",
     month: "October",
     website: "https://www.alleghenysport.com/2025-film-festival",
-    genre: "Sport, Outdoor Adventure"
+    genre: "Sport, Outdoor"
   },
   {
     name: "Allentown Film Festival",
@@ -15,18 +15,18 @@ export const festivals = [
     genre: null
   },
   {
-    name: "Beaver Falls Film Festival",
-    city: "Beaver Falls",
-    month: "April",
-    website: "https://beaverfallsfilmfestival.org",
-    genre: "Environmental"
-  },
-  {
     name: "Backyard Docs Film Festival",
     city: "Pittsburgh",
     month: "September",
     website: "https://www.backyarddocs.com/",
     genre: "Documentaries"
+  },
+  {
+    name: "Beaver Falls Film Festival",
+    city: "Beaver Falls",
+    month: "April",
+    website: "https://beaverfallsfilmfestival.org",
+    genre: "Environmental"
   },
   {
     name: "Black Bear Film Festival",
@@ -79,6 +79,13 @@ export const festivals = [
     genre: "History"
   },
   {
+    name: "Great Lakes International Film Festival",
+    city: "Erie",
+    month: "September",
+    website: "https://greatlakesfilmfest.com/",
+    genre: null
+  },
+  {
     name: "Happy Valley Animation Festival",
     city: "University Park",
     month: "March",
@@ -114,6 +121,13 @@ export const festivals = [
     genre: null
   },
   {
+    name: "Moviate Underground Film Festival",
+    city: "Harrisburg",
+    month: "May",
+    website: "https://www.moviate.org/",
+    genre: "Experimental"
+  },
+  {
     name: "Mystery Box Film Challenge",
     city: "Waverly",
     month: "April",
@@ -128,10 +142,38 @@ export const festivals = [
     genre: null
   },
   {
+    name: "New Hope Film Festival",
+    city: "New Hope",
+    month: "August",
+    website: "https://newhopefilmfestival.com/",
+    genre: null
+  },
+  {
     name: "Northeast Pennsylvania Film Festival",
     city: "Waverly",
     month: "April",
     website: "https://nepafilmfestival.com",
+    genre: null
+  },
+  {
+    name: "Philadelphia Asian American Film Festival",
+    city: "Philadelphia",
+    month: "November",
+    website: "https://paaff.org/",
+    genre: "Asian"
+  },
+  {
+    name: "Philadelphia Film Festival",
+    city: "Philadelphia",
+    month: "October",
+    website: "https://filmadelphia.org/festival/",
+    genre: null
+  },
+  {
+    name: "Philadelphia Independent Film Festival",
+    city: "Philadelphia",
+    month: "May",
+    website: "https://pifffilms.tv/",
     genre: null
   },
   {
@@ -145,7 +187,7 @@ export const festivals = [
     name: "Pottsville Film Festival",
     city: "Pottsville",
     month: "May",
-    website: "https://www.downtownpottsville.com",
+    website: "https://filmfreeway.com/ThePottsvilleFilmFestival",
     genre: null
   },
   {
@@ -182,6 +224,13 @@ export const festivals = [
     month: "August",
     website: "https://filmfreeway.com/SEPennsylvaniaTeenFilmmakersShowcase",
     genre: "Teen"
+  },
+  {
+    name: "Southside Film Festival",
+    city: "Bethlehem",
+    month: "June",
+    website: "https://southsidefilmfestival.com/",
+    genre: null
   },
   {
     name: "Susquehanna Film Festival",

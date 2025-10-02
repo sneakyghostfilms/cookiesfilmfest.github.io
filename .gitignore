@@ -21,3 +21,6 @@ pnpm-debug.log*
 .DS_Store
 
 *.code-workspace
+
+# generated files
+festival-map.csv

@@ -1,0 +1,197 @@
+{
+  "Allegheny Sport & Outdoor Film Festival": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
+  },
+  "Allentown Film Festival": {
+    "lat": 40.6022059,
+    "lng": -75.4712794,
+    "city": "Allentown"
+  },
+  "Backyard Docs Film Festival": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
+  },
+  "Beaver Falls Film Festival": {
+    "lat": 40.7520097,
+    "lng": -80.3192295,
+    "city": "Beaver Falls"
+  },
+  "Black Bear Film Festival": {
+    "lat": 41.322316,
+    "lng": -74.8023882,
+    "city": "Milford"
+  },
+  "Centre Film Festival": {
+    "lat": 40.7944504,
+    "lng": -77.8616386,
+    "city": "State College"
+  },
+  "Cookies and Comedy Film Festival": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
+  },
+  "Delaware Valley Filmmakers Showcase": {
+    "lat": 41.1703592,
+    "lng": -76.8769076,
+    "city": "Montgomery"
+  },
+  "Eerie Horror Fest": {
+    "lat": 42.1294712,
+    "lng": -80.0852695,
+    "city": "Erie"
+  },
+  "Eleanor Rose International Film Festival": {
+    "lat": 40.209433,
+    "lng": -75.0020315,
+    "city": "Northampton"
+  },
+  "Gettysburg Film Festival": {
+    "lat": 39.8308973,
+    "lng": -77.231012,
+    "city": "Gettysburg"
+  },
+  "Great Lakes International Film Festival": {
+    "lat": 42.1294712,
+    "lng": -80.0852695,
+    "city": "Erie"
+  },
+  "Happy Valley Animation Festival": {
+    "lat": 40.7944504,
+    "lng": -77.8616386,
+    "city": "University Park"
+  },
+  "JFilm": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
+  },
+  "Lake Effect Film Festival": {
+    "lat": 42.1294712,
+    "lng": -80.0852695,
+    "city": "Erie"
+  },
+  "Media Film Festival": {
+    "lat": 39.9167783,
+    "lng": -75.387693,
+    "city": "Media"
+  },
+  "Mount Gretna International Film Festival": {
+    "lat": 40.2463587,
+    "lng": -76.4703213,
+    "city": "Mount Gretna"
+  },
+  "Moviate Underground Film Festival": {
+    "lat": 40.2663107,
+    "lng": -76.8861122,
+    "city": "Harrisburg"
+  },
+  "Mystery Box Film Challenge": {
+    "lat": 41.5259169,
+    "lng": -75.7059395,
+    "city": "Waverly"
+  },
+  "New Cumberland Music + Film Festival": {
+    "lat": 40.2284433,
+    "lng": -76.8673781,
+    "city": "New Cumberland"
+  },
+  "New Hope Film Festival": {
+    "lat": 40.3642728,
+    "lng": -74.9512785,
+    "city": "New Hope"
+  },
+  "Northeast Pennsylvania Film Festival": {
+    "lat": 41.5259169,
+    "lng": -75.7059395,
+    "city": "Waverly"
+  },
+  "Philadelphia Asian American Film Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
+  },
+  "Philadelphia Film Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
+  },
+  "Philadelphia Independent Film Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
+  },
+  "Poconos Horror Fest": {
+    "lat": 40.9995386,
+    "lng": -75.1812913,
+    "city": "East Stroudsburg"
+  },
+  "Pottsville Film Festival": {
+    "lat": 40.6851324,
+    "lng": -76.1953701,
+    "city": "Pottsville"
+  },
+  "ReadingFilmFEST": {
+    "lat": 40.335345,
+    "lng": -75.9279495,
+    "city": "Reading"
+  },
+  "Red Rose International Film Festival": {
+    "lat": 40.0379958,
+    "lng": -76.3056707,
+    "city": "Lancaster/Lititz"
+  },
+  "River Valley Film Festival": {
+    "lat": 41.2411556,
+    "lng": -77.0011096,
+    "city": "Williamsport"
+  },
+  "Route 22 Filmworks Film Festival": {
+    "lat": 40.6178915,
+    "lng": -75.3786521,
+    "city": "Bethlehem"
+  },
+  "SE PA Teen Filmmakers Showcase": {
+    "lat": 39.9597213,
+    "lng": -75.6059638,
+    "city": "West Chester"
+  },
+  "Southside Film Festival": {
+    "lat": 40.6178915,
+    "lng": -75.3786521,
+    "city": "Bethlehem"
+  },
+  "Susquehanna Film Festival": {
+    "lat": 41.2411556,
+    "lng": -77.0011096,
+    "city": "Williamsport"
+  },
+  "Three Rivers Film Festival": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
+  },
+  "United We Heal Film Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
+  },
+  "Wellsboro Film Festival": {
+    "lat": 41.7486838,
+    "lng": -77.3005305,
+    "city": "Wellsboro"
+  },
+  "West Chester Film Festival": {
+    "lat": 39.9597213,
+    "lng": -75.6059638,
+    "city": "West Chester"
+  },
+  "Whistle to the Maples Horror Film Festival": {
+    "lat": 40.9645337,
+    "lng": -76.8847639,
+    "city": "Lewisburg"
+  }
+}

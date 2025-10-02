@@ -10,7 +10,9 @@
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write **/*.astro .",
-    "clean": "rimraf dist .astro node_modules"
+    "clean": "rimraf dist .astro node_modules",
+    "geocode": "node scripts/geocode-festivals.js",
+    "export-map": "node scripts/export-map-data.js"
   },
   "devDependencies": {
     "@astrojs/tailwind": "^5.1.0",

@@ -15,6 +15,10 @@ This is the Cookies and Comedy Film Festival website - a static site built with 
 - `npm run format` - Format all code with Prettier (includes .astro files and Tailwind classes)
 - `npm run clean` - Remove node_modules, dist, and .astro directories
 
+### Festival Data Management
+- `npm run geocode` - Fetch coordinates for festivals missing location data (uses OpenStreetMap)
+- `npm run export-map` - Generate CSV file for importing into Google My Maps
+
 ## Architecture
 
 ### Technology Stack
@@ -59,6 +63,32 @@ The PA festivals list is managed through `src/data/festivals.js` and displayed o
 - **Fields**: `name` (string), `city` (string), `month` (string), `website` (string), `genre` (string or null), `isOurFestival` (optional boolean)
 - **Adding festivals**: Insert new entries in alphabetical position in the array
 - **Display**: The `src/pages/pa-festivals.astro` page automatically renders all festivals with client-side sorting by name or month
+
+#### Geocoding Festival Locations
+Festival coordinates are stored separately in `src/data/festival-locations.json` and are used to generate maps for visualization:
+
+- **After adding new festivals**, run `npm run geocode` to fetch coordinates from OpenStreetMap (Nominatim)
+  - The script only geocodes festivals missing coordinates (incremental updates)
+  - Uses city-level coordinates (not specific venues) since festivals may change locations
+  - Respects Nominatim rate limits (1 request/second)
+
+- **To generate a map for Google My Maps**, run `npm run export-map`
+  - Creates `festival-map.csv` with all festivals that have coordinates
+  - Import this CSV into Google My Maps to create an interactive map
+  - Festival name is the key that ties festivals.js to festival-locations.json
+
+- **Location data format**: JSON object keyed by festival name:
+  ```json
+  {
+    "Festival Name": {
+      "lat": 40.4406,
+      "lng": -79.9959,
+      "city": "Pittsburgh"
+    }
+  }
+  ```
+
+- **Note**: Coordinates are city-level approximations. Maps should include a disclaimer that locations are not venue-specific.
 
 ### Styling Approach
 - Uses Tailwind CSS utility classes throughout

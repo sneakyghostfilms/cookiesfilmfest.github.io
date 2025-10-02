@@ -33,6 +33,50 @@ function escapeCSV(value) {
   return str;
 }
 
+function applyJitter(festivals, locations) {
+  // Group festivals by their base coordinates
+  const coordGroups = new Map();
+
+  festivals.forEach(festival => {
+    const location = locations[festival.name];
+    if (!location) return;
+
+    const key = `${location.lat},${location.lng}`;
+    if (!coordGroups.has(key)) {
+      coordGroups.set(key, []);
+    }
+    coordGroups.get(key).push({ festival, location });
+  });
+
+  // Apply jitter to groups with multiple festivals
+  const jitteredLocations = {};
+
+  coordGroups.forEach((group, coordKey) => {
+    if (group.length === 1) {
+      // Single festival at this location - no jitter needed
+      jitteredLocations[group[0].festival.name] = group[0].location;
+    } else {
+      // Multiple festivals - arrange in circle
+      const baseLocation = group[0].location;
+      const radius = group.length <= 4 ? 0.01 : 0.015; // ~1km or ~1.5km
+
+      group.forEach((item, index) => {
+        const angle = (index * 2 * Math.PI) / group.length;
+        const latOffset = radius * Math.cos(angle);
+        const lngOffset = radius * Math.sin(angle);
+
+        jitteredLocations[item.festival.name] = {
+          lat: baseLocation.lat + latOffset,
+          lng: baseLocation.lng + lngOffset,
+          city: baseLocation.city
+        };
+      });
+    }
+  });
+
+  return jitteredLocations;
+}
+
 function createCSVRow(festival, location) {
   const descriptionLines = [
     `City: ${festival.city}`,
@@ -82,10 +126,24 @@ async function main() {
     process.exit(1);
   }
 
+  // Apply jitter to prevent overlapping markers
+  console.log('\n🎯 Applying coordinate jitter to prevent marker overlap...');
+  const jitteredLocations = applyJitter(withCoords, locations);
+
+  // Count cities with multiple festivals
+  const coordGroups = new Map();
+  withCoords.forEach(festival => {
+    const loc = locations[festival.name];
+    const key = `${loc.lat},${loc.lng}`;
+    coordGroups.set(key, (coordGroups.get(key) || 0) + 1);
+  });
+  const citiesWithMultiple = Array.from(coordGroups.values()).filter(count => count > 1).length;
+  console.log(`   Jittered ${citiesWithMultiple} location(s) with multiple festivals`);
+
   // Create CSV content
   const headers = ['Name', 'Latitude', 'Longitude', 'Description', 'Website'];
   const rows = withCoords.map(festival =>
-    createCSVRow(festival, locations[festival.name])
+    createCSVRow(festival, jitteredLocations[festival.name])
   );
 
   const csv = [headers.join(','), ...rows].join('\n');

@@ -156,6 +156,13 @@ export const festivals = [
     genre: null
   },
   {
+    name: "Oil Valley Film Festival",
+    city: "Oil City",
+    month: "September",
+    website: "https://oilvalleyfilmfestival.weebly.com/",
+    genre: null
+  },
+  {
     name: "Philadelphia Asian American Film Festival",
     city: "Philadelphia",
     month: "November",
@@ -175,6 +182,27 @@ export const festivals = [
     month: "May",
     website: "https://pifffilms.tv/",
     genre: null
+  },
+  {
+    name: "Pittsburgh Independent Film Festival",
+    city: "Pittsburgh",
+    month: "June",
+    website: "http://www.pghindie.com/",
+    genre: null
+  },
+  {
+    name: "Pittsburgh International Dance Film Festival",
+    city: "Pittsburgh",
+    month: "March",
+    website: "https://www.shanasimmonsdance.com/pidff.html",
+    genre: "Dance"
+  },
+  {
+    name: "Pittsburgh Moving Picture Festival",
+    city: "Pittsburgh",
+    month: "October",
+    website: "https://filmfreeway.com/ThePittsburghMovingPictureFestival",
+    genre: "Horror, Thriller"
   },
   {
     name: "Poconos Horror Fest",

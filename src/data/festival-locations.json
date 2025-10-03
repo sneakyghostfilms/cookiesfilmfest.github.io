@@ -193,5 +193,25 @@
     "lat": 40.9645337,
     "lng": -76.8847639,
     "city": "Lewisburg"
+  },
+  "Oil Valley Film Festival": {
+    "lat": 41.433948,
+    "lng": -79.706441,
+    "city": "Oil City"
+  },
+  "Pittsburgh Independent Film Festival": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
+  },
+  "Pittsburgh International Dance Film Festival": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
+  },
+  "Pittsburgh Moving Picture Festival": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
   }
 }

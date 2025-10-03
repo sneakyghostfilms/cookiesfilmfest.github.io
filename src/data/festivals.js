@@ -36,6 +36,13 @@ export const festivals = [
     genre: null
   },
   {
+    name: "BlackStar Film Festival",
+    city: "Philadelphia",
+    month: "July",
+    website: "https://www.blackstarfest.org/",
+    genre: "Black Cinema"
+  },
+  {
     name: "Centre Film Festival",
     city: "State College",
     month: "November",
@@ -184,6 +191,13 @@ export const festivals = [
     genre: null
   },
   {
+    name: "Philadelphia Latino Arts & Film Festival",
+    city: "Philadelphia",
+    month: "May",
+    website: "https://www.phlaff.org/",
+    genre: "Latino"
+  },
+  {
     name: "Pittsburgh Independent Film Festival",
     city: "McKees Rocks",
     month: "June",
@@ -224,6 +238,13 @@ export const festivals = [
     month: "October",
     website: "https://ReadingFilmFEST.org",
     genre: null
+  },
+  {
+    name: "Reel Q",
+    city: "Pittsburgh",
+    month: "October",
+    website: "https://reelq.org/",
+    genre: "LGBTQ+"
   },
   {
     name: "Red Rose International Film Festival",

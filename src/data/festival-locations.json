@@ -213,5 +213,20 @@
     "lat": 40.5403417,
     "lng": -80.1805269,
     "city": "Sewickley"
+  },
+  "BlackStar Film Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
+  },
+  "Philadelphia Latino Arts & Film Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
+  },
+  "Reel Q": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
   }
 }

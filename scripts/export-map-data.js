@@ -96,6 +96,7 @@ function createCSVRow(festival, location) {
     escapeCSV(location.lng),
     escapeCSV(description),
     escapeCSV(festival.website),
+    escapeCSV(festival.submissionUrl || ''),
   ].join(',');
 }
 
@@ -141,7 +142,7 @@ async function main() {
   console.log(`   Jittered ${citiesWithMultiple} location(s) with multiple festivals`);
 
   // Create CSV content
-  const headers = ['Name', 'Latitude', 'Longitude', 'Description', 'Website'];
+  const headers = ['Name', 'Latitude', 'Longitude', 'Description', 'Website', 'Submission'];
   const rows = withCoords.map(festival =>
     createCSVRow(festival, jitteredLocations[festival.name])
   );

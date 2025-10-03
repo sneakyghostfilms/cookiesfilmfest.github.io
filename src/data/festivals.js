@@ -86,6 +86,13 @@ export const festivals = [
     genre: "History"
   },
   {
+    name: "Greater Lehigh Valley Filmmaker Festival",
+    city: "Bethlehem",
+    month: "March",
+    website: "https://www.steelstacks.org/festivals/greater-lehigh-valley-filmmaker-festival/",
+    genre: null
+  },
+  {
     name: "Great Lakes International Film Festival",
     city: "Erie",
     month: "September",
@@ -196,6 +203,20 @@ export const festivals = [
     month: "May",
     website: "https://www.phlaff.org/",
     genre: "Latino"
+  },
+  {
+    name: "Philadelphia Unnamed Film Festival",
+    city: "Philadelphia",
+    month: "October",
+    website: "https://www.phillyunnamed.org/",
+    genre: null
+  },
+  {
+    name: "Phoenixville Film Festival",
+    city: "Phoenixville",
+    month: "September",
+    website: "https://www.phoenixvillefilmfestival.com",
+    genre: null
   },
   {
     name: "Pittsburgh Independent Film Festival",

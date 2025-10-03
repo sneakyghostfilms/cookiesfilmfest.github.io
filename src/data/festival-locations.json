@@ -228,5 +228,20 @@
     "lat": 40.4416941,
     "lng": -79.9900861,
     "city": "Pittsburgh"
+  },
+  "Greater Lehigh Valley Filmmaker Festival": {
+    "lat": 40.6178915,
+    "lng": -75.3786521,
+    "city": "Bethlehem"
+  },
+  "Philadelphia Unnamed Film Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
+  },
+  "Phoenixville Film Festival": {
+    "lat": 40.1303822,
+    "lng": -75.5149128,
+    "city": "Phoenixville"
   }
 }

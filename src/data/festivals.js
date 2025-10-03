@@ -63,7 +63,7 @@ export const festivals = [
     website: "https://cookiesfilmfest.com/",
     genre: "Comedy",
     isOurFestival: true,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/CookiesFilmFest"
   },
   {
     name: "Delaware Valley Filmmakers Showcase",

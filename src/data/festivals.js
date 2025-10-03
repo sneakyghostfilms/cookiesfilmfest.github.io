@@ -40,7 +40,7 @@ export const festivals = [
     city: "Philadelphia",
     month: "July",
     website: "https://www.blackstarfest.org/",
-    genre: "Black Cinema"
+    genre: "Black, Brown & Indigenous"
   },
   {
     name: "Centre Film Festival",

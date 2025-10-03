@@ -6,7 +6,7 @@ export const festivals = [
     month: "October",
     website: "https://www.alleghenysport.com/2025-film-festival",
     genre: "Sport, Outdoor",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/alleghenysport"
   },
   {
     name: "Allentown Film Festival",
@@ -14,7 +14,7 @@ export const festivals = [
     month: "April",
     website: "https://www.allentownfilmfestival.org/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/AllentownFilmFestival"
   },
   {
     name: "Backyard Docs Film Festival",
@@ -30,7 +30,7 @@ export const festivals = [
     month: "April",
     website: "https://beaverfallsfilmfestival.org",
     genre: "Environmental",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/BeaverFallsFilmFestival"
   },
   {
     name: "Black Bear Film Festival",
@@ -38,7 +38,7 @@ export const festivals = [
     month: "October",
     website: "https://blackbearfilmfestival.org/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/BlackBearFilmFestival"
   },
   {
     name: "BlackStar Film Festival",
@@ -54,7 +54,7 @@ export const festivals = [
     month: "November",
     website: "https://centrefilm.org",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/CentreFilmFestival2025"
   },
   {
     name: "Cookies and Comedy Film Festival",
@@ -71,7 +71,7 @@ export const festivals = [
     month: "August",
     website: "https://www.oakscenter.net/delaware-valley-filmmaker",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/DelawareValleyFilmmakersShowcase"
   },
   {
     name: "Eerie Horror Fest",
@@ -79,7 +79,7 @@ export const festivals = [
     month: "October",
     website: "https://eeriehorrorfest.com/",
     genre: "Horror",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/EerieHorrorFest"
   },
   {
     name: "Eleanor Rose International Film Festival",
@@ -87,7 +87,7 @@ export const festivals = [
     month: "May",
     website: "https://www.eleanorrosefilmfestival.com/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/EleanorRoseInternationalFilmFestival"
   },
   {
     name: "Gettysburg Film Festival",
@@ -111,7 +111,7 @@ export const festivals = [
     month: "September",
     website: "https://greatlakesfilmfest.com/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/GreatLakesInternationalFilmFestival"
   },
   {
     name: "Happy Valley Animation Festival",
@@ -119,7 +119,7 @@ export const festivals = [
     month: "March",
     website: "https://www.happyvalleyanimationfestival.org",
     genre: "Animation",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/HVAF"
   },
   {
     name: "JFilm",
@@ -127,7 +127,7 @@ export const festivals = [
     month: "April",
     website: "https://filmpittsburgh.org",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/JFilmFestival"
   },
   {
     name: "Lake Effect Film Festival",
@@ -135,7 +135,7 @@ export const festivals = [
     month: "September",
     website: "https://www.rhoxonproductions.com/lakeeffectfilmfestival",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/LakeEffectFilm"
   },
   {
     name: "Media Film Festival",
@@ -143,7 +143,7 @@ export const festivals = [
     month: "March",
     website: "https://www.mediaartscouncil.org/mediafilmfestival",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/MediaFilmFestival"
   },
   {
     name: "Mount Gretna International Film Festival",
@@ -151,7 +151,7 @@ export const festivals = [
     month: "August",
     website: "https://www.mtgiff.com",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/MtGretnaArtShowandIFF"
   },
   {
     name: "Moviate Underground Film Festival",
@@ -159,7 +159,7 @@ export const festivals = [
     month: "May",
     website: "https://www.moviate.org/",
     genre: "Experimental",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/Moviate"
   },
   {
     name: "Mystery Box Film Challenge",
@@ -167,7 +167,7 @@ export const festivals = [
     month: "April",
     website: "https://mysteryboxnepa.wixsite.com/mysteryboxfilm",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/TheMysteryBoxFilmChallenge"
   },
   {
     name: "New Cumberland Music + Film Festival",
@@ -175,7 +175,7 @@ export const festivals = [
     month: "September",
     website: "https://musicandfilmfestival.com",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/NewCumberlandMusicandFilmFestival"
   },
   {
     name: "New Hope Film Festival",
@@ -183,7 +183,7 @@ export const festivals = [
     month: "August",
     website: "https://newhopefilmfestival.com/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/NewHopeFilmFestival"
   },
   {
     name: "Northeast Pennsylvania Film Festival",
@@ -191,7 +191,7 @@ export const festivals = [
     month: "April",
     website: "https://nepafilmfestival.com",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/waverlycommarts"
   },
   {
     name: "Oil Valley Film Festival",
@@ -199,7 +199,7 @@ export const festivals = [
     month: "September",
     website: "https://oilvalleyfilmfestival.weebly.com/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/oilvalleyfilmfestival"
   },
   {
     name: "Philadelphia Asian American Film Festival",
@@ -207,7 +207,7 @@ export const festivals = [
     month: "November",
     website: "https://paaff.org/",
     genre: "Asian",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/PAAFF"
   },
   {
     name: "Philadelphia Film Festival",
@@ -215,7 +215,7 @@ export const festivals = [
     month: "October",
     website: "https://filmadelphia.org/festival/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/PhiladelphiaFilmFestival"
   },
   {
     name: "Philadelphia Independent Film Festival",
@@ -223,7 +223,7 @@ export const festivals = [
     month: "May",
     website: "https://pifffilms.tv/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/piffFilms"
   },
   {
     name: "Philadelphia Latino Arts & Film Festival",
@@ -255,7 +255,7 @@ export const festivals = [
     month: "June",
     website: "http://www.pghindie.com/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/PittsburghIndependentFilmFestival"
   },
   {
     name: "Pittsburgh International Dance Film Festival",
@@ -263,7 +263,7 @@ export const festivals = [
     month: "March",
     website: "https://www.shanasimmonsdance.com/pidff.html",
     genre: "Dance",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/pittsburghinternationaldancefilmfestival"
   },
   {
     name: "Pittsburgh Moving Picture Festival",
@@ -279,7 +279,7 @@ export const festivals = [
     month: "October",
     website: "https://poconoshorrorfest.weebly.com",
     genre: "Horror",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/PoconosHorrorFest"
   },
   {
     name: "Pottsville Film Festival",
@@ -295,7 +295,7 @@ export const festivals = [
     month: "October",
     website: "https://ReadingFilmFEST.org",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/ReadingFilmFEST"
   },
   {
     name: "Reel Q",
@@ -311,7 +311,7 @@ export const festivals = [
     month: "November",
     website: "https://www.redrosefilmfestival.com",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/RedRoseFilmFestival"
   },
   {
     name: "River Valley Film Festival",
@@ -319,7 +319,7 @@ export const festivals = [
     month: "July",
     website: "https://www.lycomingarts.org/RVFF",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/RiverValleyFilmFestival"
   },
   {
     name: "Route 22 Filmworks Film Festival",
@@ -343,7 +343,7 @@ export const festivals = [
     month: "June",
     website: "https://southsidefilmfestival.com/",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/SouthSideFilmFestivalBethlehemPA"
   },
   {
     name: "Susquehanna Film Festival",
@@ -351,7 +351,7 @@ export const festivals = [
     month: "September",
     website: "https://www.facebook.com/susquehannafilmfestival",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/TheSusquehannaFilmFestival"
   },
   {
     name: "Three Rivers Film Festival",
@@ -359,7 +359,7 @@ export const festivals = [
     month: "November",
     website: "https://filmpittsburgh.org",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/ThreeRiversFilmFestival"
   },
   {
     name: "United We Heal Film Festival",
@@ -367,7 +367,7 @@ export const festivals = [
     month: "June",
     website: "https://www.unitedwehealshort.com/filmfestival",
     genre: "Social Justice",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/UnitedWeHealFilmFestival"
   },
   {
     name: "Wellsboro Film Festival",
@@ -375,7 +375,7 @@ export const festivals = [
     month: "February",
     website: "https://wellsborofilmfestival.com",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/WellsboroFilmFestival"
   },
   {
     name: "West Chester Film Festival",
@@ -383,7 +383,7 @@ export const festivals = [
     month: "April",
     website: "https://WestChesterFilmFestival.com",
     genre: null,
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/WestChesterShortFilmFestival"
   },
   {
     name: "Whistle to the Maples Horror Film Festival",
@@ -391,6 +391,6 @@ export const festivals = [
     month: "November",
     website: "https://www.pointfivefest.com/",
     genre: "Horror",
-    submissionUrl: null
+    submissionUrl: "https://filmfreeway.com/WhistletotheMaplesHorrorFilmFestival"
   }
 ];

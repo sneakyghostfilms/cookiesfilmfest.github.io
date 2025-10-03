@@ -90,14 +90,6 @@ export const festivals = [
     submissionUrl: "https://filmfreeway.com/EleanorRoseInternationalFilmFestival"
   },
   {
-    name: "Gettysburg Film Festival",
-    city: "Gettysburg",
-    month: "April",
-    website: "https://www.gettysburgfilmfestival.org",
-    genre: "History",
-    submissionUrl: null
-  },
-  {
     name: "Greater Lehigh Valley Filmmaker Festival",
     city: "Bethlehem",
     month: "March",

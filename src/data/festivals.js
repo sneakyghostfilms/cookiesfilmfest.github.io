@@ -22,7 +22,7 @@ export const festivals = [
     month: "September",
     website: "https://www.backyarddocs.com/",
     genre: "Documentaries",
-    submissionUrl: null
+    submissionUrl: "https://www.backyarddocs.com/backyard-docs-film-festival-submission"
   },
   {
     name: "Beaver Falls Film Festival",

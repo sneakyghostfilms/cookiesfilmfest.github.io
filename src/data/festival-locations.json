@@ -199,19 +199,19 @@
     "lng": -79.706441,
     "city": "Oil City"
   },
-  "Pittsburgh Independent Film Festival": {
-    "lat": 40.4416941,
-    "lng": -79.9900861,
-    "city": "Pittsburgh"
-  },
   "Pittsburgh International Dance Film Festival": {
     "lat": 40.4416941,
     "lng": -79.9900861,
     "city": "Pittsburgh"
   },
+  "Pittsburgh Independent Film Festival": {
+    "lat": 40.4656244,
+    "lng": -80.0656106,
+    "city": "McKees Rocks"
+  },
   "Pittsburgh Moving Picture Festival": {
-    "lat": 40.4416941,
-    "lng": -79.9900861,
-    "city": "Pittsburgh"
+    "lat": 40.5403417,
+    "lng": -80.1805269,
+    "city": "Sewickley"
   }
 }

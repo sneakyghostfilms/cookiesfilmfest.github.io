@@ -185,7 +185,7 @@ export const festivals = [
   },
   {
     name: "Pittsburgh Independent Film Festival",
-    city: "Pittsburgh",
+    city: "McKees Rocks",
     month: "June",
     website: "http://www.pghindie.com/",
     genre: null
@@ -199,7 +199,7 @@ export const festivals = [
   },
   {
     name: "Pittsburgh Moving Picture Festival",
-    city: "Pittsburgh",
+    city: "Sewickley",
     month: "October",
     website: "https://filmfreeway.com/ThePittsburghMovingPictureFestival",
     genre: "Horror, Thriller"

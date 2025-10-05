@@ -1,6 +1,6 @@
 ---
 import "@fontsource-variable/inter";
-import { festivals } from "../data/festivals.js";
+import { festivals, contests } from "../data/festivals.js";
 
 const { generator } = Astro;
 const description = "A comprehensive list of film festivals across Pennsylvania";
@@ -611,8 +611,99 @@ function getGoogleMapsUrl(city: string) {
         </div>
         
         <div class="footer-note">
-          Know of a Pennsylvania film festival not listed here? 
+          Know of a Pennsylvania film festival not listed here?
           <a href="/#contact">Let us know!</a>
+        </div>
+      </section>
+
+      <section class="table-section">
+        <h2 class="section-title">Filmmaking Contests</h2>
+        <p class="section-subtitle">
+          48-hour film challenges and other filmmaking competitions in Pennsylvania
+        </p>
+
+        <!-- Desktop Table -->
+        <div class="desktop-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Contest Name</th>
+                <th>City</th>
+                <th>Month</th>
+                <th>Genre</th>
+                <th style="text-align: center;">Links</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contests.map((contest) => (
+                <tr>
+                  <td>
+                    <span class="festival-name">
+                      {contest.name}
+                    </span>
+                  </td>
+                  <td>
+                    <a href={getGoogleMapsUrl(contest.city)}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="city-link"
+                       title={`View ${contest.city} on Google Maps`}>
+                      {contest.city}
+                    </a>
+                  </td>
+                  <td>{contest.month}</td>
+                  <td>
+                    {contest.genre ? (
+                      <span class="genre-badge">{contest.genre}</span>
+                    ) : (
+                      <span style="color: #999;">—</span>
+                    )}
+                  </td>
+                  <td style="text-align: center;">
+                    <div class="button-container">
+                      <a href={contest.website} target="_blank" rel="noopener noreferrer" class="website-btn">
+                        Website
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards">
+          {contests.map((contest) => (
+            <div class="festival-card">
+              <h3>{contest.name}</h3>
+              <div class="detail">
+                <strong>City:</strong>{' '}
+                <a href={getGoogleMapsUrl(contest.city)}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="city-link"
+                   title={`View ${contest.city} on Google Maps`}>
+                  {contest.city}
+                </a>
+              </div>
+              <div class="detail"><strong>When:</strong> {contest.month}</div>
+              {contest.genre && (
+                <div class="detail"><strong>Genre:</strong> {contest.genre}</div>
+              )}
+              <div style="margin-top: 1rem;">
+                <a href={contest.website} target="_blank" rel="noopener noreferrer" class="visit-btn">
+                  Visit Website
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </div>

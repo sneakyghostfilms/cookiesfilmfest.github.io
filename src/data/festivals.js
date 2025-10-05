@@ -386,3 +386,31 @@ export const festivals = [
     submissionUrl: "https://filmfreeway.com/WhistletotheMaplesHorrorFilmFestival"
   }
 ];
+
+// Pennsylvania Filmmaking Contests
+export const contests = [
+  {
+    name: "CineSpark Lancaster 48 Hour Film Competition",
+    city: "Lancaster",
+    month: "Varies",
+    website: "https://www.facebook.com/CineSparkPA/",
+    genre: null,
+    isContest: true
+  },
+  {
+    name: "Philadelphia 48 Hour Film Project",
+    city: "Philadelphia",
+    month: "August",
+    website: "https://www.48hourfilm.com/philadelphia",
+    genre: null,
+    isContest: true
+  },
+  {
+    name: "Pittsburgh 48 Hour Film Project",
+    city: "Pittsburgh",
+    month: "Varies",
+    website: "https://www.48hourfilm.com/pittsburgh",
+    genre: null,
+    isContest: true
+  }
+];

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { festivals } from '../src/data/festivals.js';
+import { festivals, contests } from '../src/data/festivals.js';
 import { readFile, writeFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -78,22 +78,28 @@ async function saveLocations(locations) {
 }
 
 async function main() {
-  console.log('🗺️  Festival Geocoding Script');
+  console.log('🗺️  Festival & Contest Geocoding Script');
   console.log('━'.repeat(50));
+
+  // Combine festivals and contests
+  const allItems = [...festivals, ...contests];
+
   console.log(`Total festivals: ${festivals.length}`);
+  console.log(`Total contests: ${contests.length}`);
+  console.log(`Total items: ${allItems.length}`);
 
   // Load existing coordinates
   const locations = await loadExistingLocations();
 
-  // Find festivals without coordinates
-  const missing = festivals.filter(f => !locations[f.name]);
+  // Find items without coordinates
+  const missing = allItems.filter(f => !locations[f.name]);
 
   console.log(`Existing coordinates: ${Object.keys(locations).length}`);
   console.log(`Missing coordinates: ${missing.length}`);
   console.log('━'.repeat(50));
 
   if (missing.length === 0) {
-    console.log('✅ All festivals already have coordinates!');
+    console.log('✅ All items already have coordinates!');
     return;
   }
 
@@ -103,13 +109,14 @@ async function main() {
   let successCount = 0;
   let failCount = 0;
 
-  for (const festival of missing) {
-    console.log(`📍 ${festival.name} (${festival.city}, PA)`);
+  for (const item of missing) {
+    const type = item.isContest ? 'Contest' : 'Festival';
+    console.log(`📍 ${item.name} (${item.city}, PA) [${type}]`);
 
-    const coords = await geocodeCity(festival.city);
+    const coords = await geocodeCity(item.city);
 
     if (coords) {
-      locations[festival.name] = coords;
+      locations[item.name] = coords;
       console.log(`   ✓ ${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`);
       successCount++;
     } else {
@@ -117,7 +124,7 @@ async function main() {
     }
 
     // Respect rate limit (except for last request)
-    if (festival !== missing[missing.length - 1]) {
+    if (item !== missing[missing.length - 1]) {
       await delay(1100);
     }
   }

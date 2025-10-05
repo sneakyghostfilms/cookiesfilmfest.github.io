@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { festivals } from '../src/data/festivals.js';
+import { festivals, contests } from '../src/data/festivals.js';
 import { readFile, writeFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -89,9 +89,11 @@ function createCSVRow(festival, location) {
   }
 
   const description = descriptionLines.join('\n');
+  const type = festival.isContest ? 'Contest' : 'Festival';
 
   return [
     escapeCSV(festival.name),
+    escapeCSV(type),
     escapeCSV(location.lat),
     escapeCSV(location.lng),
     escapeCSV(description),
@@ -106,24 +108,29 @@ async function main() {
 
   const locations = await loadLocations();
 
+  // Combine festivals and contests
+  const allItems = [...festivals, ...contests];
+
   console.log(`Total festivals: ${festivals.length}`);
+  console.log(`Total contests: ${contests.length}`);
+  console.log(`Total items: ${allItems.length}`);
   console.log(`Total locations: ${Object.keys(locations).length}`);
 
-  // Find festivals with coordinates
-  const withCoords = festivals.filter(f => locations[f.name]);
-  const missing = festivals.filter(f => !locations[f.name]);
+  // Find items with coordinates
+  const withCoords = allItems.filter(f => locations[f.name]);
+  const missing = allItems.filter(f => !locations[f.name]);
 
   console.log(`With coordinates: ${withCoords.length}`);
   if (missing.length > 0) {
     console.log(`Missing coordinates: ${missing.length}`);
-    console.log('  Missing festivals:');
-    missing.forEach(f => console.log(`    - ${f.name}`));
+    console.log('  Missing items:');
+    missing.forEach(f => console.log(`    - ${f.name} (${f.isContest ? 'Contest' : 'Festival'})`));
     console.log('\n⚠️  Run `npm run geocode` to fetch missing coordinates\n');
   }
   console.log('━'.repeat(50));
 
   if (withCoords.length === 0) {
-    console.error('❌ No festivals with coordinates. Run `npm run geocode` first.');
+    console.error('❌ No items with coordinates. Run `npm run geocode` first.');
     process.exit(1);
   }
 
@@ -131,20 +138,20 @@ async function main() {
   console.log('\n🎯 Applying coordinate jitter to prevent marker overlap...');
   const jitteredLocations = applyJitter(withCoords, locations);
 
-  // Count cities with multiple festivals
+  // Count cities with multiple items
   const coordGroups = new Map();
-  withCoords.forEach(festival => {
-    const loc = locations[festival.name];
+  withCoords.forEach(item => {
+    const loc = locations[item.name];
     const key = `${loc.lat},${loc.lng}`;
     coordGroups.set(key, (coordGroups.get(key) || 0) + 1);
   });
   const citiesWithMultiple = Array.from(coordGroups.values()).filter(count => count > 1).length;
-  console.log(`   Jittered ${citiesWithMultiple} location(s) with multiple festivals`);
+  console.log(`   Jittered ${citiesWithMultiple} location(s) with multiple items`);
 
   // Create CSV content
-  const headers = ['Name', 'Latitude', 'Longitude', 'Description', 'Website', 'Submission'];
-  const rows = withCoords.map(festival =>
-    createCSVRow(festival, jitteredLocations[festival.name])
+  const headers = ['Name', 'Type', 'Latitude', 'Longitude', 'Description', 'Website', 'Submission'];
+  const rows = withCoords.map(item =>
+    createCSVRow(item, jitteredLocations[item.name])
   );
 
   const csv = [headers.join(','), ...rows].join('\n');
@@ -152,7 +159,7 @@ async function main() {
   // Write to file
   await writeFile(OUTPUT_FILE, csv, 'utf-8');
 
-  console.log(`✅ Exported ${withCoords.length} festivals to: festival-map.csv`);
+  console.log(`✅ Exported ${withCoords.length} items (${festivals.length} festivals, ${contests.length} contests) to: festival-map.csv`);
   console.log('\n📍 To import into Google My Maps:');
   console.log('   1. Go to https://www.google.com/mymaps');
   console.log('   2. Create a new map or open existing map');
@@ -160,7 +167,8 @@ async function main() {
   console.log('   4. Upload festival-map.csv');
   console.log('   5. Select "Latitude" and "Longitude" as position columns');
   console.log('   6. Select "Name" as marker title');
-  console.log('   7. Share the map and get embed code or link\n');
+  console.log('   7. Style by "Type" column to use different colors for festivals vs contests');
+  console.log('   8. Share the map and get embed code or link\n');
 }
 
 main().catch(error => {

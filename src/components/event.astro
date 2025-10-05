@@ -330,29 +330,6 @@ import { Image } from 'astro:assets';
     position: relative;
   }
 
-  .comedians-grid::before {
-    content: '';
-    position: absolute;
-    top: 35%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600%;
-    height: 600%;
-    background:
-      linear-gradient(0deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(22.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(45deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(67.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(90deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(112.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(135deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(157.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 5%, rgba(255, 255, 255, 0.5) 10%, rgba(255, 255, 255, 0.25) 15%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.05) 25%, transparent 35%, transparent 100%);
-    mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
-    -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
-    z-index: -1;
-    pointer-events: none;
-  }
 
   .comedian-card {
     text-align: center;
@@ -476,6 +453,30 @@ import { Image } from 'astro:assets';
 
     .comedians-grid {
       grid-template-columns: repeat(3, 1fr);
+    }
+
+    .comedians-grid::before {
+      content: '';
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600%;
+      height: 600%;
+      background:
+        linear-gradient(0deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(22.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(45deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(67.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(90deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(112.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(135deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(157.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 5%, rgba(255, 255, 255, 0.5) 10%, rgba(255, 255, 255, 0.25) 15%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.05) 25%, transparent 35%, transparent 100%);
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
+      z-index: -1;
+      pointer-events: none;
     }
     
     .testimonial-container {

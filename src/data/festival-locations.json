@@ -243,5 +243,20 @@
     "lat": 40.1303822,
     "lng": -75.5149128,
     "city": "Phoenixville"
+  },
+  "CineSpark Lancaster 48 Hour Film Competition": {
+    "lat": 40.0379958,
+    "lng": -76.3056707,
+    "city": "Lancaster"
+  },
+  "Philadelphia 48 Hour Film Project": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
+  },
+  "Pittsburgh 48 Hour Film Project": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh"
   }
 }

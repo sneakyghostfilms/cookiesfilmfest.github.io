@@ -120,6 +120,13 @@ export const festivals = [
     website: "https://filmpittsburgh.org",
     genre: null,
     submissionUrl: "https://filmfreeway.com/JFilmFestival"
+  },  {
+    name: "Jim Thorpe Independent Film Festival",
+    city: "Jim Thorpe",
+    month: "May",
+    website: "https://www.jimthorpeindiefilmfest.com/",
+    genre: null,
+    submissionUrl: "https://filmfreeway.com/JimThorpeIndependentFilmFestival"
   },
   {
     name: "Lake Effect Film Festival",

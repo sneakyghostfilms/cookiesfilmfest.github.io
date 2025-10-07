@@ -258,5 +258,10 @@
     "lat": 40.4416941,
     "lng": -79.9900861,
     "city": "Pittsburgh"
+  },
+  "Jim Thorpe Independent Film Festival": {
+    "lat": 40.8636074,
+    "lng": -75.7386948,
+    "city": "Jim Thorpe"
   }
 }

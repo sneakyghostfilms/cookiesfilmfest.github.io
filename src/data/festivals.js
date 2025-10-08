@@ -161,6 +161,14 @@ export const festivals = [
     submissionUrl: "https://filmfreeway.com/Moviate"
   },
   {
+    name: "Mr. Smalls Horror Film Festival",
+    city: "Millvale",
+    month: "October",
+    website: "https://mrsmalls.com/events/horror-film-festival/",
+    genre: "Horror",
+    submissionUrl: "https://mrsmalls.com/events/horror-film-festival/"
+  },
+  {
     name: "Mystery Box Film Challenge",
     city: "Waverly",
     month: "April",

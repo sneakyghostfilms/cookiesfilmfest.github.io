@@ -1,0 +1,93 @@
+{
+  "Alpe d'Huez International Comedy Film Festival": {
+    "lat": 45.092401,
+    "lng": 6.0699443,
+    "city": "Alpe d'Huez",
+    "state": null,
+    "country": "France"
+  },
+  "Broad Humor Film Festival": {
+    "lat": 34.0536909,
+    "lng": -118.242766,
+    "city": "Los Angeles",
+    "state": "CA",
+    "country": "USA"
+  },
+  "Canadian International Comedy Film Festival": {
+    "lat": 49.8955367,
+    "lng": -97.1384584,
+    "city": "Winnipeg",
+    "state": "MB",
+    "country": "Canada"
+  },
+  "Cookies & Comedy Film Festival": {
+    "lat": 40.4416941,
+    "lng": -79.9900861,
+    "city": "Pittsburgh",
+    "state": "PA",
+    "country": "USA"
+  },
+  "Dublin International Comedy Film Festival": {
+    "lat": 53.3493795,
+    "lng": -6.2605593,
+    "city": "Dublin",
+    "state": null,
+    "country": "Ireland"
+  },
+  "Great Canadian Comedy Film Festival": {
+    "lat": 43.6534817,
+    "lng": -79.3839347,
+    "city": "Toronto",
+    "state": "ON",
+    "country": "Canada"
+  },
+  "International Comedy Film Festival": {
+    "lat": 49.1443265,
+    "lng": 15.003354,
+    "city": "Jindřichův Hradec",
+    "state": null,
+    "country": "Czech Republic"
+  },
+  "Liège International Comedy Film Festival": {
+    "lat": 50.6450944,
+    "lng": 5.5736112,
+    "city": "Liège",
+    "state": null,
+    "country": "Belgium"
+  },
+  "LOCO London Comedy Film Festival": {
+    "lat": 51.5074456,
+    "lng": -0.1277653,
+    "city": "London",
+    "state": null,
+    "country": "United Kingdom"
+  },
+  "Monte-Carlo Film Festival de la Comédie": {
+    "lat": 43.7402961,
+    "lng": 7.426559,
+    "city": "Monte-Carlo",
+    "state": null,
+    "country": "Monaco"
+  },
+  "New Jersey Comedy Film Festival": {
+    "lat": 41.0401567,
+    "lng": -74.6310081,
+    "city": "Sparta",
+    "state": "NJ",
+    "country": "USA"
+  },
+  "New York City Short Comedy Film Festival": {
+    "lat": 40.7127281,
+    "lng": -74.0060152,
+    "city": "New York",
+    "state": "NY",
+    "country": "USA"
+  },
+  "Palm Springs International Comedy Festival": {
+    "lat": 33.8246269,
+    "lng": -116.540303,
+    "city": "Palm Springs",
+    "state": "CA",
+    "country": "USA"
+  }
+}

@@ -235,15 +235,6 @@ export const comedyFestivals = [
     submissionUrl: "https://www.fifcl.be/en/registration-for-films-in-the-official-selection-2025-is-now-open/",
   },
   {
-    name: "Lit Laughs International Comedy Film Festival",
-    city: "Harrogate",
-    state: null,
-    country: "United Kingdom",
-    month: "TBD",
-    website: "https://filmfreeway.com/LitLaughsInternationalComedyFilmFestival",
-    submissionUrl: "https://filmfreeway.com/LitLaughsInternationalComedyFilmFestival",
-  },
-  {
     name: "LOCO London Comedy Film Festival",
     city: "London",
     state: null,

@@ -89,5 +89,215 @@
     "city": "Palm Springs",
     "state": "CA",
     "country": "USA"
+  },
+  "1 World Comedy Film Festival": {
+    "lat": 55.9533456,
+    "lng": -3.1883749,
+    "city": "Edinburgh",
+    "state": null,
+    "country": "United Kingdom"
+  },
+  "24 Risas por Segundo": {
+    "lat": 19.4326296,
+    "lng": -99.1331785,
+    "city": "Mexico City",
+    "state": null,
+    "country": "Mexico"
+  },
+  "All Comedy Short Film Festival": {
+    "lat": 30.3321838,
+    "lng": -81.655651,
+    "city": "Jacksonville",
+    "state": "FL",
+    "country": "USA"
+  },
+  "Atlanta Comedy Film Festival": {
+    "lat": 33.7544657,
+    "lng": -84.3898151,
+    "city": "Atlanta",
+    "state": "GA",
+    "country": "USA"
+  },
+  "Bagogo - It's All Comedy!": {
+    "lat": 45.4641943,
+    "lng": 9.1896346,
+    "city": "Milano",
+    "state": null,
+    "country": "Italy"
+  },
+  "Dark Comedy Film Festival": {
+    "lat": 34.0536909,
+    "lng": -118.242766,
+    "city": "Los Angeles",
+    "state": "CA",
+    "country": "USA"
+  },
+  "Film 4 Fun - International Comedy Short Film Festival": {
+    "lat": 44.4361414,
+    "lng": 26.1027202,
+    "city": "Bucharest",
+    "state": null,
+    "country": "Romania"
+  },
+  "Funny Life Film Festival": {
+    "lat": 51.5074456,
+    "lng": -0.1277653,
+    "city": "London",
+    "state": null,
+    "country": "United Kingdom"
+  },
+  "GELOS Comedy Film Festival": {
+    "lat": 55.7505412,
+    "lng": 37.6174782,
+    "city": "Moscow",
+    "state": null,
+    "country": "Russia"
+  },
+  "Georgia Comedy Film Festival": {
+    "lat": 33.7544657,
+    "lng": -84.3898151,
+    "city": "Atlanta",
+    "state": "GA",
+    "country": "USA"
+  },
+  "Golden Smile International Film Festival": {
+    "lat": 52.6702278,
+    "lng": 4.7011616,
+    "city": "Bergen",
+    "state": null,
+    "country": "Netherlands"
+  },
+  "Guayaquil International Comedy Film Festival": {
+    "lat": -2.2895167,
+    "lng": -80.0983887,
+    "city": "Guayaquil",
+    "state": null,
+    "country": "Ecuador"
+  },
+  "HaHaArt Film Festival": {
+    "lat": 39.9161851,
+    "lng": -8.6279171,
+    "city": "Pombal",
+    "state": null,
+    "country": "Portugal"
+  },
+  "Houston Comedy Film Festival": {
+    "lat": 29.7589382,
+    "lng": -95.3676974,
+    "city": "Houston",
+    "state": "TX",
+    "country": "USA"
+  },
+  "Humor en Corto": {
+    "lat": 43.2065921,
+    "lng": -2.8873537,
+    "city": "Arrigorriaga",
+    "state": null,
+    "country": "Spain"
+  },
+  "Iceland Comedy Film Festival": {
+    "lat": 66.0488058,
+    "lng": -23.5129609,
+    "city": "Flateyri",
+    "state": null,
+    "country": "Iceland"
+  },
+  "Just For Laughs Shorts": {
+    "lat": 45.5031824,
+    "lng": -73.5698065,
+    "city": "Montreal",
+    "state": "QC",
+    "country": "Canada"
+  },
+  "LA Comedy Film Festival": {
+    "lat": 34.0536909,
+    "lng": -118.242766,
+    "city": "Los Angeles",
+    "state": "CA",
+    "country": "USA"
+  },
+  "Lit Laughs International Comedy Film Festival": {
+    "lat": 53.9921491,
+    "lng": -1.5391039,
+    "city": "Harrogate",
+    "state": null,
+    "country": "United Kingdom"
+  },
+  "Madcap Comedy International Short Film Festival": {
+    "lat": -34.9510599,
+    "lng": 138.5925347,
+    "city": "Goodwood",
+    "state": "SA",
+    "country": "Australia"
+  },
+  "Over The Fence & A World of Dark Comedy Film Festival": {
+    "lat": -32.0845215,
+    "lng": 115.7794833,
+    "city": "Hamilton Hill",
+    "state": "WA",
+    "country": "Australia"
+  },
+  "Philly Sketchfest Comedy Film Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia",
+    "state": "PA",
+    "country": "USA"
+  },
+  "Pigeon Laughs Short Comedy Film Festival": {
+    "lat": 51.4816546,
+    "lng": -3.1791934,
+    "city": "Cardiff",
+    "state": null,
+    "country": "United Kingdom"
+  },
+  "Portland Comedy Film Festival": {
+    "lat": 45.5202471,
+    "lng": -122.674194,
+    "city": "Portland",
+    "state": "OR",
+    "country": "USA"
+  },
+  "Pulcinella FilmFest - Festival della Commedia": {
+    "lat": 40.9460532,
+    "lng": 14.3750083,
+    "city": "Acerra",
+    "state": null,
+    "country": "Italy"
+  },
+  "Rabat-Comedy International Film Festival": {
+    "lat": 34.0218454,
+    "lng": -6.8408929,
+    "city": "Rabat",
+    "state": null,
+    "country": "Morocco"
+  },
+  "Short Com International Comedy Film and Animation Festival": {
+    "lat": 55.9533456,
+    "lng": -3.1883749,
+    "city": "Edinburgh",
+    "state": null,
+    "country": "United Kingdom"
+  },
+  "The 50/50 Comedy Fest": {
+    "lat": 34.0536909,
+    "lng": -118.242766,
+    "city": "Los Angeles",
+    "state": "CA",
+    "country": "USA"
+  },
+  "The Comedy Film Festival": {
+    "lat": 30.2711286,
+    "lng": -97.7436995,
+    "city": "Austin",
+    "state": "TX",
+    "country": "USA"
+  },
+  "Women's Comedy Film Festival in Atlanta": {
+    "lat": 33.7544657,
+    "lng": -84.3898151,
+    "city": "Atlanta",
+    "state": "GA",
+    "country": "USA"
   }
 }

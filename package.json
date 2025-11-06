@@ -12,7 +12,9 @@
     "format": "prettier --write **/*.astro .",
     "clean": "rimraf dist .astro node_modules",
     "geocode": "node scripts/geocode-festivals.js",
-    "export-map": "node scripts/export-map-data.js"
+    "export-map": "node scripts/export-map-data.js",
+    "geocode:comedy": "node scripts/geocode-comedy-festivals.js",
+    "export-map:comedy": "node scripts/export-comedy-map-data.js"
   },
   "devDependencies": {
     "@astrojs/tailwind": "^5.1.0",

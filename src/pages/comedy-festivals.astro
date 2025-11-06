@@ -1,0 +1,677 @@
+---
+import "@fontsource-variable/inter";
+import { comedyFestivals } from "../data/comedy-festivals.js";
+
+const { generator } = Astro;
+const description = "A comprehensive list of comedy film festivals around the world";
+
+// Helper function to generate Google Maps URL for a location
+function getGoogleMapsUrl(city: string, state: string | null, country: string) {
+  const parts = [city];
+  if (state) parts.push(state);
+  parts.push(country);
+  const query = parts.join(', ').replace(/ /g, '+');
+  return `https://www.google.com/maps/search/${query}`;
+}
+
+// Format location (city, state/province)
+function formatLocation(city: string, state: string | null) {
+  return state ? `${city}, ${state}` : city;
+}
+---
+
+<!doctype html>
+<html lang="en" class="h-full motion-safe:scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="generator" content={generator} />
+
+    <title>Comedy Film Festivals Around the World | Cookies and Comedy Film Festival</title>
+    <meta name="description" content={description} />
+
+    <!-- social media -->
+    <meta property="og:title" content="Comedy Film Festivals Around the World" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content={description} />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+      /* Reset and base styles */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --color-primary: #d79b58;
+        --color-secondary: #2b2244;
+        --color-text: #221a35;
+        --color-text-offset: #4a3968;
+        --color-background: #ffffff;
+        --color-background-offset: #fbe3c4;
+        --color-background-darker: #f5d6a8;
+        --color-border: #d79b58;
+      }
+
+      body {
+        font-family: 'Fredoka', sans-serif;
+        background-color: var(--color-background);
+        color: var(--color-text);
+        line-height: 1.5;
+        font-weight: 500;
+      }
+
+      a {
+        color: var(--color-secondary);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      a:hover {
+        color: var(--color-primary);
+      }
+
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      /* Header */
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-top: 2rem;
+      }
+
+      .page-title {
+        font-size: 3rem;
+        color: var(--color-secondary);
+        margin-bottom: 1rem;
+        letter-spacing: 0.01em;
+      }
+
+      .page-subtitle {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        margin-bottom: 2rem;
+        letter-spacing: 0.01em;
+      }
+
+      .back-link {
+        display: inline-block;
+        background-color: rgba(215, 155, 88, 0.3);
+        color: var(--color-secondary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        margin-top: 1rem;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(215, 155, 88, 0.5);
+      }
+
+      .back-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        background-color: rgba(215, 155, 88, 0.5);
+        color: var(--color-secondary);
+      }
+
+      /* Map section */
+      .map-section {
+        margin-bottom: 2rem;
+      }
+
+      .map-container {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .map-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      .map-disclaimer {
+        text-align: center;
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--color-text-offset);
+        font-style: italic;
+      }
+
+      /* Table section */
+      .table-section {
+        background-color: var(--color-background-offset);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+        overflow: visible;
+        position: relative;
+      }
+
+      .desktop-table {
+        overflow: visible;
+        position: relative;
+      }
+
+      .section-subtitle {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--color-text);
+      }
+
+      /* Sort controls */
+      .sort-controls {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .sort-label {
+        display: inline-block;
+        margin-right: 1rem;
+        color: var(--color-text);
+        font-weight: 600;
+      }
+
+      .sort-btn {
+        padding: 0.5rem 1.25rem;
+        margin: 0 0.25rem;
+        background-color: white;
+        color: var(--color-text);
+        border: 2px solid var(--color-primary);
+        border-radius: 2rem;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+      }
+
+      .sort-btn:hover {
+        background-color: var(--color-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .sort-btn.active {
+        background-color: var(--color-primary);
+        color: white;
+      }
+
+      /* Table styles */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        border-radius: 0.5rem;
+        overflow: visible;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        position: relative;
+      }
+
+      thead tr {
+        background-color: var(--color-primary);
+        color: white;
+        position: relative;
+        z-index: 5;
+      }
+
+      th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 700;
+        font-size: 1rem;
+      }
+
+      tbody {
+        position: relative;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid rgba(215, 155, 88, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+        background-color: white;
+      }
+
+      tbody tr:hover {
+        background-color: rgba(255, 255, 255, 1);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        border-radius: 0.5rem;
+        transform: translateY(-6px);
+      }
+
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 1rem 1.5rem;
+        color: var(--color-text);
+      }
+
+      /* Special styling for our festival */
+      .our-festival-row {
+        background-color: rgba(215, 155, 88, 0.1);
+      }
+
+      .our-festival-badge {
+        display: block;
+        background-color: var(--color-secondary);
+        color: white;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+        width: fit-content;
+        letter-spacing: 0.05em;
+      }
+
+      .festival-name {
+        font-weight: 600;
+      }
+
+      .our-festival-name {
+        color: var(--color-primary);
+        font-weight: 700;
+      }
+
+      /* Location links */
+      .location-link {
+        color: var(--color-text);
+        text-decoration: none;
+        font-weight: 400;
+        transition: all 0.2s ease;
+        border-bottom: 1px dotted transparent;
+      }
+
+      .location-link:hover {
+        color: var(--color-primary);
+        border-bottom-color: var(--color-primary);
+      }
+
+      /* Button container */
+      .button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        align-items: center;
+      }
+
+      /* Website and Submit buttons */
+      .website-btn, .submit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 1.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        min-width: 85px;
+      }
+
+      .website-btn {
+        background-color: var(--color-primary);
+      }
+
+      .submit-btn {
+        background-color: var(--color-secondary);
+      }
+
+      .website-btn:hover, .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        color: white;
+      }
+
+      .website-btn:hover {
+        background-color: var(--color-primary);
+      }
+
+      .submit-btn:hover {
+        background-color: var(--color-secondary);
+      }
+
+      .website-btn svg, .submit-btn svg {
+        margin-left: 0.25rem;
+        width: 0.75rem;
+        height: 0.75rem;
+      }
+
+      /* Legacy visit-btn for mobile */
+      .visit-btn {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--color-primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .visit-btn:hover {
+        background-color: var(--color-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        color: white;
+      }
+
+      .visit-btn svg {
+        margin-left: 0.25rem;
+        width: 0.75rem;
+        height: 0.75rem;
+      }
+
+      /* Footer note */
+      .footer-note {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.9rem;
+        color: var(--color-text-offset);
+      }
+
+      .footer-note a {
+        color: var(--color-primary);
+        text-decoration: underline;
+      }
+
+      /* Mobile Card View */
+      .mobile-cards {
+        display: none;
+      }
+
+      .festival-card {
+        background-color: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.2);
+      }
+
+      .festival-card.our-festival {
+        background-color: rgba(215, 155, 88, 0.1);
+        border: 2px solid var(--color-primary);
+      }
+
+      .festival-card h3 {
+        font-size: 1.25rem;
+        color: var(--color-secondary);
+        margin-bottom: 0.75rem;
+      }
+
+      .festival-card .detail {
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+      }
+
+      .festival-card .detail strong {
+        font-weight: 600;
+        color: var(--color-secondary);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .page-title {
+          font-size: 2.5rem;
+        }
+
+        .desktop-table {
+          display: none;
+        }
+
+        .mobile-cards {
+          display: block;
+        }
+
+        th, td {
+          padding: 0.75rem;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1 class="page-title">Comedy Film Festivals Around the World</h1>
+        <a href="/" class="back-link">Back to Main Site</a>
+      </header>
+
+      <section class="map-section">
+        <div class="map-container">
+          <iframe
+            src="about:blank"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+        <p class="map-disclaimer">
+          Map coming soon! Import comedy-festival-map.csv into Google My Maps to generate the embed URL.
+        </p>
+      </section>
+
+      <section class="table-section">
+        <p class="section-subtitle">
+          Discover comedy film festivals from around the globe
+        </p>
+
+        <div class="sort-controls">
+          <span class="sort-label">Sort by:</span>
+          <button class="sort-btn active" data-sort="alphabetical">Alphabetical</button>
+          <button class="sort-btn" data-sort="month">By Month</button>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="desktop-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Festival Name</th>
+                <th>Location</th>
+                <th>Country</th>
+                <th>Month</th>
+                <th style="text-align: center;">Links</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comedyFestivals.map((festival) => (
+                <tr class={festival.isOurFestival ? 'our-festival-row' : ''}>
+                  <td>
+                    {festival.isOurFestival && (
+                      <div class="our-festival-badge">OUR FESTIVAL</div>
+                    )}
+                    <span class={festival.isOurFestival ? 'our-festival-name' : 'festival-name'}>
+                      {festival.name}
+                    </span>
+                  </td>
+                  <td>
+                    <a href={getGoogleMapsUrl(festival.city, festival.state, festival.country)}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="location-link"
+                       title={`View ${formatLocation(festival.city, festival.state)} on Google Maps`}>
+                      {formatLocation(festival.city, festival.state)}
+                    </a>
+                  </td>
+                  <td>{festival.country}</td>
+                  <td>{festival.month}</td>
+                  <td style="text-align: center;">
+                    <div class="button-container">
+                      <a href={festival.website} target="_blank" rel="noopener noreferrer" class="website-btn">
+                        Website
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                      {festival.submissionUrl && (
+                        <a href={festival.submissionUrl} target="_blank" rel="noopener noreferrer" class="submit-btn">
+                          Submit
+                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards">
+          {comedyFestivals.map((festival) => (
+            <div class={`festival-card ${festival.isOurFestival ? 'our-festival' : ''}`}>
+              {festival.isOurFestival && (
+                <span class="our-festival-badge">OUR FESTIVAL</span>
+              )}
+              <h3>{festival.name}</h3>
+              <div class="detail">
+                <strong>Location:</strong>{' '}
+                <a href={getGoogleMapsUrl(festival.city, festival.state, festival.country)}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="location-link"
+                   title={`View ${formatLocation(festival.city, festival.state)} on Google Maps`}>
+                  {formatLocation(festival.city, festival.state)}
+                </a>
+              </div>
+              <div class="detail"><strong>Country:</strong> {festival.country}</div>
+              <div class="detail"><strong>When:</strong> {festival.month}</div>
+              <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href={festival.website} target="_blank" rel="noopener noreferrer" class="visit-btn">
+                  Visit Website
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+                {festival.submissionUrl && (
+                  <a href={festival.submissionUrl} target="_blank" rel="noopener noreferrer" class="visit-btn" style="background-color: var(--color-secondary);">
+                    Submit Film
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="footer-note">
+          Know of a comedy film festival not listed here?
+          <a href="/#contact">Let us know!</a>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // Month order for sorting
+      const monthOrder = {
+        'January': 1, 'February': 2, 'March': 3, 'April': 4,
+        'May': 5, 'June': 6, 'July': 7, 'August': 8,
+        'September': 9, 'October': 10, 'November': 11, 'December': 12
+      };
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const sortButtons = document.querySelectorAll('.sort-btn');
+        const tableBody = document.querySelector('tbody');
+        const mobileCards = document.querySelector('.mobile-cards');
+
+        // Store original order
+        const tableRows = Array.from(tableBody.querySelectorAll('tr'));
+        const cards = Array.from(mobileCards.querySelectorAll('.festival-card'));
+
+        // Create arrays with sorting data
+        const festivalsData = tableRows.map((row, index) => {
+          const nameCell = row.querySelector('td:first-child');
+          const monthCell = row.querySelector('td:nth-child(4)');
+          const isOurFestival = row.classList.contains('our-festival-row');
+          const name = nameCell.querySelector('.festival-name, .our-festival-name').textContent.trim();
+          const month = monthCell.textContent.trim();
+
+          return {
+            row: row,
+            card: cards[index],
+            name: name,
+            month: month,
+            monthNum: monthOrder[month] || 0,
+            isOurFestival: isOurFestival,
+            originalIndex: index
+          };
+        });
+
+        function sortAlphabetically() {
+          return [...festivalsData].sort((a, b) => {
+            return a.name.localeCompare(b.name);
+          });
+        }
+
+        function sortByMonth() {
+          return [...festivalsData].sort((a, b) => {
+            const monthDiff = a.monthNum - b.monthNum;
+            if (monthDiff !== 0) return monthDiff;
+            return a.name.localeCompare(b.name);
+          });
+        }
+
+        function updateDisplay(sorted) {
+          // Clear and re-append in new order
+          tableBody.innerHTML = '';
+          mobileCards.innerHTML = '';
+
+          sorted.forEach(item => {
+            tableBody.appendChild(item.row);
+            mobileCards.appendChild(item.card);
+          });
+        }
+
+        sortButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            // Update active state
+            sortButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Sort and update
+            const sortType = btn.dataset.sort;
+            const sorted = sortType === 'month' ? sortByMonth() : sortAlphabetically();
+            updateDisplay(sorted);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

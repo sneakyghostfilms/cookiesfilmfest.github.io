@@ -123,7 +123,7 @@ export const comedyFestivals = [
     state: null,
     country: "Russia",
     month: "April",
-    website: "https://filmfreeway.com/GelosComedyFilmFestival",
+    website: "http://gelosfilmfest.ru/",
     submissionUrl: "https://filmfreeway.com/GelosComedyFilmFestival",
   },
   {
@@ -159,7 +159,7 @@ export const comedyFestivals = [
     state: null,
     country: "Ecuador",
     month: "July",
-    website: "https://filmfreeway.com/GICOFF",
+    website: "https://gicoff.blogspot.com/",
     submissionUrl: "https://filmfreeway.com/GICOFF",
   },
   {

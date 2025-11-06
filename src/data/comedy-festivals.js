@@ -123,7 +123,7 @@ export const comedyFestivals = [
     state: null,
     country: "Russia",
     month: "April",
-    website: "http://gelosfilmfest.ru/?lang=en",
+    website: "https://filmfreeway.com/GelosComedyFilmFestival",
     submissionUrl: "https://filmfreeway.com/GelosComedyFilmFestival",
   },
   {
@@ -141,7 +141,7 @@ export const comedyFestivals = [
     state: null,
     country: "Netherlands",
     month: "January",
-    website: "http://www.goldensmileinternationalfilmfestival.com/",
+    website: "https://goldensmile.festivee.com/",
     submissionUrl: "https://filmfreeway.com/GoldenSmileInternationalFilmFestival",
   },
   {
@@ -240,7 +240,7 @@ export const comedyFestivals = [
     state: null,
     country: "United Kingdom",
     month: "TBD",
-    website: "https://www.litlaughs.com/",
+    website: "https://filmfreeway.com/LitLaughsInternationalComedyFilmFestival",
     submissionUrl: "https://filmfreeway.com/LitLaughsInternationalComedyFilmFestival",
   },
   {
@@ -348,7 +348,7 @@ export const comedyFestivals = [
     state: null,
     country: "Morocco",
     month: "June",
-    website: "https://rabat-comedy.com/en/home/",
+    website: "https://rabat-comedy.com/?page_id=5871&lang=en",
     submissionUrl: "https://filmfreeway.com/Rabat-Comedy",
   },
   {

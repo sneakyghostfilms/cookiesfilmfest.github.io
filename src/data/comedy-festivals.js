@@ -132,7 +132,7 @@ export const comedyFestivals = [
     state: "GA",
     country: "USA",
     month: "April",
-    website: "https://filmfreeway.com/georgiacomedyfilmfestival",
+    website: "https://filmfestivalcircuit.com/festival/georgia-comedy-film-festival",
     submissionUrl: "https://filmfreeway.com/georgiacomedyfilmfestival",
   },
   {
@@ -321,7 +321,7 @@ export const comedyFestivals = [
     state: "OR",
     country: "USA",
     month: "March",
-    website: "https://filmfreeway.com/PortlandComedyFilmFestival",
+    website: "https://filmfestivalcircuit.com/festival/portland-comedy-film-festival",
     submissionUrl: "https://filmfreeway.com/PortlandComedyFilmFestival",
   },
   {

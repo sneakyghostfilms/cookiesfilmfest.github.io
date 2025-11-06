@@ -82,15 +82,6 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/DublinInternationalComedyFilmFestivalDICFF",
   },
   {
-    name: "FIFES Comedy Film Festival",
-    city: "Luka",
-    state: null,
-    country: "Croatia",
-    month: "Various",
-    website: "http://www.fifes.eu",
-    submissionUrl: "https://filmfreeway.com/FIFESfilmfestivaloflaughter",
-  },
-  {
     name: "Film 4 Fun - International Comedy Short Film Festival",
     city: "Bucharest",
     state: null,
@@ -98,15 +89,6 @@ export const comedyFestivals = [
     month: "November",
     website: "https://www.film4fun.ro/",
     submissionUrl: "https://filmfreeway.com/Film4Fun-InternationalShortFilmFestival",
-  },
-  {
-    name: "FINTCH - Festival Internacional de Cinema de Humor",
-    city: "Saquarema",
-    state: null,
-    country: "Brazil",
-    month: "Various",
-    website: "https://fintch.com.br",
-    submissionUrl: "https://filmfreeway.com/FINTCH",
   },
   {
     name: "Funny Life Film Festival",
@@ -206,15 +188,6 @@ export const comedyFestivals = [
     month: "May",
     website: "https://icomfilmfest.com/en",
     submissionUrl: "https://icomfilmfest.com/en/about-festival/festival-statute",
-  },
-  {
-    name: "Iron Mule Short Comedy Film Festival",
-    city: "New York",
-    state: "NY",
-    country: "USA",
-    month: "Monthly",
-    website: "https://ironmulefest.com/",
-    submissionUrl: "https://filmfreeway.com/IronMuleFilmFestival",
   },
   {
     name: "Just For Laughs Shorts",
@@ -368,15 +341,6 @@ export const comedyFestivals = [
     month: "April",
     website: "https://www.thecomedyfilmfest.com/",
     submissionUrl: "https://filmfreeway.com/TheComedyFilmFestival",
-  },
-  {
-    name: "Willlachen Comedy & Satire Filmprize",
-    city: "Vienna",
-    state: null,
-    country: "Austria",
-    month: "Various",
-    website: "https://willlachen.at/",
-    submissionUrl: "https://filmfreeway.com/willlachen-filmprize",
   },
   {
     name: "Women's Comedy Film Festival in Atlanta",

@@ -36,6 +36,15 @@ export const comedyFestivals = [
     submissionUrl: "https://www.festival-alpedhuez.com/inscrire-un-film/",
   },
   {
+    name: "Atlanta Comedy Film Festival",
+    city: "Atlanta",
+    state: "GA",
+    country: "USA",
+    month: "November",
+    website: "https://cinemalife.org/atlanta-comedy-film-festival/",
+    submissionUrl: "https://filmfreeway.com/AtlantaComedyFilmFestival",
+  },
+  {
     name: "Bagogo - It's All Comedy!",
     city: "Milano",
     state: null,
@@ -71,6 +80,15 @@ export const comedyFestivals = [
     website: "https://www.cookiesfilmfest.com",
     submissionUrl: "https://filmfreeway.com/CookiesFilmFest",
     isOurFestival: true,
+  },
+  {
+    name: "Dark Comedy Film Festival",
+    city: "Los Angeles",
+    state: "CA",
+    country: "USA",
+    month: "May",
+    website: "https://www.darkcomedyff.com/",
+    submissionUrl: "https://filmfreeway.com/DarkComedyFilmFestival",
   },
   {
     name: "Dublin International Comedy Film Festival",
@@ -217,6 +235,15 @@ export const comedyFestivals = [
     submissionUrl: "https://www.fifcl.be/en/registration-for-films-in-the-official-selection-2025-is-now-open/",
   },
   {
+    name: "Lit Laughs International Comedy Film Festival",
+    city: "Harrogate",
+    state: null,
+    country: "United Kingdom",
+    month: "TBD",
+    website: "https://www.litlaughs.com/",
+    submissionUrl: "https://filmfreeway.com/LitLaughsInternationalComedyFilmFestival",
+  },
+  {
     name: "LOCO London Comedy Film Festival",
     city: "London",
     state: null,
@@ -260,6 +287,15 @@ export const comedyFestivals = [
     month: "November",
     website: "https://nycscff.com",
     submissionUrl: "https://filmfreeway.com/NYCSCFF",
+  },
+  {
+    name: "Over The Fence & A World of Dark Comedy Film Festival",
+    city: "Hamilton Hill",
+    state: "WA",
+    country: "Australia",
+    month: "February",
+    website: "https://overthefence.com.au/",
+    submissionUrl: "https://filmfreeway.com/OverTheFenceComedyFilmFestival",
   },
   {
     name: "Palm Springs International Comedy Festival",

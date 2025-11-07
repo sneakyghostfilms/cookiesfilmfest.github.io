@@ -306,5 +306,12 @@
     "city": "Glendale",
     "state": "CA",
     "country": "USA"
+  },
+  "PNN Academy Comedy Film Festival": {
+    "lat": 34.0980031,
+    "lng": -118.329523,
+    "city": "Hollywood",
+    "state": "CA",
+    "country": "USA"
   }
 }

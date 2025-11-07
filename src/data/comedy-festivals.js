@@ -325,6 +325,15 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/PigeonLaughsShortComedyFilmFestival",
   },
   {
+    name: "PNN Academy Comedy Film Festival",
+    city: "Hollywood",
+    state: "CA",
+    country: "USA",
+    month: "April",
+    website: "https://pnnacademy.org/",
+    submissionUrl: "https://filmfreeway.com/PNNAcademyComedyFilmFestival",
+  },
+  {
     name: "Portland Comedy Film Festival",
     city: "Portland",
     state: "OR",

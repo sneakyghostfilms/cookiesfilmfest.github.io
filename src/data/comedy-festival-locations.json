@@ -299,5 +299,12 @@
     "city": "Atlanta",
     "state": "GA",
     "country": "USA"
+  },
+  "HollyShorts Comedy Film Festival": {
+    "lat": 34.1469416,
+    "lng": -118.2478471,
+    "city": "Glendale",
+    "state": "CA",
+    "country": "USA"
   }
 }

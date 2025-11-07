@@ -181,6 +181,15 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/HoustonComedyFilmFestival",
   },
   {
+    name: "HollyShorts Comedy Film Festival",
+    city: "Glendale",
+    state: "CA",
+    country: "USA",
+    month: "May",
+    website: "https://www.hollyshortscomedy.com",
+    submissionUrl: "https://filmfreeway.com/hollyshortscomedy",
+  },
+  {
     name: "Humor en Corto",
     city: "Arrigorriaga",
     state: null,

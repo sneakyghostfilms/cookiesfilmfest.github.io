@@ -313,5 +313,26 @@
     "city": "Hollywood",
     "state": "CA",
     "country": "USA"
+  },
+  "HaHa Fest": {
+    "lat": 42.8579536,
+    "lng": -70.9300921,
+    "city": "Amesbury",
+    "state": "MA",
+    "country": "USA"
+  },
+  "LA Comedy Festival": {
+    "lat": 34.0536909,
+    "lng": -118.242766,
+    "city": "Los Angeles",
+    "state": "CA",
+    "country": "USA"
+  },
+  "Los Angeles Comedy Film Festival": {
+    "lat": 34.0536909,
+    "lng": -118.242766,
+    "city": "Los Angeles",
+    "state": "CA",
+    "country": "USA"
   }
 }

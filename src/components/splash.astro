@@ -1,15 +1,11 @@
 ---
-import { Image } from 'astro:assets';
-import cookieTableImage from '../assets/cookie-table.jpg';
 import RotatingLogo from './RotatingLogo.astro';
 ---
-<section class="relative h-screen overflow-hidden">
+<section class="relative h-screen overflow-hidden splash-bg">
   <div class="relative h-full w-full">
-    <Image src={cookieTableImage} alt="Cookie Table" class="w-full h-full object-cover transition-transform animate-scale" />
-    <div class="overlay"></div>
     <div class="absolute center responsive-container">
       <div class="logo-wrapper animate-fade-in">
-        <RotatingLogo size={500} />
+        <RotatingLogo size={800} />
       </div>
       <div class="tagline responsive-text animate-fade-in animate-delay-300">
         Come for the laughs! Stay for the cookies!
@@ -27,39 +23,34 @@ import RotatingLogo from './RotatingLogo.astro';
 </section>
 
 <style>
+  .splash-bg {
+    background: radial-gradient(ellipse at center, #4a3520 0%, #2a1a0a 25%, #120a04 50%, #000000 75%);
+    border-radius: 0;
+  }
+
   .absolute {
     position: absolute;
   }
 
   .center {
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
-  }
-
-  .overlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(43, 34, 68, 0.25); /* Reduced opacity from 0.35 to 0.25 */
-    box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.3); /* Reduced shadow opacity from 0.5 to 0.3 */
   }
 
   .responsive-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    gap: 0;
     text-align: center;
     z-index: 10;
   }
 
   .logo-wrapper {
-    width: 90%;
-    max-width: 500px;
-    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
+    width: 50vw;
+    max-width: 800px;
+    filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.6));
   }
 
   .tagline {
@@ -69,6 +60,9 @@ import RotatingLogo from './RotatingLogo.astro';
     color: #fbe3c4; /* Light cookie-dough beige */
     text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
     letter-spacing: 0.03em;
+    margin-top: -3rem; /* Pull up to overlap logo area */
+    position: relative;
+    z-index: 20;
   }
 
   .scroll-indicator {
@@ -118,17 +112,7 @@ import RotatingLogo from './RotatingLogo.astro';
       transform: translateY(-3px);
     }
   }
-  
-  /* Animation for the image and elements */
-  .animate-scale {
-    animation: scale 20s ease-in-out infinite alternate;
-  }
-  
-  @keyframes scale {
-    from { transform: scale(1); }
-    to { transform: scale(1.1); }
-  }
-  
+
   .animate-fade-in {
     animation: fadeIn 1s ease-out forwards;
     opacity: 0;
@@ -149,24 +133,29 @@ import RotatingLogo from './RotatingLogo.astro';
 
   @media (max-width: 768px) {
     .logo-wrapper {
-      width: 80%;
-      max-width: 350px;
+      width: 70vw;
+      max-width: 450px;
     }
 
     .tagline {
       font-size: 1.4rem;
     }
-    
+
     .scroll-indicator {
       margin-top: 1.5rem;
     }
   }
 
   @media (orientation: landscape) and (max-width: 768px) {
+    .logo-wrapper {
+      width: 40vw;
+      max-width: 350px;
+    }
+
     .responsive-container {
       gap: 1rem;
     }
-    
+
     .scroll-indicator {
       margin-top: 0.5rem;
     }
@@ -174,7 +163,8 @@ import RotatingLogo from './RotatingLogo.astro';
 
   @media (min-width: 1024px) {
     .logo-wrapper {
-      max-width: 600px;
+      width: 50vw;
+      max-width: 900px;
     }
 
     .tagline {

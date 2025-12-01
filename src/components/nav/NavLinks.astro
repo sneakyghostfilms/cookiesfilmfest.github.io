@@ -73,9 +73,17 @@ const { navItems, pastEvents } = Astro.props;
     border-color: var(--color-primary);
   }
 
-  @media (max-width: 639px) {
+  /* Hide nav on narrow screens OR short screens */
+  @media (max-width: 700px), (max-height: 900px) {
     .nav-desktop {
       display: none !important;
+    }
+  }
+
+  /* Only show nav if BOTH wide enough AND tall enough */
+  @media (min-width: 1200px) and (min-height: 901px) {
+    .nav-desktop {
+      display: block !important;
     }
   }
 </style>

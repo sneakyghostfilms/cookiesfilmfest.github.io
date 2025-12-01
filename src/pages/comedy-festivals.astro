@@ -61,7 +61,7 @@ function formatLocation(city: string, state: string | null) {
 
       body {
         font-family: 'Fredoka', sans-serif;
-        background-color: var(--color-background);
+        background-color: #000000;
         color: var(--color-text);
         line-height: 1.5;
         font-weight: 500;
@@ -93,7 +93,7 @@ function formatLocation(city: string, state: string | null) {
 
       .page-title {
         font-size: 3rem;
-        color: var(--color-secondary);
+        color: var(--color-background-offset);
         margin-bottom: 1rem;
         letter-spacing: 0.01em;
       }
@@ -107,21 +107,21 @@ function formatLocation(city: string, state: string | null) {
 
       .back-link {
         display: inline-block;
-        background-color: rgba(215, 155, 88, 0.3);
+        background-color: var(--color-background-offset);
         color: var(--color-secondary);
         padding: 0.75rem 1.5rem;
         border-radius: 2rem;
         margin-top: 1rem;
         font-weight: 600;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
-        border: 1px solid rgba(215, 155, 88, 0.5);
+        border: 1px solid var(--color-primary);
       }
 
       .back-link:hover {
         transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        background-color: rgba(215, 155, 88, 0.5);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        background-color: var(--color-background-darker);
         color: var(--color-secondary);
       }
 

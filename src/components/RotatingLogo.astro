@@ -1,0 +1,199 @@
+---
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 400, class: className = '' } = Astro.props;
+---
+
+<div class={`rotating-logo-container ${className}`} data-size={size}>
+  <canvas class="rotating-logo-canvas"></canvas>
+  <noscript>
+    <img src="/assets/logo-full.svg" alt="Cookies & Comedy Film Festival" class="logo-fallback" />
+  </noscript>
+</div>
+
+<script>
+  import * as THREE from 'three';
+
+  function initRotatingLogo() {
+    const containers = document.querySelectorAll('.rotating-logo-container');
+
+    containers.forEach((container) => {
+      const canvas = container.querySelector('.rotating-logo-canvas') as HTMLCanvasElement;
+      if (!canvas || canvas.dataset.initialized) return;
+
+      canvas.dataset.initialized = 'true';
+
+      const size = parseInt(container.getAttribute('data-size') || '400', 10);
+
+      // Scene setup
+      const scene = new THREE.Scene();
+
+      // Camera - orthographic for flat look, or perspective for depth
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+      camera.position.z = 3;
+
+      // Renderer
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+      });
+      renderer.setSize(size, size);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(2, 2, 3);
+      scene.add(directionalLight);
+
+      // Add a subtle rim light for the gold edge
+      const rimLight = new THREE.DirectionalLight(0xffd700, 0.4);
+      rimLight.position.set(-2, 0, 1);
+      scene.add(rimLight);
+
+      // Create coin geometry
+      const coinRadius = 1;
+      const coinThickness = 0.08;
+      const coinGeometry = new THREE.CylinderGeometry(
+        coinRadius,
+        coinRadius,
+        coinThickness,
+        64, // radial segments for smooth edge
+        1,
+        false
+      );
+
+      // Rotate geometry so the flat faces point forward/backward
+      coinGeometry.rotateX(Math.PI / 2);
+
+      // Load logo texture
+      const textureLoader = new THREE.TextureLoader();
+
+      // Create materials
+      const frontMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0.1,
+        roughness: 0.3,
+      });
+
+      const backMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        metalness: 0.1,
+        roughness: 0.3,
+      });
+
+      // Gold metallic edge material
+      const edgeMaterial = new THREE.MeshStandardMaterial({
+        color: 0xd4a84b, // Golden brass color
+        metalness: 0.8,
+        roughness: 0.2,
+      });
+
+      // Load the logo texture
+      textureLoader.load('/assets/logo-full.svg', (texture) => {
+        texture.colorSpace = THREE.SRGBColorSpace;
+
+        // Front face
+        frontMaterial.map = texture;
+        frontMaterial.needsUpdate = true;
+
+        // Back face - flip horizontally
+        const backTexture = texture.clone();
+        backTexture.wrapS = THREE.RepeatWrapping;
+        backTexture.repeat.x = -1;
+        backTexture.offset.x = 1;
+        backMaterial.map = backTexture;
+        backMaterial.needsUpdate = true;
+      });
+
+      // Create mesh with multiple materials
+      // CylinderGeometry has 3 material groups: side, top, bottom
+      const coin = new THREE.Mesh(coinGeometry, [edgeMaterial, frontMaterial, backMaterial]);
+      scene.add(coin);
+
+      // Animation state
+      let rotationSpeed = 0.005; // radians per frame (~8 seconds per rotation at 60fps)
+      const baseSpeed = 0.005;
+      const hoverSpeed = 0.02;
+      let isHovering = false;
+      let targetSpeed = baseSpeed;
+
+      // Hover detection
+      container.addEventListener('mouseenter', () => {
+        isHovering = true;
+        targetSpeed = hoverSpeed;
+      });
+
+      container.addEventListener('mouseleave', () => {
+        isHovering = false;
+        targetSpeed = baseSpeed;
+      });
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Smooth speed transition
+        rotationSpeed += (targetSpeed - rotationSpeed) * 0.05;
+
+        // Rotate around Y axis (horizontal spin)
+        coin.rotation.y += rotationSpeed;
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Handle resize
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const width = entry.contentRect.width;
+          if (width > 0) {
+            renderer.setSize(width, width);
+          }
+        }
+      });
+
+      resizeObserver.observe(container);
+    });
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRotatingLogo);
+  } else {
+    initRotatingLogo();
+  }
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener('astro:page-load', initRotatingLogo);
+</script>
+
+<style>
+  .rotating-logo-container {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .rotating-logo-canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .logo-fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+</style>

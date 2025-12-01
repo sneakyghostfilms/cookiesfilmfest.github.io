@@ -16,6 +16,7 @@ const { size = 400, class: className = '' } = Astro.props;
 
 <script>
   import * as THREE from 'three';
+  import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 
   function initRotatingLogo() {
     const containers = document.querySelectorAll('.rotating-logo-container');
@@ -31,9 +32,9 @@ const { size = 400, class: className = '' } = Astro.props;
       // Scene setup
       const scene = new THREE.Scene();
 
-      // Camera - orthographic for flat look, or perspective for depth
+      // Camera
       const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-      camera.position.z = 3;
+      camera.position.z = 5;
 
       // Renderer
       const renderer = new THREE.WebGLRenderer({
@@ -45,93 +46,198 @@ const { size = 400, class: className = '' } = Astro.props;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
       // Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
       scene.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight.position.set(2, 2, 3);
-      scene.add(directionalLight);
+      const frontLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      frontLight.position.set(0, 0, 5);
+      scene.add(frontLight);
 
-      // Add a subtle rim light for the gold edge
-      const rimLight = new THREE.DirectionalLight(0xffd700, 0.4);
-      rimLight.position.set(-2, 0, 1);
-      scene.add(rimLight);
+      const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      backLight.position.set(0, 0, -5);
+      scene.add(backLight);
 
-      // Create coin geometry
-      const coinRadius = 1;
-      const coinThickness = 0.08;
-      const coinGeometry = new THREE.CylinderGeometry(
-        coinRadius,
-        coinRadius,
-        coinThickness,
-        64, // radial segments for smooth edge
-        1,
-        false
-      );
+      // Gold rim lights
+      const rimLight1 = new THREE.DirectionalLight(0xffd700, 0.4);
+      rimLight1.position.set(3, 0, 0);
+      scene.add(rimLight1);
 
-      // Rotate geometry so the flat faces point forward/backward
-      coinGeometry.rotateX(Math.PI / 2);
+      const rimLight2 = new THREE.DirectionalLight(0xffd700, 0.4);
+      rimLight2.position.set(-3, 0, 0);
+      scene.add(rimLight2);
 
-      // Load logo texture
-      const textureLoader = new THREE.TextureLoader();
+      // Group to hold the logo
+      const logoGroup = new THREE.Group();
+      scene.add(logoGroup);
 
-      // Create materials
-      const frontMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        metalness: 0.1,
-        roughness: 0.3,
+      // Load and parse SVG
+      const loader = new SVGLoader();
+
+      loader.load('/assets/logo-full.svg', (data) => {
+        const paths = data.paths;
+
+        // Extrusion settings for cookie base
+        const cookieExtrudeSettings = {
+          depth: 30, // thickness of the coin
+          bevelEnabled: true,
+          bevelThickness: 5,
+          bevelSize: 3,
+          bevelSegments: 3,
+        };
+
+        // Extrusion settings for text/decorations - raised above surface
+        const textExtrudeSettings = {
+          depth: 15, // text thickness
+          bevelEnabled: true,
+          bevelThickness: 2,
+          bevelSize: 1,
+          bevelSegments: 2,
+        };
+
+        // Materials
+        const goldMaterial = new THREE.MeshStandardMaterial({
+          color: 0xd4a84b,
+          metalness: 0.8,
+          roughness: 0.2,
+          side: THREE.DoubleSide,
+        });
+
+        // Process each path from the SVG
+        paths.forEach((path) => {
+          const fillColor = path.userData?.style?.fill;
+
+          // Skip paths with no fill or 'none'
+          if (!fillColor || fillColor === 'none' || fillColor === 'transparent') {
+            return;
+          }
+
+          // Create material based on fill color
+          let material: THREE.MeshStandardMaterial;
+
+          if (fillColor === '#c69c6d' || fillColor === 'rgb(198, 156, 109)') {
+            // Cookie base color
+            material = new THREE.MeshStandardMaterial({
+              color: 0xc69c6d,
+              metalness: 0.1,
+              roughness: 0.6,
+              side: THREE.DoubleSide,
+            });
+          } else if (fillColor === '#ffffff' || fillColor === 'white' || fillColor === 'rgb(255, 255, 255)') {
+            // White text/decorations - FrontSide only to prevent see-through
+            material = new THREE.MeshStandardMaterial({
+              color: 0xffffff,
+              metalness: 0.1,
+              roughness: 0.3,
+              side: THREE.FrontSide,
+            });
+          } else if (fillColor === '#0c0a3a' || fillColor === 'rgb(12, 10, 58)') {
+            // Dark blue elements - FrontSide only to prevent see-through
+            material = new THREE.MeshStandardMaterial({
+              color: 0x0c0a3a,
+              metalness: 0.1,
+              roughness: 0.3,
+              side: THREE.FrontSide,
+            });
+          } else {
+            // Default material - FrontSide only
+            material = new THREE.MeshStandardMaterial({
+              color: fillColor ? new THREE.Color(fillColor) : 0xcccccc,
+              metalness: 0.1,
+              roughness: 0.5,
+              side: THREE.FrontSide,
+            });
+          }
+
+          // Check if this is the cookie base (outer shape)
+          const isCookieBase = fillColor === '#c69c6d' || fillColor === 'rgb(198, 156, 109)';
+
+          const shapes = SVGLoader.createShapes(path);
+
+          shapes.forEach((shape) => {
+            if (isCookieBase) {
+              // Main extruded cookie shape
+              const geometry = new THREE.ExtrudeGeometry(shape, cookieExtrudeSettings);
+              const mesh = new THREE.Mesh(geometry, [material, goldMaterial]);
+              logoGroup.add(mesh);
+            } else {
+              // Extruded text/decorations on front - raised above cookie surface
+              const geometry = new THREE.ExtrudeGeometry(shape, textExtrudeSettings);
+              const mesh = new THREE.Mesh(geometry, material);
+
+              // Base z position for front text
+              let frontZ = cookieExtrudeSettings.depth + cookieExtrudeSettings.bevelThickness;
+
+              // Offset white (shadow) elements behind dark blue text to prevent z-fighting
+              const isWhite = fillColor === '#ffffff' || fillColor === 'white' || fillColor === 'rgb(255, 255, 255)';
+              const isDarkBlue = fillColor === '#0c0a3a' || fillColor === 'rgb(12, 10, 58)';
+
+              if (isWhite) {
+                frontZ -= 3; // Shadow sits behind
+              } else if (isDarkBlue) {
+                frontZ += 1; // Dark text sits in front
+              }
+
+              mesh.position.z = frontZ;
+              logoGroup.add(mesh);
+
+              // Extruded text on back
+              const backGeometry = new THREE.ExtrudeGeometry(shape, textExtrudeSettings);
+              const backMesh = new THREE.Mesh(backGeometry, material);
+
+              // Base z position for back
+              let backZ = -cookieExtrudeSettings.bevelThickness - textExtrudeSettings.depth - textExtrudeSettings.bevelThickness;
+
+              if (isWhite) {
+                backZ += 3; // Shadow sits behind (further from viewer when looking at back)
+              } else if (isDarkBlue) {
+                backZ -= 1; // Dark text sits in front
+              }
+
+              backMesh.position.z = backZ;
+              backMesh.rotation.y = Math.PI; // Face backward
+              backMesh.scale.x = -1; // Mirror so text reads correctly
+              logoGroup.add(backMesh);
+            }
+          });
+        });
+
+        // Center and scale the logo
+        const box = new THREE.Box3().setFromObject(logoGroup);
+        const center = box.getCenter(new THREE.Vector3());
+        const logoSize = box.getSize(new THREE.Vector3());
+
+        // Translate each child to center around origin (don't use group position)
+        logoGroup.children.forEach((child) => {
+          child.position.x -= center.x;
+          child.position.y -= center.y;
+          child.position.z -= center.z;
+        });
+
+        // Scale to fit view - use smaller scale to prevent clipping during rotation
+        const maxDim = Math.max(logoSize.x, logoSize.y);
+        const scale = 2.2 / maxDim;
+        logoGroup.scale.set(scale, -scale, scale); // Negative Y to flip right-side up
+
+        // Position camera to see the full object during rotation
+        camera.position.z = 3;
+      },
+      undefined,
+      (error) => {
+        console.error('SVG load error:', error);
       });
-
-      const backMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        metalness: 0.1,
-        roughness: 0.3,
-      });
-
-      // Gold metallic edge material
-      const edgeMaterial = new THREE.MeshStandardMaterial({
-        color: 0xd4a84b, // Golden brass color
-        metalness: 0.8,
-        roughness: 0.2,
-      });
-
-      // Load the logo texture
-      textureLoader.load('/assets/logo-full.svg', (texture) => {
-        texture.colorSpace = THREE.SRGBColorSpace;
-
-        // Front face
-        frontMaterial.map = texture;
-        frontMaterial.needsUpdate = true;
-
-        // Back face - flip horizontally
-        const backTexture = texture.clone();
-        backTexture.wrapS = THREE.RepeatWrapping;
-        backTexture.repeat.x = -1;
-        backTexture.offset.x = 1;
-        backMaterial.map = backTexture;
-        backMaterial.needsUpdate = true;
-      });
-
-      // Create mesh with multiple materials
-      // CylinderGeometry has 3 material groups: side, top, bottom
-      const coin = new THREE.Mesh(coinGeometry, [edgeMaterial, frontMaterial, backMaterial]);
-      scene.add(coin);
 
       // Animation state
-      let rotationSpeed = 0.005; // radians per frame (~8 seconds per rotation at 60fps)
-      const baseSpeed = 0.005;
-      const hoverSpeed = 0.02;
-      let isHovering = false;
+      let rotationSpeed = 0.008;
+      const baseSpeed = 0.008;
+      const hoverSpeed = 0.025;
       let targetSpeed = baseSpeed;
 
       // Hover detection
       container.addEventListener('mouseenter', () => {
-        isHovering = true;
         targetSpeed = hoverSpeed;
       });
 
       container.addEventListener('mouseleave', () => {
-        isHovering = false;
         targetSpeed = baseSpeed;
       });
 
@@ -142,8 +248,8 @@ const { size = 400, class: className = '' } = Astro.props;
         // Smooth speed transition
         rotationSpeed += (targetSpeed - rotationSpeed) * 0.05;
 
-        // Rotate around Y axis (horizontal spin)
-        coin.rotation.y += rotationSpeed;
+        // Rotate around Y axis
+        logoGroup.rotation.y += rotationSpeed;
 
         renderer.render(scene, camera);
       }

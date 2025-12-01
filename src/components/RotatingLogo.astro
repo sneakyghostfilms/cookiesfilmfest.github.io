@@ -85,9 +85,12 @@ const { size = 400, class: className = '' } = Astro.props;
           bevelSegments: 3,
         };
 
-        // Extrusion settings for text/decorations - raised above surface
+        // Total cookie thickness for reference
+        const cookieTotalDepth = cookieExtrudeSettings.depth + (cookieExtrudeSettings.bevelThickness * 2);
+
+        // Extrusion settings for text - goes all the way through cookie plus sticks out
         const textExtrudeSettings = {
-          depth: 15, // text thickness
+          depth: cookieTotalDepth + 20, // extends beyond cookie on both sides
           bevelEnabled: true,
           bevelThickness: 2,
           bevelSize: 1,
@@ -160,43 +163,34 @@ const { size = 400, class: className = '' } = Astro.props;
               const mesh = new THREE.Mesh(geometry, [material, goldMaterial]);
               logoGroup.add(mesh);
             } else {
-              // Extruded text/decorations on front - raised above cookie surface
-              const geometry = new THREE.ExtrudeGeometry(shape, textExtrudeSettings);
-              const mesh = new THREE.Mesh(geometry, material);
-
-              // Base z position for front text
-              let frontZ = cookieExtrudeSettings.depth + cookieExtrudeSettings.bevelThickness;
-
               // Offset white (shadow) elements behind dark blue text to prevent z-fighting
               const isWhite = fillColor === '#ffffff' || fillColor === 'white' || fillColor === 'rgb(255, 255, 255)';
               const isDarkBlue = fillColor === '#0c0a3a' || fillColor === 'rgb(12, 10, 58)';
 
+              // White shadow gets shorter extrusion so it doesn't overlap on back
+              const shadowExtrudeSettings = {
+                depth: cookieTotalDepth + 10, // less stick-out than main text
+                bevelEnabled: true,
+                bevelThickness: 1,
+                bevelSize: 0.5,
+                bevelSegments: 2,
+              };
+
+              const extrudeOpts = isWhite ? shadowExtrudeSettings : textExtrudeSettings;
+              const geometry = new THREE.ExtrudeGeometry(shape, extrudeOpts);
+              const mesh = new THREE.Mesh(geometry, material);
+
+              // Position so text is centered through the cookie
+              let startZ = -cookieExtrudeSettings.bevelThickness - 10; // 10 units stick out back
+
               if (isWhite) {
-                frontZ -= 3; // Shadow sits behind
+                startZ = -cookieExtrudeSettings.bevelThickness - 5; // shadow starts closer, ends shorter
               } else if (isDarkBlue) {
-                frontZ += 1; // Dark text sits in front
+                startZ += 2; // Dark text slightly in front
               }
 
-              mesh.position.z = frontZ;
+              mesh.position.z = startZ;
               logoGroup.add(mesh);
-
-              // Extruded text on back
-              const backGeometry = new THREE.ExtrudeGeometry(shape, textExtrudeSettings);
-              const backMesh = new THREE.Mesh(backGeometry, material);
-
-              // Base z position for back
-              let backZ = -cookieExtrudeSettings.bevelThickness - textExtrudeSettings.depth - textExtrudeSettings.bevelThickness;
-
-              if (isWhite) {
-                backZ += 3; // Shadow sits behind (further from viewer when looking at back)
-              } else if (isDarkBlue) {
-                backZ -= 1; // Dark text sits in front
-              }
-
-              backMesh.position.z = backZ;
-              backMesh.rotation.y = Math.PI; // Face backward
-              backMesh.scale.x = -1; // Mirror so text reads correctly
-              logoGroup.add(backMesh);
             }
           });
         });

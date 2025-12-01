@@ -1,0 +1,46 @@
+---
+interface Props {
+  quote: string;
+  author: string;
+}
+
+const { quote, author } = Astro.props;
+---
+
+<div class="testimonial">
+  <p class="testimonial-quote">"{quote}"</p>
+  <p class="testimonial-attribution">— {author}</p>
+</div>
+
+<style>
+  .testimonial {
+    margin-bottom: 1.5rem;
+  }
+
+  .testimonial-quote {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-style: italic;
+    position: relative;
+    padding-left: 1.5rem;
+    font-weight: 500;
+  }
+
+  .testimonial-quote::before {
+    content: '"';
+    position: absolute;
+    left: 0;
+    top: -0.5rem;
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    opacity: 0.7;
+  }
+
+  .testimonial-attribution {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    text-align: right;
+    color: var(--color-secondary);
+  }
+</style>

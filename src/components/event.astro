@@ -1,7 +1,27 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
 import Map from "./map.astro";
-import { Image } from 'astro:assets';
+import Timeline from "./event/Timeline.astro";
+import ComedianCard from "./event/ComedianCard.astro";
+import GalleryItem from "./event/GalleryItem.astro";
+import Testimonial from "./event/Testimonial.astro";
+
+const timelineItems = [
+  { title: "Film Submissions", date: "June 1 - December 31, 2025" },
+  { title: "Schedule Announcement", date: "January 14, 2026" },
+  { title: "Festival Weekend", date: "Saturday, March 14, 2026" },
+];
+
+const comedians = [
+  { name: "Mike Zydel", image: "/assets/comedians/mike-zydel.jpg", imagePosition: "center 20%" },
+  { name: "Matty Malloy", image: "/assets/comedians/matty-malloy.jpg", imagePosition: "center 25%" },
+  { name: "Mary Warwick", image: "/assets/comedians/mary-warwick.jpg", imagePosition: "center 20%" },
+];
+
+const testimonials = [
+  { quote: "This was such a fun time full of truly lovely people and good films! Scott was very communicative and friendly, and the event went off without a hitch. Thanks so much for including us!", author: "Katherine Coleman, 2025 Filmmaker" },
+  { quote: "We hope to be back! Just a great experience to have as a filmmaker. The communication, venue, and crowds were great.", author: "Pat Battistini, 2025 Filmmaker" },
+];
 ---
 
 <SectionLayout title="The Event" id="event">
@@ -16,39 +36,17 @@ import { Image } from 'astro:assets';
 
       <div class="event-main">
         <div class="event-details">
-          <div class="timeline">
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <div class="timeline-content">
-                <h4 class="timeline-title">Film Submissions</h4>
-                <p>June 1 - December 31, 2025</p>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <div class="timeline-content">
-                <h4 class="timeline-title">Schedule Announcement</h4>
-                <p>January 14, 2026</p>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <div class="timeline-content">
-                <h4 class="timeline-title">Festival Weekend</h4>
-                <p>Saturday, March 14, 2026</p>
-              </div>
-            </div>
-          </div>
-          
+          <Timeline items={timelineItems} />
+
           <p class="text-justify">
             The festival will be held at the Harris Theater in downtown Pittsburgh's Cultural District.
           </p>
         </div>
-        
+
         <div class="event-image-container">
-          <img 
-            src="/assets/2025-event-photos/audience-2.jpeg" 
-            alt="Audience enjoying comedy films at our festival" 
+          <img
+            src="/assets/2025-event-photos/audience-2.jpeg"
+            alt="Audience enjoying comedy films at our festival"
             class="event-img"
           />
         </div>
@@ -61,30 +59,13 @@ import { Image } from 'astro:assets';
         <div class="comedians-section">
           <h4 class="comedians-subtitle">2026 Featured Comedians</h4>
           <div class="comedians-grid">
-            <div class="comedian-card">
-              <img
-                src="/assets/comedians/mike-zydel.jpg"
-                alt="Mike Zydel"
-                class="comedian-img mike-img"
+            {comedians.map((comedian) => (
+              <ComedianCard
+                name={comedian.name}
+                image={comedian.image}
+                imagePosition={comedian.imagePosition}
               />
-              <p class="comedian-name">Mike Zydel</p>
-            </div>
-            <div class="comedian-card">
-              <img
-                src="/assets/comedians/matty-malloy.jpg"
-                alt="Matty Malloy"
-                class="comedian-img matty-img"
-              />
-              <p class="comedian-name">Matty Malloy</p>
-            </div>
-            <div class="comedian-card">
-              <img
-                src="/assets/comedians/mary-warwick.jpg"
-                alt="Mary Warwick"
-                class="comedian-img mary-img"
-              />
-              <p class="comedian-name">Mary Warwick</p>
-            </div>
+            ))}
           </div>
           <p class="comedians-description">Live comedy performances between film blocks</p>
         </div>
@@ -92,20 +73,23 @@ import { Image } from 'astro:assets';
         <!-- Other Festival Features in Triangle Layout -->
         <div class="features-triangle">
           <div class="triangle-top">
-            <div class="gallery-item">
-              <img src="/assets/2025-event-photos/q-and-a-session.jpeg" alt="Q&A with filmmakers" class="gallery-img" />
-              <p>Engaging Q&A sessions with filmmakers</p>
-            </div>
+            <GalleryItem
+              image="/assets/2025-event-photos/q-and-a-session.jpeg"
+              alt="Q&A with filmmakers"
+              caption="Engaging Q&A sessions with filmmakers"
+            />
           </div>
           <div class="triangle-bottom">
-            <div class="gallery-item">
-              <img src="/assets/2025-event-photos/cookie-table.jpeg" alt="Cookie table at the festival" class="gallery-img" />
-              <p>Our famous cookie table</p>
-            </div>
-            <div class="gallery-item">
-              <img src="/assets/2025-event-photos/networking.jpeg" alt="Attendees networking" class="gallery-img" />
-              <p>Connect with fellow film enthusiasts</p>
-            </div>
+            <GalleryItem
+              image="/assets/2025-event-photos/cookie-table.jpeg"
+              alt="Cookie table at the festival"
+              caption="Our famous cookie table"
+            />
+            <GalleryItem
+              image="/assets/2025-event-photos/networking.jpeg"
+              alt="Attendees networking"
+              caption="Connect with fellow film enthusiasts"
+            />
           </div>
         </div>
       </div>
@@ -115,21 +99,16 @@ import { Image } from 'astro:assets';
       <h3 class="testimonial-title">What Our Filmmakers Say</h3>
       <div class="testimonial-container">
         <div class="testimonial-image">
-          <img 
-            src="/assets/2025-event-photos/audience-1.jpeg" 
-            alt="Happy audience at Cookies & Comedy Film Festival" 
+          <img
+            src="/assets/2025-event-photos/audience-1.jpeg"
+            alt="Happy audience at Cookies & Comedy Film Festival"
             class="testimonial-img"
           />
         </div>
         <div class="testimonial-content">
-          <p class="testimonial-quote">
-            "This was such a fun time full of truly lovely people and good films! Scott was very communicative and friendly, and the event went off without a hitch. Thanks so much for including us!"
-          </p>
-          <p class="testimonial-attribution">— Katherine Coleman, 2025 Filmmaker</p>
-          <p class="testimonial-quote">
-            "We hope to be back! Just a great experience to have as a filmmaker. The communication, venue, and crowds were great."
-          </p>
-          <p class="testimonial-attribution">— Pat Battistini, 2025 Filmmaker</p>
+          {testimonials.map((t) => (
+            <Testimonial quote={t.quote} author={t.author} />
+          ))}
         </div>
       </div>
       <div class="archive-link-container">
@@ -139,7 +118,7 @@ import { Image } from 'astro:assets';
         <p class="archive-link">Check out our <a href="/past-events/2025" class="highlight-link">2025 festival archive</a> to see what you missed!</p>
       </div>
     </div>
-    
+
     <Map />
   </Fragment>
 </SectionLayout>
@@ -150,7 +129,7 @@ import { Image } from 'astro:assets';
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+
   .event-header {
     margin-bottom: 1.5rem;
     text-align: center;
@@ -158,20 +137,20 @@ import { Image } from 'astro:assets';
     margin-left: auto;
     margin-right: auto;
   }
-  
+
   .event-subtitle {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 1.8rem;
     color: var(--color-secondary);
     margin-bottom: 1rem;
   }
-  
+
   .event-description {
     font-family: 'Fredoka', sans-serif;
     font-size: 1.1rem;
     line-height: 1.6;
   }
-  
+
   .event-main {
     display: flex;
     flex-direction: column;
@@ -179,13 +158,13 @@ import { Image } from 'astro:assets';
     margin-bottom: 2rem;
     align-items: center;
   }
-  
+
   .event-details {
     flex: 1;
     width: 100%;
     max-width: 550px;
   }
-  
+
   .event-image-container {
     flex: 1;
     width: 100%;
@@ -193,73 +172,20 @@ import { Image } from 'astro:assets';
     display: flex;
     justify-content: center;
   }
-  
+
   .event-img {
     width: 100%;
     height: auto;
     border-radius: 1rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   }
-  
-  .timeline {
-    margin: 2rem 0;
-  }
-  
-  .timeline-item {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .timeline-dot {
-    width: 20px;
-    height: 20px;
-    background-color: var(--color-primary);
-    border-radius: 50%;
-    margin-top: 0.25rem;
-  }
-  
-  .timeline-content {
-    flex: 1;
-  }
-  
-  .timeline-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--color-secondary);
-    margin-bottom: 0.25rem;
-  }
-  
-  .button-container {
-    text-align: center;
-    margin-top: 1.5rem;
-  }
-  
-  .event-btn {
-    background-color: var(--color-primary);
-    color: white;
-    padding: 0.85rem 2rem;
-    border-radius: 2rem;
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s ease;
-  }
-  
-  .event-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-    background-color: #c68c4a;
-  }
-  
+
   /* Experience Section */
   .experience-section {
     margin-top: 3rem;
     margin-bottom: 3rem;
   }
-  
+
   .experience-title {
     font-family: 'Inter Variable', 'Inter', sans-serif;
     font-size: 1.8rem;
@@ -267,44 +193,7 @@ import { Image } from 'astro:assets';
     margin-bottom: 2rem;
     text-align: center;
   }
-  
-  .photo-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  .gallery-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .gallery-img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4/3;
-    object-fit: cover;
-    object-position: center;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-bottom: 0.75rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .gallery-img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  .gallery-item p {
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    color: var(--color-secondary);
-    margin-top: 0.5rem;
-  }
-  
+
   /* Comedians section styling */
   .comedians-section {
     margin-bottom: 3rem;
@@ -330,79 +219,6 @@ import { Image } from 'astro:assets';
     position: relative;
   }
 
-
-  .comedian-card {
-    text-align: center;
-  }
-
-  .comedian-img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .comedian-img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-
-  .mike-img {
-    object-position: center 20%;
-  }
-
-  .matty-img {
-    object-position: center 25%;
-  }
-
-  .mary-img {
-    object-position: center 20%;
-  }
-
-  .comedian-placeholder {
-    width: 100%;
-    aspect-ratio: 1;
-    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-    border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .comedian-placeholder::before {
-    content: '🎭';
-    position: absolute;
-    font-size: 3rem;
-    opacity: 0.2;
-  }
-
-  .placeholder-text {
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    color: #999;
-    font-size: 1rem;
-    z-index: 1;
-  }
-
-  .comedian-placeholder:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-
-  .comedian-name {
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    color: var(--color-secondary);
-    margin-top: 0.75rem;
-    font-size: 1rem;
-  }
-
   .comedians-description {
     text-align: center;
     font-family: 'Fredoka', sans-serif;
@@ -424,7 +240,7 @@ import { Image } from 'astro:assets';
     margin-bottom: 1.5rem;
   }
 
-  .triangle-top .gallery-item {
+  .triangle-top :global(.gallery-item) {
     max-width: 350px;
   }
 
@@ -435,7 +251,7 @@ import { Image } from 'astro:assets';
     max-width: 700px;
     margin: 0 auto;
   }
-  
+
   @media (min-width: 768px) {
     .event-main {
       flex-direction: row;
@@ -478,26 +294,22 @@ import { Image } from 'astro:assets';
       z-index: -1;
       pointer-events: none;
     }
-    
+
     .testimonial-container {
       flex-direction: row;
       align-items: center;
     }
-    
+
     .testimonial-image {
       max-width: 65%;
     }
-    
+
     .testimonial-img {
       min-width: 600px;
     }
   }
-  
-  @media (min-width: 1024px) {
-    .gallery-img {
-      min-height: 250px;
-    }
 
+  @media (min-width: 1024px) {
     .triangle-bottom {
       gap: 2rem;
     }
@@ -543,54 +355,27 @@ import { Image } from 'astro:assets';
     gap: 1.5rem;
   }
 
-  .testimonial-quote {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    font-style: italic;
-    position: relative;
-    padding-left: 1.5rem;
-    font-weight: 500;
-  }
-
-  .testimonial-quote::before {
-    content: '"';
-    position: absolute;
-    left: 0;
-    top: -0.5rem;
-    font-size: 2.5rem;
-    color: var(--color-primary);
-    opacity: 0.7;
-  }
-
-  .testimonial-attribution {
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    text-align: right;
-    color: var(--color-secondary);
-  }
-
   @media (min-width: 768px) {
     .testimonial-container {
       flex-direction: row;
       align-items: center;
     }
-    
+
     .testimonial-image {
       max-width: 65%;
     }
-    
+
     .testimonial-img {
       min-width: 650px;
       height: auto;
     }
   }
-  
+
   @media (min-width: 1024px) {
     .testimonial-image {
       max-width: 68%;
     }
-    
+
     .testimonial-img {
       min-width: 700px;
     }
@@ -603,21 +388,13 @@ import { Image } from 'astro:assets';
     max-width: 800px;
     padding: 0 1rem;
   }
-  
+
   .cta-title {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 2.5rem;
     color: var(--color-secondary);
     margin-bottom: 0.5rem;
     font-weight: 800;
-  }
-  
-  .cta-description {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1.15rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-    color: var(--color-text);
   }
 
   /* Archive link styling */

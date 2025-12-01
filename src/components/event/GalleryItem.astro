@@ -1,0 +1,53 @@
+---
+interface Props {
+  image: string;
+  alt: string;
+  caption: string;
+}
+
+const { image, alt, caption } = Astro.props;
+---
+
+<div class="gallery-item">
+  <img src={image} alt={alt} class="gallery-img" />
+  <p>{caption}</p>
+</div>
+
+<style>
+  .gallery-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .gallery-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .gallery-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .gallery-item p {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    color: var(--color-secondary);
+    margin-top: 0.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .gallery-img {
+      min-height: 250px;
+    }
+  }
+</style>

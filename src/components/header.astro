@@ -1,5 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
+import NavLinks from "./nav/NavLinks.astro";
+import MobileMenu from "./nav/MobileMenu.astro";
 import type { NavItem } from "~/types";
 
 const navItems: Array<NavItem> = [
@@ -12,7 +14,6 @@ const navItems: Array<NavItem> = [
 
 const pastEvents = [
   { href: "/past-events/2025", text: "2025 Festival" },
-  // Add more past events here as needed
 ];
 ---
 
@@ -22,302 +23,50 @@ const pastEvents = [
 >
   <div class="flex items-end flex-grow-0">
     <div class="flex items-end gap-3">
-      <nav class="block max-sm:hidden">
-        <ul class="flex flex-wrap items-end gap-3 m-0 p-0">
-          {
-            navItems.map(({ title, url }) => (
-              <li class="mb-0 mx-1 pb-0.5">
-                <a class="menu-link text-sm" href={url}>
-                  {title}
-                </a>
-              </li>
-            ))
-          }
-          <li class="dropdown-container mb-0 mx-1 pb-0.5">
-            <button id="pastEventsDropdown" class="menu-link text-sm dropdown-button">
-              Past Events <span class="dropdown-arrow">▼</span>
-            </button>
-            <div class="dropdown-content" id="pastEventsContent">
-              {pastEvents.map((event) => (
-                <a href={event.href} class="dropdown-item">{event.text}</a>
-              ))}
-            </div>
-          </li>
-          <li class="mb-0 mx-1 pb-0.5">
-            <a class="menu-link text-sm" href="/pa-festivals">
-              PA Fests
-            </a>
-          </li>
-          <li class="mb-0 mx-1 pb-0.5">
-            <a class="menu-link text-sm" href="/comedy-festivals">
-              Comedy Fests
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <button
-        id="open-nav-button"
-        type="button"
-        class="btn btn-nav hidden max-sm:block mb-0 pb-0.5"
-        aria-label="Navigation"
-      >
-        <Icon name="mdi:menu" class="size-8" />
-      </button>
-    </div>
-    <div id="menu-modal" class="modal hidden" aria-hidden="true">
-      <div class="mobile-menu-overlay">
-        <div class="mobile-menu-container">
-          <div class="mobile-menu-header">
-            <button
-              id="close-nav-button"
-              type="button"
-              class="btn btn-nav mobile-close-btn"
-              aria-label="Close navigation"
-            >
-              <Icon name="mdi:close" class="size-8" />
-            </button>
-          </div>
-          <div class="mobile-menu-content">
-            <ul class="mobile-menu-list">
-              {
-                navItems.map(({ title, url }) => (
-                  <li class="mobile-menu-item">
-                    <a class="mobile-menu-link" href={url}>
-                      {title}
-                    </a>
-                  </li>
-                ))
-              }
-              <li class="mobile-menu-item">
-                <div class="mobile-dropdown">
-                  <button class="mobile-dropdown-title">Past Events <span class="dropdown-arrow">▼</span></button>
-                  <div class="mobile-dropdown-content">
-                    {pastEvents.map((event) => (
-                      <a class="mobile-menu-link mobile-submenu-link" href={event.href}>
-                        {event.text}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </li>
-              <li class="mobile-menu-item">
-                <a class="mobile-menu-link" href="/pa-festivals">
-                  PA Fests
-                </a>
-              </li>
-              <li class="mobile-menu-item">
-                <a class="mobile-menu-link" href="/comedy-festivals">
-                  Comedy Fests
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <NavLinks navItems={navItems} pastEvents={pastEvents} />
+      <MobileMenu navItems={navItems} pastEvents={pastEvents} />
     </div>
   </div>
   <div class="flex-shrink-0 ml-auto flex items-end">
-    <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="social-btn mb-0 pb-0.5">
-      <Icon name="mdi:facebook" class="size-5" /> Follow us 
+    <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="social-btn">
+      <Icon name="mdi:facebook" class="size-5" /> Follow us
     </a>
   </div>
 </header>
 
 <script>
-  import MicroModal from "micromodal";
-  import invariant from "tiny-invariant";
+  function initHeader() {
+    const header = document.querySelector("#page-header") as HTMLElement;
+    const page = document.documentElement;
 
-  const menuModalId = "menu-modal";
+    if (!header) return;
 
-  const header = document.querySelector("#page-header") as HTMLElement;
-  const page = document.documentElement;
-  const menu = document.querySelector(`#${menuModalId} ul`);
-  const openNavButton = document.querySelector("#open-nav-button");
-  const closeNavButton = document.querySelector("#close-nav-button");
-
-  invariant(header, "header should not be null");
-  invariant(menu, "menu should not be null");
-  invariant(openNavButton, "openNavButton should not be null");
-  invariant(closeNavButton, "closeNavButton should not be null");
-
-  const openMenu = () => {
-    MicroModal.show(menuModalId, { disableScroll: true });
-  };
-
-  const closeMenu = () => {
-    MicroModal.close(menuModalId);
-  };
-
-  openNavButton.addEventListener("click", openMenu);
-  closeNavButton.addEventListener("click", closeMenu);
-
-  document.addEventListener("scroll", () => {
-    const d = page.clientHeight - page.scrollTop - header.offsetHeight;
-    header.classList.toggle("fixed-header", d < 0);
-  });
-
-  menu.addEventListener("click", (event) => {
-    if ((event.target as HTMLElement).tagName === "A") {
-      closeMenu();
-    }
-  });
-
-  // Dropdown functionality for desktop
-  const dropdownButton = document.getElementById('pastEventsDropdown');
-  const dropdownContent = document.getElementById('pastEventsContent');
-  const dropdownContainer = document.querySelector('.dropdown-container');
-  
-  if (dropdownButton && dropdownContent && dropdownContainer) {
-    dropdownButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dropdownContent.classList.toggle('show');
-      
-      // Check if there's enough space below
-      const buttonRect = dropdownButton.getBoundingClientRect();
-      const dropdownHeight = 120; // Approximate height of dropdown
-      const viewportHeight = window.innerHeight;
-      const spaceBelow = viewportHeight - buttonRect.bottom;
-      
-      // If not enough space below, position above
-      if (spaceBelow < dropdownHeight) {
-        dropdownContainer.classList.add('position-top');
-        dropdownContent.style.animation = 'fadeInUp 0.3s ease';
-      } else {
-        dropdownContainer.classList.remove('position-top');
-        dropdownContent.style.animation = 'fadeIn 0.3s ease';
-      }
-      
-      const arrow = dropdownButton.querySelector('.dropdown-arrow');
-      if (arrow) {
-        arrow.textContent = dropdownContent.classList.contains('show') ? '▲' : '▼';
-      }
-    });
-    
-    document.addEventListener('click', (event) => {
-      if (!dropdownButton.contains(event.target as Node)) {
-        dropdownContent.classList.remove('show');
-        const arrow = dropdownButton.querySelector('.dropdown-arrow');
-        if (arrow) {
-          arrow.textContent = '▼';
-        }
-      }
+    // Toggle fixed header on scroll
+    document.addEventListener("scroll", () => {
+      const d = page.clientHeight - page.scrollTop - header.offsetHeight;
+      header.classList.toggle("fixed-header", d < 0);
     });
 
-    // Also check on resize and scroll
-    function checkDropdownPosition() {
-      const content = document.getElementById('pastEventsContent');
-      const container = document.querySelector('.dropdown-container');
-      const button = document.getElementById('pastEventsDropdown');
-      
-      if (content && container && button && content.classList.contains('show')) {
-        const buttonRect = button.getBoundingClientRect();
-        const dropdownHeight = 120; // Approximate height of dropdown
-        const viewportHeight = window.innerHeight;
-        const spaceBelow = viewportHeight - buttonRect.bottom;
-        
-        if (spaceBelow < dropdownHeight) {
-          container.classList.add('position-top');
-          content.style.animation = 'fadeInUp 0.3s ease';
-        } else {
-          container.classList.remove('position-top');
-          content.style.animation = 'fadeIn 0.3s ease';
-        }
-      }
-    }
-    
-    window.addEventListener('resize', checkDropdownPosition);
-    window.addEventListener('scroll', checkDropdownPosition);
-  }
-  
-  // Mobile dropdown functionality
-  const mobileDropdown = document.querySelector('.mobile-dropdown-title');
-  const mobileDropdownContent = document.querySelector('.mobile-dropdown-content');
-  
-  if (mobileDropdown && mobileDropdownContent) {
-    mobileDropdown.addEventListener('click', () => {
-      mobileDropdownContent.classList.toggle('show-mobile');
-      mobileDropdown.classList.toggle('active');
-    });
-  }
-  
-  // MicroModal configuration
-  MicroModal.init({
-    onShow: (modal) => {
-      document.body.style.overflow = 'hidden';
-      if (modal && modal.id) {
-        const modalElement = document.getElementById(modal.id);
-        if (modalElement) {
-          const fixedElement = modalElement.querySelector('.fixed') as HTMLElement;
-          if (fixedElement) {
-            fixedElement.scrollTop = 0;
-          }
-        }
-      }
-    },
-    onClose: (_modal) => {
-      document.body.style.overflow = '';
-    },
-    openTrigger: 'data-micromodal-trigger',
-    closeTrigger: 'data-micromodal-close',
-    disableScroll: true,
-    disableFocus: false,
-    awaitOpenAnimation: false,
-    awaitCloseAnimation: false,
-    debugMode: false
-  });
-
-  // Ensure the menu modal properly displays
-  const initializeMenuModal = () => {
-    const menuModal = document.getElementById(menuModalId);
-    if (menuModal) {
-      const menuContent = menuModal.querySelector('.fixed') as HTMLElement;
-      if (menuContent) {
-        menuContent.style.maxHeight = '100vh';
-        menuContent.style.overflowY = 'auto';
-      }
-    }
-  };
-
-  // Run on page load
-  initializeMenuModal();
-  
-  // Ensure proper scrolling in modal for landscape
-  window.addEventListener('orientationchange', () => {
-    const menuModal = document.getElementById(menuModalId);
-    if (menuModal && menuModal.classList.contains('is-open')) {
-      const menuContent = menuModal.querySelector('.fixed') as HTMLElement;
-      if (menuContent) {
-        menuContent.style.maxHeight = '100vh';
-        menuContent.style.overflowY = 'auto';
-      }
-    }
-  });
-
-  // Ensure the header and buttons stay properly positioned
-  window.addEventListener('resize', () => {
-    if (header) {
+    // Handle responsive header class
+    const updateHeaderClass = () => {
       if (window.innerWidth < 768) {
         header.classList.add('mobile-header');
       } else {
         header.classList.remove('mobile-header');
       }
-    }
-    
-    // Also check menu modal sizing
-    initializeMenuModal();
-  });
-  
-  // Trigger once on load
-  window.dispatchEvent(new Event('resize'));
-</script>
+    };
 
-<noscript>
-  <style>
-    #open-nav-button {
-      display: none;
-    }
-  </style>
-</noscript>
+    window.addEventListener('resize', updateHeaderClass);
+    updateHeaderClass();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeader);
+  } else {
+    initHeader();
+  }
+  document.addEventListener('astro:page-load', initHeader);
+</script>
 
 <style>
   .fixed-header {
@@ -325,36 +74,6 @@ const pastEvents = [
     @apply border-default bg-default text-default;
     animation: slideDown 0.3s ease forwards;
     box-shadow: var(--shadow-md);
-  }
-  
-  .modal.is-open {
-    @apply block;
-  }
-
-  .menu-link {
-    color: var(--color-secondary);
-    background-color: var(--color-background-offset);
-    padding: 0.75rem 1.5rem;
-    border-radius: 2rem;
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    box-shadow: var(--shadow-md);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    display: inline-flex;
-    margin-bottom: 0;
-    border: 2px solid transparent;
-    font-size: 0.875rem;
-    vertical-align: middle;
-    line-height: 1.5;
-  }
-
-  .menu-link:hover {
-    background-color: var(--color-background-darker);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-primary);
   }
 
   .social-btn {
@@ -364,18 +83,15 @@ const pastEvents = [
     border-radius: 2rem;
     font-family: 'Fredoka', sans-serif;
     font-weight: 600;
+    font-size: 0.95rem;
     box-shadow: var(--shadow-md);
     text-decoration: none;
     transition: all 0.3s ease;
     white-space: nowrap;
-    max-width: 100%;
-    font-size: 0.95rem;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0;
     line-height: 1.5;
-    vertical-align: middle;
     position: relative;
     top: -5px;
     border: 1px solid var(--color-primary-dark);
@@ -387,425 +103,37 @@ const pastEvents = [
     background-color: var(--color-primary-dark);
     top: -7px;
   }
-  
-  /* Button styling */
-  .btn-nav {
-    background-color: var(--color-primary);
-    color: white;
-    box-shadow: var(--shadow-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.5rem;
-    padding: 0.5rem;
-    border: 1px solid var(--color-primary-dark);
-  }
 
-  .btn-nav:hover {
-    background-color: var(--color-primary-dark);
-    box-shadow: var(--shadow-lg);
-  }
-
-  /* Dropdown Styles */
-  .dropdown-container {
-    position: relative;
-    display: inline-block;
-  }
-
-  .dropdown-button {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .dropdown-arrow {
-    font-size: 0.7rem;
-    transition: transform 0.2s ease;
-  }
-
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: var(--color-background);
-    min-width: 200px;
-    box-shadow: var(--shadow-lg);
-    z-index: 50;
-    border-radius: 1rem;
-    overflow: hidden;
-    left: 0;
-    /* Automatically check if there's enough space below; if not, position above */
-    bottom: auto;
-    top: calc(100% + 0.5rem);
-    max-height: calc(100vh - 150px);
-    overflow-y: auto;
-    border: 2px solid var(--color-primary);
-  }
-
-  /* Style for when dropdown should be placed above */
-  .dropdown-container.position-top .dropdown-content {
-    top: auto;
-    bottom: calc(100% + 0.5rem);
-  }
-
-  .dropdown-content.show {
-    display: block;
-    animation: fadeIn 0.3s ease;
-  }
-
-  .dropdown-item {
-    color: var(--color-secondary);
-    padding: 0.75rem 1rem;
-    text-decoration: none;
-    display: block;
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    border-left: 3px solid transparent;
-  }
-
-  .dropdown-item:hover {
-    background-color: var(--color-background-offset);
-    border-left-color: var(--color-primary);
-    padding-left: 1.25rem;
-  }
-  
-  /* Animation for dropdown */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* Reverse animation for dropup */
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* Animation for header when it becomes fixed */
-  @keyframes slideDown {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(0); }
-  }
-  
-  /* Header animation when it first appears */
-  .animate-slide-down {
-    animation: slideDown 0.5s ease-out;
-  }
-  
-  /* Mobile dropdown styles */
-  .mobile-dropdown {
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  
-  .mobile-dropdown-title {
-    display: flex !important;
-    width: 100% !important;
-    padding: 1rem !important;
-    justify-content: center !important;
-    align-items: center !important;
-    font-size: 1.125rem !important;
-    font-weight: 600 !important;
-    color: var(--color-secondary) !important;
-    background-color: var(--color-background-offset) !important;
-    border-radius: 2rem !important;
-    cursor: pointer !important;
-    border: 2px solid transparent !important;
-    position: relative !important;
-    font-family: 'Fredoka', sans-serif !important;
-    transition: all 0.2s ease !important;
-    box-shadow: var(--shadow-md) !important;
-    margin: 0 !important;
-    text-align: center !important;
-  }
-  
-  .mobile-dropdown-title:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: var(--shadow-lg) !important;
-    border-color: var(--color-primary) !important;
-  }
-  
-  .mobile-dropdown-title .dropdown-arrow {
-    display: inline-block !important;
-    margin-left: 0.5rem !important;
-    font-size: 0.7rem !important;
-    transition: transform 0.2s ease !important;
-  }
-  
-  .mobile-dropdown-title.active .dropdown-arrow {
-    transform: rotate(180deg) !important;
-  }
-  
-  .mobile-dropdown-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    background-color: var(--color-background-offset);
-    border-radius: 0.75rem;
-    margin: 0 2rem;
-  }
-  
-  .mobile-dropdown-content.show-mobile {
-    max-height: 200px;
-    padding: 0.75rem 0;
-    border: 1px solid var(--color-background-offset);
-  }
-  
-  .mobile-dropdown-content a {
-    transition: all 0.2s ease;
-    border-left: 3px solid transparent;
-  }
-  
-  .mobile-dropdown-content a:hover {
-    background-color: var(--color-background-offset);
-    border-left-color: var(--color-primary);
-    padding-left: 1rem;
-  }
-  
-  /* Ensure menu items wrap properly */
-  .menu-link, .social-btn {
-    margin: 0.25rem;
-    display: inline-flex;
-    align-items: center;
-  }
-  
-  /* Add styling for mobile header class */
   .mobile-header {
     padding-bottom: 2.5rem !important;
     position: fixed !important;
     bottom: 0 !important;
     left: 0;
     right: 0;
-    background-color: transparent;
   }
-  
-  /* Mobile and responsive adjustments */
+
+  @keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.5s ease-out;
+  }
+
   @media (max-width: 640px) {
     #page-header {
       padding-bottom: 0.75rem;
-      position: fixed !important; 
+      position: fixed !important;
       bottom: 0 !important;
       left: 0;
       right: 0;
-      background-color: transparent;
-      display: flex;
-      justify-content: space-between;
       z-index: 50;
     }
-    
+
     .social-btn {
       font-size: 0.85rem;
       padding: 0.6rem 1rem;
     }
-    
-    .btn-nav {
-      position: relative;
-      z-index: 51;
-    }
-    
-    .modal .fixed {
-      max-height: 100vh;
-      overflow-y: auto;
-    }
-  }
-  
-  @media (min-width: 641px) and (max-width: 768px) {
-    #page-header {
-      padding-bottom: 1rem;
-    }
-  }
-
-  /* Show/hide navigation based on screen size */
-  @media (max-width: 639px) {
-    #open-nav-button {
-      display: block !important;
-    }
-    
-    #page-header nav {
-      display: none !important;
-    }
-  }
-  
-  @media (min-width: 640px) {
-    #open-nav-button {
-      display: none !important;
-    }
-    
-    #page-header nav {
-      display: block !important;
-    }
-  }
-
-  /* Completely revised mobile menu styling */
-  .modal.is-open {
-    display: block !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    overflow: hidden !important;
-    background-color: rgba(0, 0, 0, 0.5) !important;
-  }
-  
-  .mobile-menu-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 10000 !important;
-  }
-  
-  .mobile-menu-container {
-    position: relative !important;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    background-color: var(--color-background) !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 1rem !important;
-    box-sizing: border-box !important;
-  }
-  
-  .mobile-menu-header {
-    position: sticky !important;
-    top: 0 !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-    width: 100% !important;
-    padding: 0.5rem !important;
-    background-color: var(--color-background) !important;
-    z-index: 1 !important;
-  }
-  
-  .mobile-close-btn {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: var(--color-primary) !important;
-    color: white !important;
-    border: 1px solid var(--color-primary-dark) !important;
-    border-radius: 0.5rem !important;
-    padding: 0.5rem !important;
-  }
-  
-  .mobile-menu-content {
-    flex: 1 !important;
-    width: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-  
-  .mobile-menu-list {
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 1rem 0.5rem !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0 !important;
-    row-gap: 0 !important;
-  }
-  
-  .mobile-menu-item {
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    margin: 0 0 1rem 0 !important;
-    padding: 0 !important;
-  }
-  
-  .mobile-menu-item:last-child {
-    margin-bottom: 0 !important;
-  }
-  
-  .mobile-menu-link {
-    display: block !important;
-    width: 100% !important;
-    padding: 1rem !important;
-    text-align: center !important;
-    font-size: 1.125rem !important;
-    font-weight: 600 !important;
-    color: var(--color-secondary) !important;
-    background-color: var(--color-background-offset) !important;
-    border-radius: 2rem !important;
-    text-decoration: none !important;
-    box-sizing: border-box !important;
-    border: 2px solid transparent !important;
-    transition: all 0.2s ease !important;
-    box-shadow: var(--shadow-md) !important;
-    margin: 0 !important;
-  }
-  
-  .mobile-dropdown-content {
-    display: none !important;
-    width: 100% !important;
-    padding: 0 !important;
-    margin-top: 1rem !important;
-  }
-  
-  .mobile-dropdown-content.show-mobile {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0 !important;
-  }
-  
-  .mobile-dropdown-content.show-mobile a {
-    margin-bottom: 1rem !important;
-  }
-  
-  .mobile-dropdown-content.show-mobile a:last-child {
-    margin-bottom: 0 !important;
-  }
-  
-  /* Extra styles for extremely narrow screens */
-  @media (max-width: 320px) {
-    .mobile-menu-container {
-      padding: 0.5rem !important;
-    }
-    
-    .mobile-menu-link, 
-    .mobile-dropdown-title {
-      padding: 0.75rem !important;
-      font-size: 1rem !important;
-    }
-  }
-  
-  /* Mobile-first approach for the menu modal */
-  @media screen {
-    #menu-modal.is-open .mobile-menu-overlay,
-    #menu-modal.is-open .mobile-menu-container,
-    #menu-modal.is-open .mobile-menu-content,
-    #menu-modal.is-open .mobile-menu-list,
-    #menu-modal.is-open .mobile-menu-item,
-    #menu-modal.is-open .mobile-menu-link,
-    #menu-modal.is-open .mobile-dropdown,
-    #menu-modal.is-open .mobile-dropdown-title,
-    #menu-modal.is-open .mobile-dropdown-content.show-mobile {
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-  }
-
-  .mobile-submenu-link {
-    background-color: var(--color-background) !important;
-    font-size: 1rem !important;
   }
 </style>

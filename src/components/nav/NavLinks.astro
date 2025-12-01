@@ -1,0 +1,81 @@
+---
+import DropdownMenu from './DropdownMenu.astro';
+import type { NavItem } from '~/types';
+
+interface Props {
+  navItems: NavItem[];
+  pastEvents: Array<{ href: string; text: string }>;
+}
+
+const { navItems, pastEvents } = Astro.props;
+---
+
+<nav class="nav-desktop">
+  <ul class="nav-list">
+    {navItems.map(({ title, url }) => (
+      <li class="nav-item">
+        <a class="menu-link" href={url}>{title}</a>
+      </li>
+    ))}
+    <li class="nav-item">
+      <DropdownMenu label="Past Events" items={pastEvents} />
+    </li>
+    <li class="nav-item">
+      <a class="menu-link" href="/pa-festivals">PA Fests</a>
+    </li>
+    <li class="nav-item">
+      <a class="menu-link" href="/comedy-festivals">Comedy Fests</a>
+    </li>
+  </ul>
+</nav>
+
+<style>
+  .nav-desktop {
+    display: block;
+  }
+
+  .nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nav-item {
+    margin: 0 0.25rem;
+    padding-bottom: 0.125rem;
+  }
+
+  .menu-link {
+    color: var(--color-secondary);
+    background-color: var(--color-background-offset);
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    border: 2px solid transparent;
+    line-height: 1.5;
+  }
+
+  .menu-link:hover {
+    background-color: var(--color-background-darker);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  @media (max-width: 639px) {
+    .nav-desktop {
+      display: none !important;
+    }
+  }
+</style>

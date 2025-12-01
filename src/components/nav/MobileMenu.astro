@@ -1,0 +1,286 @@
+---
+import { Icon } from "astro-icon/components";
+import type { NavItem } from "~/types";
+
+interface Props {
+  navItems: NavItem[];
+  pastEvents: Array<{ href: string; text: string }>;
+  modalId?: string;
+}
+
+const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
+---
+
+<button
+  id="open-nav-button"
+  type="button"
+  class="btn-nav mobile-menu-trigger"
+  aria-label="Open navigation"
+>
+  <Icon name="mdi:menu" class="size-8" />
+</button>
+
+<div id={modalId} class="modal hidden" aria-hidden="true">
+  <div class="mobile-menu-overlay">
+    <div class="mobile-menu-container">
+      <div class="mobile-menu-header">
+        <button
+          id="close-nav-button"
+          type="button"
+          class="btn-nav mobile-close-btn"
+          aria-label="Close navigation"
+        >
+          <Icon name="mdi:close" class="size-8" />
+        </button>
+      </div>
+      <div class="mobile-menu-content">
+        <ul class="mobile-menu-list">
+          {navItems.map(({ title, url }) => (
+            <li class="mobile-menu-item">
+              <a class="mobile-menu-link" href={url}>{title}</a>
+            </li>
+          ))}
+          <li class="mobile-menu-item">
+            <div class="mobile-dropdown">
+              <button class="mobile-dropdown-title">
+                Past Events <span class="dropdown-arrow">▼</span>
+              </button>
+              <div class="mobile-dropdown-content">
+                {pastEvents.map((event) => (
+                  <a class="mobile-menu-link mobile-submenu-link" href={event.href}>
+                    {event.text}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </li>
+          <li class="mobile-menu-item">
+            <a class="mobile-menu-link" href="/pa-festivals">PA Fests</a>
+          </li>
+          <li class="mobile-menu-item">
+            <a class="mobile-menu-link" href="/comedy-festivals">Comedy Fests</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import MicroModal from "micromodal";
+
+  function initMobileMenu() {
+    const menuModalId = "menu-modal";
+    const openNavButton = document.querySelector("#open-nav-button");
+    const closeNavButton = document.querySelector("#close-nav-button");
+    const menu = document.querySelector(`#${menuModalId} ul`);
+
+    if (!openNavButton || !closeNavButton || !menu) return;
+
+    const openMenu = () => MicroModal.show(menuModalId, { disableScroll: true });
+    const closeMenu = () => MicroModal.close(menuModalId);
+
+    openNavButton.addEventListener("click", openMenu);
+    closeNavButton.addEventListener("click", closeMenu);
+
+    // Close menu when clicking a link
+    menu.addEventListener("click", (event) => {
+      if ((event.target as HTMLElement).tagName === "A") {
+        closeMenu();
+      }
+    });
+
+    // Mobile dropdown toggle
+    const mobileDropdown = document.querySelector('.mobile-dropdown-title');
+    const mobileDropdownContent = document.querySelector('.mobile-dropdown-content');
+
+    if (mobileDropdown && mobileDropdownContent) {
+      mobileDropdown.addEventListener('click', () => {
+        mobileDropdownContent.classList.toggle('show-mobile');
+        mobileDropdown.classList.toggle('active');
+      });
+    }
+
+    // Initialize MicroModal
+    MicroModal.init({
+      onShow: () => { document.body.style.overflow = 'hidden'; },
+      onClose: () => { document.body.style.overflow = ''; },
+      disableScroll: true,
+      disableFocus: false,
+      awaitOpenAnimation: false,
+      awaitCloseAnimation: false,
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileMenu);
+  } else {
+    initMobileMenu();
+  }
+  document.addEventListener('astro:page-load', initMobileMenu);
+</script>
+
+<noscript>
+  <style>
+    #open-nav-button { display: none; }
+  </style>
+</noscript>
+
+<style>
+  /* Hide hamburger on desktop, show only on mobile */
+  .mobile-menu-trigger {
+    display: none !important;
+  }
+
+  @media (max-width: 639px) {
+    .mobile-menu-trigger {
+      display: flex !important;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .mobile-menu-trigger {
+      display: none !important;
+    }
+  }
+
+  .btn-nav {
+    background-color: var(--color-primary);
+    color: white;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--color-primary-dark);
+  }
+
+  .btn-nav:hover {
+    background-color: var(--color-primary-dark);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .modal.is-open {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .mobile-menu-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10000 !important;
+  }
+
+  .mobile-menu-container {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: var(--color-background) !important;
+    overflow-y: auto !important;
+    padding: 1rem !important;
+  }
+
+  .mobile-menu-header {
+    position: sticky !important;
+    top: 0 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding: 0.5rem !important;
+    background-color: var(--color-background) !important;
+    z-index: 1 !important;
+  }
+
+  .mobile-menu-content {
+    flex: 1 !important;
+    overflow-y: auto !important;
+  }
+
+  .mobile-menu-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 1rem 0.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .mobile-menu-item {
+    width: 100% !important;
+    margin: 0 0 1rem 0 !important;
+  }
+
+  .mobile-menu-link {
+    display: block !important;
+    width: 100% !important;
+    padding: 1rem !important;
+    text-align: center !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    color: var(--color-secondary) !important;
+    background-color: var(--color-background-offset) !important;
+    border-radius: 2rem !important;
+    text-decoration: none !important;
+    border: 2px solid transparent !important;
+    transition: all 0.2s ease !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+
+  .mobile-dropdown {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .mobile-dropdown-title {
+    display: flex !important;
+    width: 100% !important;
+    padding: 1rem !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    color: var(--color-secondary) !important;
+    background-color: var(--color-background-offset) !important;
+    border-radius: 2rem !important;
+    cursor: pointer !important;
+    border: 2px solid transparent !important;
+    font-family: 'Fredoka', sans-serif !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+
+  .mobile-dropdown-title .dropdown-arrow {
+    margin-left: 0.5rem !important;
+    font-size: 0.7rem !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .mobile-dropdown-title.active .dropdown-arrow {
+    transform: rotate(180deg) !important;
+  }
+
+  .mobile-dropdown-content {
+    display: none !important;
+    margin-top: 1rem !important;
+  }
+
+  .mobile-dropdown-content.show-mobile {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .mobile-submenu-link {
+    background-color: var(--color-background) !important;
+    font-size: 1rem !important;
+  }
+</style>

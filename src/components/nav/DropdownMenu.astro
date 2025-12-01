@@ -1,0 +1,163 @@
+---
+interface Props {
+  label: string;
+  items: Array<{ href: string; text: string }>;
+  id?: string;
+}
+
+const { label, items, id = 'dropdown' } = Astro.props;
+const buttonId = `${id}Button`;
+const contentId = `${id}Content`;
+---
+
+<div class="dropdown-container" data-dropdown>
+  <button id={buttonId} class="menu-link dropdown-button">
+    {label} <span class="dropdown-arrow">▼</span>
+  </button>
+  <div class="dropdown-content" id={contentId}>
+    {items.map((item) => (
+      <a href={item.href} class="dropdown-item">{item.text}</a>
+    ))}
+  </div>
+</div>
+
+<script>
+  function initDropdowns() {
+    const dropdowns = document.querySelectorAll('[data-dropdown]');
+
+    dropdowns.forEach((container) => {
+      const button = container.querySelector('.dropdown-button');
+      const content = container.querySelector('.dropdown-content');
+
+      if (!button || !content) return;
+
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        content.classList.toggle('show');
+
+        // Check space and position accordingly
+        const buttonRect = button.getBoundingClientRect();
+        const dropdownHeight = 120;
+        const viewportHeight = window.innerHeight;
+        const spaceBelow = viewportHeight - buttonRect.bottom;
+
+        if (spaceBelow < dropdownHeight) {
+          container.classList.add('position-top');
+        } else {
+          container.classList.remove('position-top');
+        }
+
+        const arrow = button.querySelector('.dropdown-arrow');
+        if (arrow) {
+          arrow.textContent = content.classList.contains('show') ? '▲' : '▼';
+        }
+      });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (event) => {
+      dropdowns.forEach((container) => {
+        const button = container.querySelector('.dropdown-button');
+        const content = container.querySelector('.dropdown-content');
+
+        if (button && content && !button.contains(event.target as Node)) {
+          content.classList.remove('show');
+          const arrow = button.querySelector('.dropdown-arrow');
+          if (arrow) arrow.textContent = '▼';
+        }
+      });
+    });
+  }
+
+  // Initialize on load and Astro page transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDropdowns);
+  } else {
+    initDropdowns();
+  }
+  document.addEventListener('astro:page-load', initDropdowns);
+</script>
+
+<style>
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-button {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-secondary);
+    background-color: var(--color-background-offset);
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-md);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .dropdown-button:hover {
+    background-color: var(--color-background-darker);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  .dropdown-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--color-background);
+    min-width: 200px;
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+    border-radius: 1rem;
+    overflow: hidden;
+    left: 0;
+    top: calc(100% + 0.5rem);
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+    border: 2px solid var(--color-primary);
+  }
+
+  .dropdown-container.position-top .dropdown-content {
+    top: auto;
+    bottom: calc(100% + 0.5rem);
+  }
+
+  .dropdown-content.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .dropdown-item {
+    color: var(--color-secondary);
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    display: block;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+  }
+
+  .dropdown-item:hover {
+    background-color: var(--color-background-offset);
+    border-left-color: var(--color-primary);
+    padding-left: 1.25rem;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

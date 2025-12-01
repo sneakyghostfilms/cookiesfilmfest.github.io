@@ -7,7 +7,7 @@ export interface Props {
 const { title, id } = Astro.props;
 ---
 
-<section id={id} class="flex scroll-mt-24 flex-col items-center gap-4 space-y-8 animate-fade-in">
+<section id={id} class="flex scroll-mt-24 flex-col items-center gap-4 space-y-8">
   <div class="flex flex-col items-center gap-4">
     <slot name="eyebrow" />
     <h1 class="section-title">
@@ -54,29 +54,13 @@ const { title, id } = Astro.props;
     margin-bottom: 1.5rem;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1000px) {
     section {
       padding: 2rem 1.5rem;
     }
-    
+
     .section-title {
       font-size: 2.5rem;
-    }
-  }
-  
-  /* Animation for section entry */
-  .animate-fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
-  }
-  
-  @keyframes fadeIn {
-    from { 
-      opacity: 0;
-      transform: translateY(15px);
-    }
-    to { 
-      opacity: 1;
-      transform: translateY(0);
     }
   }
 </style>

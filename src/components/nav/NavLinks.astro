@@ -74,14 +74,14 @@ const { navItems, pastEvents } = Astro.props;
   }
 
   /* Hide nav on narrow screens OR short screens */
-  @media (max-width: 700px), (max-height: 900px) {
+  @media (max-width: 1000px), (max-height: 900px) {
     .nav-desktop {
       display: none !important;
     }
   }
 
   /* Only show nav if BOTH wide enough AND tall enough */
-  @media (min-width: 1200px) and (min-height: 901px) {
+  @media (min-width: 1001px) and (min-height: 901px) {
     .nav-desktop {
       display: block !important;
     }

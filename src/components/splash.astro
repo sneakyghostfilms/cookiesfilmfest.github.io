@@ -135,16 +135,10 @@ import RotatingLogo from './RotatingLogo.astro';
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* When nav wraps to multiple lines, increase padding */
-  @media (max-width: 900px) {
+  /* On screens where hamburger menu is shown (1000px and below) */
+  @media (max-width: 1000px) {
     .splash-section {
-      padding-bottom: 120px;
-    }
-  }
-
-  @media (max-width: 600px) {
-    .splash-section {
-      padding-bottom: 200px; /* 2 rows of buttons */
+      padding-bottom: 100px; /* Just enough for hamburger + follow button row */
     }
 
     .logo-wrapper {
@@ -161,20 +155,12 @@ import RotatingLogo from './RotatingLogo.astro';
   }
 
   @media (max-width: 500px) {
-    .splash-section {
-      padding-bottom: 240px; /* 3 rows of buttons */
-    }
-
     .logo-wrapper {
       width: min(75vw, 40vh);
     }
   }
 
   @media (max-width: 400px) {
-    .splash-section {
-      padding-bottom: 280px; /* 3+ rows of buttons */
-    }
-
     .logo-wrapper {
       width: min(80vw, 35vh);
     }

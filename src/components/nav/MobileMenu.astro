@@ -133,14 +133,14 @@ const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
   }
 
   /* Show hamburger on narrow screens OR short screens */
-  @media (max-width: 700px), (max-height: 900px) {
+  @media (max-width: 1000px), (max-height: 900px) {
     .mobile-menu-trigger {
       display: flex !important;
     }
   }
 
   /* Only hide hamburger if BOTH wide enough AND tall enough */
-  @media (min-width: 1200px) and (min-height: 901px) {
+  @media (min-width: 1001px) and (min-height: 901px) {
     .mobile-menu-trigger {
       display: none !important;
     }

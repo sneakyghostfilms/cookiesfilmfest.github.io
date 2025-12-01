@@ -41,23 +41,31 @@ const pastEvents = [
 
     if (!header) return;
 
-    // Toggle fixed header on scroll
-    document.addEventListener("scroll", () => {
+    // Unified function to update header state based on scroll and viewport
+    const updateHeaderState = () => {
       const d = page.clientHeight - page.scrollTop - header.offsetHeight;
-      header.classList.toggle("fixed-header", d < 0);
-    });
+      const shouldFix = d < 0;
+      const isMobile = window.innerWidth <= 1000;
 
-    // Handle responsive header class
-    const updateHeaderClass = () => {
-      if (window.innerWidth < 768) {
-        header.classList.add('mobile-header');
+      header.classList.toggle("fixed-header", shouldFix);
+
+      // When fixed at top, remove mobile-header to prevent CSS conflict
+      // (mobile-header has bottom: 0 !important which conflicts with fixed-header's top: 0)
+      if (shouldFix) {
+        header.classList.remove("mobile-header");
+      } else if (isMobile) {
+        header.classList.add("mobile-header");
       } else {
-        header.classList.remove('mobile-header');
+        header.classList.remove("mobile-header");
       }
     };
 
-    window.addEventListener('resize', updateHeaderClass);
-    updateHeaderClass();
+    // Update on scroll and resize
+    document.addEventListener("scroll", updateHeaderState);
+    window.addEventListener('resize', updateHeaderState);
+
+    // Initial state
+    updateHeaderState();
   }
 
   if (document.readyState === 'loading') {
@@ -70,7 +78,9 @@ const pastEvents = [
 
 <style>
   .fixed-header {
-    @apply fixed bottom-auto top-0;
+    position: fixed !important;
+    bottom: auto !important;
+    top: 0 !important;
     @apply border-default bg-default text-default;
     animation: slideDown 0.3s ease forwards;
     box-shadow: var(--shadow-md);
@@ -110,6 +120,7 @@ const pastEvents = [
     bottom: 0 !important;
     left: 0;
     right: 0;
+    /* No background - stays transparent over dark splash */
   }
 
   @keyframes slideDown {
@@ -122,7 +133,8 @@ const pastEvents = [
   }
 
   @media (max-width: 640px) {
-    #page-header {
+    /* Only apply fixed bottom positioning when NOT scrolled to top */
+    #page-header:not(.fixed-header) {
       padding-bottom: 0.75rem;
       position: fixed !important;
       bottom: 0 !important;

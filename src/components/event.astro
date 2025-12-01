@@ -201,11 +201,14 @@ const testimonials = [
 
   .comedians-subtitle {
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     color: var(--color-secondary);
     margin-bottom: 1.5rem;
     text-align: center;
-    font-weight: 700;
+    font-weight: 800;
+    text-shadow: 0 0 20px var(--color-background-offset), 0 0 40px var(--color-background-offset);
+    position: relative;
+    z-index: 1;
   }
 
   .comedians-grid {
@@ -217,6 +220,34 @@ const testimonials = [
     margin-left: auto;
     margin-right: auto;
     position: relative;
+    isolation: isolate; /* Contain z-index stacking context for star rays */
+  }
+
+  /* Star rays behind comedians - show at 700px+ when grid has room */
+  @media (min-width: 700px) {
+    .comedians-grid::before {
+      content: '';
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600%;
+      height: 600%;
+      background:
+        linear-gradient(0deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(22.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(45deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(67.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(90deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(112.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(135deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        linear-gradient(157.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 5%, rgba(255, 255, 255, 0.5) 10%, rgba(255, 255, 255, 0.25) 15%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.05) 25%, transparent 35%, transparent 100%);
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
+      z-index: -1;
+      pointer-events: none;
+    }
   }
 
   .comedians-description {
@@ -252,7 +283,7 @@ const testimonials = [
     margin: 0 auto;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 1200px) {
     .event-main {
       flex-direction: row;
       align-items: flex-start;
@@ -269,43 +300,6 @@ const testimonials = [
 
     .comedians-grid {
       grid-template-columns: repeat(3, 1fr);
-    }
-
-    .comedians-grid::before {
-      content: '';
-      position: absolute;
-      top: 35%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600%;
-      height: 600%;
-      background:
-        linear-gradient(0deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-        linear-gradient(22.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-        linear-gradient(45deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-        linear-gradient(67.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-        linear-gradient(90deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-        linear-gradient(112.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-        linear-gradient(135deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-        linear-gradient(157.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-        radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 5%, rgba(255, 255, 255, 0.5) 10%, rgba(255, 255, 255, 0.25) 15%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.05) 25%, transparent 35%, transparent 100%);
-      mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .testimonial-container {
-      flex-direction: row;
-      align-items: center;
-    }
-
-    .testimonial-image {
-      max-width: 65%;
-    }
-
-    .testimonial-img {
-      min-width: 600px;
     }
   }
 
@@ -355,29 +349,27 @@ const testimonials = [
     gap: 1.5rem;
   }
 
-  @media (min-width: 768px) {
+  /* Only switch to row layout when screen is wide enough */
+  @media (min-width: 1024px) {
     .testimonial-container {
       flex-direction: row;
       align-items: center;
     }
 
     .testimonial-image {
-      max-width: 65%;
+      max-width: 55%;
     }
 
     .testimonial-img {
-      min-width: 650px;
+      min-width: 0;
+      width: 100%;
       height: auto;
     }
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     .testimonial-image {
-      max-width: 68%;
-    }
-
-    .testimonial-img {
-      min-width: 700px;
+      max-width: 60%;
     }
   }
 

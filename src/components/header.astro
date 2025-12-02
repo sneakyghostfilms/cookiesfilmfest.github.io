@@ -81,9 +81,10 @@ const pastEvents = [
     position: fixed !important;
     bottom: auto !important;
     top: 0 !important;
-    @apply border-default bg-default text-default;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     animation: slideDown 0.3s ease forwards;
-    box-shadow: var(--shadow-md);
     align-items: center !important;
     padding-top: 0.75rem;
     padding-bottom: 0.75rem !important;

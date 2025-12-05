@@ -234,6 +234,9 @@ export const comedyFestivals = [
     website: "https://montreal.hahaha.com/",
     submissionUrl: "https://filmfreeway.com/JFLShorts",
   },
+  // NOTE: LA Comedy Festival (sometimes branded as "LA Comedy Film Festival")
+  // is DISTINCT from "Los Angeles Comedy Film Festival" below - they are
+  // completely separate and unaffiliated organizations.
   {
     name: "LA Comedy Festival",
     city: "Los Angeles",
@@ -243,6 +246,17 @@ export const comedyFestivals = [
     website: "https://www.lafilmfestivals.com/la-comedy-fest",
     submissionUrl: "https://filmfreeway.com/LACOMEDYFESTIVAL",
   },
+  {
+    name: "Lit Laughs International Comedy Film Festival",
+    city: "Harrogate",
+    state: null,
+    country: "United Kingdom",
+    month: "August",
+    website: "https://www.litlaughs.com",
+    submissionUrl: "https://filmfreeway.com/LitLaughsInternationalComedyFilmFestival",
+  },
+  // NOTE: Los Angeles Comedy Film Festival is DISTINCT from "LA Comedy Festival"
+  // above - they are completely separate and unaffiliated organizations.
   {
     name: "Los Angeles Comedy Film Festival",
     city: "Los Angeles",

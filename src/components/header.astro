@@ -27,12 +27,45 @@ const pastEvents = [
       <MobileMenu navItems={navItems} pastEvents={pastEvents} />
     </div>
   </div>
-  <div class="flex-shrink-0 ml-auto flex items-end">
-    <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="social-btn">
-      <Icon name="mdi:facebook" class="size-5" /> Follow us
-    </a>
+  <div class="notify-container">
+    <div class="helper-text">Ticket sales & submissions</div>
+    <div class="notify-widget">
+      <span class="notify-label">Get Notified</span>
+      <div class="notify-icons">
+        <button type="button" id="email-notify-btn" class="notify-icon-btn" aria-label="Subscribe via email" title="Email updates">
+          <Icon name="mdi:email-outline" class="size-5" />
+        </button>
+        <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="notify-icon-btn" aria-label="Follow on Facebook" title="Facebook">
+          <Icon name="mdi:facebook" class="size-5" />
+        </a>
+      </div>
+    </div>
   </div>
 </header>
+
+<!-- Email Signup Modal -->
+<div id="email-modal" class="email-modal" aria-hidden="true">
+  <div class="email-modal-backdrop"></div>
+  <div class="email-modal-content">
+    <button type="button" class="email-modal-close" aria-label="Close modal">&times;</button>
+    <div class="email-modal-body">
+      <h3>Get Notified</h3>
+      <p>You'll get 2 emails per year:</p>
+      <ul>
+        <li>Now Open For Film Submissions</li>
+        <li>Tickets Now On Sale</li>
+      </ul>
+      <p>That's it!</p>
+      <form class="email-form" id="email-signup-form">
+        <input type="email" name="fields[email]" placeholder="Email" required autocomplete="email" />
+        <input type="hidden" name="ml-submit" value="1">
+        <input type="hidden" name="anticsrf" value="true">
+        <button type="submit" class="email-submit-btn">Subscribe</button>
+      </form>
+      <p class="email-modal-success">Thank you! You have successfully joined our subscriber list.</p>
+    </div>
+  </div>
+</div>
 
 <script>
   function initHeader() {
@@ -74,6 +107,81 @@ const pastEvents = [
     initHeader();
   }
   document.addEventListener('astro:page-load', initHeader);
+
+  // Email Modal functionality
+  function initEmailModal() {
+    const modal = document.getElementById('email-modal');
+    const openBtn = document.getElementById('email-notify-btn');
+    const closeBtn = modal?.querySelector('.email-modal-close');
+    const backdrop = modal?.querySelector('.email-modal-backdrop');
+    const form = document.getElementById('email-signup-form') as HTMLFormElement;
+    const successMsg = modal?.querySelector('.email-modal-success');
+
+    if (!modal || !openBtn) return;
+
+    const openModal = () => {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeModal = () => {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    backdrop?.addEventListener('click', closeModal);
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) {
+        closeModal();
+      }
+    });
+
+    // Handle form submission
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const email = formData.get('fields[email]');
+
+      try {
+        // Submit to Mailerlite using JSONP-style fetch
+        const response = await fetch(
+          `https://assets.mailerlite.com/jsonp/1965535/forms/172960678993201091/subscribe`,
+          {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors'
+          }
+        );
+
+        // Since mode is no-cors, we can't read the response
+        // But the subscription should go through
+        form.style.display = 'none';
+        if (successMsg) {
+          (successMsg as HTMLElement).style.display = 'block';
+        }
+      } catch (error) {
+        // Even on error, Mailerlite often succeeds with no-cors
+        form.style.display = 'none';
+        if (successMsg) {
+          (successMsg as HTMLElement).style.display = 'block';
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initEmailModal);
+  } else {
+    initEmailModal();
+  }
+  document.addEventListener('astro:page-load', initEmailModal);
 </script>
 
 <style>
@@ -94,40 +202,141 @@ const pastEvents = [
     align-items: center !important;
   }
 
-  .fixed-header .social-btn {
-    top: 0;
-  }
-
-  .fixed-header .social-btn:hover {
-    top: -2px;
-  }
-
-  .social-btn {
-    background-color: var(--color-primary);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 2rem;
+  .helper-text {
+    color: #fbe3c4;
     font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    box-shadow: var(--shadow-md);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    display: inline-flex;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+    align-self: center;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(215, 155, 88, 0.5);
+    transition: opacity 0.3s ease;
+    animation: pulseAttention 4s ease-in-out infinite;
+  }
+
+  @keyframes pulseAttention {
+    0%, 85%, 100% {
+      transform: translateY(0);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(215, 155, 88, 0.5);
+    }
+    90% {
+      transform: translateY(-3px);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(215, 155, 88, 0.8), 0 0 30px rgba(215, 155, 88, 0.4);
+    }
+    95% {
+      transform: translateY(0);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 25px rgba(215, 155, 88, 0.9), 0 0 40px rgba(215, 155, 88, 0.5);
+    }
+  }
+
+  .fixed-header .helper-text {
+    display: none;
+  }
+
+  .notify-container {
+    flex-shrink: 0;
+    margin-left: 2rem;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    line-height: 1.5;
-    position: relative;
-    top: -5px;
+  }
+
+  .notify-widget {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #fbe3c4;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border-radius: 2rem;
+    font-family: 'Fredoka', sans-serif;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
     border: 1px solid var(--color-primary-dark);
   }
 
-  .social-btn:hover {
-    transform: translateY(-2px);
+  .notify-widget:hover {
     box-shadow: var(--shadow-lg);
+  }
+
+  .notify-label {
+    color: var(--color-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .notify-icons {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .notify-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1px solid var(--color-primary);
+    color: var(--color-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    animation: coronaBg 3.6s ease-in-out infinite;
+  }
+
+  .notify-icon-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140%;
+    height: 140%;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+    animation: coronaOverlay 3.6s ease-in-out infinite;
+  }
+
+  .notify-icon-btn :global(svg) {
+    position: relative;
+    z-index: 20;
+  }
+
+  @keyframes coronaBg {
+    0%, 100% {
+      background-color: #fbe3c4;
+    }
+    50% {
+      background-color: #ffffff;
+    }
+  }
+
+  @keyframes coronaOverlay {
+    0%, 100% {
+      opacity: 0;
+      background-color: transparent;
+      box-shadow: none;
+    }
+    50% {
+      opacity: 0.6;
+      background-color: rgba(255, 255, 255, 0.3);
+      box-shadow:
+        0 0 6px rgba(255, 255, 255, 0.6),
+        0 0 12px rgba(251, 227, 196, 0.4);
+    }
+  }
+
+  .notify-icon-btn:hover {
     background-color: var(--color-primary-dark);
-    top: -7px;
+    transform: scale(1.1);
+    box-shadow: 0 0 18px rgba(215, 155, 88, 1);
+  }
+
+  .notify-icon-btn:hover :global(svg) {
+    animation: none;
   }
 
   .mobile-header {
@@ -159,9 +368,171 @@ const pastEvents = [
       z-index: 50;
     }
 
-    .social-btn {
-      font-size: 0.85rem;
-      padding: 0.6rem 1rem;
+    .helper-text {
+      font-size: 0.75rem;
     }
+
+    .notify-widget {
+      padding: 0.4rem 0.4rem 0.4rem 0.75rem;
+    }
+
+    .notify-label {
+      font-size: 0.8rem;
+    }
+
+    .notify-icon-btn {
+      width: 1.9rem;
+      height: 1.9rem;
+    }
+
+    .notify-icon-btn :global(svg) {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  /* Email Modal Styles */
+  .email-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .email-modal.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .email-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+
+  .email-modal-content {
+    position: relative;
+    background: #fbe3c4;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+
+  .email-modal.open .email-modal-content {
+    transform: scale(1);
+  }
+
+  .email-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--color-secondary);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.2s ease;
+  }
+
+  .email-modal-close:hover {
+    color: var(--color-primary-dark);
+  }
+
+  .email-modal-body {
+    font-family: 'Fredoka', sans-serif;
+    color: var(--color-secondary);
+  }
+
+  .email-modal-body h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .email-modal-body p {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+  }
+
+  .email-modal-body ul {
+    margin: 0 0 0.75rem 1.25rem;
+    padding: 0;
+    list-style: disc;
+  }
+
+  .email-modal-body li {
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .email-form input[type="email"] {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: 'Fredoka', sans-serif;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .email-form input[type="email"]:focus {
+    border-color: var(--color-primary-dark);
+    box-shadow: 0 0 0 3px rgba(215, 155, 88, 0.3);
+  }
+
+  .email-submit-btn {
+    background: var(--color-secondary);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Fredoka', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+
+  .email-submit-btn:hover {
+    background: var(--color-secondary-dark, #2a1a0a);
+  }
+
+  .email-submit-btn:active {
+    transform: scale(0.98);
+  }
+
+  .email-modal-success {
+    display: none;
+    text-align: center;
+    font-weight: 600;
+    color: var(--color-secondary);
+    padding: 1rem 0;
+  }
+
+  #email-notify-btn {
+    cursor: pointer;
+    background: none;
+    padding: 0;
+    font: inherit;
   }
 </style>

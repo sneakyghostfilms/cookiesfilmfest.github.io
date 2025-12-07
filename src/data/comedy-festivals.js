@@ -253,15 +253,6 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/humor-en-corto",
   },
   {
-    name: "Iceland Comedy Film Festival",
-    city: "Flateyri",
-    state: null,
-    country: "Iceland",
-    month: "September",
-    website: "https://www.icelandcomedyfilmfestival.com/",
-    submissionUrl: "https://filmfreeway.com/IcelandComedyFilmFestival",
-  },
-  {
     name: "International Comedy Film Festival",
     city: "Jindřichův Hradec",
     state: null,

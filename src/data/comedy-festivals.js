@@ -27,6 +27,15 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/AllComedyShortFilmFestival",
   },
   {
+    name: "All The Laughs Comedy Awards",
+    city: "Atlanta",
+    state: "GA",
+    country: "USA",
+    month: "September",
+    website: "https://www.atlcomedyawards.com/",
+    submissionUrl: "https://filmfreeway.com/AllTheLaughsComedyAwards",
+  },
+  {
     name: "Alpe d'Huez International Comedy Film Festival",
     city: "Alpe d'Huez",
     state: null,
@@ -70,6 +79,24 @@ export const comedyFestivals = [
     month: "November",
     website: "https://www.cicff.ca",
     submissionUrl: "https://filmfreeway.com/CICFF",
+  },
+  {
+    name: "Comedy Campout",
+    city: "Twentynine Palms",
+    state: "CA",
+    country: "USA",
+    month: "April",
+    website: "https://www.desertcomedycampout.com/",
+    submissionUrl: "https://filmfreeway.com/ComedyCampout",
+  },
+  {
+    name: "Comedy Film Fest",
+    city: "Puglia",
+    state: null,
+    country: "Italy",
+    month: "July",
+    website: "https://www.comedyfilmfest.it/",
+    submissionUrl: "https://filmfreeway.com/ComedyFilmFest",
   },
   {
     name: "Cookies & Comedy Film Festival",
@@ -163,6 +190,15 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/GICOFF",
   },
   {
+    name: "Ha Ha Harvest Comedy and Film Festival",
+    city: "Jersey City",
+    state: "NJ",
+    country: "USA",
+    month: "November",
+    website: "https://hahaharvest.com",
+    submissionUrl: "https://filmfreeway.com/HaHaHarvestComedyandFilmFestival",
+  },
+  {
     name: "HaHa Fest",
     city: "Amesbury",
     state: "MA",
@@ -179,6 +215,15 @@ export const comedyFestivals = [
     month: "October",
     website: "https://hahaartfilmfestival.pt/en/",
     submissionUrl: "https://filmfreeway.com/HaHaArtFilmFestival",
+  },
+  {
+    name: "Hamptons Comedy Film Fest",
+    city: "Bridgehampton",
+    state: "NY",
+    country: "USA",
+    month: "May",
+    website: "https://www.sticksandstonescomedyclub.com/pages/hamptons-comedy-festival",
+    submissionUrl: "https://filmfreeway.com/HamptonsComedyFestival",
   },
   {
     name: "Houston Comedy Film Festival",
@@ -234,6 +279,15 @@ export const comedyFestivals = [
     website: "https://montreal.hahaha.com/",
     submissionUrl: "https://filmfreeway.com/JFLShorts",
   },
+  {
+    name: "Killer Valley Comedy Film Festival",
+    city: "Ashland",
+    state: "OR",
+    country: "USA",
+    month: "December",
+    website: "https://killervalleyfilmfestival.com/comedy-film-festival/",
+    submissionUrl: "https://filmfreeway.com/KillerValleyComedyFilmFestival",
+  },
   // NOTE: LA Comedy Festival (sometimes branded as "LA Comedy Film Festival")
   // is DISTINCT from "Los Angeles Comedy Film Festival" below - they are
   // completely separate and unaffiliated organizations.
@@ -245,6 +299,15 @@ export const comedyFestivals = [
     month: "May",
     website: "https://www.lafilmfestivals.com/la-comedy-fest",
     submissionUrl: "https://filmfreeway.com/LACOMEDYFESTIVAL",
+  },
+  {
+    name: "Laughing Dog Comedy Film Festival",
+    city: "Houston",
+    state: "TX",
+    country: "USA",
+    month: "February",
+    website: "https://www.laughingdogcff.com",
+    submissionUrl: "https://filmfreeway.com/LaughingDogComedyFilmFestival",
   },
   {
     name: "Lit Laughs International Comedy Film Festival",
@@ -285,6 +348,15 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/LOCOFilmFestival",
   },
   {
+    name: "London-Worldwide Comedy Short Film Festival",
+    city: "London",
+    state: null,
+    country: "United Kingdom",
+    month: "November",
+    website: "https://worldwidecomedyshortfilmfestival.com",
+    submissionUrl: "https://filmfreeway.com/LondonWorldwideComedyShortFilmFestival",
+  },
+  {
     name: "Madcap Comedy International Short Film Festival",
     city: "Goodwood",
     state: "SA",
@@ -310,6 +382,15 @@ export const comedyFestivals = [
     month: "September",
     website: "https://www.njcomedyfilmfestival.com",
     submissionUrl: "https://filmfreeway.com/NewJerseyComedyFilmFestival",
+  },
+  {
+    name: "New York Comedy Film Festival",
+    city: "New York",
+    state: "NY",
+    country: "USA",
+    month: "February",
+    website: "https://www.comedyfilmfestivals.com/",
+    submissionUrl: "https://filmfreeway.com/NewYorkComedyFilmFestival",
   },
   {
     name: "New York City Short Comedy Film Festival",

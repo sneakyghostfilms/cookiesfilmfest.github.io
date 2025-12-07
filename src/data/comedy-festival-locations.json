@@ -327,5 +327,68 @@
     "city": "Los Angeles",
     "state": "CA",
     "country": "USA"
+  },
+  "All The Laughs Comedy Awards": {
+    "lat": 33.7544657,
+    "lng": -84.3898151,
+    "city": "Atlanta",
+    "state": "GA",
+    "country": "USA"
+  },
+  "Comedy Campout": {
+    "lat": 34.1356915,
+    "lng": -116.0543506,
+    "city": "Twentynine Palms",
+    "state": "CA",
+    "country": "USA"
+  },
+  "Comedy Film Fest": {
+    "lat": 43.5028121,
+    "lng": 11.8816631,
+    "city": "Puglia",
+    "state": null,
+    "country": "Italy"
+  },
+  "Ha Ha Harvest Comedy and Film Festival": {
+    "lat": 40.7215682,
+    "lng": -74.047455,
+    "city": "Jersey City",
+    "state": "NJ",
+    "country": "USA"
+  },
+  "Hamptons Comedy Film Fest": {
+    "lat": 40.9377598,
+    "lng": -72.3009705,
+    "city": "Bridgehampton",
+    "state": "NY",
+    "country": "USA"
+  },
+  "Killer Valley Comedy Film Festival": {
+    "lat": 42.1972487,
+    "lng": -122.7153995,
+    "city": "Ashland",
+    "state": "OR",
+    "country": "USA"
+  },
+  "Laughing Dog Comedy Film Festival": {
+    "lat": 29.7589382,
+    "lng": -95.3676974,
+    "city": "Houston",
+    "state": "TX",
+    "country": "USA"
+  },
+  "London-Worldwide Comedy Short Film Festival": {
+    "lat": 51.5074456,
+    "lng": -0.1277653,
+    "city": "London",
+    "state": null,
+    "country": "United Kingdom"
+  },
+  "New York Comedy Film Festival": {
+    "lat": 40.7127281,
+    "lng": -74.0060152,
+    "city": "New York",
+    "state": "NY",
+    "country": "USA"
   }
 }

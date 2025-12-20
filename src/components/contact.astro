@@ -12,26 +12,22 @@ import { Icon } from "astro-icon/components";
           Have questions about our film festival? Want to volunteer or sponsor? We'd love to hear from you!
         </p>
         <div class="contact-methods">
-          <div class="contact-method">
+          <a href="mailto:info@cookiesfilmfest.com" class="contact-method">
             <div class="method-icon">✉️</div>
             <div class="method-details">
               <h4>Email Us</h4>
-              <a href="mailto:info@cookiesfilmfest.com" class="method-link">
-                info@cookiesfilmfest.com
-              </a>
+              <span class="method-link">info@cookiesfilmfest.com</span>
             </div>
-          </div>
-          <div class="contact-method">
+          </a>
+          <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="contact-method">
             <div class="method-icon">
               <Icon name="mdi:facebook" class="size-6" />
             </div>
             <div class="method-details">
               <h4>Social Media</h4>
-              <a href="https://www.facebook.com/CookiesAndComedy" target="_blank" class="method-link">
-                Follow us on Facebook
-              </a>
+              <span class="method-link">Follow us on Facebook</span>
             </div>
-          </div>
+          </a>
         </div>
       </div>
       <div class="contact-form-container">
@@ -85,7 +81,7 @@ import { Icon } from "astro-icon/components";
     gap: 1.5rem;
   }
   
-  .contact-method {
+  a.contact-method {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
@@ -94,6 +90,8 @@ import { Icon } from "astro-icon/components";
     border-radius: 0.75rem;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
+    text-decoration: none;
+    cursor: pointer;
   }
   
   .contact-method:hover {

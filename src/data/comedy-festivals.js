@@ -154,6 +154,15 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/GelosComedyFilmFestival",
   },
   {
+    name: "Giggle Film Festival",
+    city: "London",
+    state: null,
+    country: "United Kingdom",
+    month: "November",
+    website: "https://gigglefilmfestival.org",
+    submissionUrl: "https://filmfreeway.com/GiggleFilmFestival",
+  },
+  {
     name: "Georgia Comedy Film Festival",
     city: "Atlanta",
     state: "GA",

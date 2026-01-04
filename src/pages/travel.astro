@@ -1,0 +1,784 @@
+---
+import "@fontsource-variable/inter";
+
+const { generator } = Astro;
+const description = "Travel and parking information for the Cookies and Comedy Film Festival on March 14, 2026";
+const lastUpdated = "January 4, 2026";
+---
+
+<!doctype html>
+<html lang="en" class="h-full motion-safe:scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="generator" content={generator} />
+
+    <title>Travel & Logistics | Cookies and Comedy Film Festival</title>
+    <meta name="description" content={description} />
+
+    <!-- social media -->
+    <meta property="og:title" content="Travel & Logistics - March 14, 2026" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content={description} />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --color-primary: #d79b58;
+        --color-primary-dark: #c68c4a;
+        --color-secondary: #2b2244;
+        --color-text: #221a35;
+        --color-text-offset: #4a3968;
+        --color-background: #ffffff;
+        --color-background-offset: #fbe3c4;
+        --color-background-darker: #f5d6a8;
+        --color-border: #d79b58;
+      }
+
+      body {
+        font-family: 'Fredoka', sans-serif;
+        background-color: #000000;
+        color: var(--color-text);
+        line-height: 1.6;
+        font-weight: 500;
+      }
+
+      a {
+        color: var(--color-secondary);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      a:hover {
+        color: var(--color-primary);
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      /* Header */
+      header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-top: 2rem;
+      }
+
+      .page-title {
+        font-size: 3rem;
+        color: var(--color-background-offset);
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.01em;
+      }
+
+      .page-subtitle {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        margin-bottom: 1.5rem;
+        letter-spacing: 0.01em;
+      }
+
+      .back-link {
+        display: inline-block;
+        background-color: var(--color-background-offset);
+        color: var(--color-secondary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        margin-top: 1rem;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        border: 1px solid var(--color-primary);
+      }
+
+      .back-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        background-color: var(--color-background-darker);
+        color: var(--color-secondary);
+      }
+
+      .last-updated {
+        color: var(--color-text-offset);
+        font-size: 0.9rem;
+        margin-top: 1rem;
+        opacity: 0.8;
+      }
+
+      /* Content cards */
+      .card {
+        background-color: var(--color-background-offset);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .card-title {
+        font-size: 1.75rem;
+        color: var(--color-secondary);
+        margin-bottom: 1rem;
+        letter-spacing: 0.01em;
+      }
+
+      .card p {
+        margin-bottom: 1rem;
+      }
+
+      .card p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Summary card - slightly different styling */
+      .summary-card {
+        background-color: var(--color-background);
+        border: 2px solid var(--color-primary);
+      }
+
+      .summary-card .venue-info {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .summary-card .venue-info strong {
+        color: var(--color-secondary);
+      }
+
+      .options-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0 0 0;
+      }
+
+      .options-list li {
+        padding: 0.5rem 0;
+        padding-left: 1.5rem;
+        position: relative;
+      }
+
+      .options-list li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--color-primary);
+        font-weight: 700;
+      }
+
+      /* Parade callout */
+      .parade-callout {
+        background-color: var(--color-background-darker);
+        border: 2px solid var(--color-primary);
+        border-left: 6px solid var(--color-primary);
+      }
+
+      .parade-image {
+        margin: 1.5rem 0;
+        text-align: center;
+      }
+
+      .parade-image img {
+        max-width: 100%;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .parade-image-caption {
+        font-size: 0.9rem;
+        color: var(--color-text-offset);
+        margin-top: 0.75rem;
+        font-style: italic;
+      }
+
+      .bottom-line {
+        background-color: var(--color-background);
+        padding: 1rem 1.25rem;
+        border-radius: 0.5rem;
+        margin-top: 1.5rem;
+        border-left: 4px solid var(--color-secondary);
+      }
+
+      .bottom-line strong {
+        color: var(--color-secondary);
+      }
+
+      /* Lists */
+      .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+      }
+
+      .tips-list li {
+        padding: 0.5rem 0;
+        padding-left: 1.75rem;
+        position: relative;
+      }
+
+      .tips-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0.5rem;
+        color: var(--color-primary);
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
+
+      /* Hotel list */
+      .hotel-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0;
+      }
+
+      .hotel-tag {
+        background-color: var(--color-background);
+        padding: 0.4rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+        border: 1px solid rgba(215, 155, 88, 0.3);
+      }
+
+      .hotel-tag.budget {
+        background-color: rgba(43, 34, 68, 0.1);
+        border-color: var(--color-secondary);
+      }
+
+      /* External links */
+      .link-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 1rem 0;
+      }
+
+      .link-btn {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--color-primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .link-btn:hover {
+        background-color: var(--color-primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        color: white;
+      }
+
+      .link-btn svg {
+        margin-left: 0.35rem;
+        width: 0.8rem;
+        height: 0.8rem;
+      }
+
+      .link-btn.secondary {
+        background-color: var(--color-secondary);
+      }
+
+      .link-btn.secondary:hover {
+        background-color: #3d3161;
+      }
+
+      /* Checklist */
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+      }
+
+      .checklist li {
+        padding: 0.6rem 0;
+        padding-left: 2rem;
+        position: relative;
+      }
+
+      .checklist li::before {
+        content: "☐";
+        position: absolute;
+        left: 0;
+        color: var(--color-primary);
+        font-size: 1.1rem;
+      }
+
+      /* Contact section */
+      .contact-card {
+        text-align: center;
+        background-color: var(--color-secondary);
+        color: white;
+      }
+
+      .contact-card .card-title {
+        color: var(--color-background-offset);
+      }
+
+      .contact-card p {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .contact-card a {
+        color: var(--color-primary);
+      }
+
+      .contact-card a:hover {
+        color: var(--color-background-offset);
+      }
+
+      .email-link {
+        display: inline-block;
+        background-color: var(--color-primary);
+        color: white !important;
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        margin-top: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .email-link:hover {
+        background-color: var(--color-background-offset);
+        color: var(--color-secondary) !important;
+        transform: translateY(-2px);
+      }
+
+      /* Tip callout */
+      .tip {
+        background-color: var(--color-background);
+        padding: 1rem 1.25rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        border-left: 4px solid var(--color-primary);
+        font-size: 0.95rem;
+      }
+
+      .tip strong {
+        color: var(--color-primary);
+      }
+
+      /* Annotated map */
+      .map-container {
+        margin: 1.5rem 0;
+        text-align: center;
+      }
+
+      .map-container a {
+        display: block;
+      }
+
+      .map-container img {
+        max-width: 100%;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .map-container img:hover {
+        transform: scale(1.01);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .map-caption {
+        font-size: 0.85rem;
+        color: var(--color-text-offset);
+        margin-top: 0.5rem;
+        font-style: italic;
+      }
+
+      /* Station info blocks */
+      .station-block {
+        background-color: var(--color-background);
+        padding: 1rem 1.25rem;
+        border-radius: 0.5rem;
+        margin: 1rem 0;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .station-thumb {
+        flex-shrink: 0;
+        width: 100px;
+        height: 75px;
+        border-radius: 0.375rem;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .station-thumb:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .station-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .station-info {
+        flex: 1;
+      }
+
+      .station-info h4 {
+        color: var(--color-secondary);
+        margin-bottom: 0.35rem;
+        font-size: 1.1rem;
+      }
+
+      .station-info p {
+        margin-bottom: 0.35rem;
+        font-size: 0.95rem;
+      }
+
+      .station-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.25rem;
+        flex-wrap: wrap;
+      }
+
+      .station-links a {
+        font-size: 0.85rem;
+        color: var(--color-secondary);
+        text-decoration: underline;
+        text-decoration-color: var(--color-primary);
+        text-underline-offset: 2px;
+      }
+
+      .station-links a:hover {
+        color: var(--color-primary);
+      }
+
+      .transit-note {
+        background-color: rgba(215, 155, 88, 0.15);
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .page-title {
+          font-size: 2.25rem;
+        }
+
+        .page-subtitle {
+          font-size: 1.25rem;
+        }
+
+        .card {
+          padding: 1.5rem;
+        }
+
+        .card-title {
+          font-size: 1.5rem;
+        }
+
+        .hotel-list {
+          gap: 0.4rem;
+        }
+
+        .hotel-tag {
+          font-size: 0.85rem;
+          padding: 0.35rem 0.7rem;
+        }
+
+        .link-buttons {
+          flex-direction: column;
+        }
+
+        .link-btn {
+          justify-content: center;
+        }
+
+        .station-block {
+          flex-direction: column;
+        }
+
+        .station-thumb {
+          width: 120px;
+          height: 90px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1 class="page-title">Travel & Logistics</h1>
+        <p class="page-subtitle">March 14, 2026 | Harris Theater</p>
+        <a href="/" class="back-link">Back to Main Site</a>
+      </header>
+
+      <!-- Quick Summary -->
+      <section class="card">
+        <h2 class="card-title">Quick Summary</h2>
+        <div class="venue-info">
+          <strong>Venue:</strong> Harris Theater, 809 Liberty Ave, Pittsburgh, PA<br>
+          <strong>Date:</strong> Saturday, March 14, 2026<br>
+          <strong>Time:</strong> Doors around 11am, films start at 12pm
+        </div>
+        <p>
+          This year's festival falls on
+          <a href="https://pittsburghstpatricksdayparade.com/" target="_blank" rel="noopener noreferrer">Pittsburgh St. Patrick's Day Parade</a>
+          day—a great excuse to make a full day of it! The parade starts at <strong>10:00am</strong> and
+          runs about 3 to 3.5 hours. Streets along the route (including Liberty Ave and Grant St) close
+          around <strong>7:00am</strong> and reopen in the early afternoon.
+        </p>
+
+        <div class="parade-image">
+          <img
+            src="https://i0.wp.com/pittsburghstpatricksdayparade.com/wp-content/uploads/2019/11/route.jpg"
+            alt="Pittsburgh St. Patrick's Day Parade route map showing the path from Liberty Ave through downtown"
+          />
+          <p class="parade-image-caption">
+            Parade route. We'll share a detailed Google Map closer to the event.
+          </p>
+        </div>
+
+        <p>
+          <strong>The simplest approach is to not bring a car downtown.</strong>
+          Stay at a downtown hotel and walk, take the T (light rail), or grab a rideshare.
+        </p>
+
+        <div class="bottom-line" style="border-left-color: var(--color-primary);">
+          <strong>Make a morning of it:</strong> Grab breakfast, catch an hour of the parade,
+          then head to the theater. Parade + comedy films = a pretty good Saturday.
+        </div>
+      </section>
+
+      <!-- Hotels -->
+      <section class="card">
+        <h2 class="card-title">Book a Downtown Hotel</h2>
+        <p>
+          Staying downtown the night before is the move. You wake up, walk to the theater, and
+          you're there for the whole day without thinking about parking or road closures.
+          Make it a weekend trip.
+        </p>
+        <p>
+          Prices and availability vary—check a hotel search site and compare:
+        </p>
+
+        <div class="link-buttons">
+          <a href="https://www.google.com/travel/hotels" target="_blank" rel="noopener noreferrer" class="link-btn">
+            Google Hotels
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+          <a href="https://www.kayak.com/hotels" target="_blank" rel="noopener noreferrer" class="link-btn">
+            Kayak
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+          <a href="https://www.booking.com/" target="_blank" rel="noopener noreferrer" class="link-btn">
+            Booking.com
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+          <a href="https://www.expedia.com/Hotels" target="_blank" rel="noopener noreferrer" class="link-btn">
+            Expedia
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </div>
+
+        <p><strong>Walkable options to check:</strong></p>
+        <div class="hotel-list">
+          <span class="hotel-tag">EVEN Hotel</span>
+          <span class="hotel-tag">Drury Plaza</span>
+          <span class="hotel-tag">Fairfield Inn</span>
+          <span class="hotel-tag">Courtyard by Marriott</span>
+          <span class="hotel-tag">The Westin</span>
+          <span class="hotel-tag">Embassy Suites</span>
+          <span class="hotel-tag">Hilton Garden Inn</span>
+          <span class="hotel-tag">Omni William Penn</span>
+          <span class="hotel-tag">Renaissance</span>
+          <span class="hotel-tag">Wyndham Grand</span>
+          <span class="hotel-tag">Kimpton Monaco</span>
+          <span class="hotel-tag budget">Holiday Inn Express North Shore (short ride)</span>
+        </div>
+
+      </section>
+
+      <!-- Rideshare -->
+      <section class="card">
+        <h2 class="card-title">Take a Rideshare</h2>
+
+        <p>
+          Honestly? Rideshare (Uber/Lyft) is a great option for parade day. The driver deals with
+          the detours, you get dropped off near the theater, and you don't think about parking all day.
+          It might cost a bit more due to surge pricing, but it's low-stress.
+        </p>
+        <p>
+          This works whether you're local, staying outside downtown, or just don't want to deal with driving.
+        </p>
+      </section>
+
+      <!-- Light Rail -->
+      <section class="card">
+        <h2 class="card-title">Take the T (Light Rail)</h2>
+
+        <p>
+          Pittsburgh's light rail (the "T") is a great option. Park outside downtown,
+          hop on the Red Line, and get off at <strong>Wood Street Station</strong>—a
+          1-minute walk from the Harris Theater.
+        </p>
+
+        <div class="station-block">
+          <a href="/assets/2026-travel-assistance/allegheny-station-entrance.jpeg" target="_blank" class="station-thumb">
+            <img src="/assets/2026-travel-assistance/allegheny-station-entrance.jpeg" alt="Allegheny Station entrance" />
+          </a>
+          <div class="station-info">
+            <h4>Allegheny Station (FREE)</h4>
+            <p>North Shore. Park nearby and ride to Wood Street for free.</p>
+            <div class="station-links">
+              <a href="/assets/2026-travel-assistance/allegheny-station-map.jpeg" target="_blank">Area map</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="station-block">
+          <a href="/assets/2026-travel-assistance/north-side-station-entrance.jpeg" target="_blank" class="station-thumb">
+            <img src="/assets/2026-travel-assistance/north-side-station-entrance.jpeg" alt="North Side Station entrance" />
+          </a>
+          <div class="station-info">
+            <h4>North Side Station (FREE)</h4>
+            <p>North Shore. Park nearby and ride to Wood Street for free.</p>
+            <div class="station-links">
+              <a href="/assets/2026-travel-assistance/north-side-map.jpeg" target="_blank">Area map</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="station-block">
+          <a href="/assets/2026-travel-assistance/station-square-entrance.jpeg" target="_blank" class="station-thumb">
+            <img src="/assets/2026-travel-assistance/station-square-entrance.jpeg" alt="Station Square entrance" />
+          </a>
+          <div class="station-info">
+            <h4>Station Square — $2.75 each way</h4>
+            <p>South of downtown. Pay with the <strong>Ready2Ride</strong> app or at the station.</p>
+            <div class="station-links">
+              <a href="/assets/2026-travel-assistance/station-square-map.jpeg" target="_blank">Area map</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="station-block">
+          <a href="/assets/2026-travel-assistance/wood-street-station-entrance.jpeg" target="_blank" class="station-thumb">
+            <img src="/assets/2026-travel-assistance/wood-street-station-entrance.jpeg" alt="Wood Street Station entrance" />
+          </a>
+          <div class="station-info">
+            <h4>Wood Street Station (Your Destination)</h4>
+            <p>Get off here—it's a 1-minute walk to the Harris Theater.</p>
+            <div class="station-links">
+              <a href="/assets/2026-travel-assistance/wood-street-station-map.jpeg" target="_blank">Area map</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <a href="/assets/2026-travel-assistance/entire-map-annotated.jpeg" target="_blank">
+            <img
+              src="/assets/2026-travel-assistance/entire-map-annotated.jpeg"
+              alt="Annotated map showing T stations, parade route, and Harris Theater location"
+            />
+          </a>
+          <p class="map-caption">Click to enlarge. Shows T stations, parade route, and theater location.</p>
+        </div>
+
+        <div class="transit-note">
+          <strong>Note:</strong> The Red Line runs every 10–20 minutes. Give yourself a little buffer.
+        </div>
+      </section>
+
+      <!-- Parking -->
+      <section class="card">
+        <h2 class="card-title">If You're Driving Downtown</h2>
+
+        <p>
+          If you want to park downtown, <strong>book with
+          <a href="https://spothero.com/" target="_blank" rel="noopener noreferrer">SpotHero</a>
+          as early as possible</strong> and you're set. Save the garage entrance address to your
+          phone (not just the garage name), give yourself an extra 30 minutes for detours, and don't stress about it.
+        </p>
+
+        <p>
+          <strong>Important:</strong> Avoid reserving a spot with an entrance on or near the parade route
+          (Liberty Ave, Grant St). Streets close at 7am and don't fully reopen until early afternoon—if
+          your garage entrance is on a closed street, you won't be able to get in.
+        </p>
+
+        <div class="link-buttons">
+          <a href="https://spothero.com/" target="_blank" rel="noopener noreferrer" class="link-btn secondary">
+            SpotHero
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </div>
+      </section>
+
+      <!-- Getting to Pittsburgh -->
+      <section class="card">
+        <h2 class="card-title">Getting to Pittsburgh</h2>
+        <ul class="tips-list">
+          <li><strong>Flying:</strong> Pittsburgh International Airport (PIT) is about 30-40 minutes from downtown by rideshare</li>
+          <li><strong>Once downtown:</strong> Walking is the easiest way to get around, especially during the parade</li>
+        </ul>
+      </section>
+
+      <!-- Day-Of Checklist -->
+      <section class="card">
+        <h2 class="card-title">Day-Of Checklist</h2>
+        <ul class="checklist">
+          <li>If driving: screenshot your parking reservation and entrance address</li>
+          <li>Leave buffer time for detours</li>
+          <li>Dress for March in Pittsburgh if you're walking or watching the parade (usually 30–50°F)</li>
+          <li>Check your email for any last-minute updates from us</li>
+        </ul>
+      </section>
+
+      <!-- Contact -->
+      <section class="card contact-card">
+        <h2 class="card-title">Questions?</h2>
+        <p>
+          If you're traveling in and want a quick sanity check on your plans,
+          don't hesitate to reach out. We're happy to help!
+        </p>
+        <a href="mailto:info@cookiesfilmfest.com" class="email-link">
+          info@cookiesfilmfest.com
+        </a>
+      </section>
+    </div>
+  </body>
+</html>

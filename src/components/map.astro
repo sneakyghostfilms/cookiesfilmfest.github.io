@@ -25,10 +25,15 @@
           <p>The Harris Theater is one of the most active arts facilities in the region, showing art films nearly every day of the year. Named after John P. Harris, co-founder of the Nickelodeon (the first theater dedicated solely to motion pictures), it features contemporary, foreign, and classic films.</p>
         </div>
         
-        <div class="venue-details">
-          <p><span class="detail-label">Parking:</span> Street parking is available, along with several nearby garages including Theater Square Garage and Smithfield Liberty Garage.</p>
-          
-          <p><span class="detail-label">Public Transit:</span> The Theater is accessible via multiple bus routes and is a short walk from the Steel Plaza T Station.</p>
+        <div class="parade-notice">
+          <p class="parade-headline">This year's festival falls on St. Patrick's Day Parade day!</p>
+          <p class="parade-text">The parade runs through downtown that morning, so getting there takes a little planning. We've put together everything you need to know—hotels, light rail, rideshare, and parking options.</p>
+          <a href="/travel/" class="travel-link">
+            Travel & Parking Guide
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="arrow-icon">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
         </div>
       </div>
     </div>
@@ -171,27 +176,59 @@
     color: var(--color-text);
   }
   
-  .venue-details {
-    margin-top: 1rem;
+  .parade-notice {
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, rgba(215, 155, 88, 0.15) 0%, rgba(215, 155, 88, 0.08) 100%);
+    border: 2px solid var(--color-primary);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    text-align: center;
   }
-  
-  .venue-details p {
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 1rem;
-    font-weight: 500;
-    color: var(--color-text);
-  }
-  
-  .venue-details p:last-child {
-    margin-bottom: 0;
-  }
-  
-  .detail-label {
-    color: var(--color-secondary);
+
+  .parade-headline {
+    font-size: 1.1rem;
     font-weight: 700;
-    padding-right: 0.25rem;
-    text-shadow: none;
+    color: var(--color-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .parade-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+  }
+
+  .travel-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(215, 155, 88, 0.3);
+  }
+
+  .travel-link:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(43, 34, 68, 0.3);
+    color: white;
+  }
+
+  .arrow-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    transition: transform 0.2s ease;
+  }
+
+  .travel-link:hover .arrow-icon {
+    transform: translateX(4px);
   }
 
   @media (min-width: 768px) {

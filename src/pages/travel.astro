@@ -3,7 +3,7 @@ import "@fontsource-variable/inter";
 
 const { generator } = Astro;
 const description = "Travel and parking information for the Cookies and Comedy Film Festival on March 14, 2026";
-const lastUpdated = "January 4, 2026";
+const lastUpdated = "January 5, 2026";
 ---
 
 <!doctype html>
@@ -478,6 +478,19 @@ const lastUpdated = "January 4, 2026";
         font-size: 0.9rem;
       }
 
+      .subsection-title {
+        font-size: 1.4rem;
+        color: var(--color-secondary);
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--color-primary);
+      }
+
+      .subsection-title:first-of-type {
+        margin-top: 0;
+      }
+
       /* Responsive */
       @media (max-width: 768px) {
         .container {
@@ -644,9 +657,11 @@ const lastUpdated = "January 4, 2026";
         </p>
       </section>
 
-      <!-- Light Rail -->
+      <!-- Mass Transit -->
       <section class="card">
-        <h2 class="card-title">Take the T (Light Rail)</h2>
+        <h2 class="card-title">Take Mass Transit</h2>
+
+        <h3 class="subsection-title">By T (Light Rail)</h3>
 
         <p>
           <a href="https://www.rideprt.org/inside-Pittsburgh-Regional-Transit/rider-info/how-to-ride/how-to-ride-the-light-rail-system/" target="_blank" rel="noopener noreferrer">Pittsburgh's light rail</a> (the "T") is a great option. Park outside downtown,
@@ -685,8 +700,8 @@ const lastUpdated = "January 4, 2026";
             <img src="/assets/2026-travel-assistance/station-square-entrance.jpeg" alt="Station Square entrance" />
           </a>
           <div class="station-info">
-            <h4>Station Square — $2.75 each way</h4>
-            <p>South of downtown. Pay with the <a href="https://www.rideprt.org/fares-and-passes/mobileticket/" target="_blank" rel="noopener noreferrer"><strong>Ready2Ride</strong></a> app or at the station.</p>
+            <h4>Station Square — $2.75 (free as bus transfer)</h4>
+            <p>South of downtown. Pay with the <a href="https://www.rideprt.org/fares-and-passes/mobileticket/" target="_blank" rel="noopener noreferrer"><strong>Ready2Ride</strong></a> app or at the station. If you're transferring from a bus and paid with the app or ConnectCard, the T ride is included.</p>
             <div class="station-links">
               <a href="/assets/2026-travel-assistance/station-square-map.jpeg" target="_blank">Area map</a>
             </div>
@@ -717,7 +732,85 @@ const lastUpdated = "January 4, 2026";
         </div>
 
         <div class="transit-note">
-          <strong>Note:</strong> The Red Line runs every 10–20 minutes. Give yourself a little buffer.
+          <strong>Note:</strong> Trains run up to 30–40 minutes apart on Saturdays. Give yourself a buffer.
+        </div>
+
+        <h3 class="subsection-title">By Bus</h3>
+
+        <p>
+          On parade day, buses can't reach central downtown—PRT detours them to transfer points
+          on the edges. If your bus goes to one of these spots, you're in good shape:
+        </p>
+
+        <div class="station-block">
+          <div class="station-info">
+            <h4>Penn Station (East Busway) → Walk</h4>
+            <p>
+              If your bus goes to Penn Station, this is the simplest option.
+              From there, it's about a <strong>0.4 mile walk</strong> to the Harris Theater—straightforward
+              even with parade crowds.
+            </p>
+          </div>
+        </div>
+
+        <div class="station-block">
+          <div class="station-info">
+            <h4>Station Square → Transfer to T</h4>
+            <p>
+              Many buses drop riders at Station Square on parade day.
+              From there, hop on the T (light rail) to <strong>Wood Street Station</strong>—PRT
+              offers free transfers, so if you paid with the app or a ConnectCard, you're covered.
+            </p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <strong>Heads up:</strong> On parade morning, nearly 50 bus routes are detoured starting around 7am.
+          The exact stops (like Penn Station Stop A/C) can shift, so check
+          <a href="https://www.rideprt.org/" target="_blank" rel="noopener noreferrer">PRT's website</a>
+          closer to the date for detour details.
+        </div>
+      </section>
+
+      <!-- Paying for Transit -->
+      <section class="card">
+        <h2 class="card-title">Paying for Transit</h2>
+
+        <p>There are three ways to pay for PRT buses and the T:</p>
+
+        <div class="station-block">
+          <div class="station-info">
+            <h4>ConnectCard</h4>
+            <p>Reloadable transit card you tap for fares. Available at stations and retailers.</p>
+          </div>
+        </div>
+
+        <div class="station-block">
+          <div class="station-info">
+            <h4>Ready2Ride Mobile App</h4>
+            <p>
+              Buy fares on your phone—no card needed. Useful if you're transferring between bus and
+              the T, since mobile fares include unlimited transfers for 3 hours.
+            </p>
+            <div class="station-links">
+              <a href="https://www.rideprt.org/fares-and-passes/mobileticket/" target="_blank" rel="noopener noreferrer">Download Ready2Ride</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="station-block">
+          <div class="station-info">
+            <h4>Cash on Board (Bus)</h4>
+            <p>
+              You can pay with cash when you board ($2.75). Drivers do not provide change—if you
+              pay more than the fare, the difference is not returned.
+            </p>
+          </div>
+        </div>
+
+        <div class="tip">
+          <strong>Tip:</strong> If you're transferring (bus → T or vice versa), using the app or ConnectCard
+          means you only pay once. Cash doesn't include transfers.
         </div>
       </section>
 

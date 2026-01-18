@@ -5,11 +5,12 @@ import Timeline from "./event/Timeline.astro";
 import ComedianCard from "./event/ComedianCard.astro";
 import GalleryItem from "./event/GalleryItem.astro";
 import Testimonial from "./event/Testimonial.astro";
+import Schedule2026 from "./schedule2026.astro";
 
 const timelineItems = [
   { title: "Film Submissions", date: "June 1 - December 31, 2025" },
   { title: "Schedule Announcement", date: "January 14, 2026" },
-  { title: "Festival Weekend", date: "Saturday, March 14, 2026" },
+  { title: "Festival Day", date: "Saturday, March 14, 2026" },
 ];
 
 const comedians = [
@@ -28,11 +29,17 @@ const testimonials = [
   <Fragment slot="content">
     <div class="event-layout">
       <div class="event-header">
-        <h3 class="event-subtitle">Next Festival - Spring 2026</h3>
+        <h3 class="event-subtitle">2026 Festival - March 14</h3>
         <p class="event-description">
-          Mark your calendars! We're planning the next Cookies & Comedy Film Festival for <strong>Saturday, March 14, 2026</strong>. We'll be curating another fantastic selection of the funniest films from around the world, along with live comedy performances and of course - cookies!
+          Mark your calendars! The 2026 Cookies & Comedy Film Festival is <strong>Saturday, March 14, 2026</strong> at the Harris Theater in downtown Pittsburgh. We've curated another fantastic selection of the funniest films from around the world, along with live comedy performances and of course - cookies!
+        </p>
+        <p class="tickets-notice">
+          Tickets will be available soon at the <a href="https://trustarts.org/pct_home/visit/facilities/harris-theater" target="_blank" class="highlight-link">Harris Theater website</a>. Subscribe to our email list or Facebook page (icons in the upper right) to be notified!
         </p>
       </div>
+
+      <!-- 2026 Schedule -->
+      <Schedule2026 />
 
       <div class="event-main">
         <div class="event-details">
@@ -115,6 +122,9 @@ const testimonials = [
         <div class="cta-section">
           <h3 class="cta-title">Join Us for 2026!</h3>
         </div>
+        <p class="tickets-notice-bottom">
+          Tickets will be available soon at the <a href="https://trustarts.org/pct_home/visit/facilities/harris-theater" target="_blank" class="highlight-link">Harris Theater website</a>. Subscribe to our email list or Facebook page (icons in the upper right) to be notified!
+        </p>
         <p class="archive-link">Check out our <a href="/past-events/2025" class="highlight-link">2025 festival archive</a> to see what you missed!</p>
       </div>
     </div>
@@ -149,6 +159,30 @@ const testimonials = [
     font-family: 'Fredoka', sans-serif;
     font-size: 1.1rem;
     line-height: 1.6;
+  }
+
+  .tickets-notice {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    color: var(--color-secondary);
+    background-color: rgba(215, 155, 88, 0.15);
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    border-left: 4px solid var(--color-primary);
+  }
+
+  .tickets-notice-bottom {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-secondary);
+    background-color: rgba(215, 155, 88, 0.15);
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    border-left: 4px solid var(--color-primary);
   }
 
   .event-main {

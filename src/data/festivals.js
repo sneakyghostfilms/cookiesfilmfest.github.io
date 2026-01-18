@@ -193,6 +193,14 @@ export const festivals = [
     submissionUrl: "https://filmfreeway.com/NewHopeFilmFestival"
   },
   {
+    name: "Nightcrawler Film Festival",
+    city: "Pittsburgh",
+    month: "August",
+    website: "https://www.nightcrawlerfilmfest.com/",
+    genre: "Horror, Sci-Fi",
+    submissionUrl: "https://filmfreeway.com/NightcrawlerFilmFestival"
+  },
+  {
     name: "Northeast Pennsylvania Film Festival",
     city: "Waverly",
     month: "April",

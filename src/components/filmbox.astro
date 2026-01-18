@@ -4,23 +4,27 @@ import filmData from '../data/films.json';
 export interface Props {
   film: {
     title: string;
-    director: string;
+    director?: string;
+    submitter?: string;
     runtime: string;
     synopsis: string;
     country: string;
     award?: string;
+    isLocal?: boolean;
   };
 }
 
 const { film } = Astro.props;
 const safeTitle = film.title.replace(/[^a-zA-Z0-9]/g, '');
+const creatorLabel = film.submitter ? "Submitted by" : "Director";
+const creatorName = film.submitter || film.director;
 ---
 
 <div class="film-box" data-film-title={film.title}>
   <div class="film-box-title">{film.title}</div>
   <div class="film-details">
     <div class="detail-row">
-      <strong>Director:</strong> {film.director}
+      <strong>{creatorLabel}:</strong> {creatorName}
     </div>
     <div class="detail-row">
       <strong>Runtime:</strong> {film.runtime}

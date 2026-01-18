@@ -6,11 +6,14 @@ import SectionLayout from "../layouts/section-layout.astro";
   <Fragment slot="content">
     <!-- Submission Content -->
     <div class="submission-content">
-      <p class="text-center mb-14">Filmmakers around the world, submit your comedy films to the Cookies and Comedy Film Festival!</p>
+      <div class="submissions-closed-banner">
+        <h2>Submissions Closed</h2>
+        <p class="submissions-notice">The submission period for the 2026 festival has ended. Thank you to all filmmakers who submitted!</p>
+      </div>
       <div class="mb-8 flex justify-center">
-        <a href="https://filmfreeway.com/festivals/81910?utm_campaign=Cookies+and+Comedy+Film+Festival&utm_medium=External&utm_source=Submission+Button" target="_blank" title="Click to submit on FilmFreeway">
-          <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" title="Click to submit on FilmFreeway" width="263" height="102">
-        </a>
+        <div class="disabled-button" title="Submission period has passed">
+          <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" alt="Submissions closed" width="263" height="102">
+        </div>
       </div>
       <h2 class="subheader-orange">Submission Guidelines:</h2>
       <div class="text-left">
@@ -67,6 +70,14 @@ import SectionLayout from "../layouts/section-layout.astro";
   /* Submission Content */
   .submission-content {
     /* No special styling needed when enabled */
+  }
+
+  /* Disabled button styling */
+  .disabled-button {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
   /* Remove the previous submission-closed-tag */

@@ -4,11 +4,16 @@ import NavLinks from "./nav/NavLinks.astro";
 import MobileMenu from "./nav/MobileMenu.astro";
 import type { NavItem } from "~/types";
 
+// Toggle this flag when ticket sales are active vs. submissions open
+const ticketSalesActive = true;
+
 const navItems: Array<NavItem> = [
   { title: "Our Mission", url: "#mission" },
   { title: "The Event", url: "#event" },
   { title: "Awards", url: "#awards" },
-  { title: "Submit", url: "#submission" },
+  ticketSalesActive
+    ? { title: "Tickets", url: "#event" }
+    : { title: "Submit", url: "#submission" },
   { title: "Contact", url: "#contact" },
 ];
 
@@ -28,9 +33,8 @@ const pastEvents = [
     </div>
   </div>
   <div class="notify-container">
-    <div class="helper-text">Ticket sales & submissions</div>
+    <div class="helper-text">Follow us</div>
     <div class="notify-widget">
-      <span class="notify-label">Get Notified</span>
       <div class="notify-icons">
         <button type="button" id="email-notify-btn" class="notify-icon-btn" aria-label="Subscribe via email" title="Email updates">
           <Icon name="mdi:email-outline" class="size-5" />
@@ -250,7 +254,7 @@ const pastEvents = [
     align-items: center;
     gap: 0.5rem;
     background-color: #fbe3c4;
-    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    padding: 0.5rem;
     border-radius: 2rem;
     font-family: 'Fredoka', sans-serif;
     box-shadow: var(--shadow-md);
@@ -260,13 +264,6 @@ const pastEvents = [
 
   .notify-widget:hover {
     box-shadow: var(--shadow-lg);
-  }
-
-  .notify-label {
-    color: var(--color-secondary);
-    font-weight: 600;
-    font-size: 0.9rem;
-    white-space: nowrap;
   }
 
   .notify-icons {
@@ -376,11 +373,7 @@ const pastEvents = [
     }
 
     .notify-widget {
-      padding: 0.4rem 0.4rem 0.4rem 0.75rem;
-    }
-
-    .notify-label {
-      font-size: 0.8rem;
+      padding: 0.4rem;
     }
 
     .notify-icon-btn {

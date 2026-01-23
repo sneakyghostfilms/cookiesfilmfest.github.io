@@ -144,7 +144,7 @@ export const festival2026 = {
       time: "2:40PM - 5:00PM",
       kickoff: "Comedy Kickoff with Mary Warwick",
       intermission: "Intermission with Mary Warwick",
-      intermissionAfterFilm: 8,
+      intermissionAfterFilm: 7,
       qa: "Filmmaker Q&A session",
       venue: "Harris Theater",
       films: [
@@ -215,19 +215,19 @@ export const festival2026 = {
           country: "United States"
         },
         {
-          title: "Tech Rehearsal",
-          submitter: "Stephen Nerangis",
-          runtime: "11:55",
-          synopsis: "The director of a community theatre struggles to lead his cast and crew through a marathon tech rehearsal.",
-          country: "United States"
-        },
-        {
           title: "What To-Do",
           submitter: "Alaina McCall",
           runtime: "5:53",
           synopsis: "Shaun knows what he is supposed to do with his life.",
           country: "United States",
           isLocal: true
+        },
+        {
+          title: "Tech Rehearsal",
+          submitter: "Stephen Nerangis",
+          runtime: "11:55",
+          synopsis: "The director of a community theatre struggles to lead his cast and crew through a marathon tech rehearsal.",
+          country: "United States"
         }
       ]
     },
@@ -238,7 +238,7 @@ export const festival2026 = {
       time: "6:20PM - 8:40PM",
       kickoff: "Comedy Kickoff with Mike Zydel",
       intermission: "Intermission with Mike Zydel",
-      intermissionAfterFilm: 7,
+      intermissionAfterFilm: 6,
       qa: "Filmmaker Q&A session",
       venue: "Harris Theater",
       films: [

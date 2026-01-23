@@ -71,9 +71,15 @@ const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
 
   function initMobileMenu() {
     const menuModalId = "menu-modal";
+    const modal = document.getElementById(menuModalId);
     const openNavButton = document.querySelector("#open-nav-button");
     const closeNavButton = document.querySelector("#close-nav-button");
     const menu = document.querySelector(`#${menuModalId} ul`);
+
+    // Move modal to body to escape header's stacking context
+    if (modal && modal.parentElement !== document.body) {
+      document.body.appendChild(modal);
+    }
 
     if (!openNavButton || !closeNavButton || !menu) return;
 
@@ -103,8 +109,12 @@ const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
 
     // Initialize MicroModal
     MicroModal.init({
-      onShow: () => { document.body.style.overflow = 'hidden'; },
-      onClose: () => { document.body.style.overflow = ''; },
+      onShow: () => {
+        document.body.style.overflow = 'hidden';
+      },
+      onClose: () => {
+        document.body.style.overflow = '';
+      },
       disableScroll: true,
       disableFocus: false,
       awaitOpenAnimation: false,
@@ -163,126 +173,134 @@ const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
     box-shadow: var(--shadow-lg);
   }
 
+  .modal {
+    display: none;
+  }
+
+  .modal.hidden {
+    display: none;
+  }
+
+  /* Need !important to override Tailwind's hidden class */
   .modal.is-open {
     display: block !important;
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    background-color: rgba(0, 0, 0, 0.5) !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 9999;
+    background-color: var(--color-background);
+    overflow: hidden;
   }
 
   .mobile-menu-overlay {
-    position: fixed !important;
-    inset: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 10000 !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: var(--color-background);
+    overflow-y: auto;
   }
 
   .mobile-menu-container {
-    position: relative !important;
-    width: 100% !important;
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    background-color: var(--color-background) !important;
-    overflow-y: auto !important;
-    padding: 1rem !important;
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-background);
+    padding: 1rem;
   }
 
   .mobile-menu-header {
-    position: sticky !important;
-    top: 0 !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-    padding: 0.5rem !important;
-    background-color: var(--color-background) !important;
-    z-index: 1 !important;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 0 1rem 0;
+    background-color: var(--color-background);
   }
 
   .mobile-menu-content {
-    flex: 1 !important;
-    overflow-y: auto !important;
+    flex: 1;
   }
 
   .mobile-menu-list {
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 1rem 0.5rem !important;
-    display: flex !important;
-    flex-direction: column !important;
+    list-style: none;
+    margin: 0;
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
   }
 
   .mobile-menu-item {
-    width: 100% !important;
-    margin: 0 0 1rem 0 !important;
+    width: 100%;
+    margin: 0 0 1rem 0;
   }
 
   .mobile-menu-link {
-    display: block !important;
-    width: 100% !important;
-    padding: 1rem !important;
-    text-align: center !important;
-    font-size: 1.125rem !important;
-    font-weight: 600 !important;
-    color: var(--color-secondary) !important;
-    background-color: var(--color-background-offset) !important;
-    border-radius: 2rem !important;
-    text-decoration: none !important;
-    border: 2px solid transparent !important;
-    transition: all 0.2s ease !important;
-    box-shadow: var(--shadow-md) !important;
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+    background-color: var(--color-background-offset);
+    border-radius: 2rem;
+    text-decoration: none;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-md);
   }
 
   .mobile-dropdown {
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   .mobile-dropdown-title {
-    display: flex !important;
-    width: 100% !important;
-    padding: 1rem !important;
-    justify-content: center !important;
-    align-items: center !important;
-    font-size: 1.125rem !important;
-    font-weight: 600 !important;
-    color: var(--color-secondary) !important;
-    background-color: var(--color-background-offset) !important;
-    border-radius: 2rem !important;
-    cursor: pointer !important;
-    border: 2px solid transparent !important;
-    font-family: 'Fredoka', sans-serif !important;
-    box-shadow: var(--shadow-md) !important;
+    display: flex;
+    width: 100%;
+    padding: 1rem;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+    background-color: var(--color-background-offset);
+    border-radius: 2rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    font-family: 'Fredoka', sans-serif;
+    box-shadow: var(--shadow-md);
   }
 
   .mobile-dropdown-title .dropdown-arrow {
-    margin-left: 0.5rem !important;
-    font-size: 0.7rem !important;
-    transition: transform 0.2s ease !important;
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
   }
 
   .mobile-dropdown-title.active .dropdown-arrow {
-    transform: rotate(180deg) !important;
+    transform: rotate(180deg);
   }
 
   .mobile-dropdown-content {
-    display: none !important;
-    margin-top: 1rem !important;
+    display: none;
+    margin-top: 1rem;
   }
 
   .mobile-dropdown-content.show-mobile {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 1rem !important;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .mobile-submenu-link {
-    background-color: var(--color-background) !important;
-    font-size: 1rem !important;
+    background-color: var(--color-background);
+    font-size: 1rem;
   }
 </style>

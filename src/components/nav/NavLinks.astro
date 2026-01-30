@@ -1,13 +1,11 @@
 ---
-import DropdownMenu from './DropdownMenu.astro';
 import type { NavItem } from '~/types';
 
 interface Props {
   navItems: NavItem[];
-  pastEvents: Array<{ href: string; text: string }>;
 }
 
-const { navItems, pastEvents } = Astro.props;
+const { navItems } = Astro.props;
 ---
 
 <nav class="nav-desktop">
@@ -17,15 +15,6 @@ const { navItems, pastEvents } = Astro.props;
         <a class="menu-link" href={url}>{title}</a>
       </li>
     ))}
-    <li class="nav-item">
-      <DropdownMenu label="Past Events" items={pastEvents} />
-    </li>
-    <li class="nav-item">
-      <a class="menu-link" href="/pa-festivals">PA Fests</a>
-    </li>
-    <li class="nav-item">
-      <a class="menu-link" href="/comedy-festivals">Comedy Fests</a>
-    </li>
   </ul>
 </nav>
 

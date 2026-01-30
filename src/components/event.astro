@@ -1,39 +1,16 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
-import Map from "./map.astro";
-import Timeline from "./event/Timeline.astro";
-import ComedianCard from "./event/ComedianCard.astro";
-import GalleryItem from "./event/GalleryItem.astro";
-import Testimonial from "./event/Testimonial.astro";
 import Schedule2026 from "./schedule2026.astro";
-
-const timelineItems = [
-  { title: "Film Submissions", date: "June 1 - December 31, 2025" },
-  { title: "Schedule Announcement", date: "January 14, 2026" },
-  { title: "Festival Day", date: "Saturday, March 14, 2026" },
-];
-
-const comedians = [
-  { name: "Mike Zydel", image: "/assets/comedians/mike-zydel.jpg", imagePosition: "center 20%" },
-  { name: "Matty Malloy", image: "/assets/comedians/matty-malloy.jpg", imagePosition: "center 25%" },
-  { name: "Mary Warwick", image: "/assets/comedians/mary-warwick.jpg", imagePosition: "center 20%" },
-];
-
-const testimonials = [
-  { quote: "This was such a fun time full of truly lovely people and good films! Scott was very communicative and friendly, and the event went off without a hitch. Thanks so much for including us!", author: "Katherine Coleman, 2025 Filmmaker" },
-  { quote: "We hope to be back! Just a great experience to have as a filmmaker. The communication, venue, and crowds were great.", author: "Pat Battistini, 2025 Filmmaker" },
-];
 ---
 
-<SectionLayout title="The Event" id="event">
+<SectionLayout title="2026 Schedule" id="event">
   <Fragment slot="content">
     <div class="event-layout">
       <div class="event-header">
-        <h3 class="event-subtitle">2026 Festival - March 14</h3>
         <p class="event-description">
           Mark your calendars! The 2026 Cookies & Comedy Film Festival is <strong>Saturday, March 14, 2026</strong> at the Harris Theater in downtown Pittsburgh. We've curated another fantastic selection of the funniest films from around the world, along with live comedy performances and of course - cookies!
         </p>
-        <div class="tickets-section">
+        <div id="tickets" class="tickets-section scroll-mt-8">
           <h4 class="tickets-headline">Tickets are now on sale!</h4>
           <div class="ticket-cards">
             <a href="https://trustarts.org/production/105446/cookies-and-comedy-film-festival-block-1-thats-absurd" target="_blank" class="ticket-card">
@@ -54,85 +31,12 @@ const testimonials = [
       </div>
 
       <!-- 2026 Schedule -->
-      <Schedule2026 />
-
-      <div class="event-main">
-        <div class="event-details">
-          <Timeline items={timelineItems} />
-
-          <p class="text-justify">
-            The festival will be held at the Harris Theater in downtown Pittsburgh's Cultural District.
-          </p>
-        </div>
-
-        <div class="event-image-container">
-          <img
-            src="/assets/2025-event-photos/audience-2.jpeg"
-            alt="Audience enjoying comedy films at our festival"
-            class="event-img"
-          />
-        </div>
-      </div>
-
-      <div class="experience-section">
-        <h3 class="experience-title">What to Expect at Our Festival</h3>
-
-        <!-- 2026 Comedians Section -->
-        <div class="comedians-section">
-          <h4 class="comedians-subtitle">2026 Featured Comedians</h4>
-          <div class="comedians-grid">
-            {comedians.map((comedian) => (
-              <ComedianCard
-                name={comedian.name}
-                image={comedian.image}
-                imagePosition={comedian.imagePosition}
-              />
-            ))}
-          </div>
-          <p class="comedians-description">Live comedy performances between film blocks</p>
-        </div>
-
-        <!-- Other Festival Features in Triangle Layout -->
-        <div class="features-triangle">
-          <div class="triangle-top">
-            <GalleryItem
-              image="/assets/2025-event-photos/q-and-a-session.jpeg"
-              alt="Q&A with filmmakers"
-              caption="Engaging Q&A sessions with filmmakers"
-            />
-          </div>
-          <div class="triangle-bottom">
-            <GalleryItem
-              image="/assets/2025-event-photos/cookie-table.jpeg"
-              alt="Cookie table at the festival"
-              caption="Our famous cookie table"
-            />
-            <GalleryItem
-              image="/assets/2025-event-photos/networking.jpeg"
-              alt="Attendees networking"
-              caption="Connect with fellow film enthusiasts"
-            />
-          </div>
-        </div>
+      <div id="schedule">
+        <Schedule2026 />
       </div>
     </div>
 
-    <div class="testimonial-section">
-      <h3 class="testimonial-title">What Our Filmmakers Say</h3>
-      <div class="testimonial-container">
-        <div class="testimonial-image">
-          <img
-            src="/assets/2025-event-photos/audience-1.jpeg"
-            alt="Happy audience at Cookies & Comedy Film Festival"
-            class="testimonial-img"
-          />
-        </div>
-        <div class="testimonial-content">
-          {testimonials.map((t) => (
-            <Testimonial quote={t.quote} author={t.author} />
-          ))}
-        </div>
-      </div>
+    <div class="cta-wrapper">
       <div class="archive-link-container">
         <div class="cta-section">
           <h3 class="cta-title">Join Us for 2026!</h3>
@@ -155,11 +59,8 @@ const testimonials = [
           </div>
           <p class="discount-note">Buy all three blocks and save $2 per ticket!</p>
         </div>
-        <p class="archive-link">Check out our <a href="/past-events/2025" class="highlight-link">2025 festival archive</a> to see what you missed!</p>
       </div>
     </div>
-
-    <Map />
   </Fragment>
 </SectionLayout>
 
@@ -176,13 +77,6 @@ const testimonials = [
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  .event-subtitle {
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 1.8rem;
-    color: var(--color-secondary);
-    margin-bottom: 1rem;
   }
 
   .event-description {
@@ -274,234 +168,10 @@ const testimonials = [
     font-style: italic;
   }
 
-  .event-main {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    align-items: center;
-  }
-
-  .event-details {
-    flex: 1;
-    width: 100%;
-    max-width: 550px;
-  }
-
-  .event-image-container {
-    flex: 1;
-    width: 100%;
-    max-width: 700px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .event-img {
-    width: 100%;
-    height: auto;
-    border-radius: 1rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Experience Section */
-  .experience-section {
-    margin-top: 3rem;
-    margin-bottom: 3rem;
-  }
-
-  .experience-title {
-    font-family: 'Inter Variable', 'Inter', sans-serif;
-    font-size: 1.8rem;
-    color: var(--color-secondary);
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  /* Comedians section styling */
-  .comedians-section {
-    margin-bottom: 3rem;
-  }
-
-  .comedians-subtitle {
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 1.6rem;
-    color: var(--color-secondary);
-    margin-bottom: 1.5rem;
-    text-align: center;
-    font-weight: 800;
-    text-shadow: 0 0 20px var(--color-background-offset), 0 0 40px var(--color-background-offset);
-    position: relative;
-    z-index: 1;
-  }
-
-  .comedians-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1rem;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    isolation: isolate; /* Contain z-index stacking context for star rays */
-  }
-
-  /* Star rays behind comedians */
-  .comedians-grid::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600%;
-    height: 600%;
-    background:
-      linear-gradient(0deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(22.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(45deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(67.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(90deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(112.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(135deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      linear-gradient(157.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
-      radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 5%, rgba(255, 255, 255, 0.5) 10%, rgba(255, 255, 255, 0.25) 15%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.05) 25%, transparent 35%, transparent 100%);
-    mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
-    -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  /* Adjust star position for desktop when grid is horizontal */
-  @media (min-width: 700px) {
-    .comedians-grid::before {
-      top: 35%;
-    }
-  }
-
-  .comedians-description {
-    text-align: center;
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 500;
-    color: var(--color-text);
-    margin-top: 1rem;
-    font-style: italic;
-  }
-
-  /* Triangle layout for other features */
-  .features-triangle {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .triangle-top {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .triangle-top :global(.gallery-item) {
-    max-width: 350px;
-  }
-
-  .triangle-bottom {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-
-  @media (min-width: 1200px) {
-    .event-main {
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: space-between;
-    }
-
-    .event-details {
-      max-width: 42%;
-    }
-
-    .event-image-container {
-      max-width: 55%;
-    }
-
-    .comedians-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .triangle-bottom {
-      gap: 2rem;
-    }
-  }
-
-  /* Testimonial section styling */
-  .testimonial-section {
-    margin-top: 3rem;
-  }
-
-  .testimonial-title {
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 1.8rem;
-    color: var(--color-secondary);
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  .testimonial-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-
-  .testimonial-image {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-  }
-
-  .testimonial-img {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    border-radius: 0.75rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  }
-
-  .testimonial-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  /* Only switch to row layout when screen is wide enough */
-  @media (min-width: 1024px) {
-    .testimonial-container {
-      flex-direction: row;
-      align-items: center;
-    }
-
-    .testimonial-image {
-      max-width: 55%;
-    }
-
-    .testimonial-img {
-      min-width: 0;
-      width: 100%;
-      height: auto;
-    }
-  }
-
-  @media (min-width: 1200px) {
-    .testimonial-image {
-      max-width: 60%;
-    }
-  }
-
   /* Call to Action styling */
+  .cta-wrapper {
+    margin-top: 3rem;
+  }
   .cta-section {
     margin: 2rem auto 1rem;
     text-align: center;
@@ -521,22 +191,5 @@ const testimonials = [
   .archive-link-container {
     margin-top: 1rem;
     text-align: center;
-  }
-
-  .archive-link {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-secondary);
-  }
-
-  .highlight-link {
-    color: var(--color-primary);
-    text-decoration: underline;
-    transition: color 0.3s ease;
-  }
-
-  .highlight-link:hover {
-    color: var(--color-secondary);
   }
 </style>

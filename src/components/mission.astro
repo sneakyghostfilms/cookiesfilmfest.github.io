@@ -1,8 +1,30 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
+import ComedianCard from "./event/ComedianCard.astro";
+import GalleryItem from "./event/GalleryItem.astro";
+import Timeline from "./event/Timeline.astro";
+import Testimonial from "./event/Testimonial.astro";
+
+const timelineItems = [
+  { title: "Film Submissions", date: "June 1 - December 31, 2026" },
+  { title: "Schedule Announcement", date: "January 14, 2027" },
+  { title: "Festival Day", date: "March 2027 (Day TBD)" },
+];
+
+const testimonials = [
+  { quote: "This was such a fun time full of truly lovely people and good films! Scott was very communicative and friendly, and the event went off without a hitch. Thanks so much for including us!", author: "Katherine Coleman, 2025 Filmmaker" },
+  { quote: "We hope to be back! Just a great experience to have as a filmmaker. The communication, venue, and crowds were great.", author: "Pat Battistini, 2025 Filmmaker" },
+];
+
+const comedians = [
+  { name: "Mike Zydel", image: "/assets/comedians/mike-zydel.jpg", imagePosition: "center 20%" },
+  { name: "Matty Malloy", image: "/assets/comedians/matty-malloy.jpg", imagePosition: "center 25%" },
+  { name: "Mary Warwick", image: "/assets/comedians/mary-warwick.jpg", imagePosition: "center 20%" },
+];
+
 ---
 
-<SectionLayout title="Our Mission" id="mission">
+<SectionLayout title="About" id="mission">
   <Fragment slot="content">
     <div class="mission-layout">
       <div class="mission-content">
@@ -38,6 +60,145 @@ import SectionLayout from "../layouts/section-layout.astro";
         <p class="tagline">
           Come for the laughs! Stay for the cookies!
         </p>
+
+        <!-- What to Expect Section -->
+        <div class="experience-section">
+          <h3 class="experience-title">What to Expect at Our Festival</h3>
+
+          <!-- 2026 Comedians Section -->
+          <div class="comedians-section">
+            <h4 class="comedians-subtitle">2026 Featured Comedians</h4>
+            <div class="comedians-grid">
+              {comedians.map((comedian) => (
+                <ComedianCard
+                  name={comedian.name}
+                  image={comedian.image}
+                  imagePosition={comedian.imagePosition}
+                />
+              ))}
+            </div>
+            <p class="comedians-description">Live comedy performances between film blocks</p>
+          </div>
+
+          <!-- Other Festival Features in Triangle Layout -->
+          <div class="features-triangle">
+            <div class="triangle-top">
+              <GalleryItem
+                image="/assets/2025-event-photos/q-and-a-session.jpeg"
+                alt="Q&A with filmmakers"
+                caption="Engaging Q&A sessions with filmmakers"
+              />
+            </div>
+            <div class="triangle-bottom">
+              <GalleryItem
+                image="/assets/2025-event-photos/cookie-table.jpeg"
+                alt="Cookie table at the festival"
+                caption="Our famous cookie table"
+              />
+              <GalleryItem
+                image="/assets/2025-event-photos/networking.jpeg"
+                alt="Attendees networking"
+                caption="Connect with fellow film enthusiasts"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline and Venue Info -->
+        <div class="timeline-section">
+          <div class="timeline-content">
+            <Timeline items={timelineItems} />
+
+            <p class="venue-text">
+              The festival will be held at the Harris Theater in downtown Pittsburgh's Cultural District.
+            </p>
+          </div>
+
+          <div class="timeline-image-container">
+            <img
+              src="/assets/2025-event-photos/audience-2.jpeg"
+              alt="Audience enjoying comedy films at our festival"
+              class="timeline-img"
+            />
+          </div>
+        </div>
+
+        <!-- Awards Section -->
+        <div class="awards-section">
+          <h3 class="awards-title">2026 Awards Categories</h3>
+          <p class="awards-intro">
+            In our upcoming festival, we'll be celebrating the best in comedy filmmaking across multiple categories.
+            Winners will receive custom certificates, festival laurels, recognition on IMDB, and of course - cookies!
+          </p>
+          <div class="awards-layout">
+            <div class="awards-categories">
+              <div class="category-item">
+                <div class="category-icon">🏆</div>
+                <div class="category-content">
+                  <h4 class="category-title">Best Short Film <span class="prize-highlight"><span class="new-badge">NEW!</span>$500 Cash Prize</span></h4>
+                  <p>For outstanding comedy shorts between 5-20 minutes</p>
+                </div>
+              </div>
+              <div class="category-item">
+                <div class="category-icon">🏆</div>
+                <div class="category-content">
+                  <h4 class="category-title">Best Super Short</h4>
+                  <p>For hilarious micro-films under 5 minutes</p>
+                </div>
+              </div>
+              <div class="category-item">
+                <div class="category-icon">🏆</div>
+                <div class="category-content">
+                  <h4 class="category-title">Best Foreign Film</h4>
+                  <p>For excellent non-US comedy entries</p>
+                </div>
+              </div>
+              <div class="category-item">
+                <div class="category-icon">🏆</div>
+                <div class="category-content">
+                  <h4 class="category-title">Best Comedic Acting</h4>
+                  <p>For standout comedic performances</p>
+                </div>
+              </div>
+              <div class="category-item">
+                <div class="category-icon">🏆</div>
+                <div class="category-content">
+                  <h4 class="category-title">Best Local Film</h4>
+                  <p>For the best Pittsburgh-area submissions</p>
+                </div>
+              </div>
+            </div>
+            <div class="awards-image">
+              <img
+                src="/assets/2025-event-photos/darin-performing-music.jpeg"
+                alt="Musical performance at Cookies & Comedy Film Festival"
+                class="awards-img"
+              />
+              <p class="awards-caption">
+                Darin DiNapoli entertaining the audience with his hilarious improvised cookie-themed singing during the 2025 awards ceremony
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonials Section -->
+        <div class="testimonial-section">
+          <h3 class="testimonial-title">What Our Filmmakers Say</h3>
+          <div class="testimonial-container">
+            <div class="testimonial-image">
+              <img
+                src="/assets/2025-event-photos/audience-1.jpeg"
+                alt="Happy audience at Cookies & Comedy Film Festival"
+                class="testimonial-img"
+              />
+            </div>
+            <div class="testimonial-content">
+              {testimonials.map((t) => (
+                <Testimonial quote={t.quote} author={t.author} />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </Fragment>
@@ -113,5 +274,428 @@ import SectionLayout from "../layouts/section-layout.astro";
     color: var(--color-secondary);
     font-weight: 700;
   }
-  
+
+  /* Experience Section */
+  .experience-section {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+  }
+
+  .experience-title {
+    font-family: 'Inter Variable', 'Inter', sans-serif;
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  /* Comedians section styling */
+  .comedians-section {
+    margin-bottom: 3rem;
+  }
+
+  .comedians-subtitle {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.6rem;
+    color: var(--color-secondary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 800;
+    text-shadow: 0 0 20px var(--color-background-offset), 0 0 40px var(--color-background-offset);
+    position: relative;
+    z-index: 1;
+  }
+
+  .comedians-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Star rays behind comedians */
+  .comedians-grid::before {
+    --starburst-size: 600%;
+    --starburst-top-fade-start: 25%;
+    --starburst-top-fade-end: 45%;
+    --starburst-edge-fade: 65%;
+
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--starburst-size);
+    height: var(--starburst-size);
+    background:
+      linear-gradient(0deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+      linear-gradient(22.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+      linear-gradient(45deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+      linear-gradient(67.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+      linear-gradient(90deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.6) 49.8%, rgba(255, 255, 255, 1) 49.9%, rgba(255, 255, 255, 1) 50.1%, rgba(255, 255, 255, 0.6) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+      linear-gradient(112.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+      linear-gradient(135deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+      linear-gradient(157.5deg, transparent 0%, transparent 40%, transparent 49.5%, rgba(255, 255, 255, 0.5) 49.8%, rgba(255, 255, 255, 0.9) 49.9%, rgba(255, 255, 255, 0.9) 50.1%, rgba(255, 255, 255, 0.5) 50.2%, transparent 50.5%, transparent 60%, transparent 100%),
+      radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 5%, rgba(255, 255, 255, 0.5) 10%, rgba(255, 255, 255, 0.25) 15%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.05) 25%, transparent 35%, transparent 100%);
+    mask-image:
+      linear-gradient(to bottom, transparent 0%, transparent var(--starburst-top-fade-start), black var(--starburst-top-fade-end), black 100%),
+      radial-gradient(ellipse at center, black 0%, transparent var(--starburst-edge-fade));
+    mask-composite: intersect;
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0%, transparent var(--starburst-top-fade-start), black var(--starburst-top-fade-end), black 100%),
+      radial-gradient(ellipse at center, black 0%, transparent var(--starburst-edge-fade));
+    -webkit-mask-composite: source-in;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* On narrow viewports, fade sooner so rays die out before the screen edge */
+  @media (max-width: 699px) {
+    .comedians-grid::before {
+      --starburst-size: 400%;
+      --starburst-top-fade-start: 30%;
+      --starburst-top-fade-end: 45%;
+      --starburst-edge-fade: 50%;
+    }
+  }
+
+  /* Extra side fade for ultra-narrow screens (prevents harsh edge cutoffs) */
+  @media (max-width: 420px) {
+    .comedians-grid::before {
+      --starburst-size: 360%;
+      mask-image:
+        linear-gradient(to bottom, transparent 0%, transparent var(--starburst-top-fade-start), black var(--starburst-top-fade-end), black 100%),
+        radial-gradient(ellipse at center, black 0%, transparent var(--starburst-edge-fade)),
+        linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%);
+      mask-composite: intersect, intersect;
+      -webkit-mask-image:
+        linear-gradient(to bottom, transparent 0%, transparent var(--starburst-top-fade-start), black var(--starburst-top-fade-end), black 100%),
+        radial-gradient(ellipse at center, black 0%, transparent var(--starburst-edge-fade)),
+        linear-gradient(to right, transparent 0%, black 14%, black 86%, transparent 100%);
+      -webkit-mask-composite: source-in, source-in;
+    }
+  }
+
+  .comedians-description {
+    text-align: center;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  /* Triangle layout for other features */
+  .features-triangle {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .triangle-top {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .triangle-top :global(.gallery-item) {
+    max-width: 350px;
+  }
+
+  .triangle-bottom {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 1024px) {
+    .triangle-bottom {
+      gap: 2rem;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .comedians-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Timeline Section */
+  .timeline-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+    align-items: center;
+  }
+
+  .timeline-content {
+    flex: 1;
+    width: 100%;
+    max-width: 550px;
+  }
+
+  .venue-text {
+    text-align: justify;
+  }
+
+  .timeline-image-container {
+    flex: 1;
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .timeline-img {
+    width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (min-width: 1200px) {
+    .timeline-section {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .timeline-content {
+      max-width: 42%;
+    }
+
+    .timeline-image-container {
+      max-width: 55%;
+    }
+  }
+
+  /* Awards Section */
+  .awards-section {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+  }
+
+  .awards-title {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    letter-spacing: 0.01em;
+  }
+
+  .awards-intro {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-weight: 500;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+  }
+
+  .awards-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .awards-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .category-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .category-content {
+    flex: 1;
+  }
+
+  .category-title {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    color: var(--color-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .prize-highlight {
+    background-color: var(--color-primary);
+    color: white;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.5rem;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    display: inline-block;
+    font-weight: 600;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: prize-pulse 2s infinite;
+  }
+
+  @keyframes prize-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .new-badge {
+    background-color: #ff5c35;
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.3rem;
+    margin-right: 0.35rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    vertical-align: text-top;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  .category-content p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  .awards-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .awards-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .awards-caption {
+    margin-top: 0.75rem;
+    text-align: center;
+    font-size: 0.95rem;
+    font-style: italic;
+    max-width: 90%;
+    color: var(--color-text-offset);
+    line-height: 1.4;
+  }
+
+  @media (min-width: 1200px) {
+    .awards-layout {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .awards-categories {
+      flex: 1;
+    }
+
+    .awards-image {
+      max-width: 55%;
+    }
+
+    .awards-img {
+      min-width: 500px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .awards-image {
+      max-width: 60%;
+    }
+
+    .awards-img {
+      min-width: 550px;
+    }
+  }
+
+  /* Testimonial section styling */
+  .testimonial-section {
+    margin-top: 3rem;
+  }
+
+  .testimonial-title {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.8rem;
+    color: var(--color-secondary);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .testimonial-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .testimonial-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .testimonial-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .testimonial-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .testimonial-container {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .testimonial-image {
+      max-width: 55%;
+    }
+
+    .testimonial-img {
+      min-width: 0;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .testimonial-image {
+      max-width: 60%;
+    }
+  }
+
 </style>

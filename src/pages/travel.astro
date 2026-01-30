@@ -134,6 +134,175 @@ const lastUpdated = "January 5, 2026";
         letter-spacing: 0.01em;
       }
 
+      /* Venue Card Styling */
+      .venue-card {
+        background-color: var(--color-background-offset);
+        text-align: center;
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .venue-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+      }
+
+      .venue-intro {
+        font-size: 1.15rem;
+        margin-bottom: 2rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+      }
+
+      .venue-highlight {
+        color: var(--color-primary);
+        font-weight: 800;
+        position: relative;
+        display: inline-block;
+      }
+
+      .venue-highlight::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 100%;
+        height: 3px;
+        background-color: var(--color-primary);
+        opacity: 0.8;
+      }
+
+      .venue-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .venue-map-container {
+        width: 100%;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .venue-map-img {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 0.75rem;
+        margin: 0 auto;
+        display: block;
+        transform: scale(1.25);
+        transform-origin: center;
+      }
+
+      .venue-info-block {
+        background-color: transparent;
+        padding: 2rem;
+        border-radius: 0.75rem;
+        text-align: left;
+      }
+
+      .venue-name {
+        font-weight: 700;
+        color: var(--color-secondary);
+        margin-bottom: 0.75rem;
+        font-size: 1.75rem;
+        margin-top: 0;
+      }
+
+      .venue-address {
+        font-size: 1.1rem;
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+
+      .venue-location {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        color: var(--color-text-offset);
+      }
+
+      .venue-description-block {
+        margin-bottom: 1.5rem;
+        border-top: 1px solid rgba(215, 155, 88, 0.2);
+        border-bottom: 1px solid rgba(215, 155, 88, 0.2);
+        padding: 1.25rem 0;
+      }
+
+      .venue-description-block p {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 0;
+      }
+
+      .parade-note {
+        margin-top: 1.5rem;
+        background: linear-gradient(135deg, rgba(215, 155, 88, 0.15) 0%, rgba(215, 155, 88, 0.08) 100%);
+        border: 2px solid var(--color-primary);
+        border-radius: 0.75rem;
+        padding: 1.25rem 1.5rem;
+        text-align: center;
+      }
+
+      .parade-note-headline {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-secondary);
+        margin-bottom: 0.5rem;
+      }
+
+      .parade-note-text {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 0;
+      }
+
+      @media (min-width: 768px) {
+        .venue-content {
+          flex-direction: row;
+          align-items: stretch;
+          gap: 2.5rem;
+        }
+
+        .venue-map-container {
+          flex: 1.3;
+          overflow: hidden;
+        }
+
+        .venue-info-block {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+        }
+
+        .venue-map-img {
+          height: 100%;
+          object-fit: cover;
+          transform: scale(1.25);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .venue-title {
+          font-size: 2rem;
+        }
+
+        .venue-intro {
+          font-size: 1rem;
+        }
+
+        .venue-info-block {
+          padding: 1.5rem;
+        }
+      }
+
       .card p {
         margin-bottom: 1rem;
       }
@@ -548,6 +717,37 @@ const lastUpdated = "January 5, 2026";
         <p class="page-subtitle">March 14, 2026 | Harris Theater</p>
         <a href="/" class="back-link">Back to Main Site</a>
       </header>
+
+      <!-- Our New Venue -->
+      <section class="card venue-card">
+        <h2 class="card-title venue-title">Our New Venue</h2>
+        <p class="venue-intro">
+          We're excited to announce that our 2026 festival will be hosted at the <span class="venue-highlight">Harris Theater</span>, with more spacious accommodations including 190+ seats!
+        </p>
+        <div class="venue-content">
+          <div class="venue-map-container">
+            <img
+              src="/assets/venues/harris-theater-map.jpg"
+              alt="Map of Harris Theater location"
+              class="venue-map-img"
+            />
+          </div>
+          <div class="venue-info-block">
+            <h3 class="venue-name">Harris Theater</h3>
+            <p class="venue-address">809 Liberty Ave, Pittsburgh, PA 15222</p>
+            <p class="venue-location">Located in the heart of downtown Pittsburgh's Cultural District</p>
+
+            <div class="venue-description-block">
+              <p>The Harris Theater is one of the most active arts facilities in the region, showing art films nearly every day of the year. Named after John P. Harris, co-founder of the Nickelodeon (the first theater dedicated solely to motion pictures), it features contemporary, foreign, and classic films.</p>
+            </div>
+
+            <div class="parade-note">
+              <p class="parade-note-headline">This year's festival falls on St. Patrick's Day Parade day!</p>
+              <p class="parade-note-text">The parade runs through downtown that morning, so getting there takes a little planning. We've put together everything you need to know below.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Quick Summary -->
       <section class="card">

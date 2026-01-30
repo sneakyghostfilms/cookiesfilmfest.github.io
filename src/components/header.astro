@@ -8,17 +8,22 @@ import type { NavItem } from "~/types";
 const ticketSalesActive = true;
 
 const navItems: Array<NavItem> = [
-  { title: "Our Mission", url: "#mission" },
-  { title: "The Event", url: "#event" },
-  { title: "Awards", url: "#awards" },
+  { title: "About", url: "#mission" },
+  { title: "Schedule", url: "#event" },
   ticketSalesActive
-    ? { title: "Tickets", url: "#event" }
+    ? { title: "Tickets", url: "#tickets" }
     : { title: "Submit", url: "#submission" },
+  { title: "Travel Details", url: "/travel" },
   { title: "Contact", url: "#contact" },
 ];
 
-const pastEvents = [
-  { href: "/past-events/2025", text: "2025 Festival" },
+const otherFestsDropdown = [
+  { href: "/pa-festivals", text: "PA Fests" },
+  { href: "/comedy-festivals", text: "Comedy Fests" },
+];
+
+const pastEventsDropdown = [
+  { href: "/past-events/2025", text: "2025" },
 ];
 ---
 
@@ -28,8 +33,22 @@ const pastEvents = [
 >
   <div class="flex items-end flex-grow-0">
     <div class="flex items-end gap-3">
-      <NavLinks navItems={navItems} pastEvents={pastEvents} />
-      <MobileMenu navItems={navItems} pastEvents={pastEvents} />
+      <NavLinks navItems={navItems} />
+      <MobileMenu navItems={navItems} otherFests={otherFestsDropdown} pastEvents={pastEventsDropdown} />
+    </div>
+  </div>
+  <div class="header-links-section">
+    <div class="link-group">
+      <span class="link-header">Other Fests</span>
+      {otherFestsDropdown.map((item) => (
+        <a href={item.href} class="link-item">{item.text}</a>
+      ))}
+    </div>
+    <div class="link-group">
+      <span class="link-header">Past Events</span>
+      {pastEventsDropdown.map((item) => (
+        <a href={item.href} class="link-item">{item.text}</a>
+      ))}
     </div>
   </div>
   <div class="notify-container">
@@ -530,5 +549,64 @@ const pastEvents = [
     background: none;
     padding: 0;
     font: inherit;
+  }
+
+  /* Header Links Section */
+  .header-links-section {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    right: 1.5rem;
+    z-index: 20;
+    flex-direction: row;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  @media (min-width: 641px) {
+    .header-links-section {
+      display: flex;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .header-links-section {
+      right: 2.5rem;
+    }
+  }
+
+  .fixed-header .header-links-section {
+    display: none !important;
+  }
+
+  .link-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .link-header {
+    color: #fbe3c4;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+
+  .link-item {
+    color: #fbe3c4;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(215, 155, 88, 0.5);
+    transition: color 0.2s ease;
+  }
+
+  .link-item:hover {
+    color: white;
   }
 </style>

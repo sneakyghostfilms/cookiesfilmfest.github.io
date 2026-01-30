@@ -7,8 +7,8 @@ import SectionLayout from "../layouts/section-layout.astro";
     <!-- Submission Content -->
     <div class="submission-content">
       <div class="submissions-closed-banner">
-        <h2>Submissions Closed</h2>
-        <p class="submissions-notice">The submission period for the 2026 festival has ended. Thank you to all filmmakers who submitted!</p>
+        <h2>Submissions Currently Closed</h2>
+        <p class="submissions-notice">Submissions for the 2026 festival have ended. Submissions for 2027 will open in June 2026!</p>
       </div>
       <div class="mb-8 flex justify-center">
         <div class="disabled-button" title="Submission period has passed">
@@ -19,7 +19,7 @@ import SectionLayout from "../layouts/section-layout.astro";
       <div class="text-left">
         <ul class="list-disc pl-6 space-y-4 mb-8">
           <li><strong>Genre:</strong> Films must be primarily comedy.</li>
-          <li><strong>Completion Date:</strong> Films should have been completed after January 1, 2023.</li>
+          <li><strong>Completion Date:</strong> Films should have been completed after January 1, 2025.</li>
           <li><strong>Language:</strong> Non-English films must include English subtitles.</li>
           <li><strong>Length:</strong> Films should not exceed 20 minutes.</li>
         </ul>
@@ -27,12 +27,36 @@ import SectionLayout from "../layouts/section-layout.astro";
       
       <h2 class="subheader-orange">Key Dates:</h2>
       <div class="text-left">
-        <ul class="list-disc pl-6 space-y-4 mb-14">
-          <li><strong>Submissions Open:</strong> June 1, 2025</li>
-          <li><strong>Submission Deadline:</strong> December 31, 2025</li>
-          <li><strong>Notification Date:</strong> January 14, 2026</li>
-          <li><strong>Festival Date:</strong> March 14, 2026</li>
+        <ul class="list-disc pl-6 space-y-4 mb-8">
+          <li><strong>Submissions Open:</strong> June 1, 2026</li>
+          <li><strong>Submission Deadline:</strong> December 31, 2026</li>
+          <li><strong>Notification Date:</strong> January 14, 2027</li>
+          <li><strong>Festival Date:</strong> March 2027 (Day TBD)</li>
         </ul>
+      </div>
+
+      <h2 class="subheader-orange">AI & Synthetic Media Policy (2027)</h2>
+      <div class="ai-policy-section">
+        <p class="policy-intro">
+          The Cookies & Comedy Film Festival recognizes that AI tools are increasingly part of modern filmmaking workflows. Rather than attempting to regulate every possible use, the festival is making a focused, pragmatic choice about what it will not accept.
+        </p>
+
+        <div class="policy-restrictions">
+          <h4 class="policy-subheader">The following are not permitted:</h4>
+          <ul class="list-disc pl-6 space-y-3">
+            <li><strong>AI-generated characters</strong>, including foreground or background characters. This includes AI-generated faces, bodies, voices, or performances intended to function as characters in the film.</li>
+            <li><strong>Synthetic replicas of real people</strong> (voice or likeness) without explicit consent from the individual depicted (and legal guardians where applicable).</li>
+          </ul>
+        </div>
+
+        <p class="policy-purpose">
+          This policy is intended to prioritize human performance, authorship, and collaboration, particularly for actors, animators, and crew whose work centers on character and performance.
+        </p>
+
+        <div class="policy-notes">
+          <p><strong>Note:</strong> Filmmakers will be asked to disclose AI use during submission.</p>
+          <p class="policy-disclaimer">This policy may be revisited and adjusted year by year as industry standards evolve.</p>
+        </div>
       </div>
     </div>
   </Fragment>
@@ -87,5 +111,55 @@ import SectionLayout from "../layouts/section-layout.astro";
 
   @media (min-width: 768px) {
     /* No special styles needed */
+  }
+
+  /* AI Policy Section */
+  .ai-policy-section {
+    background-color: rgba(255, 255, 255, 0.4);
+    padding: 1.5rem 2rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--color-secondary);
+    text-align: left;
+  }
+
+  .policy-intro {
+    margin-bottom: 1.25rem;
+    line-height: 1.7;
+  }
+
+  .policy-restrictions {
+    background-color: rgba(215, 155, 88, 0.1);
+    padding: 1.25rem 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .policy-subheader {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .policy-purpose {
+    margin-bottom: 1.25rem;
+    font-style: italic;
+  }
+
+  .policy-notes {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(215, 155, 88, 0.3);
+  }
+
+  .policy-notes p {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .policy-disclaimer {
+    color: var(--color-text-light);
+    font-style: italic;
   }
 </style>

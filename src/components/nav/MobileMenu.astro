@@ -4,11 +4,12 @@ import type { NavItem } from "~/types";
 
 interface Props {
   navItems: NavItem[];
+  otherFests: Array<{ href: string; text: string }>;
   pastEvents: Array<{ href: string; text: string }>;
   modalId?: string;
 }
 
-const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
+const { navItems, otherFests, pastEvents, modalId = 'menu-modal' } = Astro.props;
 ---
 
 <button
@@ -41,7 +42,7 @@ const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
             </li>
           ))}
           <li class="mobile-menu-item">
-            <div class="mobile-dropdown">
+            <div class="mobile-dropdown" data-dropdown="past-events">
               <button class="mobile-dropdown-title">
                 Past Events <span class="dropdown-arrow">▼</span>
               </button>
@@ -55,10 +56,18 @@ const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
             </div>
           </li>
           <li class="mobile-menu-item">
-            <a class="mobile-menu-link" href="/pa-festivals">PA Fests</a>
-          </li>
-          <li class="mobile-menu-item">
-            <a class="mobile-menu-link" href="/comedy-festivals">Comedy Fests</a>
+            <div class="mobile-dropdown" data-dropdown="other-fests">
+              <button class="mobile-dropdown-title">
+                Other Fests <span class="dropdown-arrow">▼</span>
+              </button>
+              <div class="mobile-dropdown-content">
+                {otherFests.map((fest) => (
+                  <a class="mobile-menu-link mobile-submenu-link" href={fest.href}>
+                    {fest.text}
+                  </a>
+                ))}
+              </div>
+            </div>
           </li>
         </ul>
       </div>
@@ -96,16 +105,20 @@ const { navItems, pastEvents, modalId = 'menu-modal' } = Astro.props;
       }
     });
 
-    // Mobile dropdown toggle
-    const mobileDropdown = document.querySelector('.mobile-dropdown-title');
-    const mobileDropdownContent = document.querySelector('.mobile-dropdown-content');
+    // Mobile dropdown toggles
+    const mobileDropdowns = document.querySelectorAll('.mobile-dropdown');
 
-    if (mobileDropdown && mobileDropdownContent) {
-      mobileDropdown.addEventListener('click', () => {
-        mobileDropdownContent.classList.toggle('show-mobile');
-        mobileDropdown.classList.toggle('active');
-      });
-    }
+    mobileDropdowns.forEach(dropdown => {
+      const title = dropdown.querySelector('.mobile-dropdown-title');
+      const content = dropdown.querySelector('.mobile-dropdown-content');
+
+      if (title && content) {
+        title.addEventListener('click', () => {
+          content.classList.toggle('show-mobile');
+          title.classList.toggle('active');
+        });
+      }
+    });
 
     // Initialize MicroModal
     MicroModal.init({

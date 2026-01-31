@@ -7,9 +7,7 @@ import Schedule2026 from "./schedule2026.astro";
   <Fragment slot="content">
     <div class="event-layout">
       <div class="event-header">
-        <p class="event-description">
-          Mark your calendars! The 2026 Cookies & Comedy Film Festival is <strong>Saturday, March 14, 2026</strong> at the Harris Theater in downtown Pittsburgh. We've curated another fantastic selection of the funniest films from around the world, along with live comedy performances and of course - cookies!
-        </p>
+        <h3 class="event-subheading">Saturday, March 14, 2026 at the Harris Theater</h3>
         <div id="tickets" class="tickets-section scroll-mt-8">
           <h4 class="tickets-headline">Tickets are now on sale!</h4>
           <div class="ticket-cards">
@@ -79,10 +77,12 @@ import Schedule2026 from "./schedule2026.astro";
     margin-right: auto;
   }
 
-  .event-description {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1.1rem;
-    line-height: 1.6;
+  .event-subheading {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+    margin: 0 0 1rem 0;
   }
 
   .tickets-section {

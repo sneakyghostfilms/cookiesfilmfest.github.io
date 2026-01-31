@@ -97,35 +97,62 @@
 
   .form-submit {
     margin-top: 0.5rem;
-  }
-
-  .form-button {
-    background-color: rgba(215, 155, 88, 0.3);
-    color: var(--color-secondary);
-    border: 1px solid rgba(215, 155, 88, 0.5);
-    padding: 0.85rem 1.75rem;
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    border-radius: 2rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-md);
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
     justify-content: center;
   }
 
+  .form-button {
+    background: none;
+    color: var(--color-secondary);
+    border: none;
+    padding: 0.35rem 0.25rem;
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    border-radius: 0;
+    cursor: pointer;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    justify-content: center;
+    position: relative;
+  }
+
+  .form-button::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--color-primary);
+    transition: width 0.3s ease;
+  }
+
   .form-button:hover {
-    background-color: rgba(215, 155, 88, 0.5);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    color: var(--color-primary);
   }
   
   .form-button:active {
-    transform: translateY(1px);
-    box-shadow: var(--shadow-sm);
+    opacity: 0.85;
+  }
+
+  .form-button:hover::after {
+    width: 100%;
+  }
+
+  .form-button:focus-visible {
+    outline: none;
+  }
+
+  .form-button:focus-visible::after {
+    width: 100%;
+  }
+
+  .form-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
   /* Animation for button */

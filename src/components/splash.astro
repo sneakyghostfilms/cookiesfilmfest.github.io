@@ -72,20 +72,23 @@ import RotatingLogo from './RotatingLogo.astro';
     gap: 0.35em;
     line-height: 1.2;
     --tagline-stagger: clamp(0.8rem, 6vw, 2.4rem);
+    --tagline-line-duration: 650ms;
+    --tagline-line-1-delay: 1100ms;
+    --tagline-line-gap: 0ms;
   }
 
   .tagline-line {
     opacity: 0;
-    animation: taglineFade 650ms ease-out forwards;
+    animation: taglineFade var(--tagline-line-duration) ease-out forwards;
   }
 
   .tagline-line-1 {
-    animation-delay: 1100ms;
+    animation-delay: var(--tagline-line-1-delay);
     transform: translateX(calc(-1 * var(--tagline-stagger)));
   }
 
   .tagline-line-2 {
-    animation-delay: 3100ms;
+    animation-delay: calc(var(--tagline-line-1-delay) + var(--tagline-line-duration) + var(--tagline-line-gap));
     animation-duration: 325ms;
     transform: translateX(var(--tagline-stagger));
   }

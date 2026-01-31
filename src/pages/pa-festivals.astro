@@ -102,23 +102,37 @@ function getGoogleMapsUrl(city: string) {
       }
       
       .back-link {
-        display: inline-block;
-        background-color: var(--color-background-offset);
-        color: var(--color-secondary);
-        padding: 0.75rem 1.5rem;
-        border-radius: 2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-background-offset);
+        padding: 0.35rem 0.25rem;
         margin-top: 1rem;
+        font-family: 'Nunito Sans', sans-serif;
         font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        transition: all 0.3s ease;
-        border: 1px solid var(--color-primary);
+        font-size: 1.045rem;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(215, 155, 88, 0.5);
+        transition: color 0.2s ease, opacity 0.2s ease;
+        position: relative;
+      }
+
+      .back-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        background-color: var(--color-primary);
+        transition: width 0.3s ease;
       }
 
       .back-link:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-        background-color: var(--color-background-darker);
-        color: var(--color-secondary);
+        color: #ffffff;
+      }
+
+      .back-link:hover::after {
+        width: 100%;
       }
 
       /* Map section */

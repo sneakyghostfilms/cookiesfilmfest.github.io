@@ -23,7 +23,13 @@
     </div>
     
     <div class="form-submit">
-      <button type="submit" class="form-submit-link">Send Message</button>
+      <button type="submit" class="form-submit-link">
+        <span class="button-text">Send Message</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="send-icon">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
     </div>
   </form>
 </div>
@@ -96,7 +102,10 @@
   }
 
   .form-submit-link {
+    appearance: none;
+    -webkit-appearance: none;
     background: none;
+    background-color: transparent;
     color: var(--color-secondary);
     border: none;
     padding: 0.35rem 0.25rem;
@@ -109,8 +118,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.6rem;
     position: relative;
     line-height: 1.5;
+    box-shadow: none;
+    transform: none;
   }
 
   .form-submit-link::after {
@@ -125,11 +137,15 @@
   }
 
   .form-submit-link:hover {
+    background-color: transparent;
     color: var(--color-primary);
+    box-shadow: none;
+    transform: none;
   }
   
   .form-submit-link:active {
     opacity: 0.85;
+    transform: none;
   }
 
   .form-submit-link:hover::after {
@@ -147,6 +163,15 @@
   .form-submit-link:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+  }
+
+  /* Optional: keep the fun send icon nudge */
+  .form-submit-link .send-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .form-submit-link:hover .send-icon {
+    transform: translateX(4px);
   }
   
   @media (max-width: 768px) {

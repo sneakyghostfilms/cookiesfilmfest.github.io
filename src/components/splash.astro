@@ -4,8 +4,24 @@ import RotatingLogo from './RotatingLogo.astro';
 <section class="splash-section splash-bg">
   <div class="splash-content">
     <div class="festival-loop" aria-label="Festival date and venue">
-      <span class="festival-loop-item festival-loop-date">March 14</span>
-      <span class="festival-loop-item festival-loop-venue">Harris Theater</span>
+      <svg class="festival-loop-svg" viewBox="0 0 360 40" aria-hidden="true" focusable="false">
+        <defs>
+          <path id="festivalArc" d="M 20 32 Q 180 4 340 32" fill="none" />
+          <linearGradient id="festivalGoldGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fbe3c4" />
+            <stop offset="45%" stop-color="#d79b58" />
+            <stop offset="100%" stop-color="#c69c6d" />
+          </linearGradient>
+        </defs>
+
+        <text class="festival-loop-text festival-loop-date">
+          <textPath href="#festivalArc" startOffset="50%" text-anchor="middle">March 14</textPath>
+        </text>
+        <text class="festival-loop-text festival-loop-venue">
+          <textPath href="#festivalArc" startOffset="50%" text-anchor="middle">Harris Theater</textPath>
+        </text>
+      </svg>
+      <div class="festival-loop-fallback" aria-hidden="true">March 14 • Harris Theater</div>
     </div>
     <div class="logo-wrapper animate-fade-in">
       <RotatingLogo size={800} />
@@ -62,24 +78,48 @@ import RotatingLogo from './RotatingLogo.astro';
   .festival-loop {
     position: relative;
     width: 100%;
-    height: 2.6rem;
+    height: clamp(2.8rem, 5vw, 3.8rem);
     margin-bottom: 0.5rem;
     flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
   }
 
-  .festival-loop-item {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
+  .festival-loop-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .festival-loop-fallback {
+    display: none;
     font-family: 'Nunito Sans', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1.26rem, 3.12vw, 1.92rem);
-    color: #c69c6d;
-    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-    opacity: 0;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-shadow:
+      0 1px 0 rgba(255, 238, 214, 0.25),
+      0 4px 0 rgba(104, 66, 29, 0.35),
+      0 18px 28px rgba(0, 0, 0, 0.55);
     white-space: nowrap;
-    letter-spacing: 0.01em;
+  }
+
+  .festival-loop-text {
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: 0.7px;
+    fill: #d79b58;
+    fill: url(#festivalGoldGradient);
+    stroke: rgba(0, 0, 0, 0.35);
+    stroke-width: 0.9px;
+    paint-order: stroke fill;
+    transform: translateY(0.75em);
+    filter:
+      drop-shadow(0 -1px 0 rgba(255, 238, 214, 0.25))
+      drop-shadow(0 4px 0 rgba(104, 66, 29, 0.35))
+      drop-shadow(0 18px 28px rgba(0, 0, 0, 0.55));
+    opacity: 0;
   }
 
   .festival-loop-date {
@@ -113,17 +153,14 @@ import RotatingLogo from './RotatingLogo.astro';
       margin-bottom: 0.75rem;
     }
 
-    .festival-loop-item {
-      position: static;
-      transform: none;
-      opacity: 1;
-      animation: none;
-      display: inline;
+    .festival-loop-svg {
+      display: none;
     }
 
-    .festival-loop-venue::before {
-      content: ' • ';
-      opacity: 0.85;
+    .festival-loop-fallback {
+      display: inline-block;
+      font-size: clamp(1.26rem, 3.12vw, 1.92rem);
+      color: #d79b58;
     }
   }
 
@@ -132,7 +169,7 @@ import RotatingLogo from './RotatingLogo.astro';
     font-size: clamp(1rem, 2.5vw, 2.25rem);
     font-weight: 500;
     color: #c69c6d;
-    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35), 0 10px 24px rgba(0, 0, 0, 0.55);
     letter-spacing: 0.02em;
     margin-top: -2rem;
     position: relative;
@@ -144,7 +181,7 @@ import RotatingLogo from './RotatingLogo.astro';
     gap: 0.35em;
     line-height: 1.2;
     --tagline-stagger: clamp(0.8rem, 6vw, 2.4rem);
-    --tagline-line-duration: 650ms;
+    --tagline-line-duration: 1150ms;
     --tagline-line-1-delay: 1100ms;
     --tagline-line-gap: 0ms;
   }
@@ -161,7 +198,7 @@ import RotatingLogo from './RotatingLogo.astro';
 
   .tagline-line-2 {
     animation-delay: calc(var(--tagline-line-1-delay) + var(--tagline-line-duration) + var(--tagline-line-gap));
-    animation-duration: 325ms;
+    animation-duration: 825ms;
     transform: translateX(var(--tagline-stagger));
   }
 

@@ -221,26 +221,11 @@ const { size = 400, class: className = '' } = Astro.props;
       });
 
       // Animation state
-      let rotationSpeed = 0.008;
-      const baseSpeed = 0.008;
-      const hoverSpeed = 0.025;
-      let targetSpeed = baseSpeed;
-
-      // Hover detection
-      container.addEventListener('mouseenter', () => {
-        targetSpeed = hoverSpeed;
-      });
-
-      container.addEventListener('mouseleave', () => {
-        targetSpeed = baseSpeed;
-      });
+      const rotationSpeed = 0.008;
 
       // Animation loop
       function animate() {
         requestAnimationFrame(animate);
-
-        // Smooth speed transition
-        rotationSpeed += (targetSpeed - rotationSpeed) * 0.05;
 
         // Rotate around Y axis
         logoGroup.rotation.y += rotationSpeed;
@@ -283,7 +268,7 @@ const { size = 400, class: className = '' } = Astro.props;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    cursor: default;
   }
 
   .rotating-logo-canvas {

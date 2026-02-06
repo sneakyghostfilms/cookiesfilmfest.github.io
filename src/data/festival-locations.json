@@ -273,5 +273,10 @@
     "lat": 40.4406968,
     "lng": -80.0025666,
     "city": "Pittsburgh"
+  },
+  "Philadelphia Jewish Film and Media Festival": {
+    "lat": 39.9527237,
+    "lng": -75.1635262,
+    "city": "Philadelphia"
   }
 }

@@ -8,7 +8,7 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const LOCATIONS_FILE = join(__dirname, '../src/data/festival-locations.json');
-const OUTPUT_FILE = join(__dirname, '../festival-map.csv');
+const OUTPUT_FILE = join(__dirname, '../pa-festival-map.csv');
 
 async function loadLocations() {
   try {
@@ -159,12 +159,12 @@ async function main() {
   // Write to file
   await writeFile(OUTPUT_FILE, csv, 'utf-8');
 
-  console.log(`✅ Exported ${withCoords.length} items (${festivals.length} festivals, ${contests.length} contests) to: festival-map.csv`);
+  console.log(`✅ Exported ${withCoords.length} items (${festivals.length} festivals, ${contests.length} contests) to: pa-festival-map.csv`);
   console.log('\n📍 To import into Google My Maps:');
   console.log('   1. Go to https://www.google.com/mymaps');
   console.log('   2. Create a new map or open existing map');
   console.log('   3. Click "Import" under the layer');
-  console.log('   4. Upload festival-map.csv');
+  console.log('   4. Upload pa-festival-map.csv');
   console.log('   5. Select "Latitude" and "Longitude" as position columns');
   console.log('   6. Select "Name" as marker title');
   console.log('   7. Style by "Type" column to use different colors for festivals vs contests');

@@ -241,6 +241,14 @@ export const festivals = [
     submissionUrl: "https://filmfreeway.com/piffFilms"
   },
   {
+    name: "Philadelphia Jewish Film and Media Festival",
+    city: "Philadelphia",
+    month: "November",
+    website: "https://phillyjfm.org/",
+    genre: "Jewish",
+    submissionUrl: "https://filmfreeway.com/PhillyJFM"
+  },
+  {
     name: "Philadelphia Latino Arts & Film Festival",
     city: "Philadelphia",
     month: "May",

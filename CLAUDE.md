@@ -73,7 +73,7 @@ Festival coordinates are stored separately in `src/data/festival-locations.json`
   - Respects Nominatim rate limits (1 request/second)
 
 - **To generate a map for Google My Maps**, run `npm run export-map`
-  - Creates `festival-map.csv` with all festivals that have coordinates
+  - Creates `pa-festival-map.csv` with all festivals that have coordinates
   - Import this CSV into Google My Maps to create an interactive map
   - Festival name is the key that ties festivals.js to festival-locations.json
 

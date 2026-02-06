@@ -23,4 +23,4 @@ pnpm-debug.log*
 *.code-workspace
 
 # generated files
-festival-map.csv
+pa-festival-map.csv

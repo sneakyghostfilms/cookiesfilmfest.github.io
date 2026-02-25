@@ -14,14 +14,17 @@ import Schedule2026 from "./schedule2026.astro";
             <a href="https://trustarts.org/production/105446/cookies-and-comedy-film-festival-block-1-thats-absurd" target="_blank" class="ticket-card">
               <span class="block-number">Block 1</span>
               <span class="block-theme">That's Absurd</span>
+              <span class="ticket-cta">Get Tickets →</span>
             </a>
             <a href="https://trustarts.org/production/105450/cookies-and-comedy-film-festival-block-2-the-struggle-is-real" target="_blank" class="ticket-card">
               <span class="block-number">Block 2</span>
               <span class="block-theme">The Struggle is Real</span>
+              <span class="ticket-cta">Get Tickets →</span>
             </a>
             <a href="https://trustarts.org/production/105454/cookies-and-comedy-film-festival-block-3-nothing-more-than-feelings" target="_blank" class="ticket-card">
               <span class="block-number">Block 3</span>
               <span class="block-theme">Nothing More Than Feelings</span>
+              <span class="ticket-cta">Get Tickets →</span>
             </a>
           </div>
           <p class="discount-note">Buy all three blocks and save $2 per ticket!</p>
@@ -45,14 +48,17 @@ import Schedule2026 from "./schedule2026.astro";
             <a href="https://trustarts.org/production/105446/cookies-and-comedy-film-festival-block-1-thats-absurd" target="_blank" class="ticket-card">
               <span class="block-number">Block 1</span>
               <span class="block-theme">That's Absurd</span>
+              <span class="ticket-cta">Get Tickets →</span>
             </a>
             <a href="https://trustarts.org/production/105450/cookies-and-comedy-film-festival-block-2-the-struggle-is-real" target="_blank" class="ticket-card">
               <span class="block-number">Block 2</span>
               <span class="block-theme">The Struggle is Real</span>
+              <span class="ticket-cta">Get Tickets →</span>
             </a>
             <a href="https://trustarts.org/production/105454/cookies-and-comedy-film-festival-block-3-nothing-more-than-feelings" target="_blank" class="ticket-card">
               <span class="block-number">Block 3</span>
               <span class="block-theme">Nothing More Than Feelings</span>
+              <span class="ticket-cta">Get Tickets →</span>
             </a>
           </div>
           <p class="discount-note">Buy all three blocks and save $2 per ticket!</p>
@@ -117,8 +123,9 @@ import Schedule2026 from "./schedule2026.astro";
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 1.25rem 0.75rem;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 1.25rem 0.75rem 0.75rem;
     background: linear-gradient(135deg, var(--color-background) 0%, rgba(255,255,255,0.9) 100%);
     border: 2px solid var(--color-primary);
     border-radius: 0.75rem;
@@ -150,6 +157,26 @@ import Schedule2026 from "./schedule2026.astro";
     color: var(--color-secondary);
     text-align: center;
     line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .ticket-cta {
+    display: inline-block;
+    margin-top: auto;
+    padding: 0.3rem 0.75rem;
+    background-color: var(--color-secondary);
+    color: #fff;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 999px;
+    transition: background-color 0.2s ease;
+  }
+
+  .ticket-card:hover .ticket-cta {
+    background-color: var(--color-primary);
   }
 
   @media (max-width: 500px) {

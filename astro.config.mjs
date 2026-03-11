@@ -6,4 +6,9 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
   site: "https://cookiesfilmfest.com",
   integrations: [tailwind(), icon()],
+  vite: {
+    build: {
+      chunkSizeWarningLimit: 600,
+    },
+  },
 });

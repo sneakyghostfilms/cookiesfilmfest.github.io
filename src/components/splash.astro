@@ -2,6 +2,29 @@
 import RotatingLogo from './RotatingLogo.astro';
 ---
 <section class="splash-section splash-bg">
+  <div class="sponsors">
+    <span class="sponsors-label">Supporters</span>
+    <div class="sponsors-logos">
+      <a href="https://beccabakescookies.com" target="_blank" rel="noopener noreferrer">
+        <img src="/assets/sponsors/becca-bakes-logo.webp" alt="Becca Bakes Cookies" class="sponsor-logo sponsor-logo-becca" />
+      </a>
+      <a href="https://www.thedcpworks.com" target="_blank" rel="noopener noreferrer">
+        <div class="sponsor-logo-dcp-wrapper">
+          <img src="/assets/sponsors/dcp-works-logo.webp" alt="The DCP Works" class="sponsor-logo sponsor-logo-dcp" />
+        </div>
+      </a>
+    </div>
+    <div class="sponsors-logos">
+      <a href="https://www.pittsburghartscouncil.org" target="_blank" rel="noopener noreferrer">
+        <img src="/assets/sponsors/gpac-logo.svg" alt="Greater Pittsburgh Arts Council" class="sponsor-logo sponsor-logo-gpac" />
+      </a>
+    </div>
+    <div class="sponsors-logos">
+      <a href="https://trustarts.org" target="_blank" rel="noopener noreferrer">
+        <img src="/assets/sponsors/pct-logo.webp" alt="Pittsburgh Cultural Trust" class="sponsor-logo sponsor-logo-pct" />
+      </a>
+    </div>
+  </div>
   <div class="splash-content">
     <div class="festival-loop" aria-label="Festival date and venue">
       <svg class="festival-loop-svg" viewBox="0 0 360 40" aria-hidden="true" focusable="false">
@@ -42,6 +65,7 @@ import RotatingLogo from './RotatingLogo.astro';
 
 <style>
   .splash-section {
+    position: relative;
     /* Use 100vh but reserve space for nav bar at bottom */
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile */
@@ -292,6 +316,87 @@ import RotatingLogo from './RotatingLogo.astro';
   @media (max-width: 400px) {
     .logo-wrapper {
       width: min(80vw, 35vh);
+    }
+  }
+
+  /* Sponsors */
+  .sponsors {
+    position: absolute;
+    top: 1rem;
+    left: 1.5rem;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .sponsors-label {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.77rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #fbe3c4;
+    opacity: 0.8;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+
+  .sponsors-logos {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: clamp(180px, 19vw, 290px);
+  }
+
+  .sponsors-logos a {
+    display: block;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sponsors-logos a:hover {
+    opacity: 1;
+  }
+
+  .sponsor-logo {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .sponsor-logo-becca {
+    border-radius: 6px;
+  }
+
+  .sponsor-logo-dcp-wrapper {
+    background: #1a1a1a;
+    border-radius: 6px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    box-sizing: border-box;
+  }
+
+  .sponsor-logo-dcp {
+    border-radius: 2px;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .sponsors-logos + .sponsors-logos {
+    margin-top: 0.5rem;
+  }
+
+
+  @media (max-width: 640px) {
+    .sponsors {
+      display: none;
     }
   }
 

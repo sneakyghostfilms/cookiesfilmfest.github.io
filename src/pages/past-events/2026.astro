@@ -139,54 +139,26 @@ const scheduleBlocks = festival2026.blocks;
       }
 
       .highlights-media {
-        flex: 1;
+        flex: 1.2;
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
       }
 
       .highlights-image {
         display: flex;
         flex-direction: column;
         align-items: center;
+        width: 100%;
       }
 
       .highlights-img {
+        width: 100%;
         max-width: 100%;
         height: auto;
         border-radius: 1rem;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         object-fit: cover;
         object-position: center 35%;
-        aspect-ratio: 16/9;
-      }
-
-      .highlights-secondary {
-        padding: 1rem;
-        border-radius: 1rem;
-        background-color: rgba(255, 255, 255, 0.45);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        align-self: center;
-        width: 100%;
-        max-width: 460px;
-      }
-
-      .highlights-secondary-label {
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: var(--color-text-offset);
-        text-align: center;
-        margin-bottom: 0.75rem;
-      }
-
-      .highlights-secondary-img {
-        width: 100%;
-        height: auto;
-        border-radius: 0.85rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-        object-fit: cover;
         aspect-ratio: 16/9;
       }
 
@@ -857,10 +829,6 @@ const scheduleBlocks = festival2026.blocks;
           flex: 1;
         }
 
-        .highlights-media {
-          flex: 1;
-        }
-
         .highlights-image {
           align-items: stretch;
         }
@@ -868,11 +836,6 @@ const scheduleBlocks = festival2026.blocks;
         .highlights-img {
           min-height: auto;
           width: 100%;
-        }
-
-        .highlights-secondary {
-          align-self: flex-end;
-          max-width: 360px;
         }
 
         .awards-grid {
@@ -922,18 +885,6 @@ const scheduleBlocks = festival2026.blocks;
               />
               <div class="image-caption">
                 Audience energy kept the Harris Theater buzzing throughout the 2026 festival
-              </div>
-            </div>
-
-            <div class="highlights-secondary">
-              <p class="highlights-secondary-label">At the Harris Theater</p>
-              <img
-                src="/assets/2026-event-photos/harris-theater-marquee.jpg"
-                alt="The Harris Theater marquee outside the 2026 Cookies & Comedy Film Festival"
-                class="highlights-secondary-img"
-              />
-              <div class="image-caption">
-                The Harris Theater marquee welcomed festivalgoers downtown
               </div>
             </div>
           </div>

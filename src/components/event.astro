@@ -1,68 +1,26 @@
 ---
 import SectionLayout from "../layouts/section-layout.astro";
-import Schedule2026 from "./schedule2026.astro";
 ---
 
-<SectionLayout title="2026 Schedule" id="event">
+<SectionLayout title="Our Venue" id="event">
   <Fragment slot="content">
     <div class="event-layout">
-      <div class="event-header">
-        <h3 class="event-subheading">Saturday, March 14, 2026 at the Harris Theater</h3>
-        <div id="tickets" class="tickets-section scroll-mt-8">
-          <h4 class="tickets-headline">Tickets are now on sale!</h4>
-          <div class="ticket-cards">
-            <a href="https://trustarts.org/production/105446/cookies-and-comedy-film-festival-block-1-thats-absurd" target="_blank" class="ticket-card">
-              <span class="block-number">Block 1</span>
-              <span class="block-theme">That's Absurd</span>
-              <span class="ticket-cta">Get Tickets →</span>
-            </a>
-            <a href="https://trustarts.org/production/105450/cookies-and-comedy-film-festival-block-2-the-struggle-is-real" target="_blank" class="ticket-card">
-              <span class="block-number">Block 2</span>
-              <span class="block-theme">The Struggle is Real</span>
-              <span class="ticket-cta">Get Tickets →</span>
-            </a>
-            <a href="https://trustarts.org/production/105454/cookies-and-comedy-film-festival-block-3-nothing-more-than-feelings" target="_blank" class="ticket-card">
-              <span class="block-number">Block 3</span>
-              <span class="block-theme">Nothing More Than Feelings</span>
-              <span class="ticket-cta">Get Tickets →</span>
-            </a>
-          </div>
-          <p class="discount-note">Buy all three blocks and save $2 per ticket!</p>
-        </div>
+      <div class="venue-copy">
+        <h3 class="venue-subheading">Harris Theater</h3>
+        <p class="venue-text">
+          Our festival takes place at the Harris Theater in downtown Pittsburgh's Cultural District, a beloved art-house cinema operated by the Pittsburgh Cultural Trust.
+        </p>
+        <p class="venue-text">
+          The historic marquee and Liberty Avenue entrance give the day a real sense of occasion before audiences head inside for films, Q&amp;As, live comedy, and cookies.
+        </p>
       </div>
 
-      <!-- 2026 Schedule -->
-      <div id="schedule">
-        <Schedule2026 />
-      </div>
-    </div>
-
-    <div class="cta-wrapper">
-      <div class="archive-link-container">
-        <div class="cta-section">
-          <h3 class="cta-title">Join Us for 2026!</h3>
-        </div>
-        <div class="tickets-section">
-          <h4 class="tickets-headline">Tickets are now on sale!</h4>
-          <div class="ticket-cards">
-            <a href="https://trustarts.org/production/105446/cookies-and-comedy-film-festival-block-1-thats-absurd" target="_blank" class="ticket-card">
-              <span class="block-number">Block 1</span>
-              <span class="block-theme">That's Absurd</span>
-              <span class="ticket-cta">Get Tickets →</span>
-            </a>
-            <a href="https://trustarts.org/production/105450/cookies-and-comedy-film-festival-block-2-the-struggle-is-real" target="_blank" class="ticket-card">
-              <span class="block-number">Block 2</span>
-              <span class="block-theme">The Struggle is Real</span>
-              <span class="ticket-cta">Get Tickets →</span>
-            </a>
-            <a href="https://trustarts.org/production/105454/cookies-and-comedy-film-festival-block-3-nothing-more-than-feelings" target="_blank" class="ticket-card">
-              <span class="block-number">Block 3</span>
-              <span class="block-theme">Nothing More Than Feelings</span>
-              <span class="ticket-cta">Get Tickets →</span>
-            </a>
-          </div>
-          <p class="discount-note">Buy all three blocks and save $2 per ticket!</p>
-        </div>
+      <div class="venue-image-wrap">
+        <img
+          src="/assets/2026-event-photos/harris-theater-marquee.jpg"
+          alt="The Harris Theater marquee outside the Cookies & Comedy Film Festival"
+          class="venue-image"
+        />
       </div>
     </div>
   </Fragment>
@@ -73,150 +31,50 @@ import Schedule2026 from "./schedule2026.astro";
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-  }
-
-  .event-header {
-    margin-bottom: 1.5rem;
-    text-align: center;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .event-subheading {
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-secondary);
-    margin: 0 0 1rem 0;
-  }
-
-  .tickets-section {
-    margin-top: 1.25rem;
-    margin-bottom: 1rem;
-    text-align: center;
-    background-color: rgba(215, 155, 88, 0.15);
-    padding: 1.25rem 1.5rem;
-    border-radius: 0.75rem;
-    border-left: 4px solid var(--color-primary);
-  }
-
-  .tickets-headline {
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--color-secondary);
-    margin: 0 0 1rem 0;
-  }
-
-  .ticket-cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1rem;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .ticket-card {
     display: flex;
     flex-direction: column;
+    gap: 2rem;
     align-items: center;
-    justify-content: flex-start;
-    gap: 0.5rem;
-    padding: 1.25rem 0.75rem 0.75rem;
-    background: linear-gradient(135deg, var(--color-background) 0%, rgba(255,255,255,0.9) 100%);
-    border: 2px solid var(--color-primary);
-    border-radius: 0.75rem;
-    text-decoration: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .ticket-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    border-color: var(--color-secondary);
-  }
-
-  .block-number {
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
-  }
-
-  .block-theme {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-secondary);
+  .venue-copy {
+    max-width: 760px;
     text-align: center;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
   }
 
-  .ticket-cta {
-    display: inline-block;
-    margin-top: auto;
-    padding: 0.3rem 0.75rem;
-    background-color: var(--color-secondary);
-    color: #fff;
+  .venue-subheading {
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 0.7rem;
+    font-size: 1.45rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    border-radius: 999px;
-    transition: background-color 0.2s ease;
+    color: var(--color-secondary);
+    margin: 0 0 1rem 0;
   }
 
-  .ticket-card:hover .ticket-cta {
-    background-color: var(--color-primary);
+  .venue-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
   }
 
-  @media (max-width: 500px) {
-    .ticket-cards {
-      grid-template-columns: 1fr;
-      max-width: 250px;
+  .venue-image-wrap {
+    width: 100%;
+    max-width: 1040px;
+  }
+
+  .venue-image {
+    width: 100%;
+    display: block;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  @media (min-width: 1100px) {
+    .event-layout {
+      gap: 2.5rem;
     }
-  }
 
-  .discount-note {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--color-secondary);
-    margin: 0;
-    font-style: italic;
-  }
-
-  /* Call to Action styling */
-  .cta-wrapper {
-    margin-top: 3rem;
-  }
-  .cta-section {
-    margin: 2rem auto 1rem;
-    text-align: center;
-    max-width: 800px;
-    padding: 0 1rem;
-  }
-
-  .cta-title {
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 2.5rem;
-    color: var(--color-secondary);
-    margin-bottom: 0.5rem;
-    font-weight: 800;
-  }
-
-  /* Archive link styling */
-  .archive-link-container {
-    margin-top: 1rem;
-    text-align: center;
+    .venue-copy {
+      max-width: 820px;
+    }
   }
 </style>

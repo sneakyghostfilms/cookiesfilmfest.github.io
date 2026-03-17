@@ -1,7 +1,7 @@
 // Import comedian images
 import mattyMalloyImg from '../assets/comedians/matty-malloy.jpg';
 import maryWarwickImg from '../assets/comedians/mary-warwick.jpg';
-import mikeZydelImg from '../assets/comedians/mike-zydel.jpg';
+import darinDinapoliImg from '../assets/comedians/darin-dinapoli.jpg';
 
 // Data structure for the 2026 Festival
 export const festival2026 = {
@@ -38,7 +38,8 @@ export const festival2026 = {
           runtime: "5:25",
           synopsis: "Clare, a sweet girl selling cookies, pays a visit to a potential customer.",
           country: "United States",
-          isLocal: true
+          isLocal: true,
+          award: "Festival Director's Choice"
         },
         {
           title: "Mom Walkers",
@@ -61,7 +62,8 @@ export const festival2026 = {
           runtime: "6:29",
           synopsis: "The Devil himself faces a formal deposition in this darkly comic courtroom mockumentary.",
           country: "United States",
-          isLocal: true
+          isLocal: true,
+          award: "Second to One Local Short"
         },
         {
           title: "Gold Hearts",
@@ -76,7 +78,8 @@ export const festival2026 = {
           submitter: "Kurt St. Thomas",
           runtime: "7:55",
           synopsis: "MAGNET BRAIN is a dark comedy mockumentary about billionaire George Romero, who founded TMS, a company that uses magnets to bring the dead back to life.",
-          country: "United States"
+          country: "United States",
+          award: "Honorable Mention"
         },
         {
           title: "Back In Business",
@@ -167,7 +170,8 @@ export const festival2026 = {
           submitter: "Julia Gordon",
           runtime: "4:15",
           synopsis: "Ever wonder where that missing sock went? Hank, a curious sock, wants to escape the confines of his laundry basket and explore the wonders of the world.",
-          country: "United States"
+          country: "United States",
+          award: "Second to One Super Short"
         },
         {
           title: "Time Travelers' Graveyard",
@@ -180,9 +184,11 @@ export const festival2026 = {
         {
           title: "Choice",
           submitter: "Eastwood Agency on behalf of Valentin Frolov",
+          displayCredit: "Valentin Frolov",
           runtime: "4:52",
           synopsis: "The modern world offers the consumer such a rich choice of \"bread and spectacle\" that he is not always able to cope with this quest.",
-          country: "Russia"
+          country: "Russia",
+          award: "Honorable Mention"
         },
         {
           title: "SQUONK",
@@ -190,7 +196,8 @@ export const festival2026 = {
           runtime: "13:52",
           synopsis: "A failed cryptid hunter searches for something sad and impossible within the hemlock forests of Pennsylvania as he tracks down the most elusive cryptid of all.",
           country: "United States",
-          isLocal: true
+          isLocal: true,
+          award: "Best Local Short"
         },
         {
           title: "Welcome To ESL",
@@ -198,21 +205,24 @@ export const festival2026 = {
           runtime: "6:00",
           synopsis: "A Vietnamese immigrant eagerly joins an English Second Language class in hopes of finding a better future, but he soon finds it won't be as easy as he thought.",
           country: "United States",
-          isLocal: true
+          isLocal: true,
+          award: "Best Short Film"
         },
         {
           title: "The Hat Method",
           submitter: "Rebecca del Tufo",
           runtime: "10:31",
           synopsis: "Alex is excited to meet with her line manager Milli for a social get together, only to discover that being friends with your boss never ends up favorably.",
-          country: "United Kingdom"
+          country: "United Kingdom",
+          award: "Best Foreign Film"
         },
         {
           title: "RIGHT ON!",
           submitter: "Dave Rosas",
           runtime: "14:54",
           synopsis: "An aspiring writer uses increasingly desperate and unconventional methods to overcome a crippling ailment - writer's block.",
-          country: "United States"
+          country: "United States",
+          award: "Honorable Mention"
         },
         {
           title: "What To-Do",
@@ -227,17 +237,18 @@ export const festival2026 = {
           submitter: "Stephen Nerangis",
           runtime: "11:55",
           synopsis: "The director of a community theatre struggles to lead his cast and crew through a marathon tech rehearsal.",
-          country: "United States"
+          country: "United States",
+          award: "Second to One Comedic Acting"
         }
       ]
     },
     {
       name: "Nothing More Than Feelings",
-      host: "Mike Zydel",
-      hostImage: mikeZydelImg.src,
+      host: "Darin DiNapoli",
+      hostImage: darinDinapoliImg.src,
       time: "6:20PM - 8:40PM",
-      kickoff: "Comedy Kickoff with Mike Zydel",
-      intermission: "Intermission with Mike Zydel",
+      kickoff: "Comedy Kickoff with Darin DiNapoli",
+      intermission: "Intermission with Darin DiNapoli",
       intermissionAfterFilm: 6,
       qa: "Filmmaker Q&A session",
       venue: "Harris Theater",
@@ -256,7 +267,8 @@ export const festival2026 = {
           runtime: "9:50",
           synopsis: "As three college students race against the clock to complete their final before midnight, hidden feelings emerge, putting both their friendship and grades at risk.",
           country: "United States",
-          isLocal: true
+          isLocal: true,
+          award: "Second to One Local Comedic Acting"
         },
         {
           title: "Clowning Around",
@@ -271,42 +283,49 @@ export const festival2026 = {
           runtime: "6:44",
           synopsis: "After Travis botches a social interaction with his girlfriend Gabby's father, the pair resorts to gaslighting to prevent lifelong ridicule.",
           country: "United States",
-          isLocal: true
+          isLocal: true,
+          award: "Second to One Short Film"
         },
         {
           title: "The Queen of Pop",
           submitter: "YAQ Distribución on behalf of David Goñi",
+          displayCredit: "David Goñi",
           runtime: "14:00",
           synopsis: "Sara is sitting on the lid of the closed toilet, it seems that something has happened in this room and Sara is ready to tell it to a third person.",
-          country: "Spain"
+          country: "Spain",
+          award: "Second to One Foreign Film"
         },
         {
           title: "Toasty Thighs",
           submitter: "Chris Jadallah",
           runtime: "2:47",
           synopsis: "What if men were confident enough to compliment each other like women do? Those thighs are looking toasty my guy!",
-          country: "United States"
+          country: "United States",
+          award: "Honorable Mention"
         },
         {
           title: "Knights on a Quest for Love",
           submitter: "Mickey Stepanskiy",
           runtime: "5:29",
           synopsis: "Two knights are sent to rescue a princess from a dragon, but discover the real quest was their friendship all along.",
-          country: "United States"
+          country: "United States",
+          award: "Honorable Mention"
         },
         {
           title: "Am I The Asshole",
           submitter: "Michael Hendel",
           runtime: "8:15",
           synopsis: "An insecure married man notices a viral post on Reddit from a woman seeking advice about divorcing her husband.",
-          country: "United States"
+          country: "United States",
+          award: "Honorable Mention"
         },
         {
           title: "In a Few Words",
           submitter: "Elias Kurlfink",
           runtime: "4:30",
           synopsis: "A lonely man wants to talk to a person.",
-          country: "United States"
+          country: "United States",
+          award: "Best Comedic Acting, Best Super Short"
         },
         {
           title: "Te Seguiré a la Oscuridad",
@@ -314,7 +333,8 @@ export const festival2026 = {
           runtime: "11:51",
           synopsis: "In 2005, a high school student discovers that a boy has the same taste in indie music so she obsessively studies Spanish all year to level up into his class.",
           country: "United States",
-          isLocal: true
+          isLocal: true,
+          award: "Best Local Comedic Acting"
         },
         {
           title: "Crush(ed)",
@@ -347,7 +367,7 @@ export const festival2026 = {
   },
   awardsInfo: {
     ceremony: "9:00PM",
-    description: "Join us as we honor this year's standouts, enjoy additional entertainment, and unveil our special oreshki cookies!",
+    description: "The awards ceremony honored the festival's standout films, with additional entertainment from Darin DiNapoli and our special oreshki cookies!",
     venue: "Harris Theater"
   },
   venueInfo: {
@@ -356,3 +376,65 @@ export const festival2026 = {
     address: "809 Liberty Ave, Pittsburgh, PA 15222"
   }
 };
+
+export const awardCategories2026 = [
+  {
+    categoryName: "Foreign Film",
+    awards: [
+      { title: "Best", winner: "The Hat Method", creator: "Rebecca del Tufo" },
+      { title: "Second to One", winner: "The Queen of Pop", creator: "David Goñi" }
+    ]
+  },
+  {
+    categoryName: "Comedic Acting",
+    awards: [
+      { title: "Best", winner: "In a Few Words", creator: "Elias Kurlfink" },
+      { title: "Second to One", winner: "Tech Rehearsal", creator: "Stephen Nerangis" }
+    ]
+  },
+  {
+    categoryName: "Super Short",
+    awards: [
+      { title: "Best", winner: "In a Few Words", creator: "Elias Kurlfink" },
+      { title: "Second to One", winner: "Great Googly", creator: "Julia Gordon" }
+    ]
+  },
+  {
+    categoryName: "Short Film",
+    awards: [
+      { title: "Best", winner: "Welcome To ESL", creator: "Faithe Nguyen", prize: "$500 cash prize" },
+      { title: "Second to One", winner: "Gaslighting Dad", creator: "Rocky Paterra", prize: "Free DCP from The DCP Works" }
+    ]
+  },
+  {
+    categoryName: "Local Comedic Acting",
+    awards: [
+      { title: "Best", winner: "Te Seguiré a la Oscuridad", creator: "Joy Regullano" },
+      { title: "Second to One", winner: "11:59", creator: "Alyssa You" }
+    ]
+  },
+  {
+    categoryName: "Local Short",
+    awards: [
+      { title: "Best", winner: "SQUONK", creator: "Joe Conniff", prize: "Becca Bakes Cookies $50 gift card" },
+      { title: "Second to One", winner: "Devilocalypto: A Devilish Deposition", creator: "Chris Frank", prize: "Free DCP from The DCP Works" }
+    ]
+  },
+  {
+    categoryName: "Honorable Mentions",
+    awards: [
+      { title: "", winner: "Choice", creator: "Valentin Frolov" },
+      { title: "", winner: "Knights on a Quest for Love", creator: "Mickey Stepanskiy" },
+      { title: "", winner: "RIGHT ON!", creator: "Dave Rosas" },
+      { title: "", winner: "Toasty Thighs", creator: "Chris Jadallah" },
+      { title: "", winner: "Am I The Asshole", creator: "Michael Hendel" },
+      { title: "", winner: "MAGNET BRAIN", creator: "Kurt St. Thomas" }
+    ]
+  },
+  {
+    categoryName: "Festival Director's Choice",
+    awards: [
+      { title: "", winner: "Cookies", creator: "Zach Aaron" }
+    ]
+  }
+];

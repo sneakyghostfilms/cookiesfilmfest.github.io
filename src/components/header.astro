@@ -5,15 +5,12 @@ import MobileMenu from "./nav/MobileMenu.astro";
 import type { NavItem } from "~/types";
 
 // Toggle this flag when ticket sales are active vs. submissions open
-const ticketSalesActive = true;
+const ticketSalesActive = false;
 
 const navItems: Array<NavItem> = [
   { title: "About", url: "#mission" },
-  { title: "Schedule", url: "#event" },
-  ticketSalesActive
-    ? { title: "Tickets", url: "#tickets" }
-    : { title: "Submit", url: "#submission" },
-  { title: "Travel Details", url: "/travel" },
+  { title: "2026 Awards and Recap", url: "/past-events/2026" },
+  { title: "Submit", url: "#submission" },
   { title: "Contact", url: "#contact" },
 ];
 
@@ -23,6 +20,7 @@ const otherFestsDropdown = [
 ];
 
 const pastEventsDropdown = [
+  { href: "/past-events/2026", text: "2026" },
   { href: "/past-events/2025", text: "2025" },
 ];
 ---

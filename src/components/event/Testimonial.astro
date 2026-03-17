@@ -2,45 +2,61 @@
 interface Props {
   quote: string;
   author: string;
+  context?: string;
 }
 
-const { quote, author } = Astro.props;
+const { quote, author, context } = Astro.props;
 ---
 
 <div class="testimonial">
   <p class="testimonial-quote">"{quote}"</p>
-  <p class="testimonial-attribution">— {author}</p>
+  <div class="testimonial-footer">
+    <p class="testimonial-attribution">{author}</p>
+    {context && <p class="testimonial-context">{context}</p>}
+  </div>
 </div>
 
 <style>
   .testimonial {
-    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+    padding: 1.25rem;
+    border: 1px solid rgba(50, 34, 88, 0.12);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.68);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
   }
 
   .testimonial-quote {
     font-family: 'Fredoka', sans-serif;
-    font-size: 1.1rem;
-    line-height: 1.6;
+    font-size: 1.02rem;
+    line-height: 1.65;
     font-style: italic;
-    position: relative;
-    padding-left: 1.5rem;
     font-weight: 500;
+    margin: 0;
   }
 
-  .testimonial-quote::before {
-    content: '"';
-    position: absolute;
-    left: 0;
-    top: -0.5rem;
-    font-size: 2.5rem;
-    color: var(--color-primary);
-    opacity: 0.7;
+  .testimonial-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-top: auto;
   }
 
   .testimonial-attribution {
     font-family: 'Fredoka', sans-serif;
     font-weight: 600;
-    text-align: right;
+    margin: 0;
+    text-align: left;
     color: var(--color-secondary);
+  }
+
+  .testimonial-context {
+    margin: 0;
+    font-family: 'Inter Variable', 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: rgba(45, 37, 73, 0.72);
   }
 </style>

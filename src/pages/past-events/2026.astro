@@ -1,0 +1,1177 @@
+---
+import { festival2026, awardCategories2026 } from "../../data/festival2026.js";
+
+const scheduleBlocks = festival2026.blocks;
+---
+
+<!doctype html>
+<html lang="en" class="h-full motion-safe:scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>Cookies & Comedy Film Festival - 2026 Festival Recap</title>
+    <meta name="description" content="Recap of the 2026 Cookies & Comedy Film Festival at the Harris Theater in Pittsburgh" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+      /* Reset and base styles */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --color-primary: #d79b58;
+        --color-secondary: #2b2244;
+        --color-text: #221a35;
+        --color-text-offset: #4a3968;
+        --color-background: #ffffff;
+        --color-background-offset: #fbe3c4;
+        --color-background-darker: #f5d6a8;
+        --color-border: #d79b58;
+      }
+
+      body {
+        font-family: 'Fredoka', sans-serif;
+        background-color: #000000;
+        color: var(--color-text);
+        line-height: 1.5;
+        font-weight: 500;
+      }
+
+      a {
+        color: var(--color-secondary);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      a:hover {
+        color: var(--color-primary);
+      }
+
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      /* Header */
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding-top: 2rem;
+      }
+
+      .page-title {
+        font-size: 3rem;
+        color: var(--color-background-offset);
+        margin-bottom: 1rem;
+        letter-spacing: 0.01em;
+      }
+
+      .page-subtitle {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        margin-bottom: 2rem;
+        letter-spacing: 0.01em;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-background-offset);
+        padding: 0.35rem 0.25rem;
+        margin-top: 1rem;
+        font-family: 'Nunito Sans', sans-serif;
+        font-weight: 600;
+        font-size: 1.045rem;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(215, 155, 88, 0.5);
+        transition: color 0.2s ease, opacity 0.2s ease;
+        position: relative;
+      }
+
+      .back-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        background-color: var(--color-primary);
+        transition: width 0.3s ease;
+      }
+
+      .back-link:hover {
+        color: #ffffff;
+      }
+
+      .back-link:hover::after {
+        width: 100%;
+      }
+
+      /* Highlights section */
+      .highlights-section {
+        background-color: var(--color-background-offset);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .highlights-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .highlights-text {
+        flex: 1;
+      }
+
+      .highlights-media {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .highlights-image {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .highlights-img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 1rem;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        object-fit: cover;
+        object-position: center 35%;
+        aspect-ratio: 16/9;
+      }
+
+      .highlights-secondary {
+        padding: 1rem;
+        border-radius: 1rem;
+        background-color: rgba(255, 255, 255, 0.45);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        align-self: center;
+        width: 100%;
+        max-width: 460px;
+      }
+
+      .highlights-secondary-label {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--color-text-offset);
+        text-align: center;
+        margin-bottom: 0.75rem;
+      }
+
+      .highlights-secondary-img {
+        width: 100%;
+        height: auto;
+        border-radius: 0.85rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        object-fit: cover;
+        aspect-ratio: 16/9;
+      }
+
+      .image-caption {
+        font-size: 0.9rem;
+        font-style: italic;
+        text-align: center;
+        margin-top: 0.75rem;
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+
+      .highlight-description {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Schedule section */
+      .schedule-section {
+        background-color: var(--color-background-offset);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .section-title {
+        font-size: 2.5rem;
+        color: var(--color-secondary);
+        text-align: center;
+        margin-bottom: 2rem;
+        letter-spacing: 0.01em;
+      }
+
+      .schedule-intro {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+
+      .click-hint {
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--color-text-offset);
+        margin-bottom: 1.5rem;
+        font-style: italic;
+        font-weight: 500;
+      }
+
+      /* Schedule blocks - schedule2026 style */
+      .schedule-block {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.4);
+        border-radius: 1rem;
+        border: 1px solid #b25d45;
+        transition: transform 0.3s ease;
+      }
+
+      .schedule-block:hover {
+        transform: translateY(-5px);
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .block-content {
+        position: relative;
+      }
+
+      .block-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .image-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+      }
+
+      .mc-photo {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 1rem;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .block-name {
+        position: absolute;
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: clamp(1.2rem, 3vw, 1.8rem);
+        color: var(--color-background-offset);
+        background: rgba(43, 34, 68, 0.85);
+        padding: 0.3rem 0.8rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        z-index: 2;
+      }
+
+      .host-name-label {
+        font-size: 1.1rem;
+        color: var(--color-primary);
+        font-weight: 600;
+        margin-top: 0.5rem;
+      }
+
+      .block-time {
+        font-size: 1.1rem;
+        color: var(--color-text);
+        font-weight: 600;
+      }
+
+      .block-lists-container {
+        margin-top: 1rem;
+      }
+
+      /* Event notes (kickoff, intermission, Q&A) */
+      .event-note {
+        text-align: center;
+        margin: 1rem 0;
+        font-style: italic;
+        font-size: 1.1rem;
+        color: var(--color-text);
+        font-weight: 600;
+        padding: 0.75rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        border-radius: 0.5rem;
+      }
+
+      .event-note.intermission {
+        background-color: rgba(255, 255, 255, 0.5);
+        border-top: 1px solid rgba(215, 155, 88, 0.1);
+        border-bottom: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      /* Film grid styling */
+      .film-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1rem;
+        background-color: var(--color-background-offset);
+        border-radius: 0.5rem;
+      }
+
+      /* Mixer block */
+      .mixer-block {
+        margin-bottom: 2rem;
+        text-align: center;
+        padding: 2rem;
+        background-color: rgba(255, 255, 255, 0.4);
+        border-radius: 1rem;
+        border: 1px solid #b25d45;
+      }
+
+      .mixer-content {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .mixer-title {
+        font-size: clamp(1.8rem, 5vw, 2.2rem);
+        color: var(--color-secondary);
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.01em;
+      }
+
+      .mixer-time {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--color-text);
+        margin-bottom: 1rem;
+      }
+
+      .mixer-description {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--color-text);
+        font-weight: 500;
+      }
+
+      .inline-photo {
+        margin: 2rem auto;
+        max-width: 720px;
+        text-align: center;
+      }
+
+      .inline-photo img {
+        width: 100%;
+        height: auto;
+        border-radius: 1rem;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .photo-credit {
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--color-text-offset);
+        font-style: italic;
+        margin-top: 1rem;
+        padding: 1rem 0 0.5rem;
+      }
+
+      /* Awards ceremony block */
+      .awards-block {
+        margin-top: 2rem;
+        text-align: center;
+        padding: 2rem;
+        background-color: rgba(255, 255, 255, 0.4);
+        border-radius: 1rem;
+        border: 1px solid #b25d45;
+      }
+
+      .awards-ceremony-content {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .awards-ceremony-title {
+        font-size: clamp(1.8rem, 5vw, 2.2rem);
+        color: var(--color-secondary);
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.01em;
+      }
+
+      .awards-ceremony-time {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--color-text);
+        margin-bottom: 1rem;
+      }
+
+      .awards-ceremony-description {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--color-text);
+        font-weight: 500;
+      }
+
+      /* Hosts section */
+      .hosts-section {
+        background-color: var(--color-background-offset);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .hosts-intro {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hosts-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 2rem;
+        justify-items: center;
+      }
+
+      .host-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.5);
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .host-card-image-container {
+        width: 220px;
+        height: 320px;
+        border-radius: 50% / 35%;
+        margin-bottom: 1.5rem;
+        border: 6px solid var(--color-primary);
+        background-size: cover;
+      }
+
+      .matty-image {
+        background-position: center 25%;
+      }
+
+      .mary-image {
+        background-position: center 20%;
+      }
+
+      .darin-image {
+        background-position: center 30%;
+      }
+
+      .host-details {
+        margin-top: 0.5rem;
+      }
+
+      .host-name {
+        font-size: 1.5rem;
+        color: var(--color-secondary);
+        margin-bottom: 0.5rem;
+      }
+
+      /* Awards section */
+      .awards-section {
+        background-color: var(--color-background-offset);
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .awards-explanation {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: 500;
+      }
+
+      .awards-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .award-card {
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        color: var(--color-secondary);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .award-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        background-color: rgba(255, 255, 255, 0.8);
+      }
+
+      .award-card::before {
+        content: "\1F3C6";
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5rem;
+        opacity: 0.2;
+        z-index: 0;
+      }
+
+      .award-category-title {
+        font-size: 1.5rem;
+        color: var(--color-secondary);
+        margin-bottom: 1rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(215, 155, 88, 0.2);
+        padding-bottom: 0.5rem;
+        letter-spacing: 0.01em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .category-awards {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .award-item {
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.9);
+        transition: background-color 0.2s ease;
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .award-item:hover {
+        background-color: #ffffff;
+      }
+
+      .award-title {
+        font-weight: 700;
+        color: var(--color-secondary);
+        margin-bottom: 0.25rem;
+        font-size: 1.05rem;
+      }
+
+      .award-winner-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--color-secondary);
+        margin-bottom: 0.25rem;
+      }
+
+      .award-creator-name {
+        font-size: 0.9rem;
+        font-style: italic;
+        color: var(--color-text-offset);
+        font-weight: 500;
+      }
+
+      .award-prize {
+        font-size: 0.85rem;
+        color: var(--color-primary);
+        font-weight: 600;
+        margin-top: 0.25rem;
+      }
+
+      /* Film box styling */
+      .film-box {
+        position: relative;
+        padding: 0.75rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(215, 155, 88, 0.3);
+        border-radius: 0.75rem;
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        color: var(--color-secondary);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 4rem;
+      }
+
+      .film-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: rgba(255, 255, 255, 0.8);
+        border-color: var(--color-primary);
+      }
+
+      .film-box-title {
+        font-size: 1rem;
+        line-height: 1.3;
+      }
+
+      /* Award indicator for film boxes */
+      .film-box[data-has-award="true"] {
+        background-color: rgba(255, 255, 255, 0.7);
+        border: 2px solid var(--color-primary);
+      }
+
+      .film-box[data-has-award="true"]::after {
+        content: "\1F3C6";
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 0.9rem;
+      }
+
+      /* Modal styles */
+      .film-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+
+      .film-modal-content {
+        background-color: var(--color-background);
+        margin: 10% auto;
+        padding: 2rem;
+        border-radius: 1rem;
+        width: 80%;
+        max-width: 600px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        position: relative;
+        color: var(--color-text);
+      }
+
+      .close-button {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--color-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        line-height: 1;
+      }
+
+      .close-button:hover {
+        color: var(--color-primary);
+      }
+
+      .film-modal-title {
+        font-size: 1.8rem;
+        color: var(--color-secondary);
+        margin-bottom: 1rem;
+        text-align: center;
+        padding-right: 2rem;
+      }
+
+      .modal-detail {
+        margin-bottom: 0.75rem;
+      }
+
+      .modal-detail strong {
+        color: var(--color-secondary);
+        font-weight: 700;
+      }
+
+      .local-badge {
+        display: inline-block;
+        background-color: #8b5a6b;
+        color: white;
+        font-size: 0.85rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 2rem;
+        margin: 0.5rem 0;
+      }
+
+      .modal-award {
+        display: inline-block;
+        background-color: var(--color-primary);
+        color: white;
+        font-size: 0.9rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 2rem;
+        margin: 1rem 0;
+      }
+
+      .modal-synopsis {
+        font-style: italic;
+        margin-top: 1.25rem;
+        border-top: 1px solid var(--color-border);
+        padding-top: 1rem;
+        line-height: 1.5;
+      }
+
+      .venue-info {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--color-secondary);
+        background-color: rgba(255, 255, 255, 0.4);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .award-card.honorable-mentions {
+        grid-column: 1 / -1;
+      }
+
+      .award-card.honorable-mentions .category-awards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .page-title {
+          font-size: 2.5rem;
+        }
+
+        .section-title {
+          font-size: 2rem;
+        }
+
+        .film-grid {
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: 0.75rem;
+        }
+
+        .awards-grid {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .award-card {
+          padding: 1.25rem;
+        }
+
+        .highlights-container {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .film-modal-content {
+          width: 90%;
+          margin: 20% auto;
+          padding: 1.5rem;
+        }
+
+        .film-modal-title {
+          font-size: 1.5rem;
+        }
+
+        .hosts-container {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+
+        .host-card {
+          max-width: 320px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .host-card-image-container {
+          width: 180px;
+          height: 260px;
+        }
+
+        .award-card.honorable-mentions .category-awards {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .highlights-container {
+          flex-direction: row;
+          gap: 3rem;
+        }
+
+        .highlights-text {
+          flex: 1;
+        }
+
+        .highlights-media {
+          flex: 1;
+        }
+
+        .highlights-image {
+          align-items: stretch;
+        }
+
+        .highlights-img {
+          min-height: auto;
+          width: 100%;
+        }
+
+        .highlights-secondary {
+          align-self: flex-end;
+          max-width: 360px;
+        }
+
+        .awards-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.5rem;
+        }
+      }
+
+      @media (min-width: 992px) {
+        .hosts-container {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .awards-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2rem;
+        }
+
+        .film-grid {
+          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1 class="page-title">Cookies & Comedy Film Festival</h1>
+        <h2 class="page-subtitle">2026 Festival Recap</h2>
+        <a href="/" class="back-link">Back to Main Site</a>
+      </header>
+
+      <section class="highlights-section">
+        <div class="highlights-container">
+          <div class="highlights-text">
+            <p class="highlight-description">
+              Our 2nd annual festival in 2026 was an incredible day of laughs! Held at the Harris Theater in Pittsburgh's Cultural District, we showcased over 40 comedy films from around the world across three themed blocks, each hosted by talented local standup comedians. Festival Director Scott Danzig once again baked hundreds of homemade cookies, facilitated Q&A sessions with attending filmmakers, and recorded audience reactions for each film as special mementos sent to all creators.
+            </p>
+          </div>
+
+          <div class="highlights-media">
+            <div class="highlights-image">
+              <img
+                src="/assets/2026-event-photos/recap-hero-audience-applause.jpg"
+                alt="Audience members smiling and reacting during the 2026 Cookies & Comedy Film Festival"
+                class="highlights-img"
+              />
+              <div class="image-caption">
+                Audience energy kept the Harris Theater buzzing throughout the 2026 festival
+              </div>
+            </div>
+
+            <div class="highlights-secondary">
+              <p class="highlights-secondary-label">At the Harris Theater</p>
+              <img
+                src="/assets/2026-event-photos/harris-theater-marquee.jpg"
+                alt="The Harris Theater marquee outside the 2026 Cookies & Comedy Film Festival"
+                class="highlights-secondary-img"
+              />
+              <div class="image-caption">
+                The Harris Theater marquee welcomed festivalgoers downtown
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Featured Standup Comics -->
+      <section class="hosts-section">
+        <h2 class="section-title">Featured Comedians</h2>
+        <p class="hosts-intro">
+          Our 2026 festival blocks were hosted by these incredible local comedians who kept the audience laughing between films.
+        </p>
+
+        <div class="hosts-container">
+          {scheduleBlocks.map((block) => (
+            <div class="host-card">
+              <div
+                class={`host-card-image-container ${
+                  block.host === "Matty Malloy" ? "matty-image" :
+                  block.host === "Mary Warwick" ? "mary-image" :
+                  block.host === "Darin DiNapoli" ? "darin-image" : ""
+                }`}
+                style={`background-image: url(${block.hostImage})`}
+              ></div>
+              <div class="host-details">
+                <h3 class="host-name">{block.host}</h3>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="schedule-section">
+        <h2 class="section-title">Festival Schedule</h2>
+        <p class="schedule-intro">
+          The 2026 festival featured 3 blocks of comedy films, each hosted by talented local comedians.
+        </p>
+
+        <!-- Mixer -->
+        <div class="mixer-block">
+          <div class="mixer-content">
+            <h3 class="mixer-title">Filmmaker Mixer</h3>
+            <p class="mixer-time">{festival2026.mixerInfo.time}</p>
+            <p class="mixer-description">{festival2026.mixerInfo.description}</p>
+          </div>
+        </div>
+
+        <div class="inline-photo">
+          <img
+            src="/assets/2026-event-photos/mixer-concessions-crowd.jpg"
+            alt="Festivalgoers chatting near the Harris Theater concessions during the pre-show mixer"
+          />
+          <div class="image-caption">Festivalgoers and filmmakers mingling during the pre-show mixer</div>
+        </div>
+
+        <p class="click-hint" style="margin-top: 2rem;">Click a film title for more info</p>
+
+        {scheduleBlocks.map((block) => {
+          const intermissionIndex = block.intermissionAfterFilm - 1;
+          const filmsBeforeIntermission = block.films.slice(0, intermissionIndex + 1);
+          const filmsAfterIntermission = block.films.slice(intermissionIndex + 1);
+
+          return (
+            <div class="schedule-block">
+              <div class="block-content">
+                <div class="block-header">
+                  <div class="image-wrapper">
+                    <img src={block.hostImage} alt={block.host} class="mc-photo" />
+                    <h3 class="block-name">{block.name}</h3>
+                  </div>
+                  <p class="host-name-label">Hosted by {block.host}</p>
+                  <p class="block-time">{block.time}</p>
+                </div>
+                <div class="block-lists-container">
+                  {block.kickoff && <div class="event-note"><em>{block.kickoff}</em></div>}
+                  {filmsBeforeIntermission.length > 0 && (
+                    <div class="film-grid">
+                      {filmsBeforeIntermission.map((film, index) => (
+                        <div
+                          class="film-box"
+                          data-index={`${block.name.replace(/\s+/g, '-')}-${index}`}
+                          data-has-award={film.award ? "true" : "false"}
+                        >
+                          <div class="film-box-title">{film.title}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {block.intermission && <div class="event-note intermission"><em>{block.intermission}</em></div>}
+                  {filmsAfterIntermission.length > 0 && (
+                    <div class="film-grid">
+                      {filmsAfterIntermission.map((film, index) => (
+                        <div
+                          class="film-box"
+                          data-index={`${block.name.replace(/\s+/g, '-')}-${intermissionIndex + 1 + index}`}
+                          data-has-award={film.award ? "true" : "false"}
+                        >
+                          <div class="film-box-title">{film.title}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {block.qa && <div class="event-note"><strong>{block.qa}</strong></div>}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        <!-- Awards Ceremony -->
+        <div class="awards-block">
+          <div class="awards-ceremony-content">
+            <h3 class="awards-ceremony-title">Awards Ceremony</h3>
+            <p class="awards-ceremony-time">{festival2026.awardsInfo.ceremony}</p>
+            <p class="awards-ceremony-description">{festival2026.awardsInfo.description}</p>
+          </div>
+        </div>
+
+        <div class="inline-photo">
+          <img
+            src="/assets/2026-event-photos/filmmakers-puppets.jpg"
+            alt="Filmmakers showing off their creations on stage"
+          />
+          <div class="image-caption">Filmmakers showing off their creations on stage</div>
+        </div>
+
+        <div class="inline-photo">
+          <img
+            src="/assets/2026-event-photos/cookie-platter-close.jpg"
+            alt="A platter of homemade cookies and brownies at the 2026 festival"
+          />
+          <div class="image-caption">No comedy festival is complete without homemade cookies</div>
+        </div>
+      </section>
+
+      <section class="awards-section">
+        <h2 class="section-title">2026 Award Winners</h2>
+        <p class="awards-explanation">
+          Here are the award-winning films from our 2026 festival! Huge thanks to all the talented filmmakers who made this such a fantastic lineup.
+        </p>
+
+        <div class="inline-photo">
+          <img
+            src="/assets/2026-event-photos/awards-announced.jpg"
+            alt="Award recipients posing with a certificate during the 2026 awards announcements"
+          />
+          <div class="image-caption">Festival honorees celebrating as the 2026 awards were announced</div>
+        </div>
+
+        <div class="awards-grid">
+          {awardCategories2026.map((category) => (
+            <div class={`award-card ${category.categoryName === "Honorable Mentions" ? "honorable-mentions" : ""}`}>
+              <h3 class="award-category-title">{category.categoryName}</h3>
+              <div class="category-awards">
+                {category.awards.map((award) => (
+                  <div class="award-item">
+                    {award.title && <p class="award-title">{award.title}</p>}
+                    <p class="award-winner-name">{award.winner}</p>
+                    <p class="award-creator-name">{award.creator}</p>
+                    {award.prize && <p class="award-prize">{award.prize}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <p class="photo-credit">Event photography by Lauren Keller</p>
+    </div>
+
+    {/* Create modal popups for each film */}
+    {scheduleBlocks.map((block) => {
+      const intermissionIndex = block.intermissionAfterFilm - 1;
+      return block.films.map((film, index) => (
+        <div id={`modal-${block.name.replace(/\s+/g, '-')}-${index}`} class="film-modal">
+          <div class="film-modal-content">
+            <span class="close-button">&times;</span>
+            <h3 class="film-modal-title">{film.title}</h3>
+            <p class="modal-detail"><strong>Submitted by:</strong> {film.displayCredit || film.submitter}</p>
+            <p class="modal-detail"><strong>Runtime:</strong> {film.runtime}</p>
+            <p class="modal-detail"><strong>Country:</strong> {film.country}</p>
+            {film.isLocal && <span class="local-badge">Local</span>}
+            {film.award && <p class="modal-award">{film.award}</p>}
+            <p class="modal-synopsis">{film.synopsis}</p>
+          </div>
+        </div>
+      ));
+    })}
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const filmBoxes = document.querySelectorAll('.film-box');
+        const modals = document.querySelectorAll('.film-modal');
+        const closeButtons = document.querySelectorAll('.close-button');
+
+        filmBoxes.forEach(box => {
+          box.addEventListener('click', () => {
+            const index = box.getAttribute('data-index');
+            const modal = document.getElementById(`modal-${index}`);
+            if (modal) {
+              (modal as HTMLElement).style.display = 'block';
+              document.body.style.overflow = 'hidden';
+            }
+          });
+        });
+
+        closeButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const modal = button.closest('.film-modal');
+            if (modal) {
+              (modal as HTMLElement).style.display = 'none';
+              document.body.style.overflow = 'auto';
+            }
+          });
+        });
+
+        window.addEventListener('click', (event) => {
+          modals.forEach(modal => {
+            if (event.target === modal) {
+              (modal as HTMLElement).style.display = 'none';
+              document.body.style.overflow = 'auto';
+            }
+          });
+        });
+
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            modals.forEach(modal => {
+              if ((modal as HTMLElement).style.display === 'block') {
+                (modal as HTMLElement).style.display = 'none';
+                document.body.style.overflow = 'auto';
+              }
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

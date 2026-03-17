@@ -1,6 +1,5 @@
 ---
 import "@fontsource-variable/inter";
-import Event from "../components/event.astro";
 import Submission from "../components/submission.astro";
 import Header from "../components/header.astro";
 import Mission from "../components/mission.astro";
@@ -13,7 +12,7 @@ const image = new URL("/splash_screen_thumbnail.jpg?v=3", site).href;
 const wwwimage = image.startsWith("https://cookiesfilmfest.com")
     ? image.replace("https://", "https://www.")
     : image;
-const description = "Join us for some cookie-crumbling comedy films in Pittsburgh!";
+const description = "Pittsburgh's comedy short film festival — cookies included!";
 ---
 <!doctype html>
 <html lang="en" class="min-h-full motion-safe:scroll-smooth">
@@ -52,10 +51,8 @@ const description = "Join us for some cookie-crumbling comedy films in Pittsburg
     <Splash />
     <div class="main-content mx-auto max-w-5xl px-8 pt-4 pb-32 space-y-16">
       <Mission />
-      <Event />
       <Submission />
       <Contact />
     </div>
   </body>
 </html>
-

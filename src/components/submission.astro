@@ -6,22 +6,23 @@ import SectionLayout from "../layouts/section-layout.astro";
   <Fragment slot="content">
     <!-- Submission Content -->
     <div class="submission-content">
-      <div class="submissions-closed-banner">
-        <h2>Submissions Open June 1</h2>
-        <p class="submissions-notice">Submissions for the 2027 festival open Monday, June 1, 2026. The festival returns to the Harris Theater on Saturday, March 13, 2027.</p>
+      <div class="submissions-open-banner">
+        <h2>Submissions Open</h2>
+        <p class="submissions-notice">Submissions are now open for the 2027 festival, returning to the Harris Theater on Saturday, March 13, 2027.</p>
       </div>
       <div class="mb-8 flex justify-center">
-        <div class="disabled-button" title="Submissions open Monday, June 1, 2026">
-          <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" alt="Submissions open June 1, 2026" width="263" height="102">
-        </div>
+        <a href="https://filmfreeway.com/CookiesFilmFest" target="_blank" rel="noopener noreferrer" class="submission-button-link" title="Submit on FilmFreeway">
+          <img src="https://public-assets.filmfreeway.com/submission_buttons/v2/med_submission_btn@2x-sky-gradient.png" alt="Submit on FilmFreeway" width="263" height="102">
+        </a>
       </div>
       <h2 class="subheader-orange">Submission Guidelines:</h2>
       <div class="text-left">
         <ul class="list-disc pl-6 space-y-4 mb-8">
           <li><strong>Genre:</strong> Films must be primarily comedy.</li>
-          <li><strong>Completion Date:</strong> Films should have been completed after January 1, 2026.</li>
+          <li><strong>Completion Date:</strong> Films should have been completed on or after January 1, 2025.</li>
           <li><strong>Language:</strong> Non-English films must include English subtitles.</li>
           <li><strong>Length:</strong> Films should not exceed 20 minutes.</li>
+          <li><strong>Local Eligibility:</strong> To be considered local, at least half the film must have been created within an hour of Pittsburgh.</li>
           <li><strong>Awards:</strong> Selected films will be considered for festival awards. Award categories will be announced closer to the event.</li>
         </ul>
       </div>
@@ -56,7 +57,7 @@ import SectionLayout from "../layouts/section-layout.astro";
   /* .subheader-orange now handled globally */
 
   /* Banner Styling */
-  .submissions-closed-banner {
+  .submissions-open-banner {
     background-color: rgba(255, 255, 255, 0.4);
     color: var(--color-secondary);
     text-align: center;
@@ -68,7 +69,7 @@ import SectionLayout from "../layouts/section-layout.astro";
     transition: all 0.3s ease;
   }
 
-  .submissions-closed-banner h2 {
+  .submissions-open-banner h2 {
     font-size: 2rem;
     margin-bottom: 0.75rem;
     color: var(--color-secondary);
@@ -86,12 +87,14 @@ import SectionLayout from "../layouts/section-layout.astro";
     /* No special styling needed when enabled */
   }
 
-  /* Disabled button styling */
-  .disabled-button {
-    opacity: 0.4;
-    filter: grayscale(100%);
-    cursor: not-allowed;
-    pointer-events: none;
+  .submission-button-link {
+    display: inline-flex;
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .submission-button-link:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
   }
 
   /* Remove the previous submission-closed-tag */

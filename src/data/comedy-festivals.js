@@ -63,6 +63,25 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/bagogo-itsallcomedy",
   },
   {
+    name: "Begur Costa Brava Film Fest",
+    city: "Begur",
+    state: null,
+    country: "Spain",
+    month: "October",
+    website: "https://begurfilmfest.com",
+    submissionUrl:
+      "https://filmfreeway.com/FestivalInternacionaldeCinemadeComediadeBegur",
+  },
+  {
+    name: "BoneBat Comedy of Horrors Film Fest",
+    city: "Seattle",
+    state: "WA",
+    country: "USA",
+    month: "April",
+    website: "https://www.bonebatfilmfest.com",
+    submissionUrl: "https://filmfreeway.com/BoneBatComedyofHorrorsFilmFest",
+  },
+  {
     name: "Broad Humor Film Festival",
     city: "Los Angeles",
     state: "CA",
@@ -81,6 +100,15 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/CICFF",
   },
   {
+    name: "Charcajada Film Fest",
+    city: "Campillo de Altobuey",
+    state: null,
+    country: "Spain",
+    month: "April",
+    website: "https://filmfreeway.com/CharcajadaFilmFest",
+    submissionUrl: "https://filmfreeway.com/CharcajadaFilmFest",
+  },
+  {
     name: "Comedy Campout",
     city: "Twentynine Palms",
     state: "CA",
@@ -97,6 +125,15 @@ export const comedyFestivals = [
     month: "July",
     website: "https://www.comedyfilmfest.it/",
     submissionUrl: "https://filmfreeway.com/ComedyFilmFest",
+  },
+  {
+    name: "Comicron - International Comic Short Film Festival",
+    city: "Pontelandolfo",
+    state: null,
+    country: "Italy",
+    month: "September",
+    website: "https://www.comicron.eu",
+    submissionUrl: "https://filmfreeway.com/ComicronFilmFestival",
   },
   {
     name: "Cookies & Comedy Film Festival",
@@ -124,7 +161,47 @@ export const comedyFestivals = [
     country: "Ireland",
     month: "November",
     website: "https://www.dublininternationalcomedyfilmfest.com",
-    submissionUrl: "https://filmfreeway.com/DublinInternationalComedyFilmFestivalDICFF",
+    submissionUrl:
+      "https://filmfreeway.com/DublinInternationalComedyFilmFestivalDICFF",
+  },
+  {
+    name: "Festival de Cine de Comedia de Tarazona y el Moncayo",
+    city: "Tarazona",
+    state: null,
+    country: "Spain",
+    month: "August",
+    website: "https://www.cinetarazonaymoncayo.es",
+    submissionUrl:
+      "https://filmmakers.festhome.com/en/festival/festival-de-cine-de-comedia-de-tarazona-y-el-moncayo",
+  },
+  {
+    name: "Festival du Court Métrage d'Humour de Meudon",
+    city: "Meudon",
+    state: null,
+    country: "France",
+    month: "October",
+    website: "https://www.festivalmeudon.org",
+    submissionUrl: "https://www.filmfestplatform.com/fr/festival/238",
+  },
+  {
+    name: "Festival Internacional de Cine de Comedia de Cuenca",
+    city: "Cuenca",
+    state: null,
+    country: "Spain",
+    month: "May",
+    website: "https://www.festivalcinecomedia.com",
+    submissionUrl:
+      "https://filmmakers.festhome.com/en/festival/ficcue-festival-internacional-de-cine-de-comedia-en-cuenca",
+  },
+  {
+    name: "Festival RIR - International Comedy Short Film Festival",
+    city: "Allariz",
+    state: null,
+    country: "Spain",
+    month: "September",
+    website: "https://festivalrir.com",
+    submissionUrl:
+      "https://filmmakers.festhome.com/en/festival/rir-festival-internacional-de-curtametraxes-de-comedia",
   },
   {
     name: "Film 4 Fun - International Comedy Short Film Festival",
@@ -133,7 +210,26 @@ export const comedyFestivals = [
     country: "Romania",
     month: "November",
     website: "https://www.film4fun.ro/",
-    submissionUrl: "https://filmfreeway.com/Film4Fun-InternationalShortFilmFestival",
+    submissionUrl:
+      "https://filmfreeway.com/Film4Fun-InternationalShortFilmFestival",
+  },
+  {
+    name: "FILM@Vail Comedy Festival",
+    city: "Vail",
+    state: "CO",
+    country: "USA",
+    month: "May",
+    website: "https://www.vailcomedyfestival.com",
+    submissionUrl: "https://filmfreeway.com/VailComedyFestival",
+  },
+  {
+    name: "FUNCINEMA International Comedy Film Festival",
+    city: "Mar del Plata",
+    state: null,
+    country: "Argentina",
+    month: "September",
+    website: "https://www.funcinema.com.ar",
+    submissionUrl: "https://filmfreeway.com/FUNCINEMA",
   },
   {
     name: "Funny Life Film Festival",
@@ -168,7 +264,8 @@ export const comedyFestivals = [
     state: "GA",
     country: "USA",
     month: "April",
-    website: "https://filmfestivalcircuit.com/festival/georgia-comedy-film-festival",
+    website:
+      "https://filmfestivalcircuit.com/festival/georgia-comedy-film-festival",
     submissionUrl: "https://filmfreeway.com/georgiacomedyfilmfestival",
   },
   {
@@ -178,7 +275,8 @@ export const comedyFestivals = [
     country: "Netherlands",
     month: "January",
     website: "https://goldensmile.festivee.com/",
-    submissionUrl: "https://filmfreeway.com/GoldenSmileInternationalFilmFestival",
+    submissionUrl:
+      "https://filmfreeway.com/GoldenSmileInternationalFilmFestival",
   },
   {
     name: "Great Canadian Comedy Film Festival",
@@ -231,7 +329,8 @@ export const comedyFestivals = [
     state: "NY",
     country: "USA",
     month: "May",
-    website: "https://www.sticksandstonescomedyclub.com/pages/hamptons-comedy-festival",
+    website:
+      "https://www.sticksandstonescomedyclub.com/pages/hamptons-comedy-festival",
     submissionUrl: "https://filmfreeway.com/HamptonsComedyFestival",
   },
   {
@@ -268,7 +367,8 @@ export const comedyFestivals = [
     country: "Czech Republic",
     month: "May",
     website: "https://icomfilmfest.com/en",
-    submissionUrl: "https://icomfilmfest.com/en/about-festival/festival-statute",
+    submissionUrl:
+      "https://icomfilmfest.com/en/about-festival/festival-statute",
   },
   {
     name: "Just For Laughs Shorts",
@@ -316,7 +416,8 @@ export const comedyFestivals = [
     country: "United Kingdom",
     month: "August",
     website: "https://www.litlaughs.com",
-    submissionUrl: "https://filmfreeway.com/LitLaughsInternationalComedyFilmFestival",
+    submissionUrl:
+      "https://filmfreeway.com/LitLaughsInternationalComedyFilmFestival",
   },
   // NOTE: Los Angeles Comedy Film Festival is DISTINCT from "LA Comedy Festival"
   // above - they are completely separate and unaffiliated organizations.
@@ -336,7 +437,8 @@ export const comedyFestivals = [
     country: "Belgium",
     month: "November",
     website: "https://www.fifcl.be/en",
-    submissionUrl: "https://www.fifcl.be/en/registration-for-films-in-the-official-selection-2025-is-now-open/",
+    submissionUrl:
+      "https://www.fifcl.be/en/registration-for-films-in-the-official-selection-2025-is-now-open/",
   },
   {
     name: "LOCO London Comedy Film Festival",
@@ -354,7 +456,8 @@ export const comedyFestivals = [
     country: "United Kingdom",
     month: "November",
     website: "https://worldwidecomedyshortfilmfestival.com",
-    submissionUrl: "https://filmfreeway.com/LondonWorldwideComedyShortFilmFestival",
+    submissionUrl:
+      "https://filmfreeway.com/LondonWorldwideComedyShortFilmFestival",
   },
   {
     name: "Madcap Comedy International Short Film Festival",
@@ -363,7 +466,17 @@ export const comedyFestivals = [
     country: "Australia",
     month: "September",
     website: "https://madcapcomedyinternationalshortfilmfestival.webnode.page/",
-    submissionUrl: "https://filmfreeway.com/TheMadcapComedyInternationalShortFilmFestival",
+    submissionUrl:
+      "https://filmfreeway.com/TheMadcapComedyInternationalShortFilmFestival",
+  },
+  {
+    name: "Melbourne International Comedy Festival Funny Shorts",
+    city: "Melbourne",
+    state: "VIC",
+    country: "Australia",
+    month: "April",
+    website: "https://www.comedyfestival.com.au/funny-shorts/",
+    submissionUrl: "https://filmfreeway.com/FunnyShorts",
   },
   {
     name: "Monte-Carlo Film Festival de la Comédie",
@@ -417,7 +530,8 @@ export const comedyFestivals = [
     country: "USA",
     month: "September",
     website: "https://palmspringscomedyfest.com",
-    submissionUrl: "https://filmfreeway.com/ThePalmSpringsInternationalComedyFestival",
+    submissionUrl:
+      "https://filmfreeway.com/ThePalmSpringsInternationalComedyFestival",
   },
   {
     name: "Philly Sketchfest Comedy Film Festival",
@@ -435,7 +549,8 @@ export const comedyFestivals = [
     country: "United Kingdom",
     month: "March",
     website: "https://filmfreeway.com/PigeonLaughsShortComedyFilmFestival",
-    submissionUrl: "https://filmfreeway.com/PigeonLaughsShortComedyFilmFestival",
+    submissionUrl:
+      "https://filmfreeway.com/PigeonLaughsShortComedyFilmFestival",
   },
   {
     name: "PNN Academy Comedy Film Festival",
@@ -452,7 +567,8 @@ export const comedyFestivals = [
     state: "OR",
     country: "USA",
     month: "March",
-    website: "https://filmfestivalcircuit.com/festival/portland-comedy-film-festival",
+    website:
+      "https://filmfestivalcircuit.com/festival/portland-comedy-film-festival",
     submissionUrl: "https://filmfreeway.com/PortlandComedyFilmFestival",
   },
   {
@@ -483,6 +599,15 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/ShortCom",
   },
   {
+    name: "taSHORTfest - International Comedy Short Film Festival",
+    city: "Barcelona",
+    state: null,
+    country: "Spain",
+    month: "July",
+    website: "https://www.tashortfest.com",
+    submissionUrl: "https://filmfreeway.com/taSHORTfest",
+  },
+  {
     name: "The 50/50 Comedy Fest",
     city: "Los Angeles",
     state: "CA",
@@ -501,12 +626,22 @@ export const comedyFestivals = [
     submissionUrl: "https://filmfreeway.com/TheComedyFilmFestival",
   },
   {
+    name: "Vevey International Funny Film Festival",
+    city: "Vevey",
+    state: null,
+    country: "Switzerland",
+    month: "October",
+    website: "https://vifff.ch",
+    submissionUrl: "https://filmfreeway.com/vifff",
+  },
+  {
     name: "Women's Comedy Film Festival in Atlanta",
     city: "Atlanta",
     state: "GA",
     country: "USA",
     month: "March",
     website: "https://cinemalife.org/womenscomedyfilmfestivalatl/",
-    submissionUrl: "https://filmfreeway.com/TheWomensComedyFilmFestivalinAtlanta",
+    submissionUrl:
+      "https://filmfreeway.com/TheWomensComedyFilmFestivalinAtlanta",
   },
 ];

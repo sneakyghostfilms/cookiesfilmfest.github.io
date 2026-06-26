@@ -390,5 +390,96 @@
     "city": "London",
     "state": null,
     "country": "United Kingdom"
+  },
+  "Begur Costa Brava Film Fest": {
+    "lat": 41.9541918,
+    "lng": 3.2088349,
+    "city": "Begur",
+    "state": null,
+    "country": "Spain"
+  },
+  "BoneBat Comedy of Horrors Film Fest": {
+    "lat": 47.6038321,
+    "lng": -122.330062,
+    "city": "Seattle",
+    "state": "WA",
+    "country": "USA"
+  },
+  "Charcajada Film Fest": {
+    "lat": 39.611263,
+    "lng": -1.7928416,
+    "city": "Campillo de Altobuey",
+    "state": null,
+    "country": "Spain"
+  },
+  "Comicron - International Comic Short Film Festival": {
+    "lat": 41.2871143,
+    "lng": 14.6922875,
+    "city": "Pontelandolfo",
+    "state": null,
+    "country": "Italy"
+  },
+  "Festival de Cine de Comedia de Tarazona y el Moncayo": {
+    "lat": 41.9065093,
+    "lng": -1.7216461,
+    "city": "Tarazona",
+    "state": null,
+    "country": "Spain"
+  },
+  "Festival du Court Métrage d'Humour de Meudon": {
+    "lat": 48.8126688,
+    "lng": 2.2385432,
+    "city": "Meudon",
+    "state": null,
+    "country": "France"
+  },
+  "Festival Internacional de Cine de Comedia de Cuenca": {
+    "lat": 40.0661031,
+    "lng": -2.1313528,
+    "city": "Cuenca",
+    "state": null,
+    "country": "Spain"
+  },
+  "Festival RIR - International Comedy Short Film Festival": {
+    "lat": 42.1930557,
+    "lng": -7.8045042,
+    "city": "Allariz",
+    "state": null,
+    "country": "Spain"
+  },
+  "FUNCINEMA International Comedy Film Festival": {
+    "lat": -37.9976168,
+    "lng": -57.5482079,
+    "city": "Mar del Plata",
+    "state": null,
+    "country": "Argentina"
+  },
+  "taSHORTfest - International Comedy Short Film Festival": {
+    "lat": 41.3825802,
+    "lng": 2.177073,
+    "city": "Barcelona",
+    "state": null,
+    "country": "Spain"
+  },
+  "Vevey International Funny Film Festival": {
+    "lat": 46.4602978,
+    "lng": 6.8418655,
+    "city": "Vevey",
+    "state": null,
+    "country": "Switzerland"
+  },
+  "FILM@Vail Comedy Festival": {
+    "lat": 39.6438028,
+    "lng": -106.3888231,
+    "city": "Vail",
+    "state": "CO",
+    "country": "USA"
+  },
+  "Melbourne International Comedy Festival Funny Shorts": {
+    "lat": -37.8142454,
+    "lng": 144.9631732,
+    "city": "Melbourne",
+    "state": "VIC",
+    "country": "Australia"
   }
 }

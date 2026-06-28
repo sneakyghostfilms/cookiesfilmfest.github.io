@@ -115,6 +115,29 @@ const testimonials = [
           </div>
         </div>
 
+        <!-- Accessible Block for Deaf & hard-of-hearing audiences -->
+        <div class="access-section">
+          <p class="access-kicker">New for 2027</p>
+          <h3 class="access-title">An Accessible Block for Deaf &amp; Hard-of-Hearing Audiences</h3>
+          <div class="access-feature">
+            <figure class="access-figure">
+              <img
+                src="/assets/accessibility/open-captions-example.webp"
+                alt="An animated night scene of a glowing UFO above the Pittsburgh skyline, with an open caption reading '[spaceship zooming]' across the bottom of the frame"
+                class="access-photo"
+                width="1419"
+                height="790"
+                loading="lazy"
+              />
+              <figcaption class="access-figcaption">Open captions, like this one, will appear on every short film in the block.</figcaption>
+            </figure>
+            <div class="access-copy">
+              <p>For the first time, one of our film blocks will be fully accessible to our Deaf and hard-of-hearing guests. Every short film will screen with open captions, and <strong>Dan Randolph</strong> will be on stage as our ASL interpreter throughout the live comedy and filmmaker Q&amp;A.</p>
+              <p>Comedians <strong>Darin DiNapoli</strong> and <strong>Mary Warwick</strong> are shaping their sets around the block, with planning help from <strong>Heather Gray</strong>.</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Timeline and Venue Info -->
         <div class="timeline-section">
           <div class="timeline-content">
@@ -319,6 +342,92 @@ const testimonials = [
     .experience-row-reverse .experience-photo-wrap {
       max-width: 100%;
       justify-content: center;
+    }
+  }
+
+  /* Accessible Block highlight */
+  .access-section {
+    margin: 3rem auto 2rem;
+    max-width: 1000px;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    background: rgba(251, 227, 196, 0.55);
+    border: 1px solid rgba(215, 155, 88, 0.45);
+    border-radius: 1.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    text-align: center;
+  }
+
+  .access-kicker {
+    margin: 0 0 0.4rem;
+    font-family: 'Inter Variable', 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(43, 34, 87, 0.72);
+  }
+
+  .access-title {
+    margin: 0 0 1.75rem;
+    font-family: 'Inter Variable', 'Inter', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 1.9rem);
+    color: var(--color-secondary);
+    text-align: center;
+  }
+
+  .access-feature {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    text-align: left;
+  }
+
+  .access-figure {
+    margin: 0;
+    flex: 1 1 56%;
+    min-width: 0;
+  }
+
+  .access-photo {
+    width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    display: block;
+  }
+
+  .access-figcaption {
+    margin-top: 0.6rem;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: rgba(43, 34, 87, 0.8);
+    text-align: center;
+  }
+
+  .access-copy {
+    flex: 1 1 44%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    line-height: 1.5;
+    color: var(--color-secondary);
+  }
+
+  .access-copy p {
+    margin: 0;
+  }
+
+  @media (max-width: 860px) {
+    .access-feature {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .access-copy {
+      text-align: center;
     }
   }
 

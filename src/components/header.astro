@@ -65,13 +65,13 @@ const pastEventsDropdown = [
 </header>
 
 <!-- Email Signup Modal -->
-<div id="email-modal" class="email-modal" aria-hidden="true">
+<div id="email-modal" class="email-modal" role="dialog" aria-modal="true" aria-labelledby="email-modal-title" aria-describedby="email-modal-desc" aria-hidden="true">
   <div class="email-modal-backdrop"></div>
   <div class="email-modal-content">
-    <button type="button" class="email-modal-close" aria-label="Close modal">&times;</button>
+    <button type="button" class="email-modal-close" aria-label="Close">&times;</button>
     <div class="email-modal-body">
-      <h3>Get Notified</h3>
-      <p>You'll get 2 emails per year:</p>
+      <h3 id="email-modal-title">Get Notified</h3>
+      <p id="email-modal-desc">You'll get 2 emails per year:</p>
       <ul>
         <li>Now Open For Film Submissions</li>
         <li>Tickets Now On Sale</li>
@@ -129,37 +129,119 @@ const pastEventsDropdown = [
   }
   document.addEventListener('astro:page-load', initHeader);
 
-  // Email Modal functionality
+  const NEWSLETTER_SEEN_KEY = 'ccff_newsletter_prompt_seen';
+
+  let modalInitialized = false;
+  let lastFocused: HTMLElement | null = null;
+  let autoObserver: IntersectionObserver | null = null;
+  let autoTimerId: number | null = null;
+  let autoArmTimeoutId: number | null = null;
+  let autoTriggered = false;
+
+  function hasSeenNewsletterPrompt() {
+    try {
+      return localStorage.getItem(NEWSLETTER_SEEN_KEY) !== null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markNewsletterPromptSeen() {
+    try {
+      localStorage.setItem(NEWSLETTER_SEEN_KEY, String(Date.now()));
+    } catch (e) {}
+  }
+
   function initEmailModal() {
+    if (modalInitialized) return;
+
     const modal = document.getElementById('email-modal');
     const openBtn = document.getElementById('email-notify-btn');
-    const closeBtn = modal?.querySelector('.email-modal-close');
+    const closeBtn = modal?.querySelector('.email-modal-close') as HTMLElement | null;
     const backdrop = modal?.querySelector('.email-modal-backdrop');
     const form = document.getElementById('email-signup-form') as HTMLFormElement;
     const successMsg = modal?.querySelector('.email-modal-success');
 
     if (!modal || !openBtn) return;
 
-    const openModal = () => {
+    modalInitialized = true;
+
+    const cancelAuto = () => {
+      autoTriggered = true;
+      if (autoObserver) {
+        autoObserver.disconnect();
+        autoObserver = null;
+      }
+      if (autoTimerId !== null) {
+        clearTimeout(autoTimerId);
+        autoTimerId = null;
+      }
+      if (autoArmTimeoutId !== null) {
+        clearTimeout(autoArmTimeoutId);
+        autoArmTimeoutId = null;
+      }
+    };
+
+    const focusInto = () => {
+      const emailInput = modal.querySelector('input[type="email"]') as HTMLElement | null;
+      if (emailInput && emailInput.offsetParent !== null) {
+        emailInput.focus();
+      } else {
+        closeBtn?.focus();
+      }
+    };
+
+    const openModal = (fallbackFocus?: HTMLElement | null) => {
+      cancelAuto();
+      markNewsletterPromptSeen();
+      const active = document.activeElement as HTMLElement | null;
+      lastFocused = active && active !== document.body ? active : fallbackFocus || openBtn;
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      requestAnimationFrame(focusInto);
     };
 
     const closeModal = () => {
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      if (lastFocused) {
+        lastFocused.focus();
+      }
     };
 
-    openBtn.addEventListener('click', openModal);
+    const autoTrigger = () => {
+      if (autoTriggered) return;
+      openModal(openBtn);
+    };
+
+    openBtn.addEventListener('click', () => openModal(openBtn));
     closeBtn?.addEventListener('click', closeModal);
     backdrop?.addEventListener('click', closeModal);
 
-    // Close on Escape key
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('open')) {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') {
         closeModal();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const focusable = Array.from(
+          modal.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => el.offsetParent !== null && !(el as HTMLButtonElement).disabled);
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     });
 
@@ -195,6 +277,23 @@ const pastEventsDropdown = [
         }
       }
     });
+
+    if (!hasSeenNewsletterPrompt()) {
+      autoTimerId = window.setTimeout(autoTrigger, 15000);
+      autoArmTimeoutId = window.setTimeout(() => {
+        const target = document.getElementById('experience-title');
+        if (!target) return;
+        autoObserver = new IntersectionObserver(
+          (entries) => {
+            if (entries.some((entry) => entry.isIntersecting)) {
+              autoTrigger();
+            }
+          },
+          { threshold: 0.1 }
+        );
+        autoObserver.observe(target);
+      }, 2000);
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -406,19 +505,21 @@ const pastEventsDropdown = [
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
   }
 
   .email-modal.open {
     opacity: 1;
     visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s linear 0s;
   }
 
   .email-modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 
   .email-modal-content {
@@ -441,6 +542,11 @@ const pastEventsDropdown = [
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
     background: none;
     border: none;
     font-size: 1.75rem;
@@ -539,6 +645,19 @@ const pastEventsDropdown = [
     background: none;
     padding: 0;
     font: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .email-modal,
+    .email-modal.open,
+    .email-modal-content {
+      transition: none;
+    }
+
+    .email-modal-content,
+    .email-modal.open .email-modal-content {
+      transform: none;
+    }
   }
 
   /* Header Links Section */

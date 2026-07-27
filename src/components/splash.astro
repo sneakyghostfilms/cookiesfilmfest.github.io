@@ -14,6 +14,15 @@ import RotatingLogo from './RotatingLogo.astro';
         <img src="/assets/sponsors/gpac-logo.svg" alt="Greater Pittsburgh Arts Council" class="sponsor-logo sponsor-logo-gpac" />
       </a>
     </div>
+    <div class="sponsors-logos">
+      <a href="https://linktr.ee/ShadowframeProductions" target="_blank" rel="noopener noreferrer">
+        <img
+          src="/assets/sponsors/shadowframe-productions-logo.png"
+          alt="Shadowframe Productions"
+          class="sponsor-logo sponsor-logo-shadowframe"
+        />
+      </a>
+    </div>
   </div>
   <div class="splash-content">
     <div class="festival-loop" aria-label="Festival date and venue">
@@ -356,6 +365,10 @@ import RotatingLogo from './RotatingLogo.astro';
     width: 100%;
     height: auto;
     display: block;
+  }
+
+  .sponsor-logo-shadowframe {
+    width: clamp(92px, 10vw, 150px);
   }
 
   .sponsors-logos + .sponsors-logos {

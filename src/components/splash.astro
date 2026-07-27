@@ -361,6 +361,14 @@ import RotatingLogo from './RotatingLogo.astro';
     opacity: 1;
   }
 
+  .sponsors-logos a:focus {
+    box-shadow: none;
+  }
+
+  .sponsors-logos a:focus-visible .sponsor-logo {
+    filter: drop-shadow(0 0 6px rgba(215, 155, 88, 0.8));
+  }
+
   .sponsor-logo {
     width: 100%;
     height: auto;

@@ -90,6 +90,14 @@ export const festivals = [
     submissionUrl: "https://filmfreeway.com/EleanorRoseInternationalFilmFestival"
   },
   {
+    name: "Frankenstein Awards",
+    city: "Pittsburgh",
+    month: "October",
+    website: "https://www.grandmidwayhotel.com/the-frankenstein-awards",
+    genre: "Horror",
+    submissionUrl: "https://filmfreeway.com/FrankensteinAwards"
+  },
+  {
     name: "Greater Lehigh Valley Filmmaker Festival",
     city: "Bethlehem",
     month: "March",

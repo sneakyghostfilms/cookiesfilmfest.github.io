@@ -1,0 +1,40 @@
+/* Preserve Tailwind 3 defaults relied on by the existing site styles. */
+*, ::before, ::after, ::backdrop, ::file-selector-button {
+  border-color: #e5e7eb;
+}
+
+blockquote, dl, dd, h1, h2, h3, h4, h5, h6, hr, figure, p, pre {
+  margin: 0;
+}
+fieldset { margin: 0; padding: 0; }
+legend { padding: 0; }
+ol, ul, menu { margin: 0; padding: 0; }
+
+/* v3 left the global rounded-button style and input UA background intact. */
+button { border-radius: 2rem; }
+input:not([type="hidden"]), optgroup, select, textarea { background-color: Field; }
+
+@utility flex-grow-0 { flex-grow: 0; }
+@utility flex-shrink { flex-shrink: 1; }
+
+/* Preserve the v3 later-sibling selector for the site's existing spacing. */
+.space-y-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.75rem * (1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+}
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * (1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+.space-y-8 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(2rem * (1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+}
+.space-y-16 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(4rem * (1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(4rem * var(--tw-space-y-reverse));
+}

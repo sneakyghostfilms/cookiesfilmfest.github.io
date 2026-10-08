@@ -1,6 +1,12 @@
 @import "global.css";
-@import "theme.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Keep the original unlayered cascade: global styles, reset, then utilities. */
+@import "tailwindcss/theme.css";
+@import "theme.css";
+@import "tailwindcss/preflight.css";
+@import "tailwindcss/utilities.css" source(none);
+@import "tailwind-compat.css";
+@config "../../tailwind.config.cjs";
+
+/* These four legacy spacing utilities are supplied by tailwind-compat.css. */
+@source not inline("space-y-3 space-y-4 space-y-8 space-y-16");

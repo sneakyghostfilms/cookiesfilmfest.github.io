@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project
-        run: npm run build
+      - name: Build and test project
+        run: npm test
 
       - name: Add .nojekyll file
         run: echo "" > ./dist/.nojekyll

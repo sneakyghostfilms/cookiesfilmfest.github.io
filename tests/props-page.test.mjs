@@ -79,3 +79,14 @@ test('the main page nav links to /props from the desktop link groups and the mob
   const mobile = index.slice(mobileStart, index.indexOf('</ul>', mobileStart));
   assert.match(mobile, /data-dropdown="resources"[\s\S]*?Resources[\s\S]*?<a class="mobile-menu-link mobile-submenu-link" href="\/props"[^>]*>\s*Prop Search\s*<\/a>/);
 });
+
+test('the AI scene box discloses AI processing and stays switched off until a Worker URL is configured', async () => {
+  const config = JSON.parse(await read('src/data/props/config.json'));
+  assert.equal(config.apiUrl, '', 'the committed site must not call the Worker until Scott approves');
+  assert.ok(text.includes('Paste a scene to find props (AI)'));
+  assert.ok(text.includes("Your text is sent to Cloudflare Workers AI to pick props from this catalog. This site doesn't store or log it."));
+  assert.ok(text.includes("AI scene matching isn't switched on yet. Keyword search works."));
+  assert.match(html, /<form id="scene-form" class="scene-form" data-api-url(="")?>/);
+  assert.match(html, /<textarea id="scene-text"[^>]*\sdisabled[\s>]/);
+  assert.match(html, /<button id="scene-submit"[^>]*\sdisabled[\s>]/);
+});

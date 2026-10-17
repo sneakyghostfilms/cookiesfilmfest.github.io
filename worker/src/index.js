@@ -36,7 +36,7 @@ const STATUS = {
 class TimeoutError extends Error {}
 
 function reply(status, body, origin, headers = {}) {
-  const cors = origin ? { 'access-control-allow-origin': origin, vary: 'Origin' } : {};
+  const cors = origin ? { 'access-control-allow-origin': origin, 'access-control-expose-headers': 'Retry-After', vary: 'Origin' } : {};
   return new Response(JSON.stringify(body), { status, headers: { ...JSON_HEADERS, ...cors, ...headers } });
 }
 

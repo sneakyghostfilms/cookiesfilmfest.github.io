@@ -3,10 +3,12 @@ import "../styles/index.css";
 import vendorsData from "../data/props/vendors.json";
 import inventory from "../data/props/inventory.json";
 import tagsData from "../data/props/tags.json";
+import propsConfig from "../data/props/config.json";
 import { displayEra } from "../../scripts/props/normalize.mjs";
 import { compareByName } from "../scripts/props-search.js";
 
 const { generator } = Astro;
+const apiUrl: string = import.meta.env.PUBLIC_PROPS_API_URL || propsConfig.apiUrl;
 const description = "Search Pittsburgh prop rental catalogs in plain English, with item numbers, catalog pages and how to inquire.";
 
 const catalogs = new Map(
@@ -99,6 +101,21 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
             </select>
           </label>
         </form>
+        <details id="props-scene" class="props-scene">
+          <summary>Paste a scene to find props (AI)</summary>
+          <form id="scene-form" class="scene-form" data-api-url={apiUrl}>
+            <label class="props-field">
+              <span>Scene text</span>
+              <textarea id="scene-text" rows="8" maxlength="4000" placeholder="Paste up to 4,000 characters of a scene, e.g. INT. DINER - NIGHT. A waitress pours coffee while the detective drops his badge on the counter." disabled={!apiUrl}></textarea>
+            </label>
+            <p class="props-note"><span id="scene-count">0</span> / 4,000 characters</p>
+            <p class="props-note scene-disclosure">Your text is sent to Cloudflare Workers AI to pick props from this catalog. This site doesn't store or log it. AI can be wrong, so check each item in the catalog.</p>
+            {!apiUrl && <p class="scene-off">AI scene matching isn't switched on yet. Keyword search works.</p>}
+            <button id="scene-submit" type="submit" class="props-button" disabled={!apiUrl}>Find props for this scene</button>
+          </form>
+          <p id="scene-status" class="scene-status" aria-live="polite" hidden></p>
+          <div id="scene-results" class="scene-results"></div>
+        </details>
         <p id="props-count" class="props-count" aria-live="polite">{cards.length} items, listed alphabetically</p>
         <noscript><p class="props-note">Search needs JavaScript. All {cards.length} items are listed below alphabetically.</p></noscript>
         <p id="props-empty" class="props-empty" hidden>No catalog items matched “<span id="props-empty-query"></span>”. Try fewer or simpler words, or clear the filters.</p>
@@ -139,6 +156,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
 
     <script>
       import { buildIndex, search } from "../scripts/props-search.js";
+      import { checkSceneText, keepKnownKeys, requestScene } from "../scripts/props-scene.js";
 
       const PAGE_SIZE = 24;
       const list = document.getElementById("props-results") as HTMLOListElement;
@@ -203,6 +221,113 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         render();
       });
       render();
+
+      const sceneForm = document.getElementById("scene-form") as HTMLFormElement;
+      const sceneText = document.getElementById("scene-text") as HTMLTextAreaElement;
+      const sceneCount = document.getElementById("scene-count") as HTMLElement;
+      const sceneSubmit = document.getElementById("scene-submit") as HTMLButtonElement;
+      const sceneStatus = document.getElementById("scene-status") as HTMLElement;
+      const sceneResults = document.getElementById("scene-results") as HTMLElement;
+      const apiUrl = sceneForm.dataset.apiUrl ?? "";
+      const cardsByKey = new Map(docs.map((doc) => [doc.key, doc.card]));
+
+      function showStatus(text: string) {
+        sceneStatus.textContent = text;
+        sceneStatus.hidden = !text;
+      }
+
+      function element(tag: string, className: string, text?: string) {
+        const node = document.createElement(tag);
+        node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+      }
+
+      function searchFor(prop: string) {
+        query.value = prop;
+        category.value = "";
+        decade.value = "";
+        update();
+        list.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function propBlock(entry: { prop: string; reason: string; keys: string[] }) {
+        const block = element("div", "scene-prop");
+        block.append(element("h4", "scene-prop-name", entry.prop));
+        if (entry.reason) block.append(element("p", "scene-reason", `AI: ${entry.reason}`));
+        if (entry.keys.length) {
+          const matches = element("ol", "props-results scene-matches");
+          for (const key of entry.keys) {
+            const copy = cardsByKey.get(key)!.cloneNode(true) as HTMLElement;
+            copy.hidden = false;
+            matches.append(copy);
+          }
+          block.append(matches);
+        } else {
+          const missing = element("p", "scene-missing", "No matching item found. ");
+          const link = element("button", "scene-search-link", `Search the catalog for “${entry.prop}”`) as HTMLButtonElement;
+          link.type = "button";
+          link.addEventListener("click", () => searchFor(entry.prop));
+          missing.append(link);
+          block.append(missing);
+        }
+        return block;
+      }
+
+      function group(title: string, entries: { prop: string; reason: string; keys: string[] }[]) {
+        const section = element("div", "scene-group");
+        section.append(element("h3", "scene-group-title", title));
+        if (!entries.length) section.append(element("p", "props-note", "None listed."));
+        for (const entry of entries) section.append(propBlock(entry));
+        return section;
+      }
+
+      const MESSAGES: Record<string, string> = {
+        rate_limited: "Too many requests right now. Wait a minute and try again.",
+        busy: "The AI service is busy. Try again in a minute.",
+        unavailable: "AI matching isn't available right now. Keyword search still works.",
+        timeout: "AI matching didn't work this time. Keyword search still works. Try again later.",
+        network: "AI matching didn't work this time. Keyword search still works. Try again later.",
+        error: "AI matching didn't work this time. Keyword search still works. Try again later.",
+      };
+
+      sceneText.addEventListener("input", () => {
+        sceneCount.textContent = sceneText.value.trim().length.toLocaleString("en-US");
+      });
+
+      sceneForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!apiUrl) return;
+        const problem = checkSceneText(sceneText.value);
+        if (problem) {
+          showStatus(problem);
+          return;
+        }
+        sceneSubmit.disabled = true;
+        sceneResults.replaceChildren();
+        showStatus("Matching props… this usually takes 5 to 20 seconds.");
+        const state = await requestScene(apiUrl, sceneText.value);
+        sceneSubmit.disabled = false;
+        if (state.kind === "ok") {
+          const kept = keepKnownKeys(state, new Set(cardsByKey.keys()));
+          if (!kept.required.length && !kept.optional.length) {
+            showStatus("The AI didn't identify props in this text.");
+            return;
+          }
+          showStatus("");
+          sceneResults.append(group("Required by the scene", kept.required), group("Optional set dressing", kept.optional));
+          const notes = [`Matched by AI (${kept.model}). AI can be wrong; check each item in the catalog and confirm availability with the vendor.`];
+          if (kept.ignored) notes.push(`${kept.ignored} AI ${kept.ignored === 1 ? "suggestion referred to an item that doesn't" : "suggestions referred to items that don't"} exist and ${kept.ignored === 1 ? "was" : "were"} ignored.`);
+          for (const note of notes) sceneResults.append(element("p", "props-note", note));
+          return;
+        }
+        if (state.kind === "quota") {
+          const local = state.resetsAt ? ` (about ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit", timeZoneName: "short" }).format(state.resetsAt)})` : "";
+          showStatus(`Today's AI matching budget is used up. Keyword search still works. AI matching resets at midnight UTC${local}.`);
+          return;
+        }
+        showStatus(state.kind === "invalid" ? state.message ?? "Check the scene text and try again." : MESSAGES[state.kind]);
+      });
     </script>
 
     <style is:global>
@@ -414,6 +539,106 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         display: flex;
         font-size: 1rem;
         padding: 0.6rem 1.5rem;
+      }
+
+      .props-page .props-scene {
+        background-color: #ffffff;
+        border: 2px solid var(--color-primary);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        margin: 0 0 1rem;
+      }
+
+      .props-page .props-scene summary {
+        cursor: pointer;
+        font-weight: 700;
+        color: var(--color-secondary);
+        min-height: 28px;
+      }
+
+      .props-page .scene-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+      }
+
+      .props-page .scene-form textarea {
+        font: inherit;
+        font-weight: 500;
+        padding: 0.65rem 0.85rem;
+        border: 2px solid var(--color-primary);
+        border-radius: 0.6rem;
+        background-color: #ffffff;
+        color: var(--color-text);
+        resize: vertical;
+      }
+
+      .props-page .scene-off,
+      .props-page .scene-status {
+        font-weight: 600;
+        color: var(--color-secondary);
+        margin: 0.5rem 0 0;
+      }
+
+      .props-page .props-button {
+        align-self: flex-start;
+        min-height: 44px;
+        padding: 0.6rem 1.5rem;
+        border-radius: 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #ffffff;
+        background-color: var(--color-secondary);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .props-page .props-button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .props-page .scene-group {
+        margin-top: 1rem;
+      }
+
+      .props-page .scene-group-title {
+        font-size: 1.25rem;
+        margin: 0 0 0.5rem;
+      }
+
+      .props-page .scene-prop {
+        border-top: 1px solid rgba(215, 155, 88, 0.3);
+        padding: 0.75rem 0;
+      }
+
+      .props-page .scene-prop-name {
+        font-size: 1.05rem;
+        margin: 0;
+      }
+
+      .props-page .scene-reason,
+      .props-page .scene-missing {
+        margin: 0.25rem 0 0;
+        color: var(--color-text-offset);
+      }
+
+      .props-page .scene-matches {
+        margin-top: 0.5rem;
+      }
+
+      .props-page .scene-search-link {
+        all: unset;
+        cursor: pointer;
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        text-decoration: underline;
+      }
+
+      .props-page .scene-search-link:focus-visible {
+        outline: 2px solid var(--color-secondary);
+        outline-offset: 2px;
       }
 
       .props-page .props-footer {

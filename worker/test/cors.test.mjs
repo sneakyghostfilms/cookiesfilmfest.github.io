@@ -55,4 +55,5 @@ test('responses to an allowed origin carry its CORS header', async () => {
   assert.equal(response.headers.get('access-control-allow-origin'), ORIGIN);
   assert.equal(response.headers.get('vary'), 'Origin');
   assert.equal(response.headers.get('cache-control'), 'no-store');
+  assert.equal(response.headers.get('access-control-expose-headers'), 'Retry-After');
 });

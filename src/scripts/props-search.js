@@ -18,8 +18,14 @@ export function stem(token) {
   return token;
 }
 
+const isDecadeWord = (word) => Object.hasOwn(DECADE_WORDS, word);
+
+function wordsOf(text) {
+  return String(text).toLowerCase().replace(/['’‘]/g, '').split(/[^a-z0-9]+/).filter(Boolean);
+}
+
 export function tokenize(text) {
-  return String(text).toLowerCase().replace(/['’‘]/g, '').split(/[^a-z0-9]+/).filter(Boolean).map(stem);
+  return wordsOf(text).map(stem);
 }
 
 export function parseDecades(query) {
@@ -28,12 +34,13 @@ export function parseDecades(query) {
   for (const [, digits] of text.matchAll(/\b(1[89]\d0|20[0-2]0)s?\b/g)) decades.add(Number(digits));
   for (const [, digits] of text.matchAll(/(?:^|[^\d])'?([2-9]0)s\b/g)) decades.add(1900 + Number(digits));
   for (const [, year] of text.matchAll(/\b(19\d\d|20[0-2]\d)\b/g)) decades.add(Math.floor(Number(year) / 10) * 10);
-  for (const word of text.split(/[^a-z]+/)) if (DECADE_WORDS[word]) decades.add(DECADE_WORDS[word]);
+  for (const word of text.split(/[^a-z]+/)) if (isDecadeWord(word)) decades.add(DECADE_WORDS[word]);
   return decades;
 }
 
 function queryTerms(query) {
-  return [...new Set(tokenize(query).filter((token) => !STOPWORDS.has(token) && !/^\d0s?$/.test(token)))];
+  const tokens = wordsOf(query).filter((word) => !isDecadeWord(word)).map(stem);
+  return [...new Set(tokens.filter((token) => !STOPWORDS.has(token) && !/^\d0s?$/.test(token)))];
 }
 
 const sortName = (name) => name.replace(/^[^\p{L}\p{N}]+/u, '');

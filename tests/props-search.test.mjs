@@ -78,6 +78,17 @@ test('decades boost dated items and decade-only queries return that decade', () 
   assert.equal(keys('telephone book from the 60s')[0], 'scp-051');
 });
 
+test('decade words work like decade numbers', () => {
+  for (const [word, digits] of [['sixties', '60s'], ['seventies', '70s'], ['eighties', '80s'], ['nineties', '90s']]) {
+    assert.ok(keys(digits).length > 0, digits);
+    assert.deepEqual(keys(word), keys(digits), word);
+  }
+  assert.deepEqual(keys('sixties rotary phone').slice(0, 3), keys('60s rotary phone').slice(0, 3));
+  const fifty = buildIndex([{ key: 'bill', name: 'FIFTY DOLLAR BILL', description: 'FIFTY DOLLAR BILL', categories: [], tags: [], decades: [], order: 0 }]);
+  assert.deepEqual(search(fifty, 'fifty').map((doc) => doc.key), ['bill'], 'a number word that is not a decade stays a search term');
+  assert.deepEqual([...parseDecades('constructor toString')], []);
+});
+
 test('filters narrow by section and stated decade', () => {
   const misc = keys('', { category: 'MISCELLANEOUS' });
   assert.deepEqual(misc, docs.filter((doc) => doc.categories.includes('MISCELLANEOUS')).sort(compareByName).map((doc) => doc.key));

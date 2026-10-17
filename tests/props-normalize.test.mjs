@@ -129,6 +129,14 @@ test('cleanTags keeps printed matter from being tagged as blank stationery or a 
   assert.deepEqual(cleanTags(['steno pad', 'notebook'], notebook).tags, ['steno pad', 'notebook']);
 });
 
+test('cleanTags keeps imitation guns from being called firearms and rejects status claims the caption does not make', () => {
+  const propGun = { name: 'GLOCK PROP GUN', description: 'GLOCK PROP GUN' };
+  assert.deepEqual(cleanTags(['firearm', 'replica firearm', 'prop firearm', 'handgun', 'training weapon'], propGun).tags, ['replica firearm', 'prop firearm', 'handgun']);
+  assert.deepEqual(cleanTags(['firearms', 'airsoft firearm'], { name: 'AIRSOFT AEG RIFLE', description: 'AIRSOFT AEG RIFLE' }).tags, ['airsoft firearm']);
+  assert.deepEqual(cleanTags(['official cap', 'coroner cap', 'authentic badge', 'issued badge'], { name: 'BLACK CORONER BASEBALL CAP', description: 'BLACK CORONER BASEBALL CAP' }).tags, ['coroner cap']);
+  assert.deepEqual(cleanTags(['training manual'], { name: 'POLICE TRAINING MANUAL', description: 'POLICE TRAINING MANUAL' }).tags, ['training manual']);
+});
+
 test('serializeTags writes sorted keys, one per line, and round-trips', () => {
   const file = { schemaVersion: 1, generator: { tool: 'ollama', model: 'm', promptVersion: 1 }, generatedAt: '2026-10-17', tags: { 'scp-2': ['b'], 'scp-1': ['a'] } };
   const text = serializeTags(file);

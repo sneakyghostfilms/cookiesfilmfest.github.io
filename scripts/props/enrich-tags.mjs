@@ -77,12 +77,20 @@ async function main() {
   const previous = existsSync(TAGS_FILE) ? JSON.parse(await readFile(TAGS_FILE, 'utf8')) : null;
   const sameGenerator = previous?.generator?.model === MODEL && previous?.generator?.promptVersion === PROMPT_VERSION;
   const tags = values.force || !sameGenerator ? {} : { ...previous.tags };
-  const keys = new Set(inventory.items.map((item) => item.key));
-  for (const key of Object.keys(tags)) if (!keys.has(key)) delete tags[key];
+  const items = new Map(inventory.items.map((item) => [item.key, item]));
+  const rejections = [];
+  for (const [key, kept] of Object.entries(tags)) {
+    if (!items.has(key)) {
+      delete tags[key];
+      continue;
+    }
+    const { tags: clean, rejected } = cleanTags(kept, items.get(key));
+    tags[key] = clean;
+    if (rejected.length) rejections.push(`${key}: ${rejected.join(' | ')}`);
+  }
   const pending = inventory.items.filter((item) => !(item.key in tags));
   console.log(`🏷️  Tagging ${pending.length} of ${inventory.items.length} items with ${MODEL} (prompt v${PROMPT_VERSION})`);
   let failedBatches = 0;
-  const rejections = [];
   for (let start = 0; start < pending.length; start += BATCH_SIZE) {
     const batch = pending.slice(start, start + BATCH_SIZE);
     const byKey = new Map(batch.map((item) => [item.key, item]));

@@ -1,0 +1,15 @@
+{
+  "scp-004": { "drop": ["bean hopper"], "reason": "a coffee urn, not a bean hopper" },
+  "scp-029": { "drop": ["tea tin"], "reason": "a coffee tin" },
+  "scp-037-1": { "drop": ["wall clock"], "reason": "a desk clock in the catalog photo" },
+  "scp-058-060-059": { "drop": ["strap"], "reason": "neckties, not straps" },
+  "scp-111": { "drop": ["photo printer"], "reason": "an instant camera, not a printer" },
+  "scp-112": { "drop": ["spyglass"], "reason": "binoculars, not a spyglass" },
+  "scp-129": { "drop": ["hospital gown"], "reason": "a surgeon's gown, not a patient gown" },
+  "scp-141": { "drop": ["grandfather clock"], "reason": "a wall pendulum clock in the catalog photo" },
+  "scp-193": { "drop": ["military uniform"], "reason": "navy is the color; it is an FBI jacket" },
+  "scp-250": { "drop": ["police radio"], "reason": "a police call box, not a radio" },
+  "scp-260": { "drop": ["musket"], "reason": "the catalog lists a long rifle; a musket is a different weapon" },
+  "scp-322": { "drop": ["wall clock"], "reason": "a miniature desk clock" },
+  "scp-335": { "drop": ["legal paper"], "reason": "a steno notebook, not legal paper" }
+}

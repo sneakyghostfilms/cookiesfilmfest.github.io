@@ -39,7 +39,42 @@ test('the spec example item keeps the vendor facts exactly as printed', () => {
 
 test('malformed printed IDs are preserved as vendor facts', () => {
   assert.deepEqual(byKey.get('scp-132').printedIds, ['[132']);
+  assert.deepEqual(byKey.get('scp-103').printedIds, ['[103']);
   assert.deepEqual(byKey.get('scp-284').printedIds, ['284']);
+});
+
+test('numbers the vendor reused for different items get distinct keys, and repeated cards merge', () => {
+  const pairs = {
+    'scp-037': ['GOLDEN CIRCLE CLOCK', 'MISC 2010S MAGAZINES'],
+    'scp-054': ['BLACK ROTARY PHONE', 'ALL-BLACK ROTARY PHONE'],
+    'scp-108': ['BEIGE SOVIET ERA GAS MASK', 'PARK RANGER BUNDLE'],
+    'scp-262': ['COLT REVOLVER PROP GUN', 'PROP KNIVES SET OF TWO'],
+    'scp-283': ['ROYAL SOVEREIGN ELECTRIC BILL COUNTER', 'STOP N GO FOODS SM PAPER BAG'],
+    'scp-286': ['BLACK OFFICE PHONE', 'COKER TIRE NEWSPAPER'],
+  };
+  for (const [base, names] of Object.entries(pairs)) {
+    assert.deepEqual([byKey.get(`${base}-1`).name, byKey.get(`${base}-2`).name], names, base);
+    assert.ok(!byKey.has(base), base);
+  }
+  assert.equal(byKey.get('scp-146').name, 'CANON XL 1S CAMCORDER');
+  assert.equal(byKey.get('scp-144-146').name, 'BROWN LEATHER GUN HOLSTER');
+  assert.deepEqual(byKey.get('scp-108-2').pages, [31, 33]);
+  assert.deepEqual(byKey.get('scp-108-2').categories, ['UNIFORMS', 'MENSWEAR']);
+  assert.deepEqual(byKey.get('scp-027').pages, [6]);
+});
+
+test('multi-number cards keep every printed number', () => {
+  const multi = inventory.items.filter((item) => item.itemNumbers.length > 1).map((item) => item.key).sort();
+  assert.deepEqual(multi, ['scp-015-017-016', 'scp-058-060-059', 'scp-062-063', 'scp-144-146']);
+});
+
+test('captions keep their own 3-digit numbers and drop size-badge text', () => {
+  assert.equal(byKey.get('scp-368').name, 'MONEY MEMORY 274 POCKET CALCULATOR');
+  assert.equal(byKey.get('scp-122').name, 'MOTOROLA TELETAC 200 CELLPHONE');
+  assert.equal(byKey.get('scp-326').name, 'HTC DESIRE 510 SMARTPHONE');
+  assert.equal(byKey.get('scp-119').name, '357 MAGNUM REVOLVER PROP GUN');
+  assert.equal(byKey.get('scp-257').name, '357 MAGNUM REVOLVER PROP GUN');
+  assert.equal(byKey.get('scp-362').description, 'HEAVY DUTY FIRST RESPONDERS HI-VIS JACKET');
 });
 
 test('AI tags belong to real items, are kept separately, and already satisfy the tag rules', () => {
@@ -51,4 +86,13 @@ test('AI tags belong to real items, are kept separately, and already satisfy the
     assert.deepEqual(cleanTags(tags, item).tags, tags, key);
   }
   for (const item of inventory.items) assert.ok(!('tags' in item), `${item.key} mixes AI tags into vendor facts`);
+});
+
+test('reviewed tag removals stay removed', async () => {
+  const exclusions = JSON.parse(await readFile(new URL('../scripts/props/tag-exclusions.json', import.meta.url), 'utf8'));
+  for (const [key, { drop, reason }] of Object.entries(exclusions)) {
+    assert.ok(byKey.has(key), `exclusion for an unknown item: ${key}`);
+    assert.ok(reason, key);
+    for (const tag of drop) assert.ok(!(tagsFile.tags[key] ?? []).includes(tag), `${key} still has "${tag}"`);
+  }
 });

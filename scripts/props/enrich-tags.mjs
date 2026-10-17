@@ -61,7 +61,7 @@ async function askModel(batch) {
       stream: false,
       think: true,
       format: RESPONSE_SCHEMA,
-      options: { temperature: 0 },
+      options: { temperature: 0, num_ctx: 16384, num_predict: 8192 },
       messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: JSON.stringify(payload) }],
     }),
   });
@@ -78,8 +78,8 @@ async function main() {
   const sameGenerator = previous?.generator?.model === MODEL && previous?.generator?.promptVersion === PROMPT_VERSION;
   const tags = values.force || !sameGenerator ? {} : { ...previous.tags };
   const keys = new Set(inventory.items.map((item) => item.key));
-  for (const key of Object.keys(tags)) if (!keys.has(key) || key in exclusions) delete tags[key];
-  const pending = inventory.items.filter((item) => !(item.key in tags) && !(item.key in exclusions));
+  for (const key of Object.keys(tags)) if (!keys.has(key)) delete tags[key];
+  const pending = inventory.items.filter((item) => !(item.key in tags));
   console.log(`🏷️  Tagging ${pending.length} of ${inventory.items.length} items with ${MODEL} (prompt v${PROMPT_VERSION})`);
   let failedBatches = 0;
   const rejections = [];
@@ -101,6 +101,9 @@ async function main() {
       failedBatches += 1;
       console.error(`   batch ${start / BATCH_SIZE + 1} failed: ${error.message}`);
     }
+  }
+  for (const [key, { drop }] of Object.entries(exclusions)) {
+    if (tags[key]) tags[key] = tags[key].filter((tag) => !drop.includes(tag));
   }
   const changed = JSON.stringify(previous?.tags ?? {}) !== JSON.stringify(Object.fromEntries(Object.keys(tags).sort().map((key) => [key, tags[key]])));
   const file = {

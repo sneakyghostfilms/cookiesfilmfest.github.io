@@ -21,7 +21,7 @@
           "sha256": "eb99107731a9fa9fba303911e3a61f018e52964c0288357e565071e7fdbdbafa",
           "pageCount": 49,
           "sourceUrl": "https://drive.google.com/file/d/1cJY8nQRyVa80l0_pCCeGHrN2QuuO7Avd/view",
-          "expected": { "cards": 18, "items": 18, "itemPages": 3 }
+          "expected": { "cards": 355, "items": 353, "itemPages": 36 }
         }
       ]
     }

@@ -41,18 +41,28 @@ test('with no query the full list comes back alphabetically by name', () => {
   assert.deepEqual(keys('a the for some'), keys(''));
 });
 
+const top = (query, count) => keys(query).slice(0, count);
+
 test('keyword queries rank the matching items first', () => {
+  assert.deepEqual(top('rotary phone', 5).sort(), ['scp-054-1', 'scp-054-2', 'scp-055', 'scp-134', 'scp-296']);
+  assert.deepEqual(top('typewriter', 4).sort(), ['scp-077', 'scp-078', 'scp-079', 'scp-331']);
   assert.equal(keys('change machine')[0], 'scp-056');
   assert.equal(keys('telephone book')[0], 'scp-051');
   assert.equal(keys('secretary handbook')[0], 'scp-024');
-  assert.equal(keys('handcuffs')[0], 'scp-142');
+  assert.deepEqual(top('handcuffs', 2).sort(), ['scp-142', 'scp-280']);
+  assert.deepEqual(keys('santa').sort(), ['scp-210', 'scp-370']);
+  assert.deepEqual(keys('wig'), ['scp-082']);
+  assert.equal(keys('fake blood')[0], 'scp-057');
+  for (const key of ['scp-204', 'scp-236', 'scp-237']) assert.ok(top('police jacket', 3).includes(key), key);
+  for (const doc of search(index, 'gun').slice(0, 10)) assert.match(doc.name, /GUN/);
+  assert.deepEqual(top('cell phone', 2).sort(), ['scp-122', 'scp-135']);
   assert.ok(keys('secret').includes('scp-021'), 'prefix match');
   assert.deepEqual(keys('zzqx nonsense'), []);
 });
 
 test('AI tags extend keyword search to synonyms the vendor did not print', () => {
-  assert.deepEqual(keys('megaphone'), ['scp-284']);
-  assert.ok(keys('coin changer').includes('scp-056'));
+  assert.deepEqual(keys('megaphone').sort(), ['scp-284', 'scp-372']);
+  assert.equal(keys('coin changer')[0], 'scp-056');
 });
 
 test('decades boost dated items and decade-only queries return that decade', () => {
@@ -73,6 +83,7 @@ test('a bare year finds its decade unless the year itself is printed', () => {
   const year = keys('1965');
   assert.ok(year.length > 0);
   assert.deepEqual(year, keys('60s'));
+  assert.deepEqual(top('1991', 3).sort(), ['scp-286-2', 'scp-342', 'scp-351']);
   const printed = buildIndex([
     { key: 'calendar', name: 'PIN-UP CALENDAR 1991', description: 'PIN-UP CALENDAR 1991', categories: [], tags: [], decades: [], order: 0 },
     { key: 'phone', name: 'CORDLESS PHONE', description: 'CORDLESS PHONE 1990S', categories: [], tags: [], decades: [1990], order: 1 },

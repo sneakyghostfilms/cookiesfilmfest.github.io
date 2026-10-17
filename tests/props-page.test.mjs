@@ -4,6 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { compareByName } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dist = path.join(root, 'dist');
@@ -37,7 +38,7 @@ async function filesUnder(directory) {
 test('/props renders one card per inventory item, alphabetically by name', () => {
   assert.equal((html.match(/<li class="prop-card"/g) ?? []).length, inventory.items.length);
   const names = [...html.matchAll(/<span class="prop-name">([^<]*)<\/span>/g)].map(([, name]) => decode(name));
-  assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b, 'en')));
+  assert.deepEqual(names, names.map((name) => ({ name, key: '' })).sort(compareByName).map((entry) => entry.name));
 });
 
 test('cards follow the spec format and carry the source link and inquiry route', () => {

@@ -36,8 +36,10 @@ function queryTerms(query) {
   return [...new Set(tokenize(query).filter((token) => !STOPWORDS.has(token) && !/^\d0s?$/.test(token)))];
 }
 
+const sortName = (name) => name.replace(/^[^\p{L}\p{N}]+/u, '');
+
 export function compareByName(a, b) {
-  return a.name.localeCompare(b.name, 'en') || a.key.localeCompare(b.key, 'en');
+  return sortName(a.name).localeCompare(sortName(b.name), 'en') || a.key.localeCompare(b.key, 'en');
 }
 
 export function buildIndex(docs) {

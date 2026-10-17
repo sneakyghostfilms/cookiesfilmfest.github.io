@@ -41,6 +41,12 @@ test('with no query the full list comes back alphabetically by name', () => {
   assert.deepEqual(keys('a the for some'), keys(''));
 });
 
+test('alphabetical order ignores opening quotes but keeps digits first', () => {
+  const names = ['“JADE” NAME TAG', 'HOSPITAL BLANKET', '24 QT IGLOO COOLER', 'JUDGE’S WOODEN GAVEL', '“GEORGE ADAMS’” NAME TAG'];
+  const sorted = names.map((name, index) => ({ name, key: `k${index}` })).sort(compareByName).map((entry) => entry.name);
+  assert.deepEqual(sorted, ['24 QT IGLOO COOLER', '“GEORGE ADAMS’” NAME TAG', 'HOSPITAL BLANKET', '“JADE” NAME TAG', 'JUDGE’S WOODEN GAVEL']);
+});
+
 const top = (query, count) => keys(query).slice(0, count);
 
 test('keyword queries rank the matching items first', () => {

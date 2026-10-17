@@ -70,15 +70,25 @@ function termScore(entry, term, index) {
 export function search(index, query = '', { category = '', decade = '' } = {}) {
   const passes = (doc) => (!category || doc.categories.includes(category)) && (!decade || doc.decades.includes(Number(decade)));
   const terms = queryTerms(query);
+  const isYear = (term) => /^(19|20)\d\d$/.test(term);
+  const words = terms.filter((term) => !isYear(term));
+  const years = terms.filter((term) => isYear(term) && index.documentFrequency.has(term));
   const decades = parseDecades(query);
-  if (!terms.length && !decades.size) return index.alphabetical.filter(passes);
+  if (!words.length && !years.length && !decades.size) return index.alphabetical.filter(passes);
   const scored = [];
   for (const entry of index.entries) {
     if (!passes(entry.doc)) continue;
     let score = 0;
-    for (const term of terms) score += termScore(entry, term, index);
+    let matched = 0;
+    for (const term of words) {
+      const value = termScore(entry, term, index);
+      score += value;
+      if (value > 0) matched += 1;
+    }
+    if (words.length) score *= matched / words.length;
+    for (const term of years) score += termScore(entry, term, index);
     const inDecade = entry.doc.decades.some((value) => decades.has(value));
-    if (!terms.length) score = inDecade ? 1 : 0;
+    if (!words.length) score += inDecade ? 1 : 0;
     else if (inDecade) score *= DECADE_BOOST;
     if (score > 0) scored.push({ doc: entry.doc, score });
   }

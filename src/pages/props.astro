@@ -78,6 +78,9 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
 
       <section class="props-box props-about">
         <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> Item numbers, names, eras and page numbers are copied from each vendor's catalog. Not affiliated with {vendorsData.vendors.map((vendor) => vendor.name).join(", ")}. Keyword search runs in your browser.</p>
+        {vendorsData.vendors.map((vendor) => (
+          <p class="props-contact">To rent from {vendor.name}: <a href={vendor.contact.formUrl} target="_blank" rel="noopener noreferrer">official contact form</a> or <a href={`mailto:${vendor.contact.email}`}>{vendor.contact.email}</a>. Pricing is by quote.</p>
+        ))}
       </section>
 
       <section class="props-box props-search">
@@ -118,7 +121,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         </details>
         <p id="props-count" class="props-count" aria-live="polite">{cards.length} items, listed alphabetically</p>
         <noscript><p class="props-note">Search needs JavaScript. All {cards.length} items are listed below alphabetically.</p></noscript>
-        <p id="props-empty" class="props-empty" hidden>No catalog items matched “<span id="props-empty-query"></span>”. Try fewer or simpler words, or clear the filters.</p>
+        <p id="props-empty" class="props-empty" hidden></p>
         <ol id="props-results" class="props-results">
           {cards.map((card) => (
             <li class="prop-card" data-key={card.key} data-categories={card.categories.join("|")} data-decades={card.decades.join(" ")} data-order={card.order}>
@@ -165,7 +168,6 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
       const decade = document.getElementById("props-decade") as HTMLSelectElement;
       const count = document.getElementById("props-count") as HTMLElement;
       const empty = document.getElementById("props-empty") as HTMLElement;
-      const emptyQuery = document.getElementById("props-empty-query") as HTMLElement;
       const more = document.getElementById("props-more") as HTMLButtonElement;
       const form = document.getElementById("props-form") as HTMLFormElement;
 
@@ -195,7 +197,9 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         more.hidden = results.length <= shown;
         const text = query.value.trim();
         empty.hidden = results.length > 0;
-        emptyQuery.textContent = text;
+        empty.textContent = text
+          ? `No catalog items matched “${text}”. Try fewer or simpler words, or clear the filters.`
+          : "No items match these filters. Clear a filter to see more.";
         const filtered = text || category.value || decade.value;
         count.textContent = filtered
           ? `${results.length} matching ${results.length === 1 ? "item" : "items"}${results.length > shown ? `, showing ${shown}` : ""}`

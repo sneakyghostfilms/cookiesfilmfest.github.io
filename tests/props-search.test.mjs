@@ -68,3 +68,24 @@ test('filters narrow by section and stated decade', () => {
   assert.ok(keys('', { decade: '1960' }).every((key) => docs.find((doc) => doc.key === key).decades.includes(1960)));
   assert.deepEqual(keys('jacket', { category: 'THE OFFICE' }), []);
 });
+
+test('a bare year finds its decade unless the year itself is printed', () => {
+  const year = keys('1965');
+  assert.ok(year.length > 0);
+  assert.deepEqual(year, keys('60s'));
+  const printed = buildIndex([
+    { key: 'calendar', name: 'PIN-UP CALENDAR 1991', description: 'PIN-UP CALENDAR 1991', categories: [], tags: [], decades: [], order: 0 },
+    { key: 'phone', name: 'CORDLESS PHONE', description: 'CORDLESS PHONE 1990S', categories: [], tags: [], decades: [1990], order: 1 },
+  ]);
+  assert.deepEqual(search(printed, '1991').map((doc) => doc.key), ['calendar', 'phone']);
+});
+
+test('items matching every query word outrank stronger single-word matches', () => {
+  const filler = Array.from({ length: 6 }, (_, order) => ({ key: `police-${order}`, name: `POLICE ITEM ${order}`, description: `POLICE ITEM ${order}`, categories: [], tags: [], decades: [], order: order + 2 }));
+  const local = buildIndex([
+    { key: 'nurse', name: 'NURSE SMOCK JACKETS', description: 'NURSE SMOCK JACKETS', categories: [], tags: [], decades: [], order: 0 },
+    { key: 'uniform', name: 'BLUE UNIFORM', description: 'BLUE UNIFORM POLICE JACKET', categories: [], tags: [], decades: [], order: 1 },
+    ...filler,
+  ]);
+  assert.deepEqual(search(local, 'police jacket').slice(0, 2).map((doc) => doc.key), ['uniform', 'nurse']);
+});

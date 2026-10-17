@@ -70,3 +70,12 @@ test('the existing festival pages still build', () => {
     assert.ok(existsSync(path.join(dist, route)), route);
   }
 });
+
+test('the main page nav links to /props from the desktop link groups and the mobile menu', async () => {
+  const index = await read('dist/index.html');
+  const desktop = index.slice(index.indexOf('class="header-links-section"'), index.indexOf('class="notify-container"'));
+  assert.match(desktop, /<span class="link-header"[^>]*>Resources<\/span><a href="\/props"[^>]*>Prop Search<\/a>/);
+  const mobileStart = index.indexOf('id="menu-modal"');
+  const mobile = index.slice(mobileStart, index.indexOf('</ul>', mobileStart));
+  assert.match(mobile, /data-dropdown="resources"[\s\S]*?Resources[\s\S]*?<a class="mobile-menu-link mobile-submenu-link" href="\/props"[^>]*>\s*Prop Search\s*<\/a>/);
+});

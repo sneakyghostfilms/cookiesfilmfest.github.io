@@ -5,11 +5,12 @@ import type { NavItem } from "~/types";
 interface Props {
   navItems: NavItem[];
   otherFests: Array<{ href: string; text: string }>;
+  resources: Array<{ href: string; text: string }>;
   pastEvents: Array<{ href: string; text: string }>;
   modalId?: string;
 }
 
-const { navItems, otherFests, pastEvents, modalId = 'menu-modal' } = Astro.props;
+const { navItems, otherFests, resources, pastEvents, modalId = 'menu-modal' } = Astro.props;
 ---
 
 <button
@@ -64,6 +65,20 @@ const { navItems, otherFests, pastEvents, modalId = 'menu-modal' } = Astro.props
                 {otherFests.map((fest) => (
                   <a class="mobile-menu-link mobile-submenu-link" href={fest.href}>
                     {fest.text}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </li>
+          <li class="mobile-menu-item">
+            <div class="mobile-dropdown" data-dropdown="resources">
+              <button class="mobile-dropdown-title">
+                Resources <span class="dropdown-arrow">▼</span>
+              </button>
+              <div class="mobile-dropdown-content">
+                {resources.map((resource) => (
+                  <a class="mobile-menu-link mobile-submenu-link" href={resource.href}>
+                    {resource.text}
                   </a>
                 ))}
               </div>

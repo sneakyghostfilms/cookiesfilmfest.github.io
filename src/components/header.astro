@@ -16,6 +16,10 @@ const otherFestsDropdown = [
   { href: "/comedy-festivals", text: "Comedy Fests" },
 ];
 
+const resourcesDropdown = [
+  { href: "/props", text: "Prop Search" },
+];
+
 const pastEventsDropdown = [
   { href: "/past-events/2026", text: "2026" },
   { href: "/past-events/2025", text: "2025" },
@@ -29,13 +33,19 @@ const pastEventsDropdown = [
   <div class="flex items-end flex-grow-0">
     <div class="flex items-end gap-3">
       <NavLinks navItems={navItems} />
-      <MobileMenu navItems={navItems} otherFests={otherFestsDropdown} pastEvents={pastEventsDropdown} />
+      <MobileMenu navItems={navItems} otherFests={otherFestsDropdown} resources={resourcesDropdown} pastEvents={pastEventsDropdown} />
     </div>
   </div>
   <div class="header-links-section">
     <div class="link-group">
       <span class="link-header">Other Fests</span>
       {otherFestsDropdown.map((item) => (
+        <a href={item.href} class="link-item">{item.text}</a>
+      ))}
+    </div>
+    <div class="link-group">
+      <span class="link-header">Resources</span>
+      {resourcesDropdown.map((item) => (
         <a href={item.href} class="link-item">{item.text}</a>
       ))}
     </div>

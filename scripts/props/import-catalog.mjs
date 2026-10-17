@@ -61,9 +61,9 @@ function report(extraction, items, catalog, pages) {
   const considered = pages ?? Array.from({ length: extraction.pageCount }, (_, index) => index + 1);
   const skipped = considered.filter((page) => !itemPages.includes(page))
     .map((page) => (sectionPages.has(page) ? `${page} (divider: ${sectionPages.get(page)})` : `${page} (no item cards)`));
-  const sharing = new Map();
-  for (const item of items) sharing.set(item.itemNumbers.join('-'), (sharing.get(item.itemNumbers.join('-')) ?? 0) + 1);
-  const reused = [...sharing].filter(([numbers, count]) => numbers && count > 1).map(([numbers]) => numbers);
+  const owners = new Map();
+  for (const item of items) for (const number of item.itemNumbers) owners.set(number, (owners.get(number) ?? 0) + 1);
+  const reused = [...owners].filter(([, count]) => count > 1).map(([number]) => number).sort();
   const lines = [
     `Catalog: ${catalog.title} (version ${catalog.version}, ${extraction.pageCount} pages)`,
     `Pages read: ${considered.length}; pages with items: ${itemPages.length} [${itemPages.join(', ')}]`,
@@ -73,6 +73,7 @@ function report(extraction, items, catalog, pages) {
     `Item numbers reused for different captions: ${reused.join(', ') || 'none'}`,
     `Multi-number cards: ${items.filter((item) => item.itemNumbers.length > 1).map((item) => item.printedIds.join(' ')).join('; ') || 'none'}`,
     `Malformed printed IDs: ${cards.flatMap((card) => card.printedIds).filter((id) => !/^\[\d{3}\]$/.test(id)).join(', ') || 'none'}`,
+    `Bare numbers read as item numbers (top of a photo frame): ${extraction.checks.bareFramedIds.join(', ') || 'none'}`,
     `Caption lines dropped as off-centre (badge text): ${cards.filter((card) => card.droppedLines.length).map((card) => `p${card.page} ${card.printedIds.join(' ')} "${card.droppedLines.join(' / ')}"`).join('; ') || 'none'}`,
     `Cards without a photo: ${extraction.checks.cardsWithoutImage}`,
     `Items with a stated era: ${items.filter((item) => item.era).length}; without: ${items.filter((item) => !item.era).length}`,

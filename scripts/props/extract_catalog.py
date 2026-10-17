@@ -27,6 +27,7 @@ MAX_PILL_OFFSET = 45
 MAX_LINE_OFFSET_RATIO = 0.25
 SECTION_TITLE_SIZE = 60
 ROW_TOLERANCE = 30
+BARE_ID_DEPTH = 30
 SHEET_RESOLUTION = 100
 
 
@@ -50,6 +51,12 @@ def holds(outer, inner, pad=0.0):
 
 def area(box):
     return (box["x1"] - box["x0"]) * (box["bottom"] - box["top"])
+
+
+def overlap(a, b):
+    width = min(a["x1"], b["x1"]) - max(a["x0"], b["x0"])
+    height = min(a["bottom"], b["bottom"]) - max(a["top"], b["top"])
+    return max(width, 0) * max(height, 0)
 
 
 def find_shapes(page, color, accept):
@@ -119,16 +126,21 @@ def read_page(page):
     words = page.extract_words(extra_attrs=["size"])
     frames = find_shapes(page, FRAME_COLOR, lambda w, h: w >= MIN_FRAME_SIDE and h >= MIN_FRAME_SIDE)
     pills = find_shapes(page, PILL_COLOR, lambda w, h: w >= MIN_PILL_WIDTH and PILL_HEIGHTS[0] <= h <= PILL_HEIGHTS[1])
-    id_words = [w for w in words if ID_PATTERN.match(w["text"])]
     for frame in frames:
         frame["ids"] = []
-        frame["images"] = sum(1 for image in page.images if holds(frame, image, 5))
-    for word in id_words:
+        frame["images"] = sum(1 for image in page.images if overlap(frame, image) >= 0.5 * area(frame))
+    claimed = set()
+    for word in words:
         holders = [frame for frame in frames if holds(frame, word, 4)]
-        if holders:
-            min(holders, key=area)["ids"].append(word)
+        if not (ID_PATTERN.match(word["text"]) and holders):
+            continue
+        frame = min(holders, key=area)
+        if "[" in word["text"] or "]" in word["text"] or center_y(word) - frame["top"] <= BARE_ID_DEPTH:
+            frame["ids"].append(word)
+            claimed.add(id(word))
     used = attach_pills(frames, pills)
-    caption_words = [w for w in words if not ID_PATTERN.match(w["text"])]
+    caption_words = [w for w in words if id(w) not in claimed]
+    bracketed = [w for w in words if ID_PATTERN.match(w["text"]) and ("[" in w["text"] or "]" in w["text"])]
     cards = []
     for frame in reading_order(frames):
         lines, dropped = read_caption(frame["pill"], caption_words) if frame["pill"] else ([], [])
@@ -148,8 +160,9 @@ def read_page(page):
         "frames": frames,
         "cards": cards,
         "section": title if title and not frames else None,
-        "idTokens": len(id_words),
-        "framedIdTokens": sum(len(frame["ids"]) for frame in frames),
+        "idTokens": len(bracketed),
+        "framedIdTokens": sum(1 for w in bracketed if id(w) in claimed),
+        "bareFramedIds": [w["text"] for frame in frames for w in frame["ids"] if w["text"].isdigit()],
         "orphanPills": sum(1 for index, pill in enumerate(pills)
                            if index not in used and any(holds(pill, w, 1) for w in caption_words)),
     }
@@ -182,6 +195,7 @@ def main():
     wanted = {int(page) for page in args.pages.split(",")} if args.pages else None
     checks = dict.fromkeys(["idTokens", "framedIdTokens", "orphanPills", "cardsWithoutPill",
                             "cardsWithoutImage", "droppedLines"], 0)
+    checks["bareFramedIds"] = []
     output = {"pageCount": 0, "sections": [], "cards": [], "checks": checks}
     with pdfplumber.open(args.pdf) as pdf:
         output["pageCount"] = len(pdf.pages)
@@ -193,6 +207,7 @@ def main():
                 continue
             for key in ("idTokens", "framedIdTokens", "orphanPills"):
                 checks[key] += result[key]
+            checks["bareFramedIds"] += [f"p{number} {text}" for text in result["bareFramedIds"]]
             for card in result["cards"]:
                 checks["cardsWithoutPill"] += not card.pop("hasPill")
                 checks["cardsWithoutImage"] += card["imageCount"] == 0

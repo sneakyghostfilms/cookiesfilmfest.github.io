@@ -1,0 +1,458 @@
+---
+import "../styles/index.css";
+import vendorsData from "../data/props/vendors.json";
+import inventory from "../data/props/inventory.json";
+import tagsData from "../data/props/tags.json";
+import { displayEra } from "../../scripts/props/normalize.mjs";
+import { compareByName } from "../scripts/props-search.js";
+
+const { generator } = Astro;
+const description = "Search Pittsburgh prop rental catalogs in plain English, with item numbers, catalog pages and how to inquire.";
+
+const catalogs = new Map(
+  vendorsData.vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { ...catalog, vendor }])),
+);
+
+function idsLabel(itemNumbers: string[]) {
+  return itemNumbers.length ? itemNumbers.map((number) => `#${number}`).join(" / ") : "no item number printed";
+}
+
+function pagesLabel(pages: number[]) {
+  return pages.length > 1 ? `pages ${pages.join(", ")}` : `page ${pages[0]}`;
+}
+
+const cards = inventory.items
+  .map((item, order) => ({ ...item, order }))
+  .sort(compareByName)
+  .map((item) => {
+    const catalog = catalogs.get(item.catalog)!;
+    return {
+      ...item,
+      vendorName: catalog.vendor.name,
+      ids: idsLabel(item.itemNumbers),
+      era: item.era ? displayEra(item.era) : null,
+      pageText: pagesLabel(item.pages),
+      sourceUrl: catalog.sourceUrl,
+      formUrl: catalog.vendor.contact.formUrl,
+      tags: (tagsData.tags as Record<string, string[]>)[item.key] ?? [],
+    };
+  });
+
+const categories = [...new Set(inventory.items.flatMap((item) => item.categories))].sort();
+const decades = [...new Set(inventory.items.flatMap((item) => item.decades))].sort((a, b) => a - b);
+const vendorBoxes = vendorsData.vendors.map((vendor) => ({
+  vendor,
+  catalogs: vendor.catalogs.map((catalog) => ({
+    ...catalog,
+    indexedAt: (inventory.catalogs as Record<string, { indexedAt: string }>)[catalog.id]?.indexedAt,
+  })),
+}));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="generator" content={generator} />
+
+    <title>Pittsburgh Prop Search | Cookies and Comedy Film Festival</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content="Pittsburgh Prop Search" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content={description} />
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="props-page">
+    <div class="props-wrap">
+      <header class="props-header">
+        <h1 class="props-title">Pittsburgh Prop Search</h1>
+        <p class="props-subtitle">Search local prop rental catalogs in plain English.</p>
+        <a href="/" class="props-back">Back to Main Site</a>
+      </header>
+
+      <section class="props-box props-about">
+        <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> Item numbers, names, eras and page numbers are copied from each vendor's catalog. Not affiliated with {vendorsData.vendors.map((vendor) => vendor.name).join(", ")}. Keyword search runs in your browser.</p>
+      </section>
+
+      <section class="props-box props-search">
+        <form id="props-form" class="props-controls" role="search">
+          <label class="props-field props-query">
+            <span>Search props</span>
+            <input id="props-query" type="search" placeholder="e.g. rotary phone, police jacket, 60s office" autocomplete="off" />
+          </label>
+          <label class="props-field">
+            <span>Section</span>
+            <select id="props-category">
+              <option value="">All sections</option>
+              {categories.map((category) => <option value={category}>{category}</option>)}
+            </select>
+          </label>
+          <label class="props-field">
+            <span>Stated decade</span>
+            <select id="props-decade">
+              <option value="">Any decade</option>
+              {decades.map((decade) => <option value={decade}>{decade}s</option>)}
+            </select>
+          </label>
+        </form>
+        <p id="props-count" class="props-count" aria-live="polite">{cards.length} items, listed alphabetically</p>
+        <noscript><p class="props-note">Search needs JavaScript. All {cards.length} items are listed below alphabetically.</p></noscript>
+        <p id="props-empty" class="props-empty" hidden>No catalog items matched “<span id="props-empty-query"></span>”. Try fewer or simpler words, or clear the filters.</p>
+        <ol id="props-results" class="props-results">
+          {cards.map((card) => (
+            <li class="prop-card" data-key={card.key} data-categories={card.categories.join("|")} data-decades={card.decades.join(" ")} data-order={card.order}>
+              <p class="prop-line">
+                <span class="prop-vendor">{card.vendorName}</span> · <span class="prop-ids">{card.ids}</span> · <span class="prop-name">{card.name}</span>{card.era && <> · <span class="prop-era">{card.era}</span></>} · <span class="prop-page">{card.pageText}</span>
+              </p>
+              <p class="prop-category">{card.categories.join(" · ")}</p>
+              {card.tags.length > 0 && (
+                <p class="prop-tags">AI-suggested search terms: <span class="prop-tag-list">{card.tags.join(", ")}</span></p>
+              )}
+              <p class="prop-actions">
+                <a href={card.sourceUrl} target="_blank" rel="noopener noreferrer">Open catalog on Google Drive</a>
+                <a href={card.formUrl} target="_blank" rel="noopener noreferrer">Inquire</a>
+              </p>
+              <p class="prop-cite">When you inquire, cite {card.ids} · {card.name} · {card.pageText}</p>
+            </li>
+          ))}
+        </ol>
+        <button id="props-more" type="button" class="props-more" hidden>Show more</button>
+      </section>
+
+      {vendorBoxes.map(({ vendor, catalogs: vendorCatalogs }) => (
+        <section class="props-box props-vendor">
+          <h2 class="props-vendor-name">{vendor.name}</h2>
+          {vendorCatalogs.map((catalog) => (
+            <p class="props-catalog">{catalog.title} (version {catalog.version}, {catalog.pageCount} pages){catalog.indexedAt && ` · indexed ${catalog.indexedAt}`} · <a href={catalog.sourceUrl} target="_blank" rel="noopener noreferrer">Open catalog on Google Drive</a></p>
+          ))}
+          <p class="props-contact">Rental inquiries: <a href={vendor.contact.formUrl} target="_blank" rel="noopener noreferrer">official contact form</a> · <a href={`mailto:${vendor.contact.email}`}>{vendor.contact.email}</a> · <a href={vendor.contact.hubUrl} target="_blank" rel="noopener noreferrer">vendor links</a></p>
+          <p class="props-note">{vendor.inquiryHint} Contact details as published in the catalog (page 3) and on the vendor's Linktree.</p>
+        </section>
+      ))}
+
+      <p class="props-footer">Prop owners: want your inventory listed, corrected or removed? <a href="/#contact">Contact us</a>. Know another Pittsburgh prop source? <a href="/#contact">Let us know</a>.</p>
+    </div>
+
+    <script>
+      import { buildIndex, search } from "../scripts/props-search.js";
+
+      const PAGE_SIZE = 24;
+      const list = document.getElementById("props-results") as HTMLOListElement;
+      const query = document.getElementById("props-query") as HTMLInputElement;
+      const category = document.getElementById("props-category") as HTMLSelectElement;
+      const decade = document.getElementById("props-decade") as HTMLSelectElement;
+      const count = document.getElementById("props-count") as HTMLElement;
+      const empty = document.getElementById("props-empty") as HTMLElement;
+      const emptyQuery = document.getElementById("props-empty-query") as HTMLElement;
+      const more = document.getElementById("props-more") as HTMLButtonElement;
+      const form = document.getElementById("props-form") as HTMLFormElement;
+
+      const docs = [...list.querySelectorAll<HTMLElement>(".prop-card")].map((card) => {
+        const name = card.querySelector(".prop-name")!.textContent ?? "";
+        const era = card.querySelector(".prop-era")?.textContent ?? "";
+        return {
+          card,
+          key: card.dataset.key!,
+          name,
+          description: `${name} ${era}`,
+          categories: card.dataset.categories!.split("|"),
+          tags: card.querySelector(".prop-tag-list")?.textContent?.split(", ") ?? [],
+          decades: card.dataset.decades ? card.dataset.decades.split(" ").map(Number) : [],
+          order: Number(card.dataset.order),
+        };
+      });
+      const index = buildIndex(docs);
+      let results = docs;
+      let shown = PAGE_SIZE;
+
+      function render() {
+        const visible = new Set(results.slice(0, shown));
+        const matched = new Set(results);
+        list.replaceChildren(...results.map((doc) => doc.card), ...docs.filter((doc) => !matched.has(doc)).map((doc) => doc.card));
+        for (const doc of docs) doc.card.hidden = !visible.has(doc);
+        more.hidden = results.length <= shown;
+        const text = query.value.trim();
+        empty.hidden = results.length > 0;
+        emptyQuery.textContent = text;
+        const filtered = text || category.value || decade.value;
+        count.textContent = filtered
+          ? `${results.length} matching ${results.length === 1 ? "item" : "items"}${results.length > shown ? `, showing ${shown}` : ""}`
+          : `${docs.length} items, listed alphabetically${results.length > shown ? `, showing ${shown}` : ""}`;
+      }
+
+      function update() {
+        results = search(index, query.value, { category: category.value, decade: decade.value });
+        shown = PAGE_SIZE;
+        render();
+      }
+
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      query.addEventListener("input", () => {
+        clearTimeout(timer);
+        timer = setTimeout(update, 120);
+      });
+      form.addEventListener("submit", (event) => event.preventDefault());
+      category.addEventListener("change", update);
+      decade.addEventListener("change", update);
+      more.addEventListener("click", () => {
+        shown += PAGE_SIZE;
+        render();
+      });
+      render();
+    </script>
+
+    <style is:global>
+      .props-page {
+        margin: 0;
+        background-color: #000000;
+        color: var(--color-text);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 500;
+        line-height: 1.5;
+      }
+
+      .props-page [hidden] {
+        display: none !important;
+      }
+
+      .props-page .props-wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 3rem;
+      }
+
+      .props-page .props-header {
+        text-align: center;
+        padding: 2rem 0 1.5rem;
+      }
+
+      .props-page .props-title {
+        color: var(--color-background-offset);
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .props-page .props-subtitle {
+        color: var(--color-primary);
+        font-size: 1.35rem;
+        margin: 0 0 1rem;
+      }
+
+      .props-page .props-back {
+        color: var(--color-background-offset);
+        font-family: "Nunito Sans", sans-serif;
+        font-size: 1.045rem;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(215, 155, 88, 0.5);
+      }
+
+      .props-page .props-back:hover {
+        color: #ffffff;
+      }
+
+      .props-page .props-box {
+        background-color: var(--color-background-offset);
+        border-radius: 1rem;
+        padding: 1.5rem 1.75rem;
+        margin: 0 0 1.5rem;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(215, 155, 88, 0.1);
+      }
+
+      .props-page .props-box p {
+        margin: 0 0 0.6rem;
+        line-height: 1.6;
+      }
+
+      .props-page .props-box p:last-child {
+        margin-bottom: 0;
+      }
+
+      .props-page .props-vendor-name {
+        font-size: 1.6rem;
+        margin: 0 0 0.5rem;
+      }
+
+      .props-page .props-note,
+      .props-page .props-count {
+        color: var(--color-text-offset);
+        font-size: 0.95rem;
+      }
+
+      .props-page .props-controls {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .props-page .props-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        font-weight: 600;
+        color: var(--color-secondary);
+      }
+
+      .props-page .props-field input,
+      .props-page .props-field select {
+        font: inherit;
+        font-weight: 500;
+        padding: 0.65rem 0.85rem;
+        min-height: 44px;
+        border: 2px solid var(--color-primary);
+        border-radius: 0.6rem;
+        background-color: #ffffff;
+        color: var(--color-text);
+      }
+
+      .props-page .props-field input:focus,
+      .props-page .props-field select:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(215, 155, 88, 0.35);
+      }
+
+      .props-page .props-empty {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        margin: 1rem 0;
+      }
+
+      .props-page .props-results {
+        list-style: none;
+        margin: 1rem 0 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+      }
+
+      .props-page .prop-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1rem 1.15rem;
+        border: 1px solid rgba(215, 155, 88, 0.25);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+      }
+
+      .props-page .prop-card p {
+        margin: 0;
+      }
+
+      .props-page .prop-line {
+        font-size: 1rem;
+        line-height: 1.45;
+      }
+
+      .props-page .prop-name {
+        font-weight: 700;
+        color: var(--color-secondary);
+      }
+
+      .props-page .prop-ids,
+      .props-page .prop-page {
+        font-weight: 600;
+        color: var(--color-primary-dark);
+      }
+
+      .props-page .prop-category {
+        font-size: 0.85rem;
+        letter-spacing: 0.04em;
+        color: var(--color-text-offset);
+      }
+
+      .props-page .prop-tags,
+      .props-page .prop-cite {
+        font-size: 0.85rem;
+        color: var(--color-text-light);
+      }
+
+      .props-page .prop-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: auto;
+        padding-top: 0.35rem;
+      }
+
+      .props-page .prop-actions a,
+      .props-page .props-more {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        padding: 0.35rem 0.9rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #ffffff;
+        background-color: var(--color-primary);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .props-page .prop-actions a + a {
+        background-color: var(--color-secondary);
+      }
+
+      .props-page .prop-actions a::after {
+        display: none;
+      }
+
+      .props-page .prop-actions a:hover {
+        color: #ffffff;
+        transform: translateY(-1px);
+      }
+
+      .props-page .props-more {
+        margin: 1.25rem auto 0;
+        display: flex;
+        font-size: 1rem;
+        padding: 0.6rem 1.5rem;
+      }
+
+      .props-page .props-footer {
+        text-align: center;
+        color: var(--color-background-offset);
+        font-size: 0.95rem;
+      }
+
+      .props-page .props-footer a,
+      .props-page .props-footer a:hover {
+        color: var(--color-primary);
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        .props-page .props-wrap {
+          padding: 1rem 1rem 2rem;
+        }
+
+        .props-page .props-title {
+          font-size: 2.25rem;
+        }
+
+        .props-page .props-box {
+          padding: 1.25rem 1rem;
+        }
+
+        .props-page .props-controls {
+          grid-template-columns: 1fr;
+        }
+
+        .props-page .props-results {
+          grid-template-columns: 1fr;
+        }
+
+        .props-page .prop-actions a {
+          min-height: 44px;
+        }
+      }
+    </style>
+  </body>
+</html>

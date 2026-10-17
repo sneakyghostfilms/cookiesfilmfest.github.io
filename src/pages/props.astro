@@ -320,7 +320,10 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
           }
           showStatus("");
           sceneResults.append(group("Required by the scene", kept.required), group("Optional set dressing", kept.optional));
-          const notes = [`Matched by AI (${kept.model}). AI can be wrong; check each item in the catalog and confirm availability with the vendor.`];
+          const notes = [
+            "Props not listed above were not identified or have no match in this catalog; try keyword search for them.",
+            `Matched by AI (${kept.model}). AI can be wrong; check each item in the catalog and confirm availability with the vendor.`,
+          ];
           if (kept.ignored) notes.push(`${kept.ignored} AI ${kept.ignored === 1 ? "suggestion referred to an item that doesn't" : "suggestions referred to items that don't"} exist and ${kept.ignored === 1 ? "was" : "were"} ignored.`);
           for (const note of notes) sceneResults.append(element("p", "props-note", note));
           return;

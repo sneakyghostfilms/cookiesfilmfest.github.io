@@ -172,7 +172,7 @@ export async function handleRequest(request, env, { now: clock = Date.now, guard
 
   const config = readConfig(env);
   if (!config) return failure(503, 'ai_not_configured', origin);
-  const aiRequest = buildRequest(config.model, inventoryText, text);
+  const aiRequest = buildRequest(inventoryText, text);
   const cost = estimateNeurons(config.model, aiRequest);
   const now = clock();
   let reservation;

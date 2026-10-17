@@ -90,3 +90,11 @@ test('the AI scene box discloses AI processing and stays switched off until a Wo
   assert.match(html, /<textarea id="scene-text"[^>]*\sdisabled[\s>]/);
   assert.match(html, /<button id="scene-submit"[^>]*\sdisabled[\s>]/);
 });
+
+test('scene results tell the reader that unlisted props were not identified or have no match', async () => {
+  const scripts = (await filesUnder(path.join(dist, '_astro'))).filter((file) => file.endsWith('.js'));
+  const sources = await Promise.all(scripts.map((file) => readFile(file, 'utf8')));
+  const pageScript = sources.find((source) => source.includes('Matched by AI'));
+  assert.ok(pageScript, 'the /props script is built');
+  assert.ok(pageScript.includes('Props not listed above were not identified or have no match in this catalog; try keyword search for them.'));
+});

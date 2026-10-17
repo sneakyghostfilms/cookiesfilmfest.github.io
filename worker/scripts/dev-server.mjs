@@ -21,16 +21,15 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const backends = {
   async mock() {
     await pause(Number(values.delay));
-    return {
-      response: JSON.stringify({
-        required: [
-          { prop: 'first prop', reason: 'Mock answer: the scene names it', keys: keys.slice(0, 2) },
-          { prop: 'a prop the catalog lacks', reason: 'Mock answer: nothing in the inventory fits', keys: [] },
-          { prop: 'an invented key', reason: 'Mock answer: a key that does not exist', keys: ['scp-000-404'] },
-        ],
-        optional: [{ prop: 'set dressing', reason: 'Mock answer: suits the setting', keys: keys.slice(2, 4) }],
-      }),
+    const output = {
+      required: [
+        { prop: 'first prop', reason: 'Mock answer: the scene names it', keys: keys.slice(0, 2) },
+        { prop: 'a prop the catalog lacks', reason: 'Mock answer: nothing in the inventory fits', keys: [] },
+        { prop: 'an invented key', reason: 'Mock answer: a key that does not exist', keys: ['scp-000-404'] },
+      ],
+      optional: [{ prop: 'set dressing', reason: 'Mock answer: suits the setting', keys: keys.slice(2, 4) }],
     };
+    return { choices: [{ message: { content: JSON.stringify(output) } }], usage: { prompt_tokens: 7000, completion_tokens: 300 } };
   },
   async fail() {
     await pause(Number(values.delay));
@@ -45,7 +44,7 @@ if (!backends[values.ai]) {
 
 const env = {
   ALLOWED_ORIGINS: 'http://localhost:4321',
-  AI_MODEL: '@cf/ibm-granite/granite-4.0-h-micro',
+  AI_MODEL: '@cf/google/gemma-4-26b-a4b-it',
   DAILY_NEURON_BUDGET: values['daily-budget'],
   AI_PER_MINUTE_LIMIT: '20',
   AI_PER_CLIENT_PER_MINUTE: '3',

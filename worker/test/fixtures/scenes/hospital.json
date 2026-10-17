@@ -1,0 +1,61 @@
+{
+  "id": "hospital",
+  "text": "INT. MERCY HOSPITAL - ROOM 412 - NIGHT\nA patient in a hospital gown sleeps under a thin hospital blanket. NURSE OKAFOR, in scrubs, checks on him, then listens to his chest with a stethoscope. A surgeon in a green surgery gown leans in the doorway.\nSURGEON: We go in at six.\nNURSE OKAFOR: He knows.\nThe IV pole clicks. The heart monitor keeps time.",
+  "required": [
+    {
+      "prop": "hospital gown",
+      "acceptableKeys": [
+        "scp-316",
+        "scp-317",
+        "scp-318",
+        "scp-319",
+        "scp-320",
+        "scp-321"
+      ]
+    },
+    {
+      "prop": "hospital blanket",
+      "acceptableKeys": [
+        "scp-125"
+      ]
+    },
+    {
+      "prop": "scrubs",
+      "acceptableKeys": [
+        "scp-126",
+        "scp-127",
+        "scp-301",
+        "scp-302",
+        "scp-303",
+        "scp-304",
+        "scp-305",
+        "scp-306",
+        "scp-308",
+        "scp-309",
+        "scp-310",
+        "scp-311",
+        "scp-312",
+        "scp-313",
+        "scp-354"
+      ]
+    },
+    {
+      "prop": "stethoscope",
+      "acceptableKeys": [
+        "scp-241",
+        "scp-277"
+      ]
+    },
+    {
+      "prop": "surgery gown",
+      "acceptableKeys": [
+        "scp-129",
+        "scp-130"
+      ]
+    }
+  ],
+  "absent": [
+    "IV pole",
+    "heart monitor"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "police",
+  "text": "EXT. ALLEY BEHIND A BLOOMFIELD BAR - NIGHT\nRain. OFFICER DIAZ, in a Pittsburgh police heavy jacket and a black police baseball cap, steps around a pool of blood with her pistol drawn. Her partner snaps handcuffs on a suspect and calls it in on a walkie-talkie.\nThe CORONER, in a white short-sleeve coroner shirt, kneels by the body.\nCORONER: Two hours. Maybe three.\nRed and blue light from the squad car washes over the bricks while a rookie strings up crime scene tape.",
+  "required": [
+    {
+      "prop": "police jacket",
+      "acceptableKeys": [
+        "scp-237"
+      ]
+    },
+    {
+      "prop": "police baseball cap",
+      "acceptableKeys": [
+        "scp-212",
+        "scp-215"
+      ]
+    },
+    {
+      "prop": "blood",
+      "acceptableKeys": [
+        "scp-057"
+      ]
+    },
+    {
+      "prop": "pistol",
+      "acceptableKeys": [
+        "scp-110",
+        "scp-261",
+        "scp-263",
+        "scp-264",
+        "scp-265",
+        "scp-267",
+        "scp-269",
+        "scp-270",
+        "scp-271",
+        "scp-272",
+        "scp-258",
+        "scp-268"
+      ]
+    },
+    {
+      "prop": "handcuffs",
+      "acceptableKeys": [
+        "scp-142",
+        "scp-280"
+      ]
+    },
+    {
+      "prop": "walkie-talkie",
+      "acceptableKeys": [
+        "scp-173"
+      ]
+    },
+    {
+      "prop": "coroner shirt",
+      "acceptableKeys": [
+        "scp-207"
+      ]
+    }
+  ],
+  "absent": [
+    "squad car",
+    "crime scene tape"
+  ]
+}

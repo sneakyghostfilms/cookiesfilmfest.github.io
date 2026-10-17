@@ -1,0 +1,151 @@
+#!/usr/bin/env node
+
+import { readdir, readFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
+import { inventoryText } from '../src/inventory.js';
+import { LIMITS, MODELS, buildRequest, estimateNeurons } from '../src/scene.js';
+
+const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), '../test/fixtures/scenes');
+const DAILY_BUDGET = 5000;
+const SLOTS = LIMITS.maxRequiredProps + LIMITS.maxOptionalProps;
+const FLOOR = { requiredShare: 0.7, invalidKeysPerScene: 1, wrongMatchesPerScene: 1, scenesPerDay: 50 };
+const { values } = parseArgs({
+  options: {
+    url: { type: 'string' },
+    scene: { type: 'string' },
+    origin: { type: 'string', default: 'http://localhost:4321' },
+  },
+});
+if (!values.url) {
+  console.error('Usage: node scripts/eval-models.mjs --url <worker base URL> [--scene office] [--origin http://localhost:4321]');
+  process.exit(1);
+}
+
+const words = (text) => text.toLowerCase().split(/[^a-z0-9]+/)
+  .filter((word) => word.length > 1)
+  .map((word) => (word.length > 3 ? word.replace(/s$/, '') : word));
+const names = (prop, absentName) => {
+  const propWords = new Set(words(prop));
+  return words(absentName).every((word) => propWords.has(word));
+};
+
+function score(fixture, body) {
+  const props = [...body.required, ...body.optional];
+  const acceptable = new Set(fixture.required.flatMap((expected) => expected.acceptableKeys));
+  const dense = fixture.required.length + fixture.absent.length > SLOTS;
+  const required = fixture.required.map((expected) => {
+    const accept = new Set(expected.acceptableKeys);
+    const match = props.find((prop) => prop.keys.some((key) => accept.has(key)));
+    return {
+      prop: expected.prop,
+      found: Boolean(match),
+      asRequired: body.required.some((prop) => prop.keys.some((key) => accept.has(key))),
+      falseKeys: match ? match.keys.filter((key) => !accept.has(key)) : [],
+    };
+  });
+  const absent = fixture.absent.map((name) => {
+    const prop = props.find((entry) => names(entry.prop, name));
+    if (!prop) return { name, outcome: 'left out' };
+    return { name, outcome: prop.keys.length ? `force-matched (${prop.keys.join(', ')})` : 'reported as no match' };
+  });
+  const found = required.filter((entry) => entry.found).length;
+  return {
+    dense,
+    required,
+    absent,
+    found,
+    counted: dense ? Math.min(found, LIMITS.maxRequiredProps) : found,
+    countable: dense ? Math.min(required.length, LIMITS.maxRequiredProps) : required.length,
+    honest: absent.filter((entry) => entry.outcome === 'reported as no match').length,
+    wrong: body.required.filter((prop) => prop.keys.length && !prop.keys.some((key) => acceptable.has(key))).map((prop) => prop.prop),
+    withKeys: props.filter((prop) => prop.keys.length).length,
+  };
+}
+
+function usedNeurons(model, usage) {
+  const rates = MODELS[model];
+  if (!rates || !usage) return null;
+  return (usage.inputTokens * rates.inputNeuronsPerMillion + usage.outputTokens * rates.outputNeuronsPerMillion) / 1e6;
+}
+
+const files = (await readdir(FIXTURES)).filter((file) => file.endsWith('.json')).sort();
+const fixtures = await Promise.all(files.map(async (file) => JSON.parse(await readFile(join(FIXTURES, file), 'utf8'))));
+const selected = values.scene ? fixtures.filter((fixture) => fixture.id === values.scene) : fixtures;
+const rows = [];
+for (const fixture of selected) {
+  const started = Date.now();
+  const response = await fetch(`${values.url.replace(/\/+$/, '')}/v1/scene`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', origin: values.origin },
+    body: JSON.stringify({ text: fixture.text }),
+  });
+  const seconds = (Date.now() - started) / 1000;
+  const body = await response.json().catch(() => ({}));
+  if (!body.ok) {
+    rows.push({ fixture, seconds, error: `${response.status} ${body.error ?? 'no JSON'}` });
+    continue;
+  }
+  rows.push({
+    fixture,
+    seconds,
+    body,
+    reserved: MODELS[body.model] ? estimateNeurons(body.model, buildRequest(inventoryText, fixture.text)) : null,
+    truncated: Boolean(body.usage && body.usage.outputTokens >= LIMITS.maxOutputTokens),
+    result: score(fixture, body),
+    used: usedNeurons(body.model, body.usage),
+  });
+}
+
+const lines = [];
+const listed = (prop, mark) => `${mark}:${prop.prop} [${prop.keys.join(', ')}]`;
+for (const row of rows) {
+  lines.push(`\n### ${row.fixture.id} (${row.fixture.text.length} characters, ${row.seconds.toFixed(1)} s)`);
+  if (row.error) {
+    lines.push(`- request failed: ${row.error}`);
+    continue;
+  }
+  const { body, result, used } = row;
+  lines.push(`- model ${body.model}; required props found ${result.found}/${result.required.length} (${result.required.filter((entry) => entry.asRequired).length} listed as required); invalid keys ${body.ignoredSuggestions}; wrong matches ${result.wrong.length ? result.wrong.join(', ') : 'none'}`);
+  lines.push(`- usage ${body.usage ? `${body.usage.inputTokens} in / ${body.usage.outputTokens} out${row.truncated ? ' (TRUNCATED)' : ''}` : 'not reported'}; reserved ${row.reserved === null ? 'unknown' : row.reserved.toFixed(1)} Neurons; charged after settling ${body.chargedNeurons}; used ${used === null ? 'unknown' : used.toFixed(1)}`);
+  if (result.dense) lines.push(`- this scene names more props than the lists hold (${SLOTS}), so at most ${LIMITS.maxRequiredProps} found props count and absent props are not scored`);
+  for (const entry of result.required) {
+    lines.push(`  - ${entry.found ? '✓' : '✗'} ${entry.prop}${entry.falseKeys.length ? ` (also suggested ${entry.falseKeys.join(', ')})` : ''}`);
+  }
+  for (const entry of result.absent) lines.push(`  - absent "${entry.name}": ${entry.outcome}`);
+  lines.push(`  - model's props: ${[...body.required.map((prop) => listed(prop, 'R')), ...body.optional.map((prop) => listed(prop, 'O'))].join(' | ')}`);
+}
+
+const scored = rows.filter((row) => !row.error);
+const sum = (pick, list = scored) => list.reduce((total, row) => total + pick(row), 0);
+const counted = sum((row) => row.result.counted);
+const countable = sum((row) => row.result.countable);
+const sparse = scored.filter((row) => !row.result.dense);
+const dense = scored.filter((row) => row.result.dense);
+const lowestCapacity = Math.min(...scored.map((row) => Math.floor(DAILY_BUDGET / row.body.chargedNeurons)));
+const checks = [
+  ['every request answered', rows.length === scored.length, `${scored.length}/${rows.length}`],
+  [`required props found ≥ ${FLOOR.requiredShare * 100}%`, countable > 0 && counted / countable >= FLOOR.requiredShare, `${counted}/${countable} (${countable ? Math.round((100 * counted) / countable) : 0}%)`],
+  ['no truncated output', scored.every((row) => !row.truncated), scored.filter((row) => row.truncated).map((row) => row.fixture.id).join(', ') || 'none'],
+  [`at most ${FLOOR.invalidKeysPerScene} invalid key per scene`, scored.every((row) => row.body.ignoredSuggestions <= FLOOR.invalidKeysPerScene), scored.map((row) => row.body.ignoredSuggestions).join(', ')],
+  [`at most ${FLOOR.wrongMatchesPerScene} wrong match per scene in the required list`, scored.every((row) => row.result.wrong.length <= FLOOR.wrongMatchesPerScene), scored.map((row) => row.result.wrong.length).join(', ')],
+  ['every absent prop reported as no match', sum((row) => row.result.honest, sparse) === sum((row) => row.result.absent.length, sparse), `${sum((row) => row.result.honest, sparse)}/${sum((row) => row.result.absent.length, sparse)}`],
+  [`scenes too long for the lists return at least ${LIMITS.maxRequiredProps} matched props`, dense.every((row) => row.result.withKeys >= LIMITS.maxRequiredProps), dense.map((row) => `${row.fixture.id} ${row.result.withKeys}`).join(', ') || 'none'],
+  [`capacity ≥ ${FLOOR.scenesPerDay} scenes a day at ${DAILY_BUDGET} Neurons`, lowestCapacity >= FLOOR.scenesPerDay, `${lowestCapacity} for the costliest scene`],
+];
+lines.push('\n| Scene | Required found | Listed as required | Wrong matches | Absent reported as no match | Invalid keys | Output tokens | Latency | Reserved | Charged after settling |');
+lines.push('|---|---|---|---|---|---|---|---|---|---|');
+for (const row of rows) {
+  if (row.error) {
+    lines.push(`| ${row.fixture.id} | request failed: ${row.error} | | | | | | ${row.seconds.toFixed(1)} s | | |`);
+    continue;
+  }
+  const { body, result } = row;
+  const absentCell = `${result.honest}/${result.absent.length}${result.dense ? ' (not scored)' : ''}`;
+  lines.push(`| ${row.fixture.id} | ${result.found}/${result.required.length}${result.dense ? ` (counts as ${result.counted}/${result.countable})` : ''} | ${result.required.filter((entry) => entry.asRequired).length} | ${result.wrong.length} | ${absentCell} | ${body.ignoredSuggestions} | ${body.usage?.outputTokens ?? '?'}${row.truncated ? ' (truncated)' : ''} | ${row.seconds.toFixed(1)} s | ${row.reserved === null ? '?' : row.reserved.toFixed(1)} | ${body.chargedNeurons} |`);
+}
+lines.push('\nQuality floor:');
+for (const [label, passed, detail] of checks) lines.push(`- ${passed ? 'PASS' : 'FAIL'} ${label}: ${detail}`);
+lines.push(`\nNeurons used by these ${scored.length} calls: ${sum((row) => row.used ?? 0).toFixed(1)}`);
+console.log(lines.join('\n'));

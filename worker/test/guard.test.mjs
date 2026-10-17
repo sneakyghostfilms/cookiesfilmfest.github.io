@@ -2,10 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { handleRequest } from '../src/index.js';
 import { inventoryText } from '../src/inventory.js';
-import { MODELS, buildRequest, estimateNeurons } from '../src/scene.js';
-import { NOW, budgetNamespace, fakeAI, fixedClock, makeEnv, memoryStorage, sceneRequest } from './helpers.mjs';
+import { LIMITS, MODELS, buildRequest, estimateNeurons } from '../src/scene.js';
+import { MODEL, NOW, budgetNamespace, fakeAI, fixedClock, makeEnv, memoryStorage, sceneRequest } from './helpers.mjs';
 
-const GRANITE = '@cf/ibm-granite/granite-4.0-h-micro';
+const SHORT = 'x'.repeat(30);
+const SHORT_COST = estimateNeurons(MODEL, buildRequest(inventoryText, SHORT));
 
 async function send(env, { ip, now = NOW, text } = {}) {
   const response = await handleRequest(sceneRequest(text, { ip }), env, fixedClock(now));
@@ -47,19 +48,20 @@ test('a guard that throws, hangs or answers nonsense stops the AI call', async (
 });
 
 test('the daily budget refuses requests that would pass it and resets at midnight UTC', async () => {
-  const env = makeEnv({ DAILY_NEURON_BUDGET: '100' });
-  const cost = estimateNeurons(GRANITE, buildRequest(GRANITE, inventoryText, 'x'.repeat(30)));
-  const fits = Math.floor(100 / cost);
+  const budget = Math.ceil(SHORT_COST * 3.5);
+  const env = makeEnv({ DAILY_NEURON_BUDGET: String(budget) });
+  const fits = Math.floor(budget / SHORT_COST);
+  assert.equal(fits, 3);
   for (let index = 0; index < fits; index += 1) {
-    assert.equal((await send(env, { ip: `198.51.100.${index}`, now: NOW + index * 61_000, text: 'x'.repeat(30) })).status, 200);
+    assert.equal((await send(env, { ip: `198.51.100.${index}`, now: NOW + index * 61_000, text: SHORT })).status, 200);
   }
-  const refused = await send(env, { ip: '198.51.100.250', now: NOW + fits * 61_000, text: 'x'.repeat(30) });
+  const refused = await send(env, { ip: '198.51.100.250', now: NOW + fits * 61_000, text: SHORT });
   assert.equal(refused.status, 503);
   assert.equal(refused.body.error, 'quota_exhausted');
   const midnight = Date.UTC(2026, 9, 18);
   assert.equal(Number(refused.retryAfter), Math.ceil((midnight - (NOW + fits * 61_000)) / 1000));
   assert.equal(env.AI.calls.length, fits);
-  assert.equal((await send(env, { now: midnight + 1000, text: 'x'.repeat(30) })).status, 200);
+  assert.equal((await send(env, { now: midnight + 1000, text: SHORT })).status, 200);
 });
 
 test('one client gets 3 requests a minute while others still get through', async () => {
@@ -83,11 +85,11 @@ test('the global cap stops the 21st request in a minute', async () => {
 });
 
 test('concurrent requests cannot overspend the daily budget', async () => {
-  const env = makeEnv({ DAILY_NEURON_BUDGET: '100', AI_PER_CLIENT_PER_MINUTE: '100', AI_PER_MINUTE_LIMIT: '100' });
-  const cost = estimateNeurons(GRANITE, buildRequest(GRANITE, inventoryText, 'x'.repeat(30)));
-  const results = await Promise.all(Array.from({ length: 10 }, (_, index) => send(env, { ip: `192.0.2.${index}`, text: 'x'.repeat(30) })));
-  assert.equal(results.filter((result) => result.status === 200).length, Math.floor(100 / cost));
-  assert.ok(env.AI_BUDGET.storage.values.get('spend').spent <= 100);
+  const budget = Math.ceil(SHORT_COST * 3.5);
+  const env = makeEnv({ DAILY_NEURON_BUDGET: String(budget), AI_PER_CLIENT_PER_MINUTE: '100', AI_PER_MINUTE_LIMIT: '100' });
+  const results = await Promise.all(Array.from({ length: 10 }, (_, index) => send(env, { ip: `192.0.2.${index}`, text: SHORT })));
+  assert.equal(results.filter((result) => result.status === 200).length, 3);
+  assert.ok(env.AI_BUDGET.storage.values.get('spend').spent <= budget);
 });
 
 test('the guard stores only the day and the amount spent, never the client address', async () => {
@@ -104,15 +106,15 @@ test('the guard stores only the day and the amount spent, never the client addre
 });
 
 test('the pre-charge bounds input tokens by UTF-8 bytes, so non-Latin scenes cost more', () => {
-  const ascii = buildRequest(GRANITE, inventoryText, 'x'.repeat(4000));
-  const emoji = buildRequest(GRANITE, inventoryText, '😀'.repeat(2000));
+  const ascii = buildRequest(inventoryText, 'x'.repeat(4000));
+  const emoji = buildRequest(inventoryText, '😀'.repeat(2000));
   const bytes = (request) => new TextEncoder().encode(JSON.stringify(request.messages) + JSON.stringify(request.response_format)).length;
-  const rates = MODELS[GRANITE];
+  const rates = MODELS[MODEL];
   for (const request of [ascii, emoji]) {
-    const expected = ((bytes(request) + 256) * rates.inputNeuronsPerMillion + 1700 * rates.outputNeuronsPerMillion) / 1e6;
-    assert.ok(Math.abs(estimateNeurons(GRANITE, request) - expected) < 1e-9);
+    const expected = ((bytes(request) + 256) * rates.inputNeuronsPerMillion + LIMITS.maxOutputTokens * rates.outputNeuronsPerMillion) / 1e6;
+    assert.ok(Math.abs(estimateNeurons(MODEL, request) - expected) < 1e-9);
   }
-  assert.ok(estimateNeurons(GRANITE, emoji) > estimateNeurons(GRANITE, ascii));
+  assert.ok(estimateNeurons(MODEL, emoji) > estimateNeurons(MODEL, ascii));
 });
 
 test('an unknown model never reaches the AI', async () => {

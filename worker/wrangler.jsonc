@@ -12,7 +12,7 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["AiBudget"] }],
   "vars": {
     "ALLOWED_ORIGINS": "https://cookiesfilmfest.com,http://localhost:4321",
-    "AI_MODEL": "@cf/ibm-granite/granite-4.0-h-micro",
+    "AI_MODEL": "@cf/google/gemma-4-26b-a4b-it",
     "DAILY_NEURON_BUDGET": "5000",
     "AI_PER_MINUTE_LIMIT": "20",
     "AI_PER_CLIENT_PER_MINUTE": "3",

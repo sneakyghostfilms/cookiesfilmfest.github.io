@@ -1,6 +1,7 @@
 import { AiBudget } from '../src/budget.js';
 
 export const ORIGIN = 'https://cookiesfilmfest.com';
+export const MODEL = '@cf/google/gemma-4-26b-a4b-it';
 export const SCENE = 'INT. INSURANCE OFFICE - DAY. Margaret counts coins at the green change machine and answers the phone.';
 export const NOW = Date.UTC(2026, 9, 17, 16, 0, 0);
 
@@ -22,11 +23,21 @@ export function memoryStorage() {
 
 export function budgetNamespace(storage = memoryStorage()) {
   const object = new AiBudget({ storage });
-  const stub = { fetch: (url, init) => object.fetch(new Request(url, init)) };
-  return { storage, object, idFromName: (name) => name, get: () => stub };
+  const actions = [];
+  const stub = {
+    fetch: (url, init) => {
+      actions.push(new URL(url).pathname);
+      return object.fetch(new Request(url, init));
+    },
+  };
+  return { storage, object, actions, idFromName: (name) => name, get: () => stub };
 }
 
-export function fakeAI(respond = () => ({ response: JSON.stringify(goodOutput()) })) {
+export function answer(output = goodOutput(), usage) {
+  return { choices: [{ message: { role: 'assistant', content: JSON.stringify(output) } }], ...(usage ? { usage } : {}) };
+}
+
+export function fakeAI(respond = () => answer()) {
   const calls = [];
   return {
     calls,
@@ -50,7 +61,7 @@ export function goodOutput() {
 export function makeEnv(overrides = {}) {
   return {
     ALLOWED_ORIGINS: 'https://cookiesfilmfest.com,http://localhost:4321',
-    AI_MODEL: '@cf/ibm-granite/granite-4.0-h-micro',
+    AI_MODEL: MODEL,
     DAILY_NEURON_BUDGET: '5000',
     AI_PER_MINUTE_LIMIT: '20',
     AI_PER_CLIENT_PER_MINUTE: '3',

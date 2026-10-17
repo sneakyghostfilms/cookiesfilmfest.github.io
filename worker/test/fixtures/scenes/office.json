@@ -1,0 +1,47 @@
+{
+  "id": "office",
+  "text": "INT. HARTWELL INSURANCE - SECRETARIAL POOL - DAY (1962)\nFluorescent hum. MARGARET (40s) feeds a sheet into her gray typewriter and hammers out a letter. The black rotary phone on her desk rings. She answers, cradling the receiver against her shoulder while she counts dimes out of the green change machine for the bus home.\nMR. DAVIES (60s) drops a thick reference manual on her desk.\nDAVIES: Section nine. Before lunch.\nMARGARET: I'll have the Pittsburgh file on your desk by five.\nShe jots a note in her steno notebook, then fills a paper cup at the water cooler and waits by the fax machine for the Erie office.",
+  "required": [
+    {
+      "prop": "typewriter",
+      "acceptableKeys": [
+        "scp-077",
+        "scp-078",
+        "scp-079",
+        "scp-331"
+      ]
+    },
+    {
+      "prop": "rotary phone",
+      "acceptableKeys": [
+        "scp-296",
+        "scp-054-1",
+        "scp-054-2",
+        "scp-055",
+        "scp-134"
+      ]
+    },
+    {
+      "prop": "change machine",
+      "acceptableKeys": [
+        "scp-056"
+      ]
+    },
+    {
+      "prop": "reference manual",
+      "acceptableKeys": [
+        "scp-052"
+      ]
+    },
+    {
+      "prop": "steno notebook",
+      "acceptableKeys": [
+        "scp-335"
+      ]
+    }
+  ],
+  "absent": [
+    "water cooler",
+    "fax machine"
+  ]
+}

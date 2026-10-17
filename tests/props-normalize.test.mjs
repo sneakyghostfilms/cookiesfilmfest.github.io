@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   buildItems, checkItems, decadesOf, displayEra, isEraLine, serializeInventory, splitEra,
 } from '../scripts/props/normalize.mjs';
+import { cleanTags, serializeTags } from '../scripts/props/tags.mjs';
 
 const fixture = JSON.parse(await readFile(new URL('./fixtures/props-cards.json', import.meta.url), 'utf8'));
 const vendor = { id: 'steel-city-props', keyPrefix: 'scp' };
@@ -105,4 +106,25 @@ test('serializeInventory writes one item per line and round-trips', () => {
   const text = serializeInventory(inventory);
   assert.deepEqual(JSON.parse(text), inventory);
   assert.equal(text.split('\n').filter((line) => line.startsWith('    {"key"')).length, items.length);
+});
+
+test('cleanTags rejects era claims the caption does not make, denied words and malformed tags', () => {
+  const dated = { name: 'GREEN CHANGE MACHINE', description: 'GREEN CHANGE MACHINE 1960S' };
+  const undated = { name: 'WHITE MEGA PHONE', description: 'WHITE MEGA PHONE' };
+  const vintage = { name: 'VINTAGE STETHOSCOPE', description: 'VINTAGE STETHOSCOPE' };
+  assert.deepEqual(cleanTags(['coin changer', '1960s office'], dated).tags, ['coin changer', '1960s office']);
+  assert.deepEqual(cleanTags(['megaphone', '1960s megaphone', 'vintage bullhorn', 'retro', 'antique horn', 'mid-century'], undated).tags, ['megaphone']);
+  assert.deepEqual(cleanTags(['vintage medical tool', 'doctor tool'], vintage).tags, ['vintage medical tool', 'doctor tool']);
+  assert.deepEqual(cleanTags(['cheap megaphone', 'working megaphone', 'size large', 'Bullhorn', 'bullhorn', 'white mega phone', '', 7, 'a very long tag with too many words', '<b>x</b>'], undated).tags, ['bullhorn']);
+  assert.deepEqual(cleanTags(['bullhorn', 'model 9', '2000s phone'], undated).tags, ['bullhorn']);
+  assert.deepEqual(cleanTags(['9mm pistol', 'colt 45'], { name: '9MM COLT .45 PROP GUN', description: '9MM COLT .45 PROP GUN' }).tags, ['9mm pistol', 'colt 45']);
+  assert.equal(cleanTags(['one', 'two', 'three', 'four', 'five', 'six', 'seven'], undated).tags.length, 6);
+  assert.deepEqual(cleanTags(null, undated), { tags: [], rejected: [] });
+});
+
+test('serializeTags writes sorted keys, one per line, and round-trips', () => {
+  const file = { schemaVersion: 1, generator: { tool: 'ollama', model: 'm', promptVersion: 1 }, generatedAt: '2026-10-17', tags: { 'scp-2': ['b'], 'scp-1': ['a'] } };
+  const text = serializeTags(file);
+  assert.deepEqual(JSON.parse(text), file);
+  assert.ok(text.indexOf('"scp-1"') < text.indexOf('"scp-2"'));
 });

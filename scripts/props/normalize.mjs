@@ -120,7 +120,8 @@ export function checkItems(items, { pageCount, sectionTitles }) {
 }
 
 export function serializeInventory(inventory) {
-  const items = inventory.items.map((item) => `    ${JSON.stringify(item)}`).join(',\n');
-  const catalogs = JSON.stringify(inventory.catalogs, null, 2).replace(/\n/g, '\n  ');
-  return `{\n  "schemaVersion": ${inventory.schemaVersion},\n  "catalogs": ${catalogs},\n  "items": [\n${items}\n  ]\n}\n`;
+  const lines = (entries) => entries.map((entry) => `    ${entry}`).join(',\n');
+  const catalogs = lines(Object.entries(inventory.catalogs).map(([id, entry]) => `${JSON.stringify(id)}: ${JSON.stringify(entry)}`));
+  const items = lines(inventory.items.map((item) => JSON.stringify(item)));
+  return `{\n  "schemaVersion": ${inventory.schemaVersion},\n  "catalogs": {\n${catalogs}\n  },\n  "items": [\n${items}\n  ]\n}\n`;
 }

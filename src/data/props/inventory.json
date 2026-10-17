@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "catalogs": {
+    "scp-2026-09-30": {"indexedAt":"2026-10-17","cards":18,"itemPages":[5,20,46],"sections":[{"page":2,"title":"INDEX"},{"page":4,"title":"THE OFFICE"},{"page":10,"title":"HOUSEWARES"},{"page":16,"title":"UNIFORMS"},{"page":32,"title":"MENSWEAR"},{"page":35,"title":"WOMENSWEAR"},{"page":38,"title":"WEAPONS"},{"page":42,"title":"SPFX PROPS"},{"page":44,"title":"MISCELLANEOUS"},{"page":47,"title":"PRODUCTION SUPPLIES"}]}
+  },
+  "items": [
+    {"key":"scp-056","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["056"],"printedIds":["[056]"],"name":"GREEN CHANGE MACHINE","description":"GREEN CHANGE MACHINE 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-021","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["021"],"printedIds":["[021]"],"name":"THE EXECUTIVE SECRETARY’S BOOK","description":"THE EXECUTIVE SECRETARY’S BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-022","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["022"],"printedIds":["[022]"],"name":"SECRETARIAL OFFICE PRACTICE BOOK","description":"SECRETARIAL OFFICE PRACTICE BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-024","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["024"],"printedIds":["[024]"],"name":"SECRETARY’S HANDBOOK","description":"SECRETARY’S HANDBOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-045","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["045"],"printedIds":["[045]"],"name":"THE PERFECT SECRETARY BOOK","description":"THE PERFECT SECRETARY BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-046","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["046"],"printedIds":["[046]"],"name":"MODERN BUSINESS BOOK","description":"MODERN BUSINESS BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-047","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["047"],"printedIds":["[047]"],"name":"A REVEALING LOOK AT THOSE GIRLS IN THE OFFICE BOOK","description":"A REVEALING LOOK AT THOSE GIRLS IN THE OFFICE BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-052","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["052"],"printedIds":["[052]"],"name":"REFERENCE MANUAL BOOK","description":"REFERENCE MANUAL BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-053","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["053"],"printedIds":["[053]"],"name":"GRAY BOOK","description":"GRAY BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-051","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["051"],"printedIds":["[051]"],"name":"TELEPHONE BOOK","description":"TELEPHONE BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-023","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["023"],"printedIds":["[023]"],"name":"WOODEN ADDRESS BOOK","description":"WOODEN ADDRESS BOOK 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-025","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["025"],"printedIds":["[025]"],"name":"DIAL-A-MATIC ADDING MACHINE","description":"DIAL-A-MATIC ADDING MACHINE 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
+    {"key":"scp-130","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["130"],"printedIds":["[130]"],"name":"TAN SURGERY GOWN","description":"TAN SURGERY GOWN","categories":["UNIFORMS"],"era":null,"decades":[],"pages":[20]},
+    {"key":"scp-132","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["132"],"printedIds":["[132"],"name":"CCAC NURSING SCHOOL JACKET","description":"CCAC NURSING SCHOOL JACKET","categories":["UNIFORMS"],"era":null,"decades":[],"pages":[20]},
+    {"key":"scp-245","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["245"],"printedIds":["[245]"],"name":"SURGICAL COAT","description":"SURGICAL COAT","categories":["UNIFORMS"],"era":null,"decades":[],"pages":[20]},
+    {"key":"scp-142","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["142"],"printedIds":["[142]"],"name":"LEATHER HOLSTER BELTS WITH HANDCUFFS","description":"LEATHER HOLSTER BELTS WITH HANDCUFFS","categories":["MISCELLANEOUS"],"era":null,"decades":[],"pages":[46]},
+    {"key":"scp-284","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["284"],"printedIds":["284"],"name":"WHITE MEGA PHONE","description":"WHITE MEGA PHONE","categories":["MISCELLANEOUS"],"era":null,"decades":[],"pages":[46]},
+    {"key":"scp-323","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["323"],"printedIds":["[323]"],"name":"JESUS MINI FIGURINE","description":"JESUS MINI FIGURINE","categories":["MISCELLANEOUS"],"era":null,"decades":[],"pages":[46]}
+  ]
+}

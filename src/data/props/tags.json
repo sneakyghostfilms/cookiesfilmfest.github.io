@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "generator": {
+    "tool": "ollama",
+    "model": "qwen3.6:35b",
+    "promptVersion": 1
+  },
+  "generatedAt": "2026-10-17",
+  "tags": {
+    "scp-021": ["book","notebook","planner","logbook"],
+    "scp-022": ["book","notebook","workbook","practice book"],
+    "scp-023": ["address book","contact book","notebook","desk book"],
+    "scp-024": ["handbook","manual","guidebook","reference book"],
+    "scp-025": ["adding machine","calculator","accounting machine","desk calculator"],
+    "scp-045": ["book","notebook","reference book","desk book"],
+    "scp-046": ["book","business manual","guidebook","office book"],
+    "scp-047": ["book","paperback","novel","reading book"],
+    "scp-051": ["telephone directory","phone book","directory","contact book"],
+    "scp-052": ["manual","reference book","guidebook","desk book"],
+    "scp-053": ["book","notebook","ledger","desk book"],
+    "scp-056": ["change machine","coin changer","coin dispenser","vending machine"],
+    "scp-130": ["surgery gown","medical gown","hospital gown","clinic gown"],
+    "scp-132": ["nursing jacket","uniform jacket","school jacket","college jacket"],
+    "scp-142": ["holster belt","handcuffs","gun belt","police belt"],
+    "scp-245": ["lab coat","doctor coat","medical coat"],
+    "scp-284": ["megaphone","bullhorn","voice amplifier","announcement device"],
+    "scp-323": ["figurine","statue","religious figure","miniature statue"]
+  }
+}

@@ -120,6 +120,7 @@ A local-only version of `/props` for screenshare pitches. It adds photo thumbnai
 - **First run:** `npm run props:demo -- --pdf "/path/to/catalog.pdf"`. This checks the PDF's sha256 against `vendors.json` and builds `.props-demo/` (about 350 WebP thumbnails, a copy of the PDF, and `manifest.json` with each item's page and photo position). It then starts the dev server at http://localhost:4321/props with `PROPS_DEMO=1` and the Worker URL set for that process only.
 - **Later runs:** `npm run props:demo`. To rebuild the assets, run `npm run props:demo-assets -- --pdf "…"`.
 - **Port 4321 must be free.** The Worker only answers that origin, so the command stops instead of moving to another port.
+- **Stopping:** press Ctrl-C. When Astro runs detached, for example when started from a script or an agent instead of a terminal, run `npx astro dev stop`.
 - **Never commit or publish these files.**
   - `.props-demo/` is gitignored and sits outside `public/` and `src/`, so no build copies it.
   - The scripts refuse to write anywhere git doesn't ignore, or under `public/` or `src/`.

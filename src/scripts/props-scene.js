@@ -1,12 +1,18 @@
-export const SCENE_LIMITS = { minChars: 20, maxChars: 4000 };
+export const SCENE_LIMITS = { minChars: 20, maxChars: 4000, maxPeriodChars: 40 };
 export const SCENE_TIMEOUT_MS = 40_000;
-const INVALID = new Set(['invalid_json', 'text_required', 'text_too_short', 'text_too_long', 'payload_too_large']);
+const INVALID = new Set(['invalid_json', 'text_required', 'text_too_short', 'text_too_long', 'payload_too_large', 'period_invalid', 'period_too_long']);
 
-export function checkSceneText(text) {
+export function checkSceneText(text, period = '') {
   const length = text.trim().length;
   if (length < SCENE_LIMITS.minChars) return `Paste at least ${SCENE_LIMITS.minChars} characters of the scene.`;
   if (length > SCENE_LIMITS.maxChars) return `Paste at most ${SCENE_LIMITS.maxChars.toLocaleString('en-US')} characters of the scene.`;
+  if (period.trim().length > SCENE_LIMITS.maxPeriodChars) return `Keep the time period to ${SCENE_LIMITS.maxPeriodChars} characters.`;
   return null;
+}
+
+export function eraNote(periodDecades, itemDecades) {
+  if (!periodDecades.size || !itemDecades.length || itemDecades.some((decade) => periodDecades.has(decade))) return null;
+  return `Stated era ${itemDecades.map((decade) => `${decade}s`).join(', ')} differs from your period.`;
 }
 
 function stateFor(response, body, now) {
@@ -26,14 +32,14 @@ function stateFor(response, body, now) {
   return { kind: 'error' };
 }
 
-export async function requestScene(apiUrl, text, { fetch: send = globalThis.fetch, timeoutMs = SCENE_TIMEOUT_MS, now = Date.now } = {}) {
+export async function requestScene(apiUrl, text, { period = '', fetch: send = globalThis.fetch, timeoutMs = SCENE_TIMEOUT_MS, now = Date.now } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await send(`${apiUrl.replace(/\/+$/, '')}/v1/scene`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text: text.trim() }),
+      body: JSON.stringify(period.trim() ? { text: text.trim(), period: period.trim() } : { text: text.trim() }),
       signal: controller.signal,
     });
     const body = await response.json().catch(() => null);

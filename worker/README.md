@@ -11,7 +11,12 @@ The Worker is served from `*.workers.dev`, because cookiesfilmfest.com's DNS is 
 
 ## API
 
-`POST /v1/scene` takes a body of `{ "text": "<scene>" }` with `Content-Type: application/json`. The text must be 20–4,000 characters, and the whole body may be at most 16 KiB.
+`POST /v1/scene` takes a body of `{ "text": "<scene>", "period": "1960s" }` with `Content-Type: application/json`.
+- The text must be 20–4,000 characters, and the whole body may be at most 16 KiB.
+- `period` is optional: a time period or setting of at most 40 characters, after control characters are stripped and the value is trimmed. It must be a string; a blank value counts as no period.
+- When a period is given, the user message carries it as `<period>…</period>`, with `<` and `>` neutralized like the scene, and adds one instruction: prefer items whose stated era fits, never suggest one whose stated era contradicts it, and treat items with no stated era as acceptable.
+- Without a period, the request is byte-identical to the one the model rubric measured. A test pins the system prompt by hash.
+- Like the scene text, the period is never stored, logged or echoed.
 
 `200` returns this:
 
@@ -30,7 +35,7 @@ The Worker is served from `*.workers.dev`, because cookiesfilmfest.com's DNS is 
 
 | Status | Codes |
 |---|---|
-| 400 | `invalid_json`, `text_required`, `text_too_short` |
+| 400 | `invalid_json`, `text_required`, `text_too_short`, `period_invalid`, `period_too_long` |
 | 403 | `origin_not_allowed` |
 | 404 | `not_found` |
 | 405 | `method_not_allowed` |

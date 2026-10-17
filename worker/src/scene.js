@@ -2,6 +2,7 @@ export const LIMITS = {
   maxBodyBytes: 16384,
   minTextChars: 20,
   maxTextChars: 4000,
+  maxPeriodChars: 40,
   maxRequiredProps: 12,
   maxOptionalProps: 4,
   maxPropChars: 40,
@@ -45,14 +46,18 @@ const INSTRUCTIONS = `The user message contains a film scene between <scene> and
 3. For each prop give "prop": a short plain-English name such as "rotary phone" (at most ${LIMITS.maxPropChars} characters); "reason": at most 12 words on why the scene needs it; and "keys": up to ${LIMITS.maxKeysPerProp} INVENTORY keys, best first, of items whose name shows they are that kind of object. Look each prop up in the INVENTORY on its own: when an item of that kind is listed, its key must be in "keys". A related but different object is not a match: if no item is that kind of object, give an empty "keys" list. Never invent a key; copy keys exactly as listed.
 List at most ${LIMITS.maxRequiredProps} required and ${LIMITS.maxOptionalProps} optional props. Reply with JSON only.`;
 
+const PERIOD_INSTRUCTION = 'Prefer items whose stated era fits this period, do not suggest items whose stated era contradicts it, and treat items with no stated era as acceptable.';
+
 export class BadOutput extends Error {}
 
-export function buildRequest(inventoryText, sceneText) {
-  const scene = sceneText.replace(/</g, '‹').replace(/>/g, '›');
+const neutralize = (text) => text.replace(/</g, '‹').replace(/>/g, '›');
+
+export function buildRequest(inventoryText, sceneText, period = '') {
+  const periodLines = period ? `<period>${neutralize(period)}</period>\n${PERIOD_INSTRUCTION}\n` : '';
   return {
     messages: [
       { role: 'system', content: `You match film scenes to a prop rental inventory.\n\n${INVENTORY_HEADER}\n${inventoryText}\n\n${INSTRUCTIONS}` },
-      { role: 'user', content: `<scene>\n${scene}\n</scene>` },
+      { role: 'user', content: `${periodLines}<scene>\n${neutralize(sceneText)}\n</scene>` },
     ],
     temperature: 0,
     max_completion_tokens: LIMITS.maxOutputTokens,
@@ -99,7 +104,11 @@ export function readModelOutput(result) {
 
 function cleanText(value, maxLength) {
   if (typeof value !== 'string') return '';
-  return value.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, maxLength);
+  return plainText(value).slice(0, maxLength);
+}
+
+export function plainText(value) {
+  return value.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function cleanList(list, maxProps, inventoryKeys, seen, tally) {

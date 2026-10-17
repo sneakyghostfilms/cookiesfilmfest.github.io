@@ -117,6 +117,10 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
               <textarea id="scene-text" rows="8" maxlength="4000" placeholder="Paste up to 4,000 characters of a scene, e.g. INT. DINER - NIGHT. A waitress pours coffee while the detective drops his badge on the counter." disabled={!apiUrl}></textarea>
             </label>
             <p class="props-note"><span id="scene-count">0</span> / 4,000 characters</p>
+            <label class="props-field scene-period">
+              <span>Time period or setting (optional)</span>
+              <input id="scene-period" type="text" maxlength="40" placeholder="1960s, WWII, present day" autocomplete="off" disabled={!apiUrl} />
+            </label>
             <p class="props-note scene-disclosure">Your text is sent to Cloudflare Workers AI to pick props from this catalog. This site doesn't store or log it. AI can be wrong, so check each item in the catalog.</p>
             {!apiUrl && <p class="scene-off">AI scene matching isn't switched on yet. Keyword search works.</p>}
             <button id="scene-submit" type="submit" class="props-button" disabled={!apiUrl}>Find props for this scene</button>
@@ -166,8 +170,8 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
     </div>
 
     <script>
-      import { buildIndex, search } from "../scripts/props-search.js";
-      import { checkSceneText, keepKnownKeys, requestScene } from "../scripts/props-scene.js";
+      import { buildIndex, parseDecades, search } from "../scripts/props-search.js";
+      import { checkSceneText, eraNote, keepKnownKeys, requestScene } from "../scripts/props-scene.js";
 
       const PAGE_SIZE = 24;
       const list = document.getElementById("props-results") as HTMLOListElement;
@@ -236,6 +240,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
 
       const sceneForm = document.getElementById("scene-form") as HTMLFormElement;
       const sceneText = document.getElementById("scene-text") as HTMLTextAreaElement;
+      const scenePeriod = document.getElementById("scene-period") as HTMLInputElement;
       const sceneCount = document.getElementById("scene-count") as HTMLElement;
       const sceneSubmit = document.getElementById("scene-submit") as HTMLButtonElement;
       const sceneStatus = document.getElementById("scene-status") as HTMLElement;
@@ -263,7 +268,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         list.scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
-      function propBlock(entry: { prop: string; reason: string; keys: string[] }) {
+      function propBlock(entry: { prop: string; reason: string; keys: string[] }, periodDecades: Set<number>) {
         const block = element("div", "scene-prop");
         block.append(element("h4", "scene-prop-name", entry.prop));
         if (entry.reason) block.append(element("p", "scene-reason", `AI: ${entry.reason}`));
@@ -272,6 +277,8 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
           for (const key of entry.keys) {
             const copy = cardsByKey.get(key)!.cloneNode(true) as HTMLElement;
             copy.hidden = false;
+            const note = eraNote(periodDecades, (copy.dataset.decades ?? "").split(" ").filter(Boolean).map(Number));
+            if (note) copy.querySelector(".prop-line")!.after(element("p", "scene-era-note", note));
             matches.append(copy);
           }
           block.append(matches);
@@ -286,11 +293,11 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         return block;
       }
 
-      function group(title: string, entries: { prop: string; reason: string; keys: string[] }[]) {
+      function group(title: string, entries: { prop: string; reason: string; keys: string[] }[], periodDecades: Set<number>) {
         const section = element("div", "scene-group");
         section.append(element("h3", "scene-group-title", title));
         if (!entries.length) section.append(element("p", "props-note", "None listed."));
-        for (const entry of entries) section.append(propBlock(entry));
+        for (const entry of entries) section.append(propBlock(entry, periodDecades));
         return section;
       }
 
@@ -310,7 +317,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
       sceneForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         if (!apiUrl) return;
-        const problem = checkSceneText(sceneText.value);
+        const problem = checkSceneText(sceneText.value, scenePeriod.value);
         if (problem) {
           showStatus(problem);
           return;
@@ -318,7 +325,8 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         sceneSubmit.disabled = true;
         sceneResults.replaceChildren();
         showStatus("Matching props… this can take up to about 30 seconds for long scenes.");
-        const state = await requestScene(apiUrl, sceneText.value);
+        const period = scenePeriod.value;
+        const state = await requestScene(apiUrl, sceneText.value, { period });
         sceneSubmit.disabled = false;
         if (state.kind === "ok") {
           const kept = keepKnownKeys(state, new Set(cardsByKey.keys()));
@@ -327,7 +335,8 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
             return;
           }
           showStatus("");
-          sceneResults.append(group("Required by the scene", kept.required), group("Optional set dressing", kept.optional));
+          const periodDecades = parseDecades(period);
+          sceneResults.append(group("Required by the scene", kept.required, periodDecades), group("Optional set dressing", kept.optional, periodDecades));
           const notes = [
             "Props not listed above were not identified or have no match in this catalog; try keyword search for them.",
             `Matched by AI (${kept.model}). AI can be wrong; check each item in the catalog and confirm availability with the vendor.`,
@@ -550,6 +559,16 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
 
       .props-page .scene-form textarea {
         resize: vertical;
+      }
+
+      .props-page .scene-period {
+        max-width: 360px;
+      }
+
+      .props-page .scene-era-note {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pp-ink);
       }
 
       .props-page .scene-off,

@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { SCENE_TIMEOUT_MS, checkSceneText, keepKnownKeys, requestScene } from '../src/scripts/props-scene.js';
+import { SCENE_TIMEOUT_MS, checkSceneText, eraNote, keepKnownKeys, requestScene } from '../src/scripts/props-scene.js';
+import { parseDecades } from '../src/scripts/props-search.js';
 import { GUARD_TIMEOUT_MS } from '../worker/src/budget.js';
 
 const API = 'https://pgh-prop-search.example.workers.dev/';
@@ -21,6 +22,26 @@ test('the client checks scene length before sending anything', () => {
   assert.match(checkSceneText('too short'), /at least 20/);
   assert.match(checkSceneText('x'.repeat(4001)), /at most 4,000/);
   assert.equal(checkSceneText(`   ${'x'.repeat(4000)}   `), null);
+  assert.match(checkSceneText(SCENE, 'x'.repeat(41)), /40 characters/);
+  assert.equal(checkSceneText(SCENE, ` ${'x'.repeat(40)} `), null);
+});
+
+test('the period is sent trimmed, and only when it is not blank', async () => {
+  const answer = { ok: true, model: 'm', required: [], optional: [], ignoredSuggestions: 0 };
+  for (const [period, expected] of [[' 1990s ', { text: SCENE, period: '1990s' }], ['   ', { text: SCENE }], [undefined, { text: SCENE }]]) {
+    const { calls, send } = fakeFetch(200, answer);
+    await requestScene(API, SCENE, { fetch: send, ...(period === undefined ? {} : { period }) });
+    assert.deepEqual(JSON.parse(calls[0].init.body), expected, JSON.stringify(period));
+  }
+});
+
+test('a match whose stated era misses the given period gets a note; nothing is filtered', () => {
+  assert.equal(eraNote(parseDecades('1990s'), [1960]), 'Stated era 1960s differs from your period.');
+  assert.equal(eraNote(parseDecades('late 60s or 70s'), [1960, 1970]), null);
+  assert.equal(eraNote(parseDecades('1990s'), [1980, 1990, 2000]), null);
+  assert.equal(eraNote(parseDecades('1990s'), []), null, 'items with no stated era get no note');
+  assert.equal(eraNote(parseDecades('WWII'), [1960]), null, 'a period without decades gets no note');
+  assert.equal(eraNote(parseDecades('sixties'), [1990, 2000]), 'Stated era 1990s, 2000s differs from your period.');
 });
 
 test('a successful answer posts the trimmed scene once and returns its props', async () => {
@@ -42,6 +63,8 @@ test('each Worker error becomes the matching page state, with no retry', async (
     [503, { ok: false, error: 'ai_unavailable' }, {}, { kind: 'unavailable' }],
     [504, { ok: false, error: 'ai_timeout' }, {}, { kind: 'timeout' }],
     [413, { ok: false, error: 'text_too_long', message: 'Paste at most 4000 characters of the scene.' }, {}, { kind: 'invalid', message: 'Paste at most 4000 characters of the scene.' }],
+    [400, { ok: false, error: 'period_invalid', message: 'Send the time period as text.' }, {}, { kind: 'invalid', message: 'Send the time period as text.' }],
+    [400, { ok: false, error: 'period_too_long', message: 'Keep the time period to 40 characters.' }, {}, { kind: 'invalid', message: 'Keep the time period to 40 characters.' }],
     [502, { ok: false, error: 'ai_bad_output' }, {}, { kind: 'error' }],
     [502, { ok: false, error: 'ai_failed' }, {}, { kind: 'error' }],
     [500, 'not json', {}, { kind: 'error' }],

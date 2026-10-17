@@ -1,5 +1,5 @@
 import { inventoryKeys, inventoryText } from './inventory.js';
-import { LIMITS, MODELS, actualNeurons, buildRequest, estimateNeurons, readModelOutput, validateScene } from './scene.js';
+import { LIMITS, MODELS, actualNeurons, buildRequest, estimateNeurons, plainText, readModelOutput, validateScene } from './scene.js';
 
 import { GUARD_TIMEOUT_MS } from './budget.js';
 
@@ -21,6 +21,8 @@ const MESSAGES = {
   text_required: 'Send the scene as {"text": "..."}.',
   text_too_short: `Paste at least ${LIMITS.minTextChars} characters of the scene.`,
   text_too_long: `Paste at most ${LIMITS.maxTextChars} characters of the scene.`,
+  period_invalid: 'Send the time period as text.',
+  period_too_long: `Keep the time period to ${LIMITS.maxPeriodChars} characters.`,
   rate_limited: 'Too many requests right now. Wait a minute and try again.',
   quota_exhausted: "Today's AI matching budget is used up. It resets at midnight UTC.",
   ai_busy: 'The AI service is busy. Try again in a minute.',
@@ -179,10 +181,13 @@ export async function handleRequest(request, env, { now: clock = Date.now, guard
   const text = body.text.trim();
   if (text.length < LIMITS.minTextChars) return failure(400, 'text_too_short', origin);
   if (text.length > LIMITS.maxTextChars) return failure(413, 'text_too_long', origin);
+  if (body.period !== undefined && typeof body.period !== 'string') return failure(400, 'period_invalid', origin);
+  const period = plainText(body.period ?? '');
+  if (period.length > LIMITS.maxPeriodChars) return failure(400, 'period_too_long', origin);
 
   const config = readConfig(env);
   if (!config) return failure(503, 'ai_not_configured', origin);
-  const aiRequest = buildRequest(inventoryText, text);
+  const aiRequest = buildRequest(inventoryText, text, period);
   const cost = estimateNeurons(config.model, aiRequest);
   const now = clock();
   let reservation;

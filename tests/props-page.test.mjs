@@ -96,6 +96,8 @@ test('the AI scene box discloses AI processing and stays switched off until a Wo
   assert.match(html, /<form id="scene-form" class="scene-form" data-api-url(="")?>/);
   assert.match(html, /<textarea id="scene-text"[^>]*\sdisabled[\s>]/);
   assert.match(html, /<button id="scene-submit"[^>]*\sdisabled[\s>]/);
+  assert.ok(text.includes('Time period or setting (optional)'));
+  assert.match(html, /<input id="scene-period"[^>]*maxlength="40"[^>]*placeholder="1960s, WWII, present day"[^>]*\sdisabled[\s>]/);
 });
 
 test('scene results tell the reader that unlisted props were not identified or have no match', async () => {

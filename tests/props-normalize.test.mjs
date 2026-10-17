@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
-  buildItems, checkItems, decadesOf, displayEra, isEraLine, serializeInventory, splitEra,
+  buildItems, checkItems, decadesOf, displayEra, isEraLine, replaceCatalog, serializeInventory, splitEra,
 } from '../scripts/props/normalize.mjs';
 import { cleanTags, serializeTags } from '../scripts/props/tags.mjs';
 
@@ -99,6 +99,23 @@ test('checkItems accepts built items and reports each kind of broken item', () =
   assert.match(broken({ decades: [1970] }).join(), /decades/);
   assert.match(broken({ itemNumbers: ['065'] }).join(), /item numbers/);
   assert.match(checkItems([byKey['scp-056'], byKey['scp-056']], { pageCount: 49, sectionTitles }).join(), /duplicate key/);
+});
+
+test('importing a catalog under a new id replaces the catalog it supersedes and keeps other listed catalogs', () => {
+  const item = (key, catalog) => ({ key, catalog, name: key.toUpperCase() });
+  const existing = {
+    schemaVersion: 1,
+    catalogs: { 'scp-2026-09-30': { cards: 2 }, 'abc-2026': { cards: 1 } },
+    items: [item('scp-001', 'scp-2026-09-30'), item('scp-002', 'scp-2026-09-30'), item('abc-001', 'abc-2026')],
+  };
+  const fresh = [item('scp-001', 'scp-2027-01-15'), item('scp-003', 'scp-2027-01-15')];
+  const listedCatalogIds = new Set(['scp-2027-01-15', 'abc-2026']);
+  const replaced = replaceCatalog(existing, { catalogId: 'scp-2027-01-15', items: fresh, entry: { cards: 2 }, listedCatalogIds });
+  assert.deepEqual(Object.keys(replaced.catalogs), ['abc-2026', 'scp-2027-01-15']);
+  assert.deepEqual(replaced.items.map((entry) => `${entry.key}@${entry.catalog}`), ['abc-001@abc-2026', 'scp-001@scp-2027-01-15', 'scp-003@scp-2027-01-15']);
+  const again = replaceCatalog(replaced, { catalogId: 'scp-2027-01-15', items: [fresh[0]], entry: { cards: 1 }, listedCatalogIds });
+  assert.deepEqual(again.items.map((entry) => entry.key), ['abc-001', 'scp-001']);
+  assert.deepEqual(again.catalogs['scp-2027-01-15'], { cards: 1 });
 });
 
 test('serializeInventory writes one item per line and round-trips', () => {

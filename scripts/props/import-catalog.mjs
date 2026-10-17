@@ -7,7 +7,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { buildItems, checkItems, serializeInventory } from './normalize.mjs';
+import { buildItems, checkItems, replaceCatalog, serializeInventory } from './normalize.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const EXTRACTOR = join(ROOT, 'scripts/props/extract_catalog.py');
@@ -119,14 +119,15 @@ async function main() {
   const previousItems = existing.items.filter((item) => item.catalog === catalog.id);
   const unchanged = JSON.stringify(previousItems) === JSON.stringify(items);
   const indexedAt = unchanged && existing.catalogs[catalog.id] ? existing.catalogs[catalog.id].indexedAt : new Date().toLocaleDateString('en-CA');
-  const inventory = {
-    schemaVersion: 1,
-    catalogs: {
-      ...existing.catalogs,
-      [catalog.id]: { indexedAt, cards: extraction.cards.length, itemPages, sections: extraction.sections },
-    },
-    items: [...existing.items.filter((item) => item.catalog !== catalog.id), ...items],
-  };
+  const inventory = replaceCatalog(existing, {
+    catalogId: catalog.id,
+    items,
+    entry: { indexedAt, cards: extraction.cards.length, itemPages, sections: extraction.sections },
+    listedCatalogIds: new Set(vendors.vendors.flatMap((entry) => entry.catalogs.map((listed) => listed.id))),
+  });
+  const keys = inventory.items.map((item) => item.key);
+  const repeated = [...new Set(keys.filter((key, index) => keys.indexOf(key) !== index))];
+  if (repeated.length) fail(`Not writing the inventory: these keys appear in more than one listed catalog: ${repeated.join(', ')}`);
   await writeFile(outFile, serializeInventory(inventory), 'utf8');
   console.log(`✅ Wrote ${items.length} items to ${outFile}${unchanged ? ' (unchanged)' : ''}`);
 }

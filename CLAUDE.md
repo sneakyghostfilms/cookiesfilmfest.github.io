@@ -106,7 +106,7 @@ Festival coordinates are stored separately in `src/data/festival-locations.json`
   - The page is text only: no photos and no copy of the catalog layout.
 
 #### Updating a catalog
-1. Edit `vendors.json` (catalog id, the PDF's `sha256`, `pageCount`, `sourceUrl`).
+1. Edit `vendors.json` (catalog id, the PDF's `sha256`, `pageCount`, `sourceUrl`). Replace the old catalog's entry rather than adding one: the import drops items of any catalog that is no longer listed.
 2. `npm run props:import -- --pdf "/path/to/catalog.pdf" --sheets-dir /tmp/props-sheets`
 3. Review the overlay sheets and the report: item numbers, captions, photos, reused or malformed numbers. The import refuses to write when its structural checks fail.
 4. Copy the reported counts into the catalog's `expected` in `vendors.json`.

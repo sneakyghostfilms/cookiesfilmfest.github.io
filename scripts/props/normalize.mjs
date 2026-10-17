@@ -119,6 +119,15 @@ export function checkItems(items, { pageCount, sectionTitles }) {
   return problems;
 }
 
+export function replaceCatalog(existing, { catalogId, items, entry, listedCatalogIds }) {
+  const kept = (id) => id !== catalogId && listedCatalogIds.has(id);
+  return {
+    schemaVersion: 1,
+    catalogs: { ...Object.fromEntries(Object.entries(existing.catalogs).filter(([id]) => kept(id))), [catalogId]: entry },
+    items: [...existing.items.filter((item) => kept(item.catalog)), ...items],
+  };
+}
+
 export function serializeInventory(inventory) {
   const lines = (entries) => entries.map((entry) => `    ${entry}`).join(',\n');
   const catalogs = lines(Object.entries(inventory.catalogs).map(([id, entry]) => `${JSON.stringify(id)}: ${JSON.stringify(entry)}`));

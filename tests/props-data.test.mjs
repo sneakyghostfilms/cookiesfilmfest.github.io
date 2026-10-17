@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { checkItems } from '../scripts/props/normalize.mjs';
-import { cleanTags } from '../scripts/props/tags.mjs';
+import { cleanTags, tagFingerprint } from '../scripts/props/tags.mjs';
 
 const read = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
 const vendors = await read('../src/data/props/vendors.json');
@@ -80,10 +80,12 @@ test('captions keep their own 3-digit numbers and drop size-badge text', () => {
 test('AI tags belong to real items, are kept separately, and already satisfy the tag rules', () => {
   assert.equal(tagsFile.generator.tool, 'ollama');
   assert.ok(Number.isInteger(tagsFile.generator.promptVersion));
+  assert.deepEqual(Object.keys(tagsFile.fingerprints).sort(), Object.keys(tagsFile.tags).sort());
   for (const [key, tags] of Object.entries(tagsFile.tags)) {
     const item = byKey.get(key);
     assert.ok(item, `tags for an unknown item: ${key}`);
     assert.deepEqual(cleanTags(tags, item).tags, tags, key);
+    assert.equal(tagsFile.fingerprints[key], tagFingerprint(item), `${key} was tagged from a different name, section or era: run npm run props:tags`);
   }
   for (const item of inventory.items) assert.ok(!('tags' in item), `${item.key} mixes AI tags into vendor facts`);
 });

@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
   buildItems, checkItems, decadesOf, displayEra, isEraLine, replaceCatalog, serializeInventory, splitEra,
 } from '../scripts/props/normalize.mjs';
-import { cleanTags, serializeTags } from '../scripts/props/tags.mjs';
+import { cleanTags, reusableTags, serializeTags, tagFingerprint } from '../scripts/props/tags.mjs';
 
 const fixture = JSON.parse(await readFile(new URL('./fixtures/props-cards.json', import.meta.url), 'utf8'));
 const vendor = { id: 'steel-city-props', keyPrefix: 'scp' };
@@ -155,8 +155,27 @@ test('cleanTags keeps imitation guns from being called firearms and rejects stat
 });
 
 test('serializeTags writes sorted keys, one per line, and round-trips', () => {
-  const file = { schemaVersion: 1, generator: { tool: 'ollama', model: 'm', promptVersion: 1 }, generatedAt: '2026-10-17', tags: { 'scp-2': ['b'], 'scp-1': ['a'] } };
+  const file = {
+    schemaVersion: 2, generator: { tool: 'ollama', model: 'm', promptVersion: 1 }, generatedAt: '2026-10-17',
+    tags: { 'scp-2': ['b'], 'scp-1': ['a'] }, fingerprints: { 'scp-2': 'f2', 'scp-1': 'f1' },
+  };
   const text = serializeTags(file);
   assert.deepEqual(JSON.parse(text), file);
   assert.ok(text.indexOf('"scp-1"') < text.indexOf('"scp-2"'));
+});
+
+test('tags are reused only while the name, section and era they were made from are unchanged', () => {
+  const machine = { key: 'scp-056', name: 'GREEN CHANGE MACHINE', categories: ['THE OFFICE'], era: '1960S' };
+  const phone = { key: 'scp-055', name: 'WHITE ROTARY PHONE', categories: ['THE OFFICE'], era: '1960S' };
+  const previous = {
+    tags: { 'scp-056': ['coin changer'], 'scp-055': ['telephone'], 'scp-999': ['gone'] },
+    fingerprints: { 'scp-056': tagFingerprint(machine), 'scp-055': tagFingerprint(phone), 'scp-999': 'x' },
+  };
+  const recaptioned = { ...phone, name: 'PINK ROTARY PHONE' };
+  const reused = reusableTags(previous, [machine, recaptioned]);
+  assert.deepEqual(reused.tags, { 'scp-056': ['coin changer'] });
+  assert.deepEqual(reused.fingerprints, { 'scp-056': tagFingerprint(machine) });
+  assert.notEqual(tagFingerprint({ ...machine, categories: ['HOUSEWARES'] }), tagFingerprint(machine));
+  assert.notEqual(tagFingerprint({ ...machine, era: null }), tagFingerprint(machine));
+  assert.deepEqual(reusableTags({ tags: { 'scp-056': ['coin changer'] } }, [machine]).tags, {}, 'tags without a fingerprint are regenerated');
 });

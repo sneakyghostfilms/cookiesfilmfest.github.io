@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 const MAX_TAGS = 6;
 const TAG_SHAPE = /^[a-z0-9][a-z0-9 '&/.-]{1,31}$/;
 const DENIED_WORDS = new Set([
@@ -41,9 +43,26 @@ export function cleanTags(rawTags, item) {
   return { tags: kept.slice(0, MAX_TAGS), rejected: [...rejected, ...kept.slice(MAX_TAGS)] };
 }
 
+export function tagFingerprint(item) {
+  return createHash('sha256').update(JSON.stringify([item.name, item.categories, item.era ?? null])).digest('hex').slice(0, 16);
+}
+
+export function reusableTags(previous, items) {
+  const tags = {};
+  const fingerprints = {};
+  for (const item of items) {
+    const fingerprint = tagFingerprint(item);
+    if (Object.hasOwn(previous?.tags ?? {}, item.key) && previous.fingerprints?.[item.key] === fingerprint) {
+      tags[item.key] = previous.tags[item.key];
+      fingerprints[item.key] = fingerprint;
+    }
+  }
+  return { tags, fingerprints };
+}
+
 export function serializeTags(file) {
-  const entries = Object.keys(file.tags).sort().map((key) => `    ${JSON.stringify(key)}: ${JSON.stringify(file.tags[key])}`);
+  const entries = (map) => Object.keys(map).sort().map((key) => `    ${JSON.stringify(key)}: ${JSON.stringify(map[key])}`).join(',\n');
   const header = JSON.stringify({ schemaVersion: file.schemaVersion, generator: file.generator, generatedAt: file.generatedAt }, null, 2)
     .replace(/\n}$/, '');
-  return `${header},\n  "tags": {\n${entries.join(',\n')}\n  }\n}\n`;
+  return `${header},\n  "tags": {\n${entries(file.tags)}\n  },\n  "fingerprints": {\n${entries(file.fingerprints)}\n  }\n}\n`;
 }

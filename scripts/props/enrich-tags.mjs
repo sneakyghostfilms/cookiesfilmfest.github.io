@@ -5,7 +5,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { cleanTags, serializeTags } from './tags.mjs';
+import { cleanTags, reusableTags, serializeTags, tagFingerprint } from './tags.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
@@ -76,14 +76,10 @@ async function main() {
   const exclusions = existsSync(EXCLUSIONS_FILE) ? JSON.parse(await readFile(EXCLUSIONS_FILE, 'utf8')) : {};
   const previous = existsSync(TAGS_FILE) ? JSON.parse(await readFile(TAGS_FILE, 'utf8')) : null;
   const sameGenerator = previous?.generator?.model === MODEL && previous?.generator?.promptVersion === PROMPT_VERSION;
-  const tags = values.force || !sameGenerator ? {} : { ...previous.tags };
+  const { tags, fingerprints } = values.force || !sameGenerator ? { tags: {}, fingerprints: {} } : reusableTags(previous, inventory.items);
   const items = new Map(inventory.items.map((item) => [item.key, item]));
   const rejections = [];
   for (const [key, kept] of Object.entries(tags)) {
-    if (!items.has(key)) {
-      delete tags[key];
-      continue;
-    }
     const { tags: clean, rejected } = cleanTags(kept, items.get(key));
     tags[key] = clean;
     if (rejected.length) rejections.push(`${key}: ${rejected.join(' | ')}`);
@@ -101,6 +97,7 @@ async function main() {
         if (!item || item.key in tags) continue;
         const { tags: kept, rejected } = cleanTags(answer.tags, item);
         tags[item.key] = kept;
+        fingerprints[item.key] = tagFingerprint(item);
         if (rejected.length) rejections.push(`${item.key}: ${rejected.join(' | ')}`);
       }
       const missing = batch.filter((item) => !(item.key in tags)).map((item) => item.key);
@@ -113,12 +110,14 @@ async function main() {
   for (const [key, { drop }] of Object.entries(exclusions)) {
     if (tags[key]) tags[key] = tags[key].filter((tag) => !drop.includes(tag));
   }
-  const changed = JSON.stringify(previous?.tags ?? {}) !== JSON.stringify(Object.fromEntries(Object.keys(tags).sort().map((key) => [key, tags[key]])));
+  const sorted = (map) => JSON.stringify(Object.fromEntries(Object.keys(map).sort().map((key) => [key, map[key]])));
+  const changed = sorted(previous?.tags ?? {}) !== sorted(tags) || sorted(previous?.fingerprints ?? {}) !== sorted(fingerprints);
   const file = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     generator: { tool: 'ollama', model: MODEL, promptVersion: PROMPT_VERSION },
     generatedAt: changed || !previous ? new Date().toLocaleDateString('en-CA') : previous.generatedAt,
     tags,
+    fingerprints,
   };
   await writeFile(TAGS_FILE, serializeTags(file), 'utf8');
   if (rejections.length) console.log(`Rejected tags (validation rules):\n  ${rejections.join('\n  ')}`);

@@ -122,6 +122,13 @@ test('cleanTags rejects era claims the caption does not make, denied words and m
   assert.deepEqual(cleanTags(null, undated), { tags: [], rejected: [] });
 });
 
+test('cleanTags keeps printed matter from being tagged as blank stationery or a guessed genre', () => {
+  const book = { name: 'GRAY BOOK', description: 'GRAY BOOK 1960S' };
+  const notebook = { name: 'STENO SPIRAL NOTEBOOK', description: 'STENO SPIRAL NOTEBOOK 1990S' };
+  assert.deepEqual(cleanTags(['notebook', 'reference book', 'novel', 'logbook', 'paperback'], book).tags, ['reference book']);
+  assert.deepEqual(cleanTags(['steno pad', 'notebook'], notebook).tags, ['steno pad', 'notebook']);
+});
+
 test('serializeTags writes sorted keys, one per line, and round-trips', () => {
   const file = { schemaVersion: 1, generator: { tool: 'ollama', model: 'm', promptVersion: 1 }, generatedAt: '2026-10-17', tags: { 'scp-2': ['b'], 'scp-1': ['a'] } };
   const text = serializeTags(file);

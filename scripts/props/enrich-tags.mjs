@@ -13,7 +13,7 @@ const TAGS_FILE = join(ROOT, 'src/data/props/tags.json');
 const EXCLUSIONS_FILE = join(ROOT, 'scripts/props/tag-exclusions.json');
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
 const MODEL = process.env.PROPS_TAG_MODEL ?? 'qwen3.6:35b';
-const PROMPT_VERSION = 1;
+const PROMPT_VERSION = 2;
 const BATCH_SIZE = 20;
 const BATCH_TIMEOUT_MS = 600_000;
 
@@ -25,8 +25,12 @@ const SYSTEM_PROMPT = [
   'For each item, return 2 to 5 short lowercase search terms a filmmaker might type to find that exact item:',
   'the everyday word for the object (for example \'megaphone\' for MEGA PHONE, or \'coin changer\' for CHANGE MACHINE),',
   'corrected spellings of misspelled words, close synonyms, and the general kind of object (such as \'telephone\', \'firearm\' or \'costume\').',
-  'Do not list places, scenes or settings. A wrong term is worse than a missing one: never name a different kind of object.',
-  'Do not use vague words such as prop, item, thing, accessory or decor on their own.',
+  'A wrong term is worse than a missing one. Never name a different kind of object, not even a related one:',
+  'a coin changer is not a vending machine or a cash register.',
+  'Printed matter (books, manuals, directories, magazines, newspapers, calendars) gets only printed-matter terms such as book, manual,',
+  'guide, directory or magazine, never blank stationery such as notebook, notepad, planner, journal, logbook or ledger.',
+  'Never guess a genre, format or binding (such as novel, paperback or hardcover) that the name does not state.',
+  'Do not list places, scenes or settings, and do not use vague words such as prop, item, thing, accessory or decor on their own.',
   'Never add colors, materials, sizes, quantities, condition, prices, availability, or claims that it works.',
   'Never add a decade, year, period or style word (such as 1960s, vintage, retro, antique or modern) unless the item\'s own name or era states it.',
   'Return JSON only.',

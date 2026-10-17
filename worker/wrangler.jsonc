@@ -1,0 +1,21 @@
+{
+  "name": "pgh-prop-search",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-07",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "ai": { "binding": "AI" },
+  "durable_objects": {
+    "bindings": [{ "name": "AI_BUDGET", "class_name": "AiBudget" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["AiBudget"] }],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://cookiesfilmfest.com,http://localhost:4321",
+    "AI_MODEL": "@cf/ibm-granite/granite-4.0-h-micro",
+    "DAILY_NEURON_BUDGET": "5000",
+    "AI_PER_MINUTE_LIMIT": "20",
+    "AI_PER_CLIENT_PER_MINUTE": "3",
+    "AI_TIMEOUT_MS": "20000"
+  }
+}

@@ -17,7 +17,7 @@
     "export-map:comedy": "node scripts/export-comedy-map-data.js",
     "props:import": "node scripts/props/import-catalog.mjs",
     "props:tags": "node scripts/props/enrich-tags.mjs",
-    "test": "npm run build && node --test tests/*.test.mjs"
+    "test": "npm run build && node --test tests/*.test.mjs worker/test/*.test.mjs"
   },
   "devDependencies": {
     "@iconify-json/fa-brands": "^1.1.8",

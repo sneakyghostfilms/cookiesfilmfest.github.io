@@ -1,5 +1,5 @@
 import { inventoryKeys, inventoryText } from './inventory.js';
-import { LIMITS, MODELS, buildRequest, estimateNeurons, readModelOutput, validateScene } from './scene.js';
+import { LIMITS, MODELS, actualNeurons, buildRequest, estimateNeurons, readModelOutput, validateScene } from './scene.js';
 
 export { AiBudget } from './budget.js';
 
@@ -134,10 +134,19 @@ function secondsUntilUtcMidnight(now) {
   return Math.ceil((midnight.getTime() - now) / 1000);
 }
 
-async function reserveBudget(env, input) {
+async function askBudget(env, action, input) {
   const stub = env.AI_BUDGET.get(env.AI_BUDGET.idFromName('global'));
-  const response = await stub.fetch('https://budget/reserve', { method: 'POST', body: JSON.stringify(input) });
+  const response = await stub.fetch(`https://budget/${action}`, { method: 'POST', body: JSON.stringify(input) });
   return response.json();
+}
+
+async function settledCharge(env, input, timeoutMs) {
+  try {
+    const { refunded } = await withTimeout(askBudget(env, 'settle', input), timeoutMs);
+    return typeof refunded === 'number' && refunded >= 0 && refunded <= input.reserved ? input.reserved - refunded : input.reserved;
+  } catch {
+    return input.reserved;
+  }
 }
 
 function usageOf(result) {
@@ -177,7 +186,7 @@ export async function handleRequest(request, env, { now: clock = Date.now, guard
   const now = clock();
   let reservation;
   try {
-    reservation = await withTimeout(reserveBudget(env, {
+    reservation = await withTimeout(askBudget(env, 'reserve', {
       now, cost, client: request.headers.get('cf-connecting-ip') ?? 'unknown',
       dailyLimit: config.dailyLimit, perMinute: config.perMinute, perClient: config.perClient,
     }), guardTimeoutMs);
@@ -204,7 +213,9 @@ export async function handleRequest(request, env, { now: clock = Date.now, guard
   } catch {
     return failure(502, 'ai_bad_output', origin);
   }
-  return reply(200, { ok: true, model: config.model, ...scene, usage: usageOf(result), chargedNeurons: Math.round(cost * 10) / 10 }, origin);
+  const actual = actualNeurons(config.model, result?.usage);
+  const charged = actual === null ? cost : await settledCharge(env, { now, reserved: cost, actual }, guardTimeoutMs);
+  return reply(200, { ok: true, model: config.model, ...scene, usage: usageOf(result), chargedNeurons: Math.round(charged * 10) / 10 }, origin);
 }
 
 export default {

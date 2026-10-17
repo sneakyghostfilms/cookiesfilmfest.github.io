@@ -68,6 +68,23 @@ export function estimateNeurons(model, request) {
   return (inputTokens * rates.inputNeuronsPerMillion + LIMITS.maxOutputTokens * rates.outputNeuronsPerMillion) / 1e6;
 }
 
+function tokensOf(usage) {
+  const count = (value) => (Number.isSafeInteger(value) && value >= 0 ? value : null);
+  const input = count(usage?.prompt_tokens);
+  const output = count(usage?.completion_tokens);
+  const reported = usage?.completion_tokens_details?.reasoning_tokens;
+  const reasoning = reported === undefined || reported === null ? 0 : count(reported);
+  if (!input || output === null || reasoning === null) return null;
+  return { input, output: output + reasoning };
+}
+
+export function actualNeurons(model, usage) {
+  const tokens = tokensOf(usage);
+  if (!tokens) return null;
+  const rates = MODELS[model];
+  return (tokens.input * rates.inputNeuronsPerMillion + tokens.output * rates.outputNeuronsPerMillion) / 1e6;
+}
+
 export function readModelOutput(result) {
   const raw = result?.response ?? result?.choices?.[0]?.message?.content;
   if (raw && typeof raw === 'object') return raw;

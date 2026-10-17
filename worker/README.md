@@ -20,11 +20,12 @@ The Worker is served from `*.workers.dev`, because cookiesfilmfest.com's DNS is 
   "required": [{ "prop": "black rotary phone", "reason": "Margaret answers it", "keys": ["scp-296"] },
                { "prop": "fax machine", "reason": "She waits by it for the Erie office", "keys": [] }],
   "optional": [{ "prop": "globe decor", "reason": "Suits a 1960s office", "keys": ["scp-038"] }],
-  "ignoredSuggestions": 0, "usage": { "inputTokens": 6762, "outputTokens": 556 }, "chargedNeurons": 208.9 }
+  "ignoredSuggestions": 0, "usage": { "inputTokens": 6762, "outputTokens": 556 }, "chargedNeurons": 76.6 }
 ```
 
 - `keys` are keys from `src/data/props/inventory.json`. Keys the model invents are dropped and counted in `ignoredSuggestions`. An empty `keys` list means no matching item was found.
 - The model usually lists props the catalog lacks with an empty `keys` list, but it can leave some out, and a scene that names more props than the lists hold gets matches for only some of them. The page therefore says under every answer: "Props not listed above were not identified or have no match in this catalog; try keyword search for them."
+- `chargedNeurons` is what the request finally cost the daily budget (see Cost guard).
 - Every error has the shape `{ "ok": false, "error": "<code>", "message": "..." }`:
 
 | Status | Codes |
@@ -51,8 +52,9 @@ One SQLite-backed Durable Object, `AiBudget`, controls every AI call. The defaul
 | `AI_PER_MINUTE_LIMIT` | `20` | requests per minute for everyone |
 | `AI_TIMEOUT_MS` | `20000` | how long to wait for the model |
 
-- **Pre-charge.** Before each call, the Worker reserves the worst case: input tokens are bounded by the UTF-8 byte length of everything sent plus 256, and output by `max_completion_tokens` (1,700). Real usage can't exceed the reservation. With gemma-4-26b-a4b-it a typical scene reserves about 205–225 Neurons, which gives roughly 22–24 scenes a day.
-- **No refunds.** The charge is never refunded, not even when the call fails, times out or reports `ai_busy`. A Workers AI outage during heavy use can therefore use up the day's budget with nothing to show for it. When the budget is gone, scene matching shows "Today's AI matching budget is used up" until midnight UTC, and keyword search keeps working.
+- **Pre-charge.** Before each call, the Worker reserves the worst case: input tokens are bounded by the UTF-8 byte length of everything sent plus 256, and output by `max_completion_tokens` (1,700). Real usage can't exceed the reservation. With gemma-4-26b-a4b-it a typical scene reserves about 205–225 Neurons.
+- **Settling.** After a successful answer whose usage is well formed, the Worker sends the object one settle request, and the object lowers the day's spend from the reservation to the actual cost: prompt tokens plus completion tokens (plus reasoning tokens, if reported) at the model's rates. It never lowers spend by more than the reservation or below zero, and a settle for a reservation made on an earlier UTC day changes nothing. A typical scene then costs about 70–90 Neurons, roughly 55–70 scenes a day.
+- **Refunds only after success.** The charge is refunded down to actual usage only after a successful answer; never on failures (`ai_failed`, `ai_timeout`, `ai_busy`, `ai_bad_output`, `quota_exhausted`, `ai_not_configured`), and not when usage is missing or malformed. If the settle request fails or doesn't answer within 3 s, the worst-case charge stands and the answer is still returned. A Workers AI outage during heavy use can therefore use up the day's budget with nothing to show for it. When the budget is gone, scene matching shows "Today's AI matching budget is used up" until midnight UTC, and keyword search keeps working.
 - **What is stored.** Durable storage holds one record, `{ day, spent }`. The per-client and per-minute counters live only in memory. They count the current minute and are reset by the first request of the next minute, so the last minute's client addresses stay in memory until then, or until Cloudflare evicts the object. Client addresses are never written to storage, logged or returned.
 - **Fails closed.** A missing or malformed var, an unknown model, or a guard that errors or doesn't answer within 3 s turns the AI off (`ai_not_configured` or `ai_unavailable`). It never runs unguarded.
 

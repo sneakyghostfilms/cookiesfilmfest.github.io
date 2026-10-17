@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { inventoryText } from '../src/inventory.js';
-import { LIMITS, MODELS, buildRequest, estimateNeurons } from '../src/scene.js';
+import { LIMITS, MODELS, actualNeurons, buildRequest, estimateNeurons } from '../src/scene.js';
 
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), '../test/fixtures/scenes');
 const DAILY_BUDGET = 5000;
@@ -64,12 +64,6 @@ function score(fixture, body) {
   };
 }
 
-function usedNeurons(model, usage) {
-  const rates = MODELS[model];
-  if (!rates || !usage) return null;
-  return (usage.inputTokens * rates.inputNeuronsPerMillion + usage.outputTokens * rates.outputNeuronsPerMillion) / 1e6;
-}
-
 const files = (await readdir(FIXTURES)).filter((file) => file.endsWith('.json')).sort();
 const fixtures = await Promise.all(files.map(async (file) => JSON.parse(await readFile(join(FIXTURES, file), 'utf8'))));
 const selected = values.scene ? fixtures.filter((fixture) => fixture.id === values.scene) : fixtures;
@@ -87,14 +81,15 @@ for (const fixture of selected) {
     rows.push({ fixture, seconds, error: `${response.status} ${body.error ?? 'no JSON'}` });
     continue;
   }
+  const known = Boolean(MODELS[body.model]);
   rows.push({
     fixture,
     seconds,
     body,
-    reserved: MODELS[body.model] ? estimateNeurons(body.model, buildRequest(inventoryText, fixture.text)) : null,
+    reserved: known ? estimateNeurons(body.model, buildRequest(inventoryText, fixture.text)) : null,
     truncated: Boolean(body.usage && body.usage.outputTokens >= LIMITS.maxOutputTokens),
     result: score(fixture, body),
-    used: usedNeurons(body.model, body.usage),
+    used: known && body.usage ? actualNeurons(body.model, { prompt_tokens: body.usage.inputTokens, completion_tokens: body.usage.outputTokens }) : null,
   });
 }
 
@@ -121,7 +116,7 @@ const scored = rows.filter((row) => !row.error);
 const sum = (pick, list = scored) => list.reduce((total, row) => total + pick(row), 0);
 const counted = sum((row) => row.result.counted);
 const countable = sum((row) => row.result.countable);
-const sparse = scored.filter((row) => !row.result.dense);
+const fitting = scored.filter((row) => !row.result.dense);
 const dense = scored.filter((row) => row.result.dense);
 const lowestCapacity = Math.min(...scored.map((row) => Math.floor(DAILY_BUDGET / row.body.chargedNeurons)));
 const checks = [
@@ -130,7 +125,7 @@ const checks = [
   ['no truncated output', scored.every((row) => !row.truncated), scored.filter((row) => row.truncated).map((row) => row.fixture.id).join(', ') || 'none'],
   [`at most ${FLOOR.invalidKeysPerScene} invalid key per scene`, scored.every((row) => row.body.ignoredSuggestions <= FLOOR.invalidKeysPerScene), scored.map((row) => row.body.ignoredSuggestions).join(', ')],
   [`at most ${FLOOR.wrongMatchesPerScene} wrong match per scene in the required list`, scored.every((row) => row.result.wrong.length <= FLOOR.wrongMatchesPerScene), scored.map((row) => row.result.wrong.length).join(', ')],
-  ['every absent prop reported as no match', sum((row) => row.result.honest, sparse) === sum((row) => row.result.absent.length, sparse), `${sum((row) => row.result.honest, sparse)}/${sum((row) => row.result.absent.length, sparse)}`],
+  ['every absent prop reported as no match', sum((row) => row.result.honest, fitting) === sum((row) => row.result.absent.length, fitting), `${sum((row) => row.result.honest, fitting)}/${sum((row) => row.result.absent.length, fitting)}`],
   [`scenes too long for the lists return at least ${LIMITS.maxRequiredProps} matched props`, dense.every((row) => row.result.withKeys >= LIMITS.maxRequiredProps), dense.map((row) => `${row.fixture.id} ${row.result.withKeys}`).join(', ') || 'none'],
   [`capacity ≥ ${FLOOR.scenesPerDay} scenes a day at ${DAILY_BUDGET} Neurons`, lowestCapacity >= FLOOR.scenesPerDay, `${lowestCapacity} for the costliest scene`],
 ];

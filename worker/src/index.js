@@ -214,7 +214,7 @@ export async function handleRequest(request, env, { now: clock = Date.now, guard
     return failure(502, 'ai_bad_output', origin);
   }
   const actual = actualNeurons(config.model, result?.usage);
-  const charged = actual === null ? cost : await settledCharge(env, { now, reserved: cost, actual }, guardTimeoutMs);
+  const charged = actual === null ? cost : await settledCharge(env, { day: reservation.day, reserved: cost, actual }, guardTimeoutMs);
   return reply(200, { ok: true, model: config.model, ...scene, usage: usageOf(result), chargedNeurons: Math.round(charged * 10) / 10 }, origin);
 }
 

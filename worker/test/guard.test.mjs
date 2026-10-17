@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { reserve } from '../src/budget.js';
 import { handleRequest } from '../src/index.js';
 import { inventoryText } from '../src/inventory.js';
 import { LIMITS, MODELS, buildRequest, estimateNeurons } from '../src/scene.js';
@@ -122,3 +123,25 @@ test('an unknown model never reaches the AI', async () => {
   assert.equal((await send(env)).body.error, 'ai_not_configured');
   assert.equal(env.AI.calls.length, 0);
 });
+
+test('a late request stamped before midnight cannot reset the new day', async () => {
+  const counters = { minute: -1, minuteCount: 0, perClient: new Map() };
+  const storage = memoryStorage();
+  const midnight = Date.UTC(2026, 9, 18);
+  const input = (now, client) => ({ now, cost: 60, client, dailyLimit: 100, perMinute: 100, perClient: 100 });
+  assert.deepEqual(await reserve(counters, storage, input(midnight + 1, 'a')), { ok: true, day: '2026-10-18' });
+  assert.deepEqual(await reserve(counters, storage, input(midnight - 1, 'b')), { ok: false, reason: 'daily' });
+  assert.deepEqual(await reserve(counters, storage, input(midnight + 2, 'c')), { ok: false, reason: 'daily' });
+  assert.deepEqual(storage.values.get('spend'), { day: '2026-10-18', spent: 60 });
+});
+
+test('a late request stamped in an earlier minute cannot reset the minute counters', async () => {
+  const counters = { minute: -1, minuteCount: 0, perClient: new Map() };
+  const storage = memoryStorage();
+  const input = (now, client) => ({ now, cost: 1, client, dailyLimit: 1000, perMinute: 2, perClient: 100 });
+  assert.equal((await reserve(counters, storage, input(NOW + 60_000, 'a'))).ok, true);
+  assert.equal((await reserve(counters, storage, input(NOW + 60_001, 'b'))).ok, true);
+  assert.deepEqual(await reserve(counters, storage, input(NOW + 59_999, 'c')), { ok: false, reason: 'minute' });
+  assert.deepEqual(await reserve(counters, storage, input(NOW + 60_002, 'd')), { ok: false, reason: 'minute' });
+});
+

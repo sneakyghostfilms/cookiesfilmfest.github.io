@@ -2,6 +2,7 @@ const SPEND_KEY = 'spend';
 
 const positive = (value) => typeof value === 'number' && Number.isFinite(value) && value > 0;
 const dayOf = (now) => new Date(now).toISOString().slice(0, 10);
+const isDay = (value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
 
 export function isReserveInput(input) {
   return Boolean(input) && positive(input.now) && positive(input.cost) && positive(input.dailyLimit)
@@ -9,12 +10,12 @@ export function isReserveInput(input) {
 }
 
 export function isSettleInput(input) {
-  return Boolean(input) && positive(input.now) && positive(input.reserved)
+  return Boolean(input) && isDay(input.day) && positive(input.reserved)
     && typeof input.actual === 'number' && Number.isFinite(input.actual) && input.actual >= 0;
 }
 
 export async function reserve(counters, storage, { now, cost, client, dailyLimit, perMinute, perClient }) {
-  const minute = Math.floor(now / 60_000);
+  const minute = Math.max(Math.floor(now / 60_000), counters.minute);
   if (counters.minute !== minute) {
     counters.minute = minute;
     counters.minuteCount = 0;
@@ -23,18 +24,17 @@ export async function reserve(counters, storage, { now, cost, client, dailyLimit
   const clientCount = counters.perClient.get(client) ?? 0;
   if (clientCount >= perClient) return { ok: false, reason: 'client' };
   if (counters.minuteCount >= perMinute) return { ok: false, reason: 'minute' };
-  const day = dayOf(now);
   const record = await storage.get(SPEND_KEY);
+  const day = record?.day > dayOf(now) ? record.day : dayOf(now);
   const spent = record?.day === day ? record.spent : 0;
   if (spent + cost > dailyLimit) return { ok: false, reason: 'daily' };
   await storage.put(SPEND_KEY, { day, spent: spent + cost });
   counters.minuteCount += 1;
   counters.perClient.set(client, clientCount + 1);
-  return { ok: true };
+  return { ok: true, day };
 }
 
-export async function settle(storage, { now, reserved, actual }) {
-  const day = dayOf(now);
+export async function settle(storage, { day, reserved, actual }) {
   const record = await storage.get(SPEND_KEY);
   if (record?.day !== day) return { ok: true, refunded: 0 };
   const refunded = Math.max(0, Math.min(record.spent, reserved - Math.min(actual, reserved)));

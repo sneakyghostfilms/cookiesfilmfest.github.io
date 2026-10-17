@@ -13,8 +13,8 @@ const priced = (input, output) => (input * MODELS[MODEL].inputNeuronsPerMillion 
 const tenths = (value) => Math.round(value * 10) / 10;
 const spent = (env) => env.AI_BUDGET.storage.values.get('spend').spent;
 
-async function send(env, { ip } = {}) {
-  const response = await handleRequest(sceneRequest(SCENE, { ip }), env, fixedClock());
+async function send(env, { ip, now } = {}) {
+  const response = await handleRequest(sceneRequest(SCENE, { ip }), env, fixedClock(now));
   return { status: response.status, body: await response.json() };
 }
 
@@ -111,12 +111,12 @@ test('a settle that fails, hangs or answers nonsense leaves the 200 and the wors
 test('settling never raises spend, never goes below zero and never refunds more than the reservation', async () => {
   const storage = memoryStorage();
   await storage.put('spend', { day: DAY, spent: 300 });
-  assert.deepEqual(await settle(storage, { now: NOW, reserved: 200, actual: 250 }), { ok: true, refunded: 0 });
+  assert.deepEqual(await settle(storage, { day: DAY, reserved: 200, actual: 250 }), { ok: true, refunded: 0 });
   assert.equal(storage.values.get('spend').spent, 300);
-  assert.deepEqual(await settle(storage, { now: NOW, reserved: 200, actual: 50 }), { ok: true, refunded: 150 });
+  assert.deepEqual(await settle(storage, { day: DAY, reserved: 200, actual: 50 }), { ok: true, refunded: 150 });
   assert.equal(storage.values.get('spend').spent, 150);
   await storage.put('spend', { day: DAY, spent: 40 });
-  assert.deepEqual(await settle(storage, { now: NOW, reserved: 200, actual: 0 }), { ok: true, refunded: 40 });
+  assert.deepEqual(await settle(storage, { day: DAY, reserved: 200, actual: 0 }), { ok: true, refunded: 40 });
   assert.equal(storage.values.get('spend').spent, 0);
 });
 
@@ -124,21 +124,32 @@ test('a settle for a reservation made on an earlier UTC day leaves the new day a
   const storage = memoryStorage();
   const nextDay = new Date(NOW + 86_400_000).toISOString().slice(0, 10);
   await storage.put('spend', { day: nextDay, spent: 210 });
-  assert.deepEqual(await settle(storage, { now: NOW, reserved: 200, actual: 70 }), { ok: true, refunded: 0 });
+  assert.deepEqual(await settle(storage, { day: DAY, reserved: 200, actual: 70 }), { ok: true, refunded: 0 });
   assert.equal(storage.values.get('spend').spent, 210);
+});
+
+test('a late request stamped before midnight is charged and settled on the new day', async () => {
+  const midnight = Date.UTC(2026, 9, 18);
+  const env = makeEnv({ AI: fakeAI(() => answer(goodOutput(), USAGE)), AI_PER_CLIENT_PER_MINUTE: '100' });
+  assert.equal((await send(env, { ip: '192.0.2.1', now: midnight + 1 })).status, 200);
+  assert.equal((await send(env, { ip: '192.0.2.2', now: midnight - 1 })).status, 200);
+  const record = env.AI_BUDGET.storage.values.get('spend');
+  assert.equal(record.day, '2026-10-18');
+  assert.ok(Math.abs(record.spent - 2 * priced(7000, 450)) < 1e-9, String(record.spent));
 });
 
 test('the budget object refuses malformed settle input and unknown actions without writing', async () => {
   const budget = budgetNamespace();
   const inputs = [
-    null, {}, { now: NOW, reserved: 200 }, { now: NOW, reserved: 200, actual: -1 }, { now: NOW, reserved: 0, actual: 5 },
-    { now: NOW, reserved: 200, actual: Number.NaN }, { now: NOW, reserved: '200', actual: 5 },
+    null, {}, { day: DAY, reserved: 200 }, { day: DAY, reserved: 200, actual: -1 }, { day: DAY, reserved: 0, actual: 5 },
+    { day: DAY, reserved: 200, actual: Number.NaN }, { day: DAY, reserved: '200', actual: 5 },
+    { now: NOW, reserved: 200, actual: 5 }, { day: 'yesterday', reserved: 200, actual: 5 },
   ];
   for (const input of inputs) {
     const response = await budget.get().fetch('https://budget/settle', { method: 'POST', body: JSON.stringify(input) });
     assert.equal(response.status, 400, JSON.stringify(input));
   }
-  const unknown = await budget.get().fetch('https://budget/refund', { method: 'POST', body: JSON.stringify({ now: NOW, reserved: 200, actual: 5 }) });
+  const unknown = await budget.get().fetch('https://budget/refund', { method: 'POST', body: JSON.stringify({ day: DAY, reserved: 200, actual: 5 }) });
   assert.equal(unknown.status, 400);
   assert.equal(budget.storage.writes.length, 0);
 });

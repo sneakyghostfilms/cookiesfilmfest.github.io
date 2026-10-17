@@ -1,0 +1,36 @@
+{
+  "pageCount": 49,
+  "sections": [
+    { "page": 2, "title": "INDEX" },
+    { "page": 4, "title": "THE OFFICE" },
+    { "page": 10, "title": "HOUSEWARES" },
+    { "page": 16, "title": "UNIFORMS" },
+    { "page": 32, "title": "MENSWEAR" },
+    { "page": 35, "title": "WOMENSWEAR" },
+    { "page": 38, "title": "WEAPONS" },
+    { "page": 44, "title": "MISCELLANEOUS" }
+  ],
+  "cards": [
+    { "page": 5, "printedIds": ["[056]"], "captionLines": ["GREEN CHANGE", "MACHINE", "1960S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 6, "printedIds": ["[027]"], "captionLines": ["RETRO OFFICE", "SUPPLIES BUNDLE", "1960S/70S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 6, "printedIds": ["[027]"], "captionLines": ["RETRO OFFICE", "SUPPLIES BUNDLE", "1960S/70S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 6, "printedIds": ["[035]"], "captionLines": ["GOLDEN SCALES", "DECOR"], "droppedLines": [], "imageCount": 1 },
+    { "page": 7, "printedIds": ["[286]"], "captionLines": ["BLACK OFFICE", "PHONE", "1990S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 8, "printedIds": ["[286]"], "captionLines": ["COKER TIRE", "NEWSPAPER", "07/11/1991"], "droppedLines": [], "imageCount": 1 },
+    { "page": 13, "printedIds": ["[054]"], "captionLines": ["BLACK ROTARY", "PHONE", "1960S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 13, "printedIds": ["[054]"], "captionLines": ["ALL-BLACK ROTARY", "PHONE", "1960S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 15, "printedIds": ["[348]"], "captionLines": ["JUICYFRUIT PLENT-PAK", "BUBBLDE GUM,", "2000S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 15, "printedIds": ["[336]"], "captionLines": ["BAZOOKA BUBBLE GUM", "UNOPENED, 2000S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 15, "printedIds": ["[340]"], "captionLines": ["MISC PRINTED PHOTO SLEEVES", "(KODAK, COOL PRINTS &", "NEGATIVE, FILMWORKS)", "1980S - 2000S"], "droppedLines": [], "imageCount": 1 },
+    { "page": 20, "printedIds": ["[132"], "captionLines": ["CCAC NURSING", "SCHOOL JACKET"], "droppedLines": [], "imageCount": 1 },
+    { "page": 25, "printedIds": ["[362]"], "captionLines": ["HEAVY DUTY FIRST", "RESPONDERS HI-VIS", "JACKET"], "droppedLines": ["XL"], "imageCount": 1 },
+    { "page": 28, "printedIds": ["[108]"], "captionLines": ["BEIGE SOVIET ERA", "GAS MASK"], "droppedLines": [], "imageCount": 1 },
+    { "page": 31, "printedIds": ["[108]"], "captionLines": ["PARK RANGER", "BUNDLE"], "droppedLines": [], "imageCount": 1 },
+    { "page": 33, "printedIds": ["[015]", "[017]", "[016]"], "captionLines": ["BROWN,", "BROWN POLKA DOTS,", "& PINK STRIPPED TIES"], "droppedLines": [], "imageCount": 1 },
+    { "page": 33, "printedIds": ["[108]"], "captionLines": ["PARK RANGER", "BUNDLE"], "droppedLines": [], "imageCount": 1 },
+    { "page": 36, "printedIds": ["[098]"], "captionLines": ["BLACK SEQUINS", "TANK TOP", "Y2K STYLE"], "droppedLines": [], "imageCount": 1 },
+    { "page": 39, "printedIds": ["[118]"], "captionLines": ["STEN MACHINE PROP", "GUN REPLICA,", "WWII ERA"], "droppedLines": [], "imageCount": 1 },
+    { "page": 46, "printedIds": ["284"], "captionLines": ["WHITE MEGA", "PHONE"], "droppedLines": [], "imageCount": 1 },
+    { "page": 46, "printedIds": [], "captionLines": ["UNNUMBERED PROP"], "droppedLines": [], "imageCount": 1 }
+  ]
+}

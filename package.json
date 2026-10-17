@@ -15,6 +15,7 @@
     "export-map": "node scripts/export-map-data.js",
     "geocode:comedy": "node scripts/geocode-comedy-festivals.js",
     "export-map:comedy": "node scripts/export-comedy-map-data.js",
+    "props:import": "node scripts/props/import-catalog.mjs",
     "test": "npm run build && node --test tests/*.test.mjs"
   },
   "devDependencies": {

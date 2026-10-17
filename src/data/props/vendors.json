@@ -1,0 +1,28 @@
+{
+  "vendors": [
+    {
+      "id": "steel-city-props",
+      "name": "Steel City Props",
+      "keyPrefix": "scp",
+      "region": "Pittsburgh, PA",
+      "contact": {
+        "formUrl": "https://forms.gle/JJqcgmxkJFwqKLXF9",
+        "email": "steelcitypropsllc@gmail.com",
+        "hubUrl": "https://linktr.ee/steelcityprops",
+        "source": "Catalog page 3; the same form and email are linked from the vendor's Linktree"
+      },
+      "inquiryHint": "Their form asks for the item number printed at the top left of each catalog photo. Pricing is by quote.",
+      "catalogs": [
+        {
+          "id": "scp-2026-09-30",
+          "title": "Steel City Props 2026 Rental Catalog",
+          "version": "2026-09-30",
+          "fileName": "Steel City Props 2026 Rental Catalog 93026.pdf",
+          "sha256": "eb99107731a9fa9fba303911e3a61f018e52964c0288357e565071e7fdbdbafa",
+          "pageCount": 49,
+          "sourceUrl": "https://drive.google.com/file/d/1cJY8nQRyVa80l0_pCCeGHrN2QuuO7Avd/view"
+        }
+      ]
+    }
+  ]
+}

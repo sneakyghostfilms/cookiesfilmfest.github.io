@@ -1,5 +1,5 @@
 export const SCENE_LIMITS = { minChars: 20, maxChars: 4000 };
-const DEFAULT_TIMEOUT_MS = 30_000;
+export const SCENE_TIMEOUT_MS = 40_000;
 const INVALID = new Set(['invalid_json', 'text_required', 'text_too_short', 'text_too_long', 'payload_too_large']);
 
 export function checkSceneText(text) {
@@ -26,7 +26,7 @@ function stateFor(response, body, now) {
   return { kind: 'error' };
 }
 
-export async function requestScene(apiUrl, text, { fetch: send = globalThis.fetch, timeoutMs = DEFAULT_TIMEOUT_MS, now = Date.now } = {}) {
+export async function requestScene(apiUrl, text, { fetch: send = globalThis.fetch, timeoutMs = SCENE_TIMEOUT_MS, now = Date.now } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {

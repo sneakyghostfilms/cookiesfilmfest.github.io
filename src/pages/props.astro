@@ -309,7 +309,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         }
         sceneSubmit.disabled = true;
         sceneResults.replaceChildren();
-        showStatus("Matching props… this usually takes 5 to 20 seconds.");
+        showStatus("Matching props… this can take up to about 30 seconds for long scenes.");
         const state = await requestScene(apiUrl, sceneText.value);
         sceneSubmit.disabled = false;
         if (state.kind === "ok") {

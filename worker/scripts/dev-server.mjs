@@ -11,7 +11,7 @@ const { values } = parseArgs({
     ai: { type: 'string', default: 'mock' },
     port: { type: 'string', default: '8787' },
     'daily-budget': { type: 'string', default: '5000' },
-    'timeout-ms': { type: 'string', default: '20000' },
+    'timeout-ms': { type: 'string', default: '30000' },
     delay: { type: 'string', default: '1500' },
   },
 });

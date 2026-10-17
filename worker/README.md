@@ -50,7 +50,7 @@ One SQLite-backed Durable Object, `AiBudget`, controls every AI call. The defaul
 | `DAILY_NEURON_BUDGET` | `5000` | Workers AI Neurons per UTC day. That is half of the account's free daily 10,000. |
 | `AI_PER_CLIENT_PER_MINUTE` | `3` | requests per client address per minute |
 | `AI_PER_MINUTE_LIMIT` | `20` | requests per minute for everyone |
-| `AI_TIMEOUT_MS` | `20000` | how long to wait for the model |
+| `AI_TIMEOUT_MS` | `30000` | how long to wait for the model; long scenes can take about 20 s |
 
 - **Pre-charge.** Before each call, the Worker reserves the worst case: input tokens are bounded by the UTF-8 byte length of everything sent plus 256, and output by `max_completion_tokens` (1,700). Real usage can't exceed the reservation. With gemma-4-26b-a4b-it a typical scene reserves about 205–225 Neurons.
 - **Settling.** After a successful answer whose usage is well formed, the Worker sends the object one settle request, and the object lowers the day's spend from the reservation to the actual cost: prompt tokens plus completion tokens (plus reasoning tokens, if reported) at the model's rates. It never lowers spend by more than the reservation or below zero, and a settle for a reservation made on an earlier UTC day changes nothing. A typical scene then costs about 70–90 Neurons, roughly 55–70 scenes a day.

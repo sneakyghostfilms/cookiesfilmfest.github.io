@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { checkSceneText, keepKnownKeys, requestScene } from '../src/scripts/props-scene.js';
+import { SCENE_TIMEOUT_MS, checkSceneText, keepKnownKeys, requestScene } from '../src/scripts/props-scene.js';
+import { GUARD_TIMEOUT_MS } from '../worker/src/index.js';
 
 const API = 'https://pgh-prop-search.example.workers.dev/';
 const NOW = Date.UTC(2026, 9, 17, 16, 0, 0);
@@ -79,4 +81,10 @@ test('the page shows only items it knows, and counts the rest as ignored', () =>
   assert.deepEqual(kept.required, [{ prop: 'phone', reason: 'r', keys: ['scp-056'] }]);
   assert.deepEqual(kept.optional, [{ prop: 'lamp', reason: 'r', keys: [] }]);
   assert.equal(kept.ignored, 2);
+});
+
+test('the page waits longer than the Worker can take to answer', async () => {
+  const { vars } = JSON.parse(await readFile(new URL('../worker/wrangler.jsonc', import.meta.url), 'utf8'));
+  const workerAnswersWithin = Number(vars.AI_TIMEOUT_MS) + 2 * GUARD_TIMEOUT_MS;
+  assert.ok(SCENE_TIMEOUT_MS > workerAnswersWithin, `client ${SCENE_TIMEOUT_MS} ms vs Worker ${workerAnswersWithin} ms`);
 });

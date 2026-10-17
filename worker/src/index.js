@@ -3,7 +3,7 @@ import { LIMITS, MODELS, actualNeurons, buildRequest, estimateNeurons, readModel
 
 export { AiBudget } from './budget.js';
 
-const GUARD_TIMEOUT_MS = 3000;
+export const GUARD_TIMEOUT_MS = 3000;
 const NOT_CONFIGURED_CODES = new Set([5035, 5016, 5007, 3042, 3023, 5018, 3041]);
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',

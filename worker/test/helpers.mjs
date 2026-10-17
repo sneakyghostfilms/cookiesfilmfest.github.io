@@ -65,7 +65,7 @@ export function makeEnv(overrides = {}) {
     DAILY_NEURON_BUDGET: '5000',
     AI_PER_MINUTE_LIMIT: '20',
     AI_PER_CLIENT_PER_MINUTE: '3',
-    AI_TIMEOUT_MS: '20000',
+    AI_TIMEOUT_MS: '30000',
     AI: fakeAI(),
     AI_BUDGET: budgetNamespace(),
     ...overrides,

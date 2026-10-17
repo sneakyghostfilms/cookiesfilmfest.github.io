@@ -1,7 +1,6 @@
+import { GUARD_TIMEOUT_MS } from './budget.js';
 import { inventoryKeys, inventoryText } from './inventory.js';
 import { LIMITS, MODELS, actualNeurons, buildRequest, estimateNeurons, plainText, readModelOutput, validateScene } from './scene.js';
-
-import { GUARD_TIMEOUT_MS } from './budget.js';
 
 export { AiBudget } from './budget.js';
 

@@ -153,6 +153,8 @@ def read_page(page):
             "droppedLines": dropped,
             "imageCount": frame["images"],
             "hasPill": frame["pill"] is not None,
+            "box": [round(frame[edge], 2) for edge in ("x0", "top", "x1", "bottom")],
+            "pageHeight": round(float(page.height), 2),
         })
     big_words = [w for w in words if w["size"] >= SECTION_TITLE_SIZE]
     title = " ".join(" ".join(w["text"] for w in line) for line in group_lines(big_words))

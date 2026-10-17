@@ -1,46 +1,17 @@
 #!/usr/bin/env node
 
-import { createHash } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
-import { createReadStream, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
+import { ROOT, VENDORS_FILE, extractCatalog, findCatalog, sha256 } from './catalog-pdf.mjs';
 import { buildItems, checkItems, replaceCatalog, serializeInventory } from './normalize.mjs';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
-const EXTRACTOR = join(ROOT, 'scripts/props/extract_catalog.py');
-const VENDORS_FILE = join(ROOT, 'src/data/props/vendors.json');
 const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 
 function fail(message) {
   console.error(`❌ ${message}`);
   process.exit(1);
-}
-
-async function sha256(path) {
-  const hash = createHash('sha256');
-  for await (const chunk of createReadStream(path)) hash.update(chunk);
-  return hash.digest('hex');
-}
-
-function findCatalog(vendors, digest) {
-  for (const vendor of vendors.vendors) {
-    const catalog = vendor.catalogs.find((entry) => entry.sha256 === digest);
-    if (catalog) return { vendor, catalog };
-  }
-  return null;
-}
-
-function extract(pdf, pages, sheetsDir) {
-  const args = ['-I', EXTRACTOR, pdf];
-  if (pages) args.push('--pages', pages);
-  if (sheetsDir) args.push('--sheets-dir', sheetsDir);
-  const run = spawnSync('python3', args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  if (run.error) fail(`Could not run python3: ${run.error.message}`);
-  if (run.status !== 0) fail(`Extractor failed (exit ${run.status}):\n${run.stderr}`);
-  return JSON.parse(run.stdout);
 }
 
 function structuralProblems(extraction) {
@@ -102,7 +73,7 @@ async function main() {
   if (!match) fail(`The PDF's sha256 (${digest}) matches no catalog in src/data/props/vendors.json. Add or update that catalog entry first.`);
   const { vendor, catalog } = match;
   const pages = values.pages ? values.pages.split(',').map(Number) : null;
-  const extraction = extract(pdf, values.pages, values['sheets-dir'] && resolve(values['sheets-dir']));
+  const extraction = extractCatalog(pdf, { pages: values.pages, sheetsDir: values['sheets-dir'] && resolve(values['sheets-dir']) });
   const items = buildItems(extraction, { vendor, catalog });
   const itemPages = report(extraction, items, catalog, pages);
   const problems = [

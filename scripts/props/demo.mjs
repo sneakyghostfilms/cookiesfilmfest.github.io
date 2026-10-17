@@ -1,0 +1,120 @@
+#!/usr/bin/env node
+
+import { spawn, spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createServer } from 'node:net';
+import { isAbsolute, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
+import { ROOT, VENDORS_FILE, extractCatalog, findCatalog, sha256 } from './catalog-pdf.mjs';
+import { pdfBox, readDemoManifest } from './demo-links.mjs';
+import { buildItems, cardIdentity, identityOf } from './normalize.mjs';
+
+export const DEMO_DIR = join(ROOT, '.props-demo');
+const CROPPER = join(ROOT, 'scripts/props/crop_thumbs.py');
+const DEMO_PORT = 4321;
+const DEMO_API_URL = 'https://pgh-prop-search.sdanzig.workers.dev';
+
+export function privateOutputProblem(path, root = ROOT) {
+  const resolved = resolve(root, path);
+  const inside = relative(root, resolved);
+  if (inside.startsWith('..') || isAbsolute(inside)) return `${resolved} is outside the repository`;
+  const top = inside.split(/[\\/]/)[0];
+  if (top === 'public' || top === 'src') return `${resolved} is under ${top}/`;
+  const check = spawnSync('git', ['-C', root, 'check-ignore', '-q', join(resolved, 'probe.webp')]);
+  if (check.status !== 0) return `git does not ignore ${resolved}`;
+  return null;
+}
+
+function assertPrivate(directory) {
+  const problem = privateOutputProblem(directory);
+  if (problem) throw new Error(`Refusing to write vendor photos: ${problem}`);
+}
+
+async function buildAssets(pdfPath) {
+  const thumbs = join(DEMO_DIR, 'thumbs');
+  const catalogs = join(DEMO_DIR, 'catalogs');
+  for (const directory of [DEMO_DIR, thumbs, catalogs]) assertPrivate(directory);
+  const vendors = JSON.parse(await readFile(VENDORS_FILE, 'utf8'));
+  const digest = await sha256(pdfPath);
+  const match = findCatalog(vendors, digest);
+  if (!match) throw new Error(`The PDF's sha256 (${digest}) matches no catalog in src/data/props/vendors.json.`);
+  const { catalog } = match;
+  console.log(`Building local demo assets for ${catalog.id}…`);
+  const extraction = extractCatalog(pdfPath);
+  const firstCards = new Map();
+  for (const card of extraction.cards) if (!firstCards.has(cardIdentity(card))) firstCards.set(cardIdentity(card), card);
+  const cards = new Map(buildItems(extraction, match).map((item) => [item.key, firstCards.get(identityOf(item))]));
+  await mkdir(thumbs, { recursive: true });
+  await mkdir(catalogs, { recursive: true });
+  const planFile = join(DEMO_DIR, 'crop-plan.json');
+  await writeFile(planFile, JSON.stringify(Object.fromEntries([...cards].map(([key, card]) => [key, { page: card.page, box: card.box }]))));
+  const run = spawnSync('python3', ['-I', '-B', CROPPER, pdfPath, planFile, thumbs], { cwd: ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+  await rm(planFile, { force: true });
+  if (run.status !== 0) throw new Error(`Cropping failed (exit ${run.status}):\n${run.stderr}`);
+  const sizes = JSON.parse(run.stdout);
+  await copyFile(pdfPath, join(catalogs, `${catalog.id}.pdf`));
+  const previous = readDemoManifest(DEMO_DIR);
+  const items = [...cards].map(([key, card]) => [key, {
+    catalog: catalog.id,
+    page: card.page,
+    box: pdfBox(card.box, card.pageHeight),
+    thumb: { width: sizes[key][0], height: sizes[key][1] },
+  }]);
+  const manifest = {
+    schemaVersion: 1,
+    catalogs: { ...previous?.catalogs, [catalog.id]: { sha256: digest } },
+    items: Object.fromEntries([...Object.entries(previous?.items ?? {}).filter(([, entry]) => entry.catalog !== catalog.id), ...items]),
+  };
+  await writeFile(join(DEMO_DIR, 'manifest.json'), `${JSON.stringify(manifest, null, 1)}\n`);
+  console.log(`✅ ${items.length} thumbnails, the catalog PDF and manifest.json are in .props-demo/`);
+}
+
+async function hasAssets(catalog) {
+  const copy = join(DEMO_DIR, 'catalogs', `${catalog.id}.pdf`);
+  return existsSync(copy) && readDemoManifest(DEMO_DIR)?.catalogs?.[catalog.id]?.sha256 === catalog.sha256 && (await sha256(copy)) === catalog.sha256;
+}
+
+function assertPortFree(port) {
+  return Promise.all(['127.0.0.1', '::1'].map((host) => new Promise((done, reject) => {
+    const probe = createServer();
+    probe.once('error', (error) => (error.code === 'EADDRINUSE'
+      ? reject(new Error(`Port ${port} is in use. Stop whatever is running there first: the Worker only answers http://localhost:${port}.`))
+      : done()));
+    probe.listen(port, host, () => probe.close(done));
+  })));
+}
+
+async function serve(pdfPath) {
+  const vendors = JSON.parse(await readFile(VENDORS_FILE, 'utf8'));
+  const supplied = pdfPath ? await sha256(pdfPath) : null;
+  for (const catalog of vendors.vendors.flatMap((vendor) => vendor.catalogs)) {
+    if (await hasAssets(catalog)) continue;
+    if (supplied !== catalog.sha256) {
+      throw new Error(`No local demo assets for "${catalog.title}". Run: npm run props:demo -- --pdf "/path/to/that catalog.pdf"`);
+    }
+    await buildAssets(pdfPath);
+  }
+  await assertPortFree(DEMO_PORT);
+  const env = { ...process.env, PROPS_DEMO: '1', PUBLIC_PROPS_API_URL: process.env.PUBLIC_PROPS_API_URL || DEMO_API_URL };
+  const child = spawn('npx', ['astro', 'dev', '--port', String(DEMO_PORT)], { cwd: ROOT, stdio: 'inherit', env });
+  child.on('exit', (code, signal) => process.exit(code ?? (signal ? 1 : 0)));
+}
+
+async function main() {
+  const [mode, ...rest] = process.argv.slice(2);
+  const { values } = parseArgs({ args: rest, options: { pdf: { type: 'string' } } });
+  const pdf = values.pdf && resolve(values.pdf);
+  if (pdf && !existsSync(pdf)) throw new Error(`No such file: ${pdf}`);
+  if (mode === 'assets' && pdf) return buildAssets(pdf);
+  if (mode === 'serve') return serve(pdf);
+  throw new Error('Usage: npm run props:demo [-- --pdf "<catalog.pdf>"]  or  npm run props:demo-assets -- --pdf "<catalog.pdf>"');
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(`❌ ${error.message}`);
+    process.exit(1);
+  });
+}

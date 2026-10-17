@@ -6,11 +6,13 @@ import inventory from "../data/props/inventory.json";
 import tagsData from "../data/props/tags.json";
 import propsConfig from "../data/props/config.json";
 import { displayEra } from "../../scripts/props/normalize.mjs";
+import { DEMO_STYLES, DEMO_URL, demoCatalogHref, readDemoManifest } from "../../scripts/props/demo-links.mjs";
 import { compareByName } from "../scripts/props-search.js";
 
 const { generator } = Astro;
 const apiUrl: string = import.meta.env.PUBLIC_PROPS_API_URL || propsConfig.apiUrl;
 const description = "Search Pittsburgh prop rental catalogs in plain English, with item numbers, catalog pages and how to inquire.";
+const demo = process.env.PROPS_DEMO === "1" ? readDemoManifest() : null;
 
 const catalogs = new Map(
   vendorsData.vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { ...catalog, vendor }])),
@@ -29,13 +31,16 @@ const cards = inventory.items
   .sort(compareByName)
   .map((item) => {
     const catalog = catalogs.get(item.catalog)!;
+    const position = demo?.items?.[item.key];
     return {
       ...item,
       vendorName: catalog.vendor.name,
       ids: idsLabel(item.itemNumbers),
       era: item.era ? displayEra(item.era) : null,
       pageText: pagesLabel(item.pages),
-      sourceUrl: catalog.sourceUrl,
+      catalogHref: position ? demoCatalogHref(position) : catalog.sourceUrl,
+      catalogLabel: position ? "Open catalog (local PDF)" : "Open catalog on Google Drive",
+      thumb: position ? { src: `${DEMO_URL}/thumbs/${item.key}.webp`, ...position.thumb } : null,
       formUrl: catalog.vendor.contact.formUrl,
       tags: (tagsData.tags as Record<string, string[]>)[item.key] ?? [],
     };
@@ -73,6 +78,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         <h1 class="props-title">Pittsburgh Prop Search</h1>
         <p class="props-subtitle">Search local prop rental catalogs in plain English.</p>
         <a href="/" class="props-back">Back to Main Site</a>
+        {demo && <p class="props-demo-marker"><span>Local demo, not public</span></p>}
       </header>
 
       <section class="props-box props-about">
@@ -124,6 +130,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         <ol id="props-results" class="props-results">
           {cards.map((card) => (
             <li class="prop-card" data-key={card.key} data-categories={card.categories.join("|")} data-decades={card.decades.join(" ")} data-order={card.order}>
+              {card.thumb && <img class="prop-thumb" src={card.thumb.src} width={card.thumb.width} height={card.thumb.height} alt={card.description} loading="lazy" decoding="async" />}
               <p class="prop-line">
                 <span class="prop-vendor">{card.vendorName}</span> · <span class="prop-ids">{card.ids}</span> · <span class="prop-name">{card.name}</span>{card.era && <> · <span class="prop-era">{card.era}</span></>} · <span class="prop-page">{card.pageText}</span>
               </p>
@@ -131,8 +138,9 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
               {card.tags.length > 0 && (
                 <p class="prop-tags">AI-suggested search terms: <span class="prop-tag-list">{card.tags.join(", ")}</span></p>
               )}
+              {card.thumb && <p class="prop-photo">Photo: {card.vendorName} catalog</p>}
               <p class="prop-actions">
-                <a href={card.sourceUrl} target="_blank" rel="noopener noreferrer">Open catalog on Google Drive</a>
+                <a href={card.catalogHref} target="_blank" rel="noopener noreferrer">{card.catalogLabel}</a>
                 <a href={card.formUrl} target="_blank" rel="noopener noreferrer">Inquire</a>
               </p>
               <p class="prop-cite">When you inquire, cite {card.ids} · {card.name} · {card.pageText}</p>
@@ -337,6 +345,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
       });
     </script>
 
+    {demo && <style is:inline set:html={DEMO_STYLES}></style>}
     <style is:global>
       .props-page {
         --pp-paper: #f5f6f7;

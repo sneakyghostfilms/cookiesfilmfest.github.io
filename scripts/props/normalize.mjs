@@ -53,13 +53,21 @@ function categoryFor(page, sections) {
   return before.length ? before[before.length - 1].title : null;
 }
 
+export function identityOf({ itemNumbers, description }) {
+  return `${itemNumbers.join("-")}|${description}`;
+}
+
+export function cardIdentity(card) {
+  return identityOf({ itemNumbers: itemNumbersOf(card.printedIds), description: card.captionLines.join(" ") });
+}
+
 export function buildItems({ cards, sections }, { vendor, catalog }) {
   const groups = new Map();
   for (const card of cards) {
     const itemNumbers = itemNumbersOf(card.printedIds);
     const { nameLines, era } = splitEra(card.captionLines);
     const description = card.captionLines.join(" ");
-    const identity = `${itemNumbers.join("-")}|${description}`;
+    const identity = cardIdentity(card);
     const category = categoryFor(card.page, sections);
     const existing = groups.get(identity);
     if (existing) {

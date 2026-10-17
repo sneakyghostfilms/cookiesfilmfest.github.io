@@ -115,6 +115,20 @@ Festival coordinates are stored separately in `src/data/festival-locations.json`
 7. Redeploy the Worker (`cd worker && npx wrangler deploy`), because it bundles the inventory.
 8. Push.
 
+#### Local demo mode (private, never published)
+A local-only version of `/props` for screenshare pitches. It adds photo thumbnails cropped from the vendor's PDF and "Open catalog (local PDF)" links that open a local copy at the item's page, zoomed to its photo. Scene matching goes through the Worker.
+- **First run:** `npm run props:demo -- --pdf "/path/to/catalog.pdf"`. This checks the PDF's sha256 against `vendors.json` and builds `.props-demo/` (about 350 WebP thumbnails, a copy of the PDF, and `manifest.json` with each item's page and photo position). It then starts the dev server at http://localhost:4321/props with `PROPS_DEMO=1` and the Worker URL set for that process only.
+- **Later runs:** `npm run props:demo`. To rebuild the assets, run `npm run props:demo-assets -- --pdf "…"`.
+- **Port 4321 must be free.** The Worker only answers that origin, so the command stops instead of moving to another port.
+- **Never commit or publish these files.**
+  - `.props-demo/` is gitignored and sits outside `public/` and `src/`, so no build copies it.
+  - The scripts refuse to write anywhere git doesn't ignore, or under `public/` or `src/`.
+  - `astro build` refuses to run with `PROPS_DEMO=1`.
+  - `npm test` fails if a `.pdf`, or any `.webp` other than the site's own two, is tracked.
+  - `git add -f` bypasses all of this, and the repository is public, so never force-add anything from `.props-demo/`.
+- **Without `PROPS_DEMO=1`, `/props` is byte-for-byte unchanged.** The assets are served only by the dev server, under `/props-demo/`. The Vite dev server also serves project files, but only on localhost.
+- **Browser support for the PDF links:** Chrome's built-in viewer opens the item's page and photo with `#page=N&zoom=150,left,top`. Firefox and Safari are untested.
+
 ### Styling Approach
 - Uses Tailwind CSS utility classes throughout
 - Theme colors are CSS variables (--color-primary, --color-secondary, etc.)

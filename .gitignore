@@ -21,6 +21,12 @@ pnpm-debug.log*
 # wrangler state
 worker/.wrangler/
 
+# Python bytecode
+__pycache__/
+
+# local demo assets: vendor photos and catalog PDFs, never committed (see CLAUDE.md, Local demo mode)
+.props-demo/
+
 # macOS-specific files
 .DS_Store
 

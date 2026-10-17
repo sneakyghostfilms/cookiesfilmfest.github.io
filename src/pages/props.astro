@@ -1,5 +1,6 @@
 ---
 import "../styles/index.css";
+import "@fontsource-variable/inter";
 import vendorsData from "../data/props/vendors.json";
 import inventory from "../data/props/inventory.json";
 import tagsData from "../data/props/tags.json";
@@ -65,8 +66,6 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
     <meta property="og:type" content="website" />
     <meta property="og:description" content={description} />
 
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body class="props-page">
     <div class="props-wrap">
@@ -155,6 +154,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
       ))}
 
       <p class="props-footer">Prop owners: want your inventory listed, corrected or removed? <a href="/#contact">Contact us</a>. Know another Pittsburgh prop source? <a href="/#contact">Let us know</a>.</p>
+      <p class="props-byline"><a href="/">A Cookies &amp; Comedy Film Festival project</a></p>
     </div>
 
     <script>
@@ -339,11 +339,19 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
 
     <style is:global>
       .props-page {
+        --pp-paper: #f5f6f7;
+        --pp-surface: #ffffff;
+        --pp-ink: #000000;
+        --pp-muted: #4b5157;
+        --pp-rule: #d5d8dc;
+        --pp-field: #767c83;
+        --pp-gold: #ffb612;
         margin: 0;
-        background-color: #000000;
-        color: var(--color-text);
-        font-family: "Fredoka", sans-serif;
-        font-weight: 500;
+        background-color: var(--pp-paper);
+        color: var(--pp-ink);
+        font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+        font-size: 15px;
+        font-weight: 400;
         line-height: 1.5;
       }
 
@@ -352,126 +360,258 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
       }
 
       .props-page .props-wrap {
-        max-width: 1100px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 2rem 1.25rem 3rem;
+        padding: 24px 32px 40px;
+      }
+
+      .props-page h1,
+      .props-page h2,
+      .props-page h3,
+      .props-page h4 {
+        font-family: inherit;
+        color: var(--pp-ink);
+        letter-spacing: normal;
+        line-height: 1.25;
+        margin: 0;
+      }
+
+      .props-page a {
+        color: var(--pp-ink);
+        font-weight: inherit;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+        transition: none;
+      }
+
+      .props-page a::after {
+        display: none;
+      }
+
+      .props-page strong {
+        color: var(--pp-ink);
+        font-weight: 700;
+      }
+
+      .props-page a:hover {
+        color: var(--pp-ink);
+        text-decoration-thickness: 2px;
+      }
+
+      .props-page :is(a, button, input, select, textarea, summary):focus {
+        box-shadow: none;
+      }
+
+      .props-page :is(a, button, input, select, textarea, summary):focus-visible {
+        outline: 3px solid var(--pp-ink);
+        outline-offset: 2px;
       }
 
       .props-page .props-header {
-        text-align: center;
-        padding: 2rem 0 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 4px 24px;
+        padding: 0 0 16px;
+        margin: 0 0 20px;
+        border-bottom: 2px solid var(--pp-ink);
       }
 
       .props-page .props-title {
-        color: var(--color-background-offset);
-        font-size: 3rem;
-        margin-bottom: 0.5rem;
+        font-size: 28px;
+        font-weight: 750;
+        letter-spacing: -0.01em;
       }
 
       .props-page .props-subtitle {
-        color: var(--color-primary);
-        font-size: 1.35rem;
-        margin: 0 0 1rem;
+        flex-basis: 100%;
+        order: 3;
+        margin: 0;
+        color: var(--pp-muted);
       }
 
       .props-page .props-back {
-        color: var(--color-background-offset);
-        font-family: "Nunito Sans", sans-serif;
-        font-size: 1.045rem;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 12px rgba(215, 155, 88, 0.5);
-      }
-
-      .props-page .props-back:hover {
-        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
       }
 
       .props-page .props-box {
-        background-color: var(--color-background-offset);
-        border-radius: 1rem;
-        padding: 1.5rem 1.75rem;
-        margin: 0 0 1.5rem;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(215, 155, 88, 0.1);
+        background-color: var(--pp-surface);
+        border: 1px solid var(--pp-rule);
+        border-radius: 2px;
+        box-shadow: none;
+        padding: 16px 20px;
+        margin: 0 0 20px;
+        transition: none;
       }
 
       .props-page .props-box p {
-        margin: 0 0 0.6rem;
-        line-height: 1.6;
+        margin: 0 0 8px;
+        max-width: 78ch;
       }
 
       .props-page .props-box p:last-child {
         margin-bottom: 0;
       }
 
-      .props-page .props-vendor-name {
-        font-size: 1.6rem;
-        margin: 0 0 0.5rem;
+      .props-page .props-search.props-box {
+        background: none;
+        border: 0;
+        padding: 0;
       }
 
       .props-page .props-note,
       .props-page .props-count {
-        color: var(--color-text-offset);
-        font-size: 0.95rem;
+        color: var(--pp-muted);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
       }
 
       .props-page .props-controls {
         display: grid;
-        grid-template-columns: 2fr 1fr 1fr;
-        gap: 1rem;
-        margin-bottom: 0.75rem;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+        gap: 12px;
+        padding: 12px;
+        margin: 0 0 12px;
+        background-color: var(--pp-surface);
+        border: 1px solid var(--pp-rule);
+        border-radius: 2px;
       }
 
       .props-page .props-field {
         display: flex;
         flex-direction: column;
-        gap: 0.3rem;
+        gap: 4px;
+        font-size: 13px;
         font-weight: 600;
-        color: var(--color-secondary);
+        color: var(--pp-ink);
       }
 
       .props-page .props-field input,
-      .props-page .props-field select {
+      .props-page .props-field select,
+      .props-page .props-field textarea {
         font: inherit;
-        font-weight: 500;
-        padding: 0.65rem 0.85rem;
+        font-size: 15px;
+        font-weight: 400;
         min-height: 44px;
-        border: 2px solid var(--color-primary);
-        border-radius: 0.6rem;
-        background-color: #ffffff;
-        color: var(--color-text);
+        padding: 8px 12px;
+        border: 1px solid var(--pp-field);
+        border-radius: 2px;
+        background-color: var(--pp-surface);
+        color: var(--pp-ink);
       }
 
-      .props-page .props-field input:focus,
-      .props-page .props-field select:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(215, 155, 88, 0.35);
+      .props-page .props-field input::placeholder,
+      .props-page .props-field textarea::placeholder {
+        color: var(--pp-muted);
+        opacity: 1;
+      }
+
+      .props-page .props-scene {
+        background-color: var(--pp-surface);
+        border: 1px solid var(--pp-rule);
+        border-radius: 2px;
+        padding: 0 16px;
+        margin: 0 0 16px;
+      }
+
+      .props-page .props-scene[open] {
+        padding-bottom: 16px;
+      }
+
+      .props-page .props-scene summary {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+        cursor: pointer;
+        font-weight: 650;
+      }
+
+      .props-page .scene-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      .props-page .scene-form textarea {
+        resize: vertical;
+      }
+
+      .props-page .scene-off,
+      .props-page .scene-status {
+        margin: 8px 0 0;
+        font-weight: 600;
+      }
+
+      .props-page .props-button,
+      .props-page .props-more {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 20px;
+        border: 1px solid var(--pp-ink);
+        border-radius: 2px;
+        background-color: var(--pp-ink);
+        color: var(--pp-surface);
+        font: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        box-shadow: none;
+        cursor: pointer;
+      }
+
+      .props-page .props-button {
+        align-self: flex-start;
+      }
+
+      .props-page .props-button:disabled {
+        border-color: var(--pp-rule);
+        background-color: #e3e5e8;
+        color: var(--pp-muted);
+        cursor: not-allowed;
+      }
+
+      .props-page .props-more {
+        margin: 16px auto 0;
+        display: flex;
+      }
+
+      .props-page .props-count {
+        margin: 0 0 8px;
       }
 
       .props-page .props-empty {
-        background-color: #ffffff;
-        border-radius: 0.75rem;
-        padding: 1rem 1.25rem;
-        margin: 1rem 0;
+        margin: 12px 0;
+        padding: 12px 16px;
+        background-color: var(--pp-surface);
+        border: 1px solid var(--pp-rule);
+        border-radius: 2px;
       }
 
       .props-page .props-results {
         list-style: none;
-        margin: 1rem 0 0;
+        margin: 0;
         padding: 0;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 12px;
       }
 
       .props-page .prop-card {
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
-        background-color: #ffffff;
-        border-radius: 0.75rem;
-        padding: 1rem 1.15rem;
-        border: 1px solid rgba(215, 155, 88, 0.25);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        gap: 6px;
+        padding: 12px 14px;
+        background-color: var(--pp-surface);
+        border: 1px solid var(--pp-rule);
+        border-radius: 2px;
       }
 
       .props-page .prop-card p {
@@ -479,210 +619,151 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
       }
 
       .props-page .prop-line {
-        font-size: 1rem;
-        line-height: 1.45;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--pp-muted);
+      }
+
+      .props-page .prop-ids {
+        display: inline-block;
+        padding: 0 6px;
+        border-radius: 2px;
+        background-color: var(--pp-gold);
+        color: var(--pp-ink);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
       }
 
       .props-page .prop-name {
+        font-size: 15px;
         font-weight: 700;
-        color: var(--color-secondary);
+        color: var(--pp-ink);
       }
 
-      .props-page .prop-ids,
       .props-page .prop-page {
+        color: var(--pp-ink);
         font-weight: 600;
-        color: var(--color-primary-dark);
+        font-variant-numeric: tabular-nums;
       }
 
-      .props-page .prop-category {
-        font-size: 0.85rem;
-        letter-spacing: 0.04em;
-        color: var(--color-text-offset);
-      }
-
+      .props-page .prop-category,
       .props-page .prop-tags,
       .props-page .prop-cite {
-        font-size: 0.85rem;
-        color: var(--color-text-light);
+        font-size: 13px;
+        color: var(--pp-muted);
       }
 
       .props-page .prop-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        column-gap: 12px;
         margin-top: auto;
-        padding-top: 0.35rem;
       }
 
-      .props-page .prop-actions a,
-      .props-page .props-more {
+      .props-page .prop-actions a {
         display: inline-flex;
         align-items: center;
-        min-height: 36px;
-        padding: 0.35rem 0.9rem;
-        border-radius: 2rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #ffffff;
-        background-color: var(--color-primary);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      .props-page .prop-actions a + a {
-        background-color: var(--color-secondary);
-      }
-
-      .props-page .prop-actions a::after {
-        display: none;
-      }
-
-      .props-page .prop-actions a:hover {
-        color: #ffffff;
-        transform: translateY(-1px);
-      }
-
-      .props-page .props-more {
-        margin: 1.25rem auto 0;
-        display: flex;
-        font-size: 1rem;
-        padding: 0.6rem 1.5rem;
-      }
-
-      .props-page .props-scene {
-        background-color: #ffffff;
-        border: 2px solid var(--color-primary);
-        border-radius: 0.75rem;
-        padding: 0.75rem 1rem;
-        margin: 0 0 1rem;
-      }
-
-      .props-page .props-scene summary {
-        cursor: pointer;
-        font-weight: 700;
-        color: var(--color-secondary);
-        min-height: 28px;
-      }
-
-      .props-page .scene-form {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-top: 0.75rem;
-      }
-
-      .props-page .scene-form textarea {
-        font: inherit;
-        font-weight: 500;
-        padding: 0.65rem 0.85rem;
-        border: 2px solid var(--color-primary);
-        border-radius: 0.6rem;
-        background-color: #ffffff;
-        color: var(--color-text);
-        resize: vertical;
-      }
-
-      .props-page .scene-off,
-      .props-page .scene-status {
-        font-weight: 600;
-        color: var(--color-secondary);
-        margin: 0.5rem 0 0;
-      }
-
-      .props-page .props-button {
-        align-self: flex-start;
         min-height: 44px;
-        padding: 0.6rem 1.5rem;
-        border-radius: 2rem;
-        font-size: 1rem;
+        font-size: 13px;
         font-weight: 600;
-        color: #ffffff;
-        background-color: var(--color-secondary);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
 
-      .props-page .props-button:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-        transform: none;
+      .props-page .scene-results {
+        margin-top: 4px;
       }
 
       .props-page .scene-group {
-        margin-top: 1rem;
+        margin-top: 16px;
       }
 
       .props-page .scene-group-title {
-        font-size: 1.25rem;
-        margin: 0 0 0.5rem;
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 4px;
       }
 
       .props-page .scene-prop {
-        border-top: 1px solid rgba(215, 155, 88, 0.3);
-        padding: 0.75rem 0;
+        border-top: 1px solid var(--pp-rule);
+        padding: 12px 0;
       }
 
       .props-page .scene-prop-name {
-        font-size: 1.05rem;
-        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
       }
 
       .props-page .scene-reason,
       .props-page .scene-missing {
-        margin: 0.25rem 0 0;
-        color: var(--color-text-offset);
+        margin: 4px 0 0;
+        font-size: 13px;
+        color: var(--pp-muted);
       }
 
       .props-page .scene-matches {
-        margin-top: 0.5rem;
+        margin-top: 8px;
       }
 
       .props-page .scene-search-link {
         all: unset;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
         cursor: pointer;
-        color: var(--color-primary-dark);
+        color: var(--pp-ink);
         font-weight: 600;
         text-decoration: underline;
+        text-underline-offset: 2px;
       }
 
       .props-page .scene-search-link:focus-visible {
-        outline: 2px solid var(--color-secondary);
+        outline: 3px solid var(--pp-ink);
         outline-offset: 2px;
       }
 
-      .props-page .props-footer {
-        text-align: center;
-        color: var(--color-background-offset);
-        font-size: 0.95rem;
+      .props-page .props-vendor-name {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 8px;
       }
 
-      .props-page .props-footer a,
-      .props-page .props-footer a:hover {
-        color: var(--color-primary);
-        text-decoration: underline;
+      .props-page .props-footer,
+      .props-page .props-byline {
+        margin: 0;
+        font-size: 13px;
+        color: var(--pp-muted);
       }
 
-      @media (max-width: 768px) {
+      .props-page .props-byline {
+        margin-top: 24px;
+        padding-top: 4px;
+        border-top: 1px solid var(--pp-rule);
+      }
+
+      .props-page .props-byline a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+      }
+
+      @media (max-width: 640px) {
         .props-page .props-wrap {
-          padding: 1rem 1rem 2rem;
+          padding: 16px 16px 32px;
         }
 
         .props-page .props-title {
-          font-size: 2.25rem;
+          font-size: 24px;
+        }
+
+        .props-page .props-back {
+          order: 4;
         }
 
         .props-page .props-box {
-          padding: 1.25rem 1rem;
+          padding: 14px 16px;
         }
 
         .props-page .props-controls {
-          grid-template-columns: 1fr;
-        }
-
-        .props-page .props-results {
-          grid-template-columns: 1fr;
-        }
-
-        .props-page .prop-actions a {
-          min-height: 44px;
+          grid-template-columns: minmax(0, 1fr);
         }
       }
     </style>

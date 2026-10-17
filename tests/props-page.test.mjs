@@ -60,6 +60,12 @@ test('/props states what it is not and how vendors can opt out', () => {
   assert.ok(html.includes('href="/#contact"'));
 });
 
+test('/props carries the festival byline and requests no fonts of its own', () => {
+  assert.match(html, /<p class="props-byline"><a href="\/">A Cookies &amp; Comedy Film Festival project<\/a><\/p>/);
+  assert.ok(text.includes('Back to Main Site'));
+  assert.ok(!html.includes('fonts.googleapis.com'), 'the page links no font stylesheet itself');
+});
+
 test('no vendor photos or catalog PDFs are published', async () => {
   assert.ok(!/<img\b/i.test(html));
   assert.deepEqual((await filesUnder(dist)).filter((file) => file.toLowerCase().endsWith('.pdf')), []);

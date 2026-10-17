@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { SCENE_TIMEOUT_MS, checkSceneText, keepKnownKeys, requestScene } from '../src/scripts/props-scene.js';
-import { GUARD_TIMEOUT_MS } from '../worker/src/index.js';
+import { GUARD_TIMEOUT_MS } from '../worker/src/budget.js';
 
 const API = 'https://pgh-prop-search.example.workers.dev/';
 const NOW = Date.UTC(2026, 9, 17, 16, 0, 0);

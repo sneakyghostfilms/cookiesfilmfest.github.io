@@ -1,3 +1,5 @@
+export const GUARD_TIMEOUT_MS = 3000;
+
 const SPEND_KEY = 'spend';
 
 const positive = (value) => typeof value === 'number' && Number.isFinite(value) && value > 0;

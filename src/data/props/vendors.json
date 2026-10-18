@@ -134,6 +134,7 @@
     {
       "id": "bespoke-event-rentals",
       "name": "Bespoke Event Rentals",
+      "keyPrefix": "ber",
       "siteUrl": "https://bespokeeventrental.com/",
       "sourceType": {
         "value": "event-rental",
@@ -189,7 +190,64 @@
       },
       "notice": null,
       "lastVerified": "2026-10-17",
-      "catalogs": []
+      "catalogs": [
+        {
+          "id": "ber-2026-10-18",
+          "type": "tapgoods-catalog",
+          "title": "Furniture and decor pages on bespokeeventrental.com",
+          "siteUrl": "https://bespokeeventrental.com/",
+          "collections": [
+            {
+              "url": "https://bespokeeventrental.com/categories/furniture-rentals-collection/",
+              "subcategories": [
+                "artificial-trees",
+                "benches",
+                "chairs",
+                "coffee-end-tables",
+                "furniture-tables",
+                "modern-tables",
+                "ottomans",
+                "outdoor-collection",
+                "soho-collection",
+                "sofa-loveseats",
+                "specialty-chairs",
+                "throw-pillows"
+              ]
+            },
+            {
+              "url": "https://bespokeeventrental.com/categories/bar-collection/",
+              "subcategories": [
+                "bar-back-collection",
+                "heritage-bar-collection",
+                "specialty-bar-collection"
+              ]
+            },
+            {
+              "url": "https://bespokeeventrental.com/categories/event-accessories-collection/",
+              "subcategories": [
+                "podiums"
+              ]
+            },
+            {
+              "url": "https://bespokeeventrental.com/categories/screen-stanchions-hedges-easels-coat-rack-collection/",
+              "subcategories": [
+                "coat-racks-accessories",
+                "easels",
+                "hedges-screens",
+                "stanchions"
+              ]
+            }
+          ],
+          "itemLinkLabel": "Open product page",
+          "photoHost": "s3.us-east-1.amazonaws.com",
+          "expected": {
+            "pages": 20,
+            "tiles": 153,
+            "items": 127,
+            "merged": 26
+          }
+        }
+      ]
     },
     {
       "id": "cleveland-play-house-props",

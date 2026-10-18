@@ -3,7 +3,6 @@
 import { createServer } from 'node:http';
 import { parseArgs } from 'node:util';
 import { handleRequest } from '../src/index.js';
-import { inventoryKeys } from '../src/inventory.js';
 import { budgetNamespace } from '../test/helpers.mjs';
 
 const { values } = parseArgs({
@@ -16,11 +15,11 @@ const { values } = parseArgs({
   },
 });
 
-const keys = [...inventoryKeys];
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const backends = {
-  async mock() {
+  async mock(model, input) {
     await pause(Number(values.delay));
+    const keys = [...input.messages[0].content.matchAll(/^(\S+) \| /gm)].map(([, key]) => key);
     const output = {
       required: [
         { prop: 'first prop', reason: 'Mock answer: the scene names it', keys: keys.slice(0, 2) },

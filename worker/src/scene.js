@@ -9,6 +9,7 @@ export const LIMITS = {
   maxReasonChars: 80,
   maxKeysPerProp: 3,
   maxOutputTokens: 1700,
+  shortlistSize: 100,
   templateAllowanceTokens: 256,
 };
 
@@ -52,11 +53,11 @@ export class BadOutput extends Error {}
 
 const neutralize = (text) => text.replace(/</g, '‹').replace(/>/g, '›');
 
-export function buildRequest(inventoryText, sceneText, period = '') {
+export function buildRequest(listingText, sceneText, period = '') {
   const periodLines = period ? `<period>${neutralize(period)}</period>\n${PERIOD_INSTRUCTION}\n` : '';
   return {
     messages: [
-      { role: 'system', content: `You match film scenes to a prop rental inventory.\n\n${INVENTORY_HEADER}\n${inventoryText}\n\n${INSTRUCTIONS}` },
+      { role: 'system', content: `You match film scenes to a prop rental inventory.\n\n${INVENTORY_HEADER}\n${listingText}\n\n${INSTRUCTIONS}` },
       { role: 'user', content: `${periodLines}<scene>\n${neutralize(sceneText)}\n</scene>` },
     ],
     temperature: 0,
@@ -111,7 +112,7 @@ export function plainText(value) {
   return value.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function cleanList(list, maxProps, inventoryKeys, seen, tally) {
+function cleanList(list, maxProps, allowedKeys, seen, tally) {
   if (!Array.isArray(list)) throw new BadOutput('a prop list is missing');
   const props = [];
   for (const entry of list) {
@@ -123,7 +124,7 @@ function cleanList(list, maxProps, inventoryKeys, seen, tally) {
     seen.add(prop.toLowerCase());
     const keys = [];
     for (const key of entry.keys) {
-      if (typeof key !== 'string' || !inventoryKeys.has(key)) tally.ignored += 1;
+      if (typeof key !== 'string' || !allowedKeys.has(key)) tally.ignored += 1;
       else if (!keys.includes(key)) keys.push(key);
     }
     props.push({ prop, reason: cleanText(entry.reason, LIMITS.maxReasonChars), keys: keys.slice(0, LIMITS.maxKeysPerProp) });
@@ -132,11 +133,11 @@ function cleanList(list, maxProps, inventoryKeys, seen, tally) {
   return props;
 }
 
-export function validateScene(output, inventoryKeys) {
+export function validateScene(output, allowedKeys) {
   if (!output || typeof output !== 'object') throw new BadOutput('the model output is not an object');
   const seen = new Set();
   const tally = { ignored: 0 };
-  const required = cleanList(output.required, LIMITS.maxRequiredProps, inventoryKeys, seen, tally);
-  const optional = cleanList(output.optional, LIMITS.maxOptionalProps, inventoryKeys, seen, tally);
+  const required = cleanList(output.required, LIMITS.maxRequiredProps, allowedKeys, seen, tally);
+  const optional = cleanList(output.optional, LIMITS.maxOptionalProps, allowedKeys, seen, tally);
   return { required, optional, ignoredSuggestions: tally.ignored };
 }

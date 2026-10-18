@@ -2,12 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { reserve } from '../src/budget.js';
 import { handleRequest } from '../src/index.js';
-import { inventoryText } from '../src/inventory.js';
+import { prepareScene } from '../src/inventory.js';
 import { LIMITS, MODELS, buildRequest, estimateNeurons } from '../src/scene.js';
 import { MODEL, NOW, budgetNamespace, fakeAI, fixedClock, makeEnv, memoryStorage, sceneRequest } from './helpers.mjs';
 
 const SHORT = 'x'.repeat(30);
-const SHORT_COST = estimateNeurons(MODEL, buildRequest(inventoryText, SHORT));
+const SHORT_COST = estimateNeurons(MODEL, prepareScene(SHORT).request);
+const LISTING = prepareScene('A typewriter and a rotary phone on the office desk.').listingText;
 
 async function send(env, { ip, now = NOW, text } = {}) {
   const response = await handleRequest(sceneRequest(text, { ip }), env, fixedClock(now));
@@ -78,7 +79,7 @@ test('one client gets 3 requests a minute while others still get through', async
 });
 
 test('the global cap stops the 21st request in a minute', async () => {
-  const env = makeEnv({ AI_PER_CLIENT_PER_MINUTE: '100' });
+  const env = makeEnv({ AI_PER_CLIENT_PER_MINUTE: '100', DAILY_NEURON_BUDGET: '1000000' });
   for (let index = 0; index < 20; index += 1) assert.equal((await send(env, { ip: `192.0.2.${index}` })).status, 200);
   const capped = await send(env, { ip: '192.0.2.200' });
   assert.equal(capped.status, 429);
@@ -107,8 +108,8 @@ test('the guard stores only the day and the amount spent, never the client addre
 });
 
 test('the pre-charge bounds input tokens by UTF-8 bytes, so non-Latin scenes cost more', () => {
-  const ascii = buildRequest(inventoryText, 'x'.repeat(4000));
-  const emoji = buildRequest(inventoryText, '😀'.repeat(2000));
+  const ascii = buildRequest(LISTING, 'x'.repeat(4000));
+  const emoji = buildRequest(LISTING, '😀'.repeat(2000));
   const bytes = (request) => new TextEncoder().encode(JSON.stringify(request.messages) + JSON.stringify(request.response_format)).length;
   const rates = MODELS[MODEL];
   for (const request of [ascii, emoji]) {

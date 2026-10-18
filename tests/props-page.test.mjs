@@ -126,7 +126,9 @@ test('vendor boxes show the published facts with their sources, and nothing priv
   assert.ok(text.includes('Address: Pittsburgh, PA'));
   assert.match(text, /Details as the vendor publishes them, last checked 2026-10-17: instagram\.com\/steelcityprops · catalog page 3 · catalog page 1 · forms\.gle\/JJqcgmxkJFwqKLXF9 · linktr\.ee\/steelcityprops \./);
   assert.ok(html.includes('href="https://linktr.ee/steelcityprops"'));
-  assert.ok(!text.includes('Private, local demo only'), 'relationship notes appear only in the local demo');
+  assert.ok(!text.includes('Private, local demo only'), 'relationship notes appear only in the local demo, and only with PROPS_SHOW_PRIVATE=1');
+  assert.ok(text.includes('Prop pages on dezzigncentralpgh.com · captured 2026-10-17 · 23 items · indexed 2026-10-17 · Open site'));
+  assert.ok(text.includes('Hours: please call or email us to schedule an appointment Pricing and terms: ask the vendor'));
   assert.ok(!/permission|not asked/i.test(text));
 });
 

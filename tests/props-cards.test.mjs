@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { affiliation, cardFor, contactRoutes, inquiryHref, privateFacts, socialLinks, vendorFacts, vendorSources } from '../src/scripts/props-cards.js';
+import { affiliation, cardFor, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, vendorFacts, vendorSources } from '../src/scripts/props-cards.js';
 
 const pdfVendor = { id: 'steel-city-props', name: 'Steel City Props', contact: { formUrl: 'https://forms.example/form', email: 'shop@example.com', phone: null, pageUrl: null } };
 const pdfCatalog = { id: 'scp-2026-09-30', type: 'pdf', sourceUrl: 'https://drive.example/catalog' };
@@ -69,10 +69,13 @@ test('contact routes and facts come only from what the vendor publishes', () => 
     'Address (prop warehouse): 1 test street, pittsburgh, pa 15201',
     'Mailing address: p.o. box 1, pittsburgh, pa 15235',
     'Hours: please call or email us to schedule an appointment',
-    'No prices or terms are published; ask when you inquire.',
+    'Pricing and terms: ask the vendor',
   ]);
   const quiet = { ...siteVendor, sourceType: null, modes: null, address: null, mailingAddress: null, hours: null };
-  assert.deepEqual(vendorFacts(quiet), ['No prices or terms are published; ask when you inquire.'], 'nothing is filled in by inference');
+  assert.deepEqual(vendorFacts(quiet), ['Pricing and terms: ask the vendor'], 'nothing is filled in by inference');
+  for (const phone of ['412.555.0100', '1-412-555-0100', '+1 412 555 0100', '(412) 555-0100']) {
+    assert.equal(contactRoutes({ phone }).at(0).href, 'tel:+14125550100', phone);
+  }
   assert.deepEqual(socialLinks(null), []);
   assert.deepEqual(socialLinks({ instagram: 'https://instagram.example/v', facebook: null, linktree: 'https://linktree.example/v' }).map((link) => link.label), ['Instagram', 'Linktree']);
 });
@@ -92,5 +95,17 @@ test('private relationship notes are rendered only from the private file', () =>
   assert.deepEqual(privateFacts({ permissions: { listing: 'not-asked', photos: 'asked', asOf: '2026-10-17' }, notes: 'Met at the market.' }), [
     'Listing permission: not asked; photo permission: asked (as of 2026-10-17)',
     'Notes: Met at the market.',
+  ]);
+});
+
+test('catalog lines describe each snapshot, and a vendor with none says so', () => {
+  assert.deepEqual(catalogLines({ ...siteVendor, catalogs: [] }), [{ text: 'Inventory not indexed; contact the vendor.' }]);
+  const indexed = { [siteCatalog.id]: { indexedAt: '2026-10-17', capturedAt: '2026-10-17' }, [pdfCatalog.id]: { indexedAt: '2026-10-17' } };
+  const itemCounts = new Map([[siteCatalog.id, 23]]);
+  assert.deepEqual(catalogLines({ ...siteVendor, catalogs: [{ ...siteCatalog, title: 'Prop pages' }] }, { indexed, itemCounts }), [
+    { text: 'Prop pages · captured 2026-10-17 · 23 items · indexed 2026-10-17 · ', href: 'https://vendor.example/props/', linkLabel: 'Open site' },
+  ]);
+  assert.deepEqual(catalogLines({ ...pdfVendor, catalogs: [{ ...pdfCatalog, title: 'Rental Catalog', version: '2026-09-30', pageCount: 49 }] }, { indexed }), [
+    { text: 'Rental Catalog (version 2026-09-30, 49 pages) · indexed 2026-10-17 · ', href: 'https://drive.example/catalog', linkLabel: 'Open catalog on Google Drive' },
   ]);
 });

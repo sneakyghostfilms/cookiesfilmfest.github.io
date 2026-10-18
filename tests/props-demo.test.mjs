@@ -6,7 +6,8 @@ import path from 'node:path';
 import { Writable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { demoCatalogHref, pdfBox, readPrivateVendors } from '../scripts/props/demo-links.mjs';
+import { demoCatalogHref, pdfBox, privateVendorsFor, readPrivateVendors } from '../scripts/props/demo-links.mjs';
+import { privateFacts } from '../src/scripts/props-cards.js';
 import { demoAssetHandler, propsDemo } from '../scripts/props/demo-server.mjs';
 import { privateOutputProblem } from '../scripts/props/demo.mjs';
 
@@ -117,6 +118,24 @@ test('private vendor notes are read only from the ignored folder, and only for t
   await writeFile(path.join(directory, 'vendors.json'), JSON.stringify({ 'steel-city-props': { notes: 'n' } }));
   assert.deepEqual(readPrivateVendors(directory), { 'steel-city-props': { notes: 'n' } });
   const page = await readFile(path.join(root, 'src/pages/props.astro'), 'utf8');
-  assert.match(page, /const privateVendors = demoMode \? readPrivateVendors\(\) : null;/);
-  assert.equal(page.match(/readPrivateVendors\(/g).length, 1, 'no other read of the private file');
+  assert.match(page, /const privateVendors = privateVendorsFor\(process\.env\);/);
+  assert.doesNotMatch(page, /readPrivateVendors/, 'the page reads private notes only through privateVendorsFor');
+});
+
+test('private notes need both the demo and PROPS_SHOW_PRIVATE=1, which npm run props:demo never sets', async () => {
+  const SENTINEL = { 'steel-city-props': { permissions: { listing: 'declined', photos: 'asked', asOf: '2026-10-17' }, notes: 'SENTINEL-PRIVATE-NOTE' } };
+  let reads = 0;
+  const read = () => {
+    reads += 1;
+    return SENTINEL;
+  };
+  for (const env of [{}, { PROPS_DEMO: '1' }, { PROPS_SHOW_PRIVATE: '1' }, { PROPS_DEMO: '1', PROPS_SHOW_PRIVATE: 'true' }]) {
+    const shown = privateFacts(privateVendorsFor(env, read)?.['steel-city-props']);
+    assert.doesNotMatch(JSON.stringify(shown), /SENTINEL|declined/, JSON.stringify(env));
+  }
+  assert.equal(reads, 0, 'the private file is not even read');
+  const shown = privateFacts(privateVendorsFor({ PROPS_DEMO: '1', PROPS_SHOW_PRIVATE: '1' }, read)['steel-city-props']);
+  assert.deepEqual(shown, ['Listing permission: declined; photo permission: asked (as of 2026-10-17)', 'Notes: SENTINEL-PRIVATE-NOTE']);
+  const demo = await readFile(path.join(root, 'scripts/props/demo.mjs'), 'utf8');
+  assert.doesNotMatch(demo, /PROPS_SHOW_PRIVATE/, 'npm run props:demo never sets the flag');
 });

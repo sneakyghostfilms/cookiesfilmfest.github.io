@@ -56,11 +56,30 @@ export function affiliation(vendors) {
   return `Not affiliated with ${new Intl.ListFormat('en', { type: 'disjunction' }).format(vendors.map((vendor) => vendor.name))}.`;
 }
 
+function telHref(phone) {
+  const digits = phone.replace(/\D/g, '');
+  return `tel:+${digits.length === 11 && digits.startsWith('1') ? digits : `1${digits}`}`;
+}
+
+export function catalogLines(vendor, { indexed = {}, itemCounts = new Map() } = {}) {
+  if (!vendor.catalogs.length) return [{ text: 'Inventory not indexed; contact the vendor.' }];
+  return vendor.catalogs.map((catalog) => {
+    const entry = indexed[catalog.id] ?? {};
+    const indexedAt = entry.indexedAt ? ` · indexed ${entry.indexedAt}` : '';
+    if (catalog.type === 'pdf') {
+      return { text: `${catalog.title} (version ${catalog.version}, ${catalog.pageCount} pages)${indexedAt} · `, href: catalog.sourceUrl, linkLabel: 'Open catalog on Google Drive' };
+    }
+    const count = itemCounts.get(catalog.id) ?? 0;
+    const captured = entry.capturedAt ? ` · captured ${entry.capturedAt}` : '';
+    return { text: `${catalog.title}${captured} · ${count} ${count === 1 ? 'item' : 'items'}${indexedAt} · `, href: catalog.siteUrl, linkLabel: 'Open site' };
+  });
+}
+
 export function contactRoutes(contact) {
   return [
     contact.formUrl && { label: 'official contact form', href: contact.formUrl, external: true },
     contact.email && { label: contact.email, href: `mailto:${contact.email}` },
-    contact.phone && { label: contact.phone, href: `tel:+1${contact.phone.replace(/\D/g, '')}` },
+    contact.phone && { label: contact.phone, href: telHref(contact.phone) },
     contact.pageUrl && { label: 'contact page', href: contact.pageUrl, external: true },
   ].filter(Boolean);
 }
@@ -87,7 +106,7 @@ export function vendorFacts(vendor) {
   if (vendor.address) lines.push(`Address${vendor.address.label ? ` (${vendor.address.label})` : ''}: ${placeText(vendor.address)}`);
   if (vendor.mailingAddress) lines.push(`Mailing address: ${placeText(vendor.mailingAddress)}`);
   if (vendor.hours) lines.push(`Hours: ${vendor.hours.text}`);
-  lines.push(vendor.terms ? `Terms they publish: “${vendor.terms.text}”` : 'No prices or terms are published; ask when you inquire.');
+  lines.push(vendor.terms ? `Terms they publish: “${vendor.terms.text}”` : 'Pricing and terms: ask the vendor');
   if (vendor.inquiryHint) lines.push(vendor.inquiryHint.text);
   return lines;
 }

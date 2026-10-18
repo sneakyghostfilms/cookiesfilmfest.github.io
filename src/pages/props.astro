@@ -6,8 +6,8 @@ import vendorsData from "../data/props/vendors.json";
 import inventory from "../data/props/inventory.json";
 import tagsData from "../data/props/tags.json";
 import propsConfig from "../data/props/config.json";
-import { DEMO_STYLES, readDemoManifest, readPrivateVendors } from "../../scripts/props/demo-links.mjs";
-import { affiliation, cardFor, contactRoutes, privateFacts, socialLinks, vendorFacts, vendorSources } from "../scripts/props-cards.js";
+import { DEMO_STYLES, privateVendorsFor, readDemoManifest } from "../../scripts/props/demo-links.mjs";
+import { affiliation, cardFor, catalogLines, contactRoutes, privateFacts, socialLinks, vendorFacts, vendorSources } from "../scripts/props-cards.js";
 import { compareByName } from "../scripts/props-search.js";
 
 const { generator } = Astro;
@@ -15,7 +15,7 @@ const apiUrl: string = import.meta.env.PUBLIC_PROPS_API_URL || propsConfig.apiUr
 const description = "Search Pittsburgh prop rental catalogs in plain English, with item numbers, catalog pages and how to inquire.";
 const demoMode = process.env.PROPS_DEMO === "1";
 const demo = demoMode ? readDemoManifest() : null;
-const privateVendors = demoMode ? readPrivateVendors() : null;
+const privateVendors = privateVendorsFor(process.env);
 
 const catalogs = new Map(
   vendorsData.vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { catalog, vendor }])),
@@ -35,7 +35,7 @@ const decades = [...new Set(inventory.items.flatMap((item) => item.decades))].so
 const itemCounts = new Map<string, number>();
 for (const item of inventory.items) itemCounts.set(item.catalog, (itemCounts.get(item.catalog) ?? 0) + 1);
 const vendorsWithItems = vendorsData.vendors.filter((vendor) => inventory.items.some((item) => item.vendor === vendor.id));
-const inventoryCatalogs = inventory.catalogs as Record<string, { indexedAt: string; capturedAt?: string }>;
+const indexed = inventory.catalogs as Record<string, { indexedAt: string; capturedAt?: string }>;
 const vendorBoxes = vendorsData.vendors.map((vendor) => ({
   vendor,
   facts: vendorFacts(vendor),
@@ -43,7 +43,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
   social: socialLinks(vendor.social),
   sources: vendorSources(vendor),
   private: privateFacts(privateVendors?.[vendor.id]),
-  catalogs: vendor.catalogs.map((catalog) => ({ ...catalog, ...inventoryCatalogs[catalog.id], items: itemCounts.get(catalog.id) ?? 0 })),
+  catalogs: catalogLines(vendor, { indexed, itemCounts }),
 }));
 ---
 
@@ -158,11 +158,8 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
       {vendorBoxes.map(({ vendor, facts, routes, social, sources, private: privateLines, catalogs: vendorCatalogs }) => (
         <section class="props-box props-vendor" data-vendor={vendor.id}>
           <h2 class="props-vendor-name">{vendor.name}</h2>
-          {vendorCatalogs.length === 0 && <p class="props-catalog">Inventory not indexed; contact the vendor.</p>}
-          {vendorCatalogs.map((catalog) => catalog.type === "pdf" ? (
-            <p class="props-catalog">{catalog.title} (version {catalog.version}, {catalog.pageCount} pages){catalog.indexedAt && ` · indexed ${catalog.indexedAt}`} · <a href={catalog.sourceUrl} target="_blank" rel="noopener noreferrer">Open catalog on Google Drive</a></p>
-          ) : (
-            <p class="props-catalog">{catalog.title}{catalog.capturedAt && ` · captured ${catalog.capturedAt}`} · {catalog.items} {catalog.items === 1 ? "item" : "items"}{catalog.indexedAt && ` · indexed ${catalog.indexedAt}`} · <a href={catalog.siteUrl} target="_blank" rel="noopener noreferrer">Open site</a></p>
+          {vendorCatalogs.map((line) => (
+            <p class="props-catalog">{line.text}{line.href && <a href={line.href} target="_blank" rel="noopener noreferrer">{line.linkLabel}</a>}</p>
           ))}
           <p class="props-contact">Inquiries: {routes.map((route, position) => (
             <>{position > 0 && " · "}<a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>

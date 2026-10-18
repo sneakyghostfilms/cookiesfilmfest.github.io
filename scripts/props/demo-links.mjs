@@ -15,6 +15,10 @@ export function readPrivateVendors(directory = resolve('.props-private')) {
   return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null;
 }
 
+export function privateVendorsFor(env, read = readPrivateVendors) {
+  return env.PROPS_DEMO === '1' && env.PROPS_SHOW_PRIVATE === '1' ? read() : null;
+}
+
 const points = (value) => Math.round(value * 100) / 100;
 
 export function pdfBox([x0, top, x1, bottom], pageHeight) {

@@ -172,7 +172,7 @@ sceneForm.addEventListener("submit", async (event) => {
     ];
     const excluded = periodNote(period);
     if (excluded) notes.push(excluded);
-    if (kept.ignored) notes.push(`${kept.ignored} AI ${kept.ignored === 1 ? "suggestion referred to an item that doesn't" : "suggestions referred to items that don't"} exist and ${kept.ignored === 1 ? "was" : "were"} ignored.`);
+    if (kept.ignored) notes.push(`${kept.ignored} AI ${kept.ignored === 1 ? "suggestion referred to an item that wasn't" : "suggestions referred to items that weren't"} on the list the AI was given and ${kept.ignored === 1 ? "was" : "were"} ignored.`);
     for (const note of notes) sceneResults.append(element("p", "props-note", note));
     return;
   }

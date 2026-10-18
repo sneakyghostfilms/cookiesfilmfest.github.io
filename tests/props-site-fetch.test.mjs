@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { FetchStopped, JITTER_MS, MIN_GAP_MS, TIMEOUT_MS, USER_AGENT, cacheName, createSiteFetcher, hostProblem } from '../scripts/props/site-fetch.mjs';
+import { robotsAllow, robotsRules, robotsStopReason } from '../scripts/props/robots.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const HOST = 'vendor.example.com';
@@ -103,8 +104,8 @@ test('other HTTP errors and network failures stop the run', async () => {
   const directory = await freshDirectory();
   const { fetcher } = harness({ [url('a')]: status(500) });
   await assert.rejects(fetcher.get(url('a'), directory), (error) => error instanceof FetchStopped && error.status === 500);
-  const broken = harness({ [url('a')]: () => { throw new TypeError('fetch failed'); } });
-  await assert.rejects(broken.fetcher.get(url('a'), directory), (error) => error instanceof FetchStopped && error.reason === 'network');
+  const broken = harness({ [url('a')]: () => { throw new TypeError('fetch failed', { cause: Object.assign(new Error('read ECONNRESET'), { code: 'ECONNRESET' }) }); } });
+  await assert.rejects(broken.fetcher.get(url('a'), directory), (error) => error instanceof FetchStopped && error.reason === 'network' && error.message.endsWith('fetch failed (ECONNRESET)'));
 });
 
 test('Retro on 8th and Shopify store hosts are refused before any request, whatever the allowlist says', async () => {
@@ -137,4 +138,67 @@ test('a cache entry must belong to the URL asked for', async () => {
   const { calls, fetcher } = harness({});
   await assert.rejects(fetcher.get(url('a'), directory), (error) => error.reason === 'cache');
   assert.equal(calls.length, 0);
+});
+
+test('a run can slow down to a declared delay, but never below the minimum gap', async () => {
+  const directory = await freshDirectory();
+  const { waits, fetcher } = harness({ [url('a')]: ok('a'), [url('b')]: ok('b'), [url('c')]: ok('c') });
+  await fetcher.get(url('a'), directory);
+  fetcher.raiseGap(500);
+  await fetcher.get(url('b'), directory);
+  fetcher.raiseGap(10_000);
+  await fetcher.get(url('c'), directory);
+  assert.deepEqual(waits, [MIN_GAP_MS + JITTER_MS / 2, 10_000 + JITTER_MS / 2]);
+});
+
+test('missingOk reads 401, 403, 404 or 410 as missing (RFC 9309: robots.txt unavailable) and caches it; 429, 5xx and the same URL without missingOk still stop', async () => {
+  const directory = await freshDirectory();
+  const { calls, fetcher } = harness({ [url('robots.txt')]: status(404), [url('gone.txt')]: status(410), [url('denied.txt')]: status(403), [url('auth.txt')]: status(401) });
+  const first = await fetcher.get(url('robots.txt'), directory, { missingOk: true });
+  assert.equal(first.missing, true);
+  const again = await fetcher.get(url('robots.txt'), directory, { missingOk: true });
+  assert.deepEqual([again.cached, again.missing, calls.length], [true, true, 1]);
+  for (const page of ['gone.txt', 'denied.txt', 'auth.txt']) assert.equal((await fetcher.get(url(page), directory, { missingOk: true })).missing, true, page);
+  await assert.rejects(fetcher.get(url('robots.txt'), directory), FetchStopped);
+  for (const code of [429, 500, 503]) {
+    const fresh = harness({ [url('busy.txt')]: status(code) }).fetcher;
+    await assert.rejects(fresh.get(url('busy.txt'), await freshDirectory(), { missingOk: true }), (error) => error instanceof FetchStopped && error.status === code, String(code));
+  }
+});
+
+test('robots rules: our named group beats *, plain prefixes only, anything else is reported instead of guessed', () => {
+  assert.deepEqual(robotsRules(''), { group: null, disallow: [], crawlDelaySeconds: null, unsupported: [] });
+  const star = robotsRules('User-agent: *\nDisallow: /private/\nCrawl-delay: 5\nAllow: /private/ok\n');
+  assert.deepEqual(star, { group: '*', disallow: ['/private/'], crawlDelaySeconds: 5, unsupported: [] });
+  assert.equal(robotsAllow(star, '/private/a.jpg'), false);
+  assert.equal(robotsAllow(star, '/public/a.jpg'), true);
+  const named = robotsRules('User-agent: *\nDisallow: /\n\nUser-agent: PittsburghPropSearch\nDisallow: /tmp/ # ours\n');
+  assert.deepEqual([named.group, named.disallow], ['PittsburghPropSearch', ['/tmp/']]);
+  assert.deepEqual(robotsRules('User-agent: other\nUser-agent: *\nDisallow: /x\n').disallow, ['/x'], 'a group can name several agents');
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow:\n').disallow, [], 'an empty Disallow allows everything');
+  for (const eol of ['\n', '\r\n', '\r']) assert.deepEqual(robotsRules(`User-agent: *${eol}Disallow: /private/${eol}`).disallow, ['/private/'], JSON.stringify(eol));
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow: /*.jpg$\n').unsupported, ['Disallow: /*.jpg$']);
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow: images\n').unsupported, ['Disallow: images']);
+  assert.deepEqual(robotsRules('User-agent: *\nCrawl-delay: soon\n').unsupported, ['Crawl-delay: soon']);
+  assert.deepEqual(robotsRules('User-agent: other\nDisallow: /*\n').unsupported, [], "another agent's rules don't apply to us");
+  for (const name of ['search', 'Pittsburgh', 'p', 'PittsburghPropSearchBot']) {
+    const rules = robotsRules(`User-agent: *\nDisallow: /\n\nUser-agent: ${name}\nDisallow:\n`);
+    assert.deepEqual([rules.group, rules.disallow], ['*', ['/']], `"${name}" is not our product token`);
+  }
+  const barred = (group) => robotsRules(`User-agent: *\nDisallow: /\n\n${group}`);
+  assert.deepEqual(barred('User-agent: search\nDisallow:').disallow, ['/'], 'reproduction 1');
+  assert.deepEqual(barred('User-agent: Pittsburgh\nDisallow:').disallow, ['/'], 'reproduction 2');
+  assert.deepEqual(barred('User-agent: p\nAllow: /').disallow, ['/'], 'reproduction 3');
+  assert.deepEqual(robotsRules('User-agent: PittsburghPropSearch/0.1\nDisallow: /x/').disallow, ['/x/'], 'a versioned token names us');
+  for (const name of ['PittsburghPropSearch/0.1', 'pittsburghpropsearch']) {
+    assert.deepEqual(robotsRules(`User-agent: *\nDisallow: /\n\nUser-agent: ${name}\nDisallow: /x/\n`).disallow, ['/x/'], `"${name}" names us`);
+  }
+});
+
+test('photo downloads stop before any request when robots.txt disallows a photo path or has a rule we cannot apply', () => {
+  const photos = ['https://cdn.example/a/opt/one-640w.jpg', 'https://cdn.example/b/two-640w.jpg'];
+  assert.equal(robotsStopReason(robotsRules(''), photos, 'cdn.example'), null);
+  assert.equal(robotsStopReason(robotsRules('User-agent: *\nDisallow: /private/\n'), photos, 'cdn.example'), null);
+  assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /a/\n'), photos, 'cdn.example'), /disallows 1 of the 2 photo paths, for example \/a\/opt\/one-640w\.jpg/);
+  assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /*.jpg$\n'), photos, 'cdn.example'), /can't apply with certainty \(Disallow: \/\*\.jpg\$\)/);
 });

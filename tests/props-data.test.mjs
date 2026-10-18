@@ -28,7 +28,7 @@ const NAMED_ON_VENDOR_PAGES = new Set([
   'a762048a21c020d2bea56f4505e9bceb6a64bdc84d91063ffebf0e29be1a5c97',
   'd64d04ba625edb1fabfcd66fd4144143d734e5cdf9c7720daa6f244643b33289',
 ]);
-const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'shopify-export']);
+const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'duda-gallery', 'shopify-export']);
 
 function keysOf(value, found = new Set()) {
   if (value && typeof value === 'object') {
@@ -81,9 +81,7 @@ test('each catalog passes the import invariants and matches its expected counts'
         assert.deepEqual([...new Set(items.flatMap((item) => item.pages))].sort((a, b) => a - b), entry.itemPages);
       } else {
         assert.deepEqual(checkSiteItems(items, { vendor, catalog }), []);
-        const actual = catalog.type === 'wordpress-pages'
-          ? { pages: entry.pages, photos: entry.photos, items: items.length }
-          : { products: entry.products, items: items.length, excluded: entry.excluded };
+        const actual = Object.fromEntries(Object.keys(catalog.expected).map((name) => [name, name === 'items' ? items.length : entry[name]]));
         assert.deepEqual(actual, catalog.expected, catalog.id);
         assert.match(entry.capturedAt, /^\d{4}-\d{2}-\d{2}$/);
       }

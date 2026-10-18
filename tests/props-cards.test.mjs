@@ -127,6 +127,11 @@ test('catalog lines describe each snapshot, and a vendor with none says so', () 
   assert.deepEqual(catalogLines({ ...siteVendor, catalogs: [{ ...siteCatalog, title: 'Prop pages' }] }, { indexed, itemCounts }), [
     { text: 'Prop pages · captured 2026-10-17 · 23 items · indexed 2026-10-17 · ', href: 'https://vendor.example/props/', linkLabel: 'Open site' },
   ]);
+  const withExtraPages = { ...siteCatalog, title: 'Gallery', unindexedPages: [{ label: 'Accessories', url: 'https://vendor.example/accessories' }, { label: 'Trunks', url: 'https://vendor.example/trunks' }] };
+  assert.deepEqual(catalogLines({ ...siteVendor, catalogs: [withExtraPages] }, { indexed, itemCounts }).at(1), {
+    text: 'Also on their site, not indexed: ',
+    links: [{ href: 'https://vendor.example/accessories', label: 'Accessories' }, { href: 'https://vendor.example/trunks', label: 'Trunks' }],
+  });
   assert.deepEqual(catalogLines({ ...pdfVendor, catalogs: [{ ...pdfCatalog, title: 'Rental Catalog', version: '2026-09-30', pageCount: 49 }] }, { indexed }), [
     { text: 'Rental Catalog (version 2026-09-30, 49 pages) · indexed 2026-10-17 · ', href: 'https://drive.example/catalog', linkLabel: 'Open catalog on Google Drive' },
   ]);

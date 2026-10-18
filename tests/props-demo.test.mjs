@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { demoCatalogHref, pdfBox, privateVendorsFor, readPrivateVendors } from '../scripts/props/demo-links.mjs';
 import { privateFacts } from '../src/scripts/props-cards.js';
-import { demoAssetHandler, propsDemo } from '../scripts/props/demo-server.mjs';
+import { DEMO_EXCLUDED_KEYS, demoAssetHandler, propsDemo } from '../scripts/props/demo-server.mjs';
 import { demoEnv, demoWarnings, mergeManifest, photoUrl, privateOutputProblem } from '../scripts/props/demo.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -47,6 +47,7 @@ test('no vendor photo or catalog PDF is tracked, and the demo folder is ignored'
 });
 
 const TRACKED_CSV = ['comedy-festival-map.csv', 'festinfo.csv', 'tests/fixtures/props-shopify-export-current.csv', 'tests/fixtures/props-shopify-export-legacy.csv'];
+const TRACKED_HTML = ['tests/fixtures/props-vintage-alley.html'];
 
 test('raw vendor responses stay in the ignored cache, and only known CSV files are tracked', () => {
   assert.equal(git('ls-files', '.props-cache').stdout, '');
@@ -57,7 +58,7 @@ test('raw vendor responses stay in the ignored cache, and only known CSV files a
   }
   const tracked = git('ls-files').stdout.split('\n');
   assert.deepEqual(tracked.filter((file) => /\.csv$/i.test(file) && !TRACKED_CSV.includes(file)), [], 'a vendor export or other CSV is tracked');
-  assert.deepEqual(tracked.filter((file) => /\.html?$/i.test(file)), [], 'an HTML page is tracked');
+  assert.deepEqual(tracked.filter((file) => /\.html?$/i.test(file) && !TRACKED_HTML.includes(file)), [], 'a vendor HTML page is tracked');
 });
 
 class Response extends Writable {
@@ -89,6 +90,32 @@ test('the demo asset route serves only thumbnails and PDFs inside the demo folde
   for (const url of ['/manifest.json', '/thumbs/missing.webp', '/%2e%2e/escape.webp', '/thumbs/..%2f..%2fescape.pdf', '/%E0%A4%A']) {
     assert.equal(await request(url), 'next', url);
   }
+});
+
+test('photos listed in demo-exclusions.json are never thumbnailed or served, and each has a reason', async () => {
+  const exclusions = JSON.parse(await readFile(path.join(root, 'scripts/props/demo-exclusions.json'), 'utf8'));
+  const inventoryKeys = new Set(JSON.parse(await readFile(path.join(root, 'src/data/props/inventory.json'), 'utf8')).items.map((item) => item.key));
+  for (const [key, { reason }] of Object.entries(exclusions)) {
+    assert.ok(inventoryKeys.has(key), `${key} is an inventory item`);
+    assert.match(reason, /\S/, key);
+  }
+  assert.deepEqual([...DEMO_EXCLUDED_KEYS].sort(), Object.keys(exclusions).sort());
+  const directory = await mkdtemp(path.join(tmpdir(), 'props-demo-'));
+  await mkdir(path.join(directory, 'thumbs'));
+  const [excluded] = DEMO_EXCLUDED_KEYS;
+  for (const key of [excluded, 'scp-056']) await writeFile(path.join(directory, 'thumbs', `${key}.webp`), 'webp bytes');
+  const handler = demoAssetHandler(directory);
+  const request = (url) => new Promise((resolve) => {
+    const response = new Response();
+    response.on('finish', () => resolve('served'));
+    handler({ url }, response, () => resolve('next'));
+  });
+  for (const url of [`/thumbs/${excluded}.webp`, `/thumbs//${excluded}.webp`, `/thumbs/${excluded.toUpperCase()}.webp`, `/thumbs/${excluded}.WEBP`, `/THUMBS/${excluded}.webp`]) {
+    assert.equal(await request(url), 'next', `${url}: an excluded thumbnail is not served even if the file exists`);
+  }
+  assert.equal(await request('/thumbs/scp-056.webp'), 'served');
+  const { demoPhotoItems } = await import('../scripts/props/demo.mjs');
+  assert.deepEqual(demoPhotoItems([{ key: excluded }, { key: 'scp-056' }]).map((item) => item.key), ['scp-056'], 'the photo download skips excluded items before any request');
 });
 
 test('PROPS_DEMO=1 adds the asset route to dev only and makes astro build refuse to run', () => {
@@ -151,6 +178,13 @@ test('website photos are fetched at a modest size where the CDN offers one, and 
   const merged = mergeManifest(previous, 'dz-2026-10-17', { type: 'wordpress-pages', photos: 1 }, [['dz-cccccc', { catalog: 'dz-2026-10-17', thumb: { width: 320, height: 240 }, image: 'https://example.com/a.jpg' }]]);
   assert.deepEqual(Object.keys(merged.items).sort(), ['dz-aaaaaa', 'dz-cccccc', 'scp-056']);
   assert.deepEqual(merged.catalogs['scp-2026-09-30'], { sha256: 'x' });
+});
+
+test("photos come from the catalog's photo host, or else the site host, or Shopify's image host for an export", async () => {
+  const { photoHostFor } = await import('../scripts/props/demo.mjs');
+  assert.equal(photoHostFor({ type: 'duda-gallery', siteUrl: 'https://www.vendor.example/', photoHost: 'irp.cdn-website.com' }), 'irp.cdn-website.com');
+  assert.equal(photoHostFor({ type: 'wordpress-pages', siteUrl: 'https://vendor.example/props/' }), 'vendor.example');
+  assert.equal(photoHostFor({ type: 'shopify-export', siteUrl: 'https://shop.example/products/' }), 'cdn.shopify.com');
 });
 
 test('npm run props:demo warns about missing website photos and about visible private notes', () => {

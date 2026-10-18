@@ -12,10 +12,11 @@ import { createSiteFetcher } from './site-fetch.mjs';
 import { checkSiteItems } from './site-items.mjs';
 import { parsePages } from './sites/dezzign-central.mjs';
 import { parseExport } from './sites/retro-on-8th.mjs';
+import { parseCollections } from './sites/vintage-alley.mjs';
 
 const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
-const SITE_TYPES = new Set(['wordpress-pages', 'shopify-export']);
+const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export']);
 const WORDPRESS_PAGE_SIZE = 10;
 
 const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
@@ -28,6 +29,11 @@ const SOURCES = {
     const perPage = Number(new URL(catalog.sourceUrl).searchParams.get('per_page') ?? WORDPRESS_PAGE_SIZE);
     if (Array.isArray(pages) && pages.length >= perPage) throw new Error(`The answer is a full page of ${perPage}; there may be more pages than one request returns.`);
     return { ...parsePages(pages, { vendor, catalog }), capturedAt: localDate(meta.fetchedAt) };
+  },
+  async 'duda-gallery'({ vendor, catalog, fetcher, cacheRoot }) {
+    const pageFetcher = fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.sourceUrl).hostname] });
+    const { body, meta } = await pageFetcher.get(catalog.sourceUrl, join(cacheRoot, vendor.id, catalog.id));
+    return { ...parseCollections(body.toString('utf8'), { vendor, catalog }), capturedAt: localDate(meta.fetchedAt) };
   },
   async 'shopify-export'({ catalog, vendor, exportPath }) {
     if (!exportPath) throw new Error(`${vendor.name} is imported from the vendor's Shopify product export: pass --export "<file.csv>".`);

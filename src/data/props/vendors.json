@@ -705,6 +705,7 @@
     {
       "id": "vintage-alley",
       "name": "Vintage Alley Rentals",
+      "keyPrefix": "va",
       "siteUrl": "https://www.vintagealleypgh.com/",
       "sourceType": {
         "value": "vintage-rental",
@@ -755,7 +756,32 @@
       },
       "notice": null,
       "lastVerified": "2026-10-17",
-      "catalogs": []
+      "catalogs": [
+        {
+          "id": "va-2026-10-17",
+          "type": "duda-gallery",
+          "title": "Collections page on vintagealleypgh.com",
+          "sourceUrl": "https://www.vintagealleypgh.com/collections",
+          "siteUrl": "https://www.vintagealleypgh.com/",
+          "itemLinkLabel": "Open collections page",
+          "photoHost": "irp.cdn-website.com",
+          "unindexedPages": [
+            {
+              "label": "Accessories",
+              "url": "https://www.vintagealleypgh.com/accessories"
+            },
+            {
+              "label": "Trunks, Suitcases & Crates",
+              "url": "https://www.vintagealleypgh.com/trunks-suitcases-crates"
+            }
+          ],
+          "expected": {
+            "sections": 6,
+            "photos": 195,
+            "items": 195
+          }
+        }
+      ]
     },
     {
       "id": "wagon-wheel-antiques",

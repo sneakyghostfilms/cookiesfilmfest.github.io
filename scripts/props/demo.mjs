@@ -11,7 +11,9 @@ import { ROOT, VENDORS_FILE, extractCatalog, findCatalog, sha256 } from './catal
 import { pdfBox, readDemoManifest } from './demo-links.mjs';
 import { CACHE_ROOT, findSiteCatalog, loadSite } from './import-site.mjs';
 import { buildItems, cardIdentity, identityOf } from './normalize.mjs';
+import { DEMO_EXCLUDED_KEYS } from './demo-server.mjs';
 import { privateOutputProblem } from './private-output.mjs';
+import { robotsRules, robotsStopReason } from './robots.mjs';
 import { createSiteFetcher } from './site-fetch.mjs';
 import { IMAGE_HOST as SHOPIFY_IMAGE_HOST } from './sites/retro-on-8th.mjs';
 
@@ -27,6 +29,15 @@ export function photoUrl(url) {
   const parsed = new URL(url);
   if (parsed.hostname === SHOPIFY_IMAGE_HOST) parsed.searchParams.set('width', '640');
   return parsed.href;
+}
+
+export function demoPhotoItems(items, excludedKeys = DEMO_EXCLUDED_KEYS) {
+  return items.filter((item) => !excludedKeys.has(item.key));
+}
+
+export function photoHostFor(catalog) {
+  if (catalog.photoHost) return catalog.photoHost;
+  return catalog.type === 'shopify-export' ? SHOPIFY_IMAGE_HOST : new URL(catalog.siteUrl).hostname;
 }
 
 export function mergeManifest(previous, catalogId, catalogEntry, entries) {
@@ -105,9 +116,21 @@ async function buildSiteAssets(vendorId, exportPath) {
       throw new Error(`not in the local cache; run npm run props:import-site -- --vendor ${vendor.id} first`);
     },
   });
-  const { items, images } = await loadSite({ vendor, catalog, cacheRoot: CACHE_ROOT, fetcher: cachedOnly, exportPath });
-  const photoHost = catalog.type === 'shopify-export' ? SHOPIFY_IMAGE_HOST : new URL(catalog.siteUrl).hostname;
+  const loaded = await loadSite({ vendor, catalog, cacheRoot: CACHE_ROOT, fetcher: cachedOnly, exportPath });
+  const { images } = loaded;
+  const items = demoPhotoItems(loaded.items);
+  const photoHost = photoHostFor(catalog);
   const fetcher = createSiteFetcher({ allowHosts: [photoHost] });
+  const robots = await fetcher.get(`https://${photoHost}/robots.txt`, originals, { missingOk: true });
+  const rules = robotsRules(robots.missing ? '' : robots.body.toString('utf8'));
+  const firstPhotos = items.map((item) => images.get(item.key)?.urls[0]).filter(Boolean).map(photoUrl);
+  const stopReason = robotsStopReason(rules, firstPhotos, photoHost);
+  if (stopReason) throw new Error(stopReason);
+  if (rules.crawlDelaySeconds) fetcher.raiseGap(rules.crawlDelaySeconds * 1000);
+  const robotsNote = robots.missing
+    ? `unavailable, so no rules (HTTP ${robots.meta.status})`
+    : `group ${rules.group ?? 'none for us'}, ${rules.disallow.length} Disallow prefixes, Crawl-delay ${rules.crawlDelaySeconds ?? 'none'}`;
+  console.log(`robots.txt on ${photoHost}: ${robotsNote}`);
   const { default: sharp } = await import('sharp');
   await mkdir(thumbs, { recursive: true });
   const entries = [];
@@ -123,7 +146,8 @@ async function buildSiteAssets(vendorId, exportPath) {
   await writeFile(join(DEMO_DIR, 'manifest.json'), `${JSON.stringify(manifest, null, 1)}\n`);
   const photos = [...images.values()].reduce((sum, entry) => sum + entry.urls.length, 0);
   const { requests, cacheHits } = fetcher.stats();
-  console.log(`✅ ${entries.length} thumbnails for ${vendor.name} in .props-demo/thumbs (${requests} downloaded, ${cacheHits} from the local copy). ${photos - entries.length} more photos on their pages were not fetched; ${items.length - entries.length} items have no photo.`);
+  const excluded = loaded.items.length - items.length;
+  console.log(`✅ ${entries.length} thumbnails for ${vendor.name} in .props-demo/thumbs (${requests} downloaded, ${cacheHits} from the local copy). ${photos - entries.length} more photos on their pages were not fetched; ${items.length - entries.length} items have no photo${excluded ? `; ${excluded} items are kept out of the demo photos (scripts/props/demo-exclusions.json)` : ''}.`);
 }
 
 async function hasAssets(catalog) {

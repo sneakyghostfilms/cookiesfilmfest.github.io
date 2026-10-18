@@ -9,7 +9,7 @@ import test from 'node:test';
 import { demoCatalogHref, pdfBox, privateVendorsFor, readPrivateVendors } from '../scripts/props/demo-links.mjs';
 import { privateFacts } from '../src/scripts/props-cards.js';
 import { demoAssetHandler, propsDemo } from '../scripts/props/demo-server.mjs';
-import { privateOutputProblem } from '../scripts/props/demo.mjs';
+import { demoEnv, demoWarnings, mergeManifest, photoUrl, privateOutputProblem } from '../scripts/props/demo.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const git = (...args) => spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' });
@@ -136,6 +136,29 @@ test('private notes need both the demo and PROPS_SHOW_PRIVATE=1, which npm run p
   assert.equal(reads, 0, 'the private file is not even read');
   const shown = privateFacts(privateVendorsFor({ PROPS_DEMO: '1', PROPS_SHOW_PRIVATE: '1' }, read)['steel-city-props']);
   assert.deepEqual(shown, ['Listing permission: declined; photo permission: asked (as of 2026-10-17)', 'Notes: SENTINEL-PRIVATE-NOTE']);
-  const demo = await readFile(path.join(root, 'scripts/props/demo.mjs'), 'utf8');
-  assert.doesNotMatch(demo, /PROPS_SHOW_PRIVATE/, 'npm run props:demo never sets the flag');
+  assert.equal(demoEnv({}).PROPS_SHOW_PRIVATE, undefined, 'npm run props:demo never sets the flag');
+  assert.equal(demoEnv({}).PROPS_DEMO, '1');
+});
+
+test('website photos are fetched at a modest size where the CDN offers one, and the manifest keeps each catalog apart', () => {
+  assert.equal(photoUrl('https://cdn.shopify.com/s/files/1/0000/products/lamp.jpg?v=1'), 'https://cdn.shopify.com/s/files/1/0000/products/lamp.jpg?v=1&width=640');
+  assert.equal(photoUrl('https://dezzigncentralpgh.com/wp-content/uploads/2015/02/chair.jpg'), 'https://dezzigncentralpgh.com/wp-content/uploads/2015/02/chair.jpg');
+  const previous = {
+    schemaVersion: 1,
+    catalogs: { 'scp-2026-09-30': { sha256: 'x' }, 'dz-old': { type: 'wordpress-pages', photos: 1 } },
+    items: { 'scp-056': { catalog: 'scp-2026-09-30', page: 5 }, 'dz-aaaaaa': { catalog: 'dz-old' }, 'dz-bbbbbb': { catalog: 'dz-2026-10-17' } },
+  };
+  const merged = mergeManifest(previous, 'dz-2026-10-17', { type: 'wordpress-pages', photos: 1 }, [['dz-cccccc', { catalog: 'dz-2026-10-17', thumb: { width: 320, height: 240 }, image: 'https://example.com/a.jpg' }]]);
+  assert.deepEqual(Object.keys(merged.items).sort(), ['dz-aaaaaa', 'dz-cccccc', 'scp-056']);
+  assert.deepEqual(merged.catalogs['scp-2026-09-30'], { sha256: 'x' });
+});
+
+test('npm run props:demo warns about missing website photos and about visible private notes', () => {
+  const vendors = { vendors: [
+    { name: 'Steel City Props', id: 'steel-city-props', catalogs: [{ id: 'scp-2026-09-30', type: 'pdf' }] },
+    { name: 'Dezzign Central', id: 'dezzign-central', catalogs: [{ id: 'dz-2026-10-17', type: 'wordpress-pages' }] },
+  ] };
+  assert.deepEqual(demoWarnings({}, vendors, { catalogs: { 'dz-2026-10-17': { photos: 23 } } }), []);
+  assert.match(demoWarnings({}, vendors, null).join('\n'), /No local photos for Dezzign Central.*--vendor dezzign-central/);
+  assert.match(demoWarnings({ PROPS_SHOW_PRIVATE: '1' }, vendors, { catalogs: { 'dz-2026-10-17': {} } }).join('\n'), /private vendor notes are visible on the page\. Do not screenshare it\./);
 });

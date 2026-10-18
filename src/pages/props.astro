@@ -68,7 +68,8 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         <h1 class="props-title">Pittsburgh Prop Search</h1>
         <p class="props-subtitle">Search local prop rental catalogs in plain English.</p>
         <a href="/" class="props-back">Back to Main Site</a>
-        {demo && <p class="props-demo-marker"><span>Local demo, not public</span></p>}
+        {demoMode && <p class="props-demo-marker"><span>Local demo, not public</span></p>}
+        {privateVendors && <p class="props-demo-marker"><span>Private vendor notes visible: do not screenshare</span></p>}
       </header>
 
       <section class="props-box props-about">
@@ -183,6 +184,6 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
 
     <script>import "../scripts/props-page.ts";</script>
 
-    {demo && <style is:inline set:html={DEMO_STYLES}></style>}
+    {demoMode && <style is:inline set:html={DEMO_STYLES}></style>}
   </body>
 </html>

@@ -21,6 +21,7 @@
   "dz-7u38md": { "drop": ["cooler"], "reason": "a refrigerator, not a cooler" },
   "dz-uwo8gc": { "drop": ["bike"], "reason": "an exercise bike, not a bicycle" },
   "dz-x77baz": { "drop": ["window pane"], "reason": "the vendor calls it stained glass in a frame, not a window" },
-  "dz-vmi74l": { "drop": ["ship"], "reason": "the vendor calls it a boat; a ship is a larger vessel" },
-  "dz-eafo2u": { "drop": ["exam table"], "reason": "a morgue table, not a doctor's examination table" }
+  "dz-eafo2u": { "drop": ["exam table"], "reason": "a morgue table, not a doctor's examination table" },
+  "dz-wfg3zg": { "drop": ["blow dryer"], "reason": "a salon hood dryer chair in the vendor's photo, not a handheld blow dryer" },
+  "dz-vmi74l": { "drop": ["skiff"], "reason": "the vendor's photo shows a two-masted sailing vessel, not a skiff" }
 }

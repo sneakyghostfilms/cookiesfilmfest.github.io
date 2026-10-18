@@ -41,6 +41,10 @@ const SOURCES = {
   },
 };
 
+export function loadSite({ vendor, catalog, cacheRoot = CACHE_ROOT, fetcher, exportPath }) {
+  return SOURCES[catalog.type]({ vendor, catalog, cacheRoot, fetcher, exportPath });
+}
+
 export function findSiteCatalog(vendors, vendorId) {
   const vendor = vendors.vendors.find((entry) => entry.id === vendorId);
   if (!vendor) throw new Error(`No vendor "${vendorId}" in src/data/props/vendors.json.`);
@@ -51,7 +55,7 @@ export function findSiteCatalog(vendors, vendorId) {
 
 export async function importSite({ vendorId, vendors, outFile = INVENTORY_FILE, cacheRoot = CACHE_ROOT, fetcher, exportPath, log = console.log, today = () => localDate(Date.now()) }) {
   const { vendor, catalog } = findSiteCatalog(vendors, vendorId);
-  const parsed = await SOURCES[catalog.type]({ vendor, catalog, cacheRoot, fetcher, exportPath });
+  const parsed = await loadSite({ vendor, catalog, cacheRoot, fetcher, exportPath });
   const { items, counts, report, capturedAt } = parsed;
   log([`${vendor.name} · ${catalog.id} (captured ${capturedAt})`, ...report].join('\n'));
   const actual = { ...counts };

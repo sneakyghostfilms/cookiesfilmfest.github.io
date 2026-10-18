@@ -143,6 +143,12 @@
   border-radius: 2px;
 }
 
+@media (min-width: 641px) {
+  .props-page .props-controls:has(#props-vendor) {
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  }
+}
+
 .props-page .props-field {
   display: flex;
   flex-direction: column;

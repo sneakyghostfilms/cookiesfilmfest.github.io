@@ -43,8 +43,11 @@ export function ranked(text, period = '') {
 
 export function diversify(order, terms, { size, quota }) {
   const rank = new Map(order.map((doc, position) => [doc.key, position]));
+  // Event rentals take no word or pair slot, so bulk event stock can't crowd out the props a scene names. They still
+  // compete by rank in the fill.
+  const eventRentals = new Set(order.filter((doc) => doc.kind === 'event-rental').map((doc) => doc.key));
   const queue = terms
-    .map(({ keys }, first) => ({ first, keys: keys.filter((key) => rank.has(key)).sort((a, b) => rank.get(a) - rank.get(b)) }))
+    .map(({ keys }, first) => ({ first, keys: keys.filter((key) => rank.has(key) && !eventRentals.has(key)).sort((a, b) => rank.get(a) - rank.get(b)) }))
     .filter(({ keys }) => keys.length)
     .sort((a, b) => a.keys.length - b.keys.length || a.first - b.first);
   const picked = new Set();

@@ -10,7 +10,9 @@ const directory = new URL('./fixtures/scenes/', import.meta.url);
 const fixtures = await Promise.all((await readdir(directory)).filter((file) => file.endsWith('.json')).sort()
   .map(async (file) => JSON.parse(await readFile(new URL(file, directory), 'utf8'))));
 const office = fixtures.find((fixture) => fixture.id === 'office').text;
-const UNREACHABLE = { diner: ['bills'] };
+// The props no shortlist reaches: the bills' one match, a movie-money lot, shares no word with them and ranks too low,
+// and the neon sign's matches are all event rentals, which take no word slot.
+const UNREACHABLE = { diner: ['neon sign', 'bills'] };
 
 test('at the shortlist size, each fixture keeps exactly the required props it is pinned to', () => {
   assert.equal(LIMITS.shortlistSize, 100);
@@ -101,6 +103,14 @@ test('a word pair keeps the best item matching both words, which neither word al
   const terms = [['red', ['a', 'c']], ['chair', ['b', 'c']]];
   assert.deepEqual(pick(['a', 'b', 'x', 'c'], terms, 2), ['a', 'b']);
   assert.deepEqual(pick(['a', 'b', 'x', 'c'], [...terms, ['red chair', ['c']]], 2), ['a', 'c']);
+});
+
+test('an event rental takes no word or pair slot, even when it ranks first, but competes by rank in the fill', () => {
+  const order = [{ key: 'a' }, { key: 'b' }, { key: 'e', kind: 'event-rental' }, { key: 'c' }];
+  const keysOf = (terms, size) => diversify(order, terms.map(([term, keys]) => ({ term, keys })), { size, quota: 1 }).map((doc) => doc.key);
+  assert.deepEqual(keysOf([['neon', ['e']], ['rare', ['c']]], 2), ['a', 'c'], 'a word only an event rental matches gets no slot');
+  assert.deepEqual(keysOf([['sign', ['e', 'c']]], 1), ['c'], "the word's slot goes to its best match that is not an event rental");
+  assert.deepEqual(keysOf([['neon sign', ['e']], ['rare', ['c']]], 4), ['a', 'b', 'e', 'c'], 'in the fill, the event rental keeps its rank');
 });
 
 test('items outside the ranking, such as those a period leaves out, are never picked, and the size is a hard cap', () => {

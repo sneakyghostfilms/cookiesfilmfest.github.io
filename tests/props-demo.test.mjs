@@ -6,7 +6,7 @@ import path from 'node:path';
 import { Writable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { demoCatalogHref, pdfBox } from '../scripts/props/demo-links.mjs';
+import { demoCatalogHref, pdfBox, readPrivateVendors } from '../scripts/props/demo-links.mjs';
 import { demoAssetHandler, propsDemo } from '../scripts/props/demo-server.mjs';
 import { privateOutputProblem } from '../scripts/props/demo.mjs';
 
@@ -49,6 +49,8 @@ const TRACKED_CSV = ['comedy-festival-map.csv', 'festinfo.csv', 'tests/fixtures/
 
 test('raw vendor responses stay in the ignored cache, and only known CSV files are tracked', () => {
   assert.equal(git('ls-files', '.props-cache').stdout, '');
+  assert.equal(git('ls-files', '.props-private').stdout, '');
+  assert.equal(git('check-ignore', '-q', '.props-private/vendors.json').status, 0, '.props-private/vendors.json');
   for (const file of ['.props-cache/dezzign-central/dz-2026-10-17/0123456789abcdef.body', '.props-demo/originals/dezzign-central/0123456789abcdef.body']) {
     assert.equal(git('check-ignore', '-q', file).status, 0, file);
   }
@@ -107,4 +109,14 @@ test('catalog links open the local PDF at the item page, zoomed to its photo', (
   const box = pdfBox([13.75, 1.2, 154.02, 141.47], 842.25);
   assert.deepEqual(box, { left: 13.75, top: 841.05, right: 154.02, bottom: 700.78 });
   assert.equal(demoCatalogHref({ catalog: 'scp-2026-09-30', page: 5, box }), '/props-demo/catalogs/scp-2026-09-30.pdf#page=5&zoom=150,1,854');
+});
+
+test('private vendor notes are read only from the ignored folder, and only for the local demo', async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'props-private-'));
+  assert.equal(readPrivateVendors(directory), null);
+  await writeFile(path.join(directory, 'vendors.json'), JSON.stringify({ 'steel-city-props': { notes: 'n' } }));
+  assert.deepEqual(readPrivateVendors(directory), { 'steel-city-props': { notes: 'n' } });
+  const page = await readFile(path.join(root, 'src/pages/props.astro'), 'utf8');
+  assert.match(page, /const privateVendors = demoMode \? readPrivateVendors\(\) : null;/);
+  assert.equal(page.match(/readPrivateVendors\(/g).length, 1, 'no other read of the private file');
 });

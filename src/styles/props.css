@@ -207,12 +207,6 @@
   max-width: 360px;
 }
 
-.props-page .scene-era-note {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--pp-ink);
-}
-
 .props-page .scene-off,
 .props-page .scene-status {
   margin: 8px 0 0;

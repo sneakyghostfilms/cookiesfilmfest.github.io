@@ -30,7 +30,7 @@ The Worker is served from `*.workers.dev`, because cookiesfilmfest.com's DNS is 
 ```
 
 - `keys` are keys from `src/data/props/inventory.json` that were on the shortlist sent with this scene. Keys the model invents, or takes from outside the shortlist, are dropped and counted in `ignoredSuggestions`. An empty `keys` list means no matching item was found on the shortlist.
-- The model usually lists props the catalog lacks with an empty `keys` list, but it can leave some out, and a scene that names more props than the lists hold gets matches for only some of them. The page therefore says under every answer: "Props not listed above were not identified or have no match in this catalog; try keyword search for them."
+- The model usually lists props the catalog lacks with an empty `keys` list, but it can leave some out, and a scene that names more props than the lists hold gets matches for only some of them. The page therefore says under every answer: "The AI chose from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them."
 - `chargedNeurons` is what the request finally cost the daily budget (see Cost guard).
 - Every error has the shape `{ "ok": false, "error": "<code>", "message": "..." }`:
 

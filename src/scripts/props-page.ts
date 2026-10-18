@@ -1,11 +1,12 @@
-import { buildIndex, parseDecades, search } from "./props-search.js";
-import { checkSceneText, eraNote, keepKnownKeys, requestScene } from "./props-scene.js";
+import { buildIndex, search } from "./props-search.js";
+import { checkSceneText, keepKnownKeys, periodNote, requestScene } from "./props-scene.js";
 
 const PAGE_SIZE = 24;
 const list = document.getElementById("props-results") as HTMLOListElement;
 const query = document.getElementById("props-query") as HTMLInputElement;
 const category = document.getElementById("props-category") as HTMLSelectElement;
 const decade = document.getElementById("props-decade") as HTMLSelectElement;
+const vendor = document.getElementById("props-vendor") as HTMLSelectElement | null;
 const count = document.getElementById("props-count") as HTMLElement;
 const empty = document.getElementById("props-empty") as HTMLElement;
 const more = document.getElementById("props-more") as HTMLButtonElement;
@@ -19,7 +20,8 @@ const docs = [...list.querySelectorAll<HTMLElement>(".prop-card")].map((card) =>
     key: card.dataset.key!,
     name,
     description: `${name} ${era}`,
-    categories: card.dataset.categories!.split("|"),
+    categories: card.dataset.categories ? card.dataset.categories.split("|") : [],
+    vendor: card.dataset.vendor!,
     tags: card.querySelector(".prop-tag-list")?.textContent?.split(", ") ?? [],
     decades: card.dataset.decades ? card.dataset.decades.split(" ").map(Number) : [],
     order: Number(card.dataset.order),
@@ -40,14 +42,14 @@ function render() {
   empty.textContent = text
     ? `No catalog items matched “${text}”. Try fewer or simpler words, or clear the filters.`
     : "No items match these filters. Clear a filter to see more.";
-  const filtered = text || category.value || decade.value;
+  const filtered = text || category.value || decade.value || vendor?.value;
   count.textContent = filtered
     ? `${results.length} matching ${results.length === 1 ? "item" : "items"}${results.length > shown ? `, showing ${shown}` : ""}`
     : `${docs.length} items, listed alphabetically${results.length > shown ? `, showing ${shown}` : ""}`;
 }
 
 function update() {
-  results = search(index, query.value, { category: category.value, decade: decade.value });
+  results = search(index, query.value, { category: category.value, decade: decade.value, vendor: vendor?.value ?? "" });
   shown = PAGE_SIZE;
   render();
 }
@@ -60,6 +62,7 @@ query.addEventListener("input", () => {
 form.addEventListener("submit", (event) => event.preventDefault());
 category.addEventListener("change", update);
 decade.addEventListener("change", update);
+vendor?.addEventListener("change", update);
 more.addEventListener("click", () => {
   shown += PAGE_SIZE;
   render();
@@ -92,11 +95,12 @@ function searchFor(prop: string) {
   query.value = prop;
   category.value = "";
   decade.value = "";
+  if (vendor) vendor.value = "";
   update();
   list.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function propBlock(entry: { prop: string; reason: string; keys: string[] }, periodDecades: Set<number>) {
+function propBlock(entry: { prop: string; reason: string; keys: string[] }) {
   const block = element("div", "scene-prop");
   block.append(element("h4", "scene-prop-name", entry.prop));
   if (entry.reason) block.append(element("p", "scene-reason", `AI: ${entry.reason}`));
@@ -105,8 +109,6 @@ function propBlock(entry: { prop: string; reason: string; keys: string[] }, peri
     for (const key of entry.keys) {
       const copy = cardsByKey.get(key)!.cloneNode(true) as HTMLElement;
       copy.hidden = false;
-      const note = eraNote(periodDecades, (copy.dataset.decades ?? "").split(" ").filter(Boolean).map(Number));
-      if (note) copy.querySelector(".prop-line")!.after(element("p", "scene-era-note", note));
       matches.append(copy);
     }
     block.append(matches);
@@ -121,11 +123,11 @@ function propBlock(entry: { prop: string; reason: string; keys: string[] }, peri
   return block;
 }
 
-function group(title: string, entries: { prop: string; reason: string; keys: string[] }[], periodDecades: Set<number>) {
+function group(title: string, entries: { prop: string; reason: string; keys: string[] }[]) {
   const section = element("div", "scene-group");
   section.append(element("h3", "scene-group-title", title));
   if (!entries.length) section.append(element("p", "props-note", "None listed."));
-  for (const entry of entries) section.append(propBlock(entry, periodDecades));
+  for (const entry of entries) section.append(propBlock(entry));
   return section;
 }
 
@@ -163,12 +165,13 @@ sceneForm.addEventListener("submit", async (event) => {
       return;
     }
     showStatus("");
-    const periodDecades = parseDecades(period);
-    sceneResults.append(group("Required by the scene", kept.required, periodDecades), group("Optional set dressing", kept.optional, periodDecades));
+    sceneResults.append(group("Required by the scene", kept.required), group("Optional set dressing", kept.optional));
     const notes = [
-      "Props not listed above were not identified or have no match in this catalog; try keyword search for them.",
+      "The AI chose from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them.",
       `Matched by AI (${kept.model}). AI can be wrong; check each item in the catalog and confirm availability with the vendor.`,
     ];
+    const excluded = periodNote(period);
+    if (excluded) notes.push(excluded);
     if (kept.ignored) notes.push(`${kept.ignored} AI ${kept.ignored === 1 ? "suggestion referred to an item that doesn't" : "suggestions referred to items that don't"} exist and ${kept.ignored === 1 ? "was" : "were"} ignored.`);
     for (const note of notes) sceneResults.append(element("p", "props-note", note));
     return;

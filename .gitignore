@@ -30,6 +30,9 @@ __pycache__/
 # raw responses fetched from vendor websites, never committed (see CLAUDE.md, Pittsburgh Prop Search)
 .props-cache/
 
+# private notes about our relationship with each vendor, local demo only (see CLAUDE.md, Pittsburgh Prop Search)
+.props-private/
+
 # macOS-specific files
 .DS_Store
 

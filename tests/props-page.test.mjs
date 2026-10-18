@@ -4,7 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { compareByName } from '../src/scripts/props-search.js';
+import { compareByName, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dist = path.join(root, 'dist');
@@ -91,7 +91,7 @@ test('the AI scene box discloses AI processing and stays switched off until a Wo
   const config = JSON.parse(await read('src/data/props/config.json'));
   assert.equal(config.apiUrl, '', 'the committed site must not call the Worker until Scott approves');
   assert.ok(text.includes('Paste a scene to find props (AI)'));
-  assert.ok(text.includes("Your text is sent to Cloudflare Workers AI to pick props from this catalog. This site doesn't store or log it."));
+  assert.ok(text.includes("Your text is sent to Cloudflare Workers AI to pick props from these catalogs. This site doesn't store or log it."));
   assert.ok(text.includes("AI scene matching isn't switched on yet. Keyword search works."));
   assert.match(html, /<form id="scene-form" class="scene-form" data-api-url(="")?>/);
   assert.match(html, /<textarea id="scene-text"[^>]*\sdisabled[\s>]/);
@@ -105,5 +105,49 @@ test('scene results tell the reader that unlisted props were not identified or h
   const sources = await Promise.all(scripts.map((file) => readFile(file, 'utf8')));
   const pageScript = sources.find((source) => source.includes('Matched by AI'));
   assert.ok(pageScript, 'the /props script is built');
-  assert.ok(pageScript.includes('Props not listed above were not identified or have no match in this catalog; try keyword search for them.'));
+  assert.ok(pageScript.includes('The AI chose from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them.'));
+  assert.ok(pageScript.includes('were left out of AI matching.'), 'a period filter is disclosed');
+  assert.ok(!pageScript.includes('differs from your period'), 'the old era note is gone');
+});
+
+test('every card names its vendor, and the vendor filter appears only with more than one vendor', () => {
+  const cardVendors = [...html.matchAll(/<li class="prop-card" data-key="[^"]+" data-vendor="([^"]+)"/g)].map(([, id]) => id);
+  assert.equal(cardVendors.length, inventory.items.length);
+  const withItems = vendors.vendors.filter((entry) => inventory.items.some((item) => item.vendor === entry.id));
+  assert.equal(/<select id="props-vendor">/.test(html), withItems.length > 1);
+});
+
+test('vendor boxes show the published facts with their sources, and nothing private', () => {
+  assert.ok(text.includes('To rent from Steel City Props: official contact form · steelcitypropsllc@gmail.com'));
+  assert.ok(text.includes('Terms they publish: “We will send a quote back as soon we review your request.”'));
+  assert.ok(text.includes('Prop house. Offers: rentals'));
+  assert.ok(text.includes('Address: Pittsburgh, PA'));
+  assert.match(text, /Details as the vendor publishes them, last checked 2026-10-17: instagram\.com\/steelcityprops · catalog page 3 · catalog page 1 · forms\.gle\/JJqcgmxkJFwqKLXF9 · linktr\.ee\/steelcityprops \./);
+  assert.ok(html.includes('href="https://linktr.ee/steelcityprops"'));
+  assert.ok(!text.includes('Private, local demo only'), 'relationship notes appear only in the local demo');
+  assert.ok(!/permission|not asked/i.test(text));
+});
+
+test('the page builds its search documents from the cards the same way the Worker builds them from the inventory', async () => {
+  const { searchDocs } = await import('../worker/src/inventory.js');
+  const tagsFile = JSON.parse(await read('src/data/props/tags.json'));
+  const fromPage = new Map([...html.matchAll(/<li class="prop-card"[\s\S]*?<\/li>/g)].map(([card]) => {
+    const pick = (pattern) => decode(card.match(pattern)?.[1] ?? '');
+    const name = pick(/<span class="prop-name">([^<]*)<\/span>/);
+    const era = pick(/<span class="prop-era">([^<]*)<\/span>/);
+    const categories = pick(/data-categories="([^"]*)"/);
+    return [pick(/data-key="([^"]*)"/), {
+      name: tokenize(name),
+      description: tokenize(`${name} ${era}`),
+      categories: categories ? categories.split('|') : [],
+      tags: pick(/<span class="prop-tag-list">([^<]*)<\/span>/) ? pick(/<span class="prop-tag-list">([^<]*)<\/span>/).split(', ') : [],
+      decades: pick(/data-decades="([^"]*)"/) ? pick(/data-decades="([^"]*)"/).split(' ').map(Number) : [],
+      vendor: pick(/data-vendor="([^"]*)"/),
+    }];
+  }));
+  for (const doc of searchDocs(inventory.items, tagsFile.tags)) {
+    assert.deepEqual(fromPage.get(doc.key), {
+      name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor,
+    }, doc.key);
+  }
 });

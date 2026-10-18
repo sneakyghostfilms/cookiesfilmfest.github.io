@@ -45,6 +45,18 @@ test('no vendor photo or catalog PDF is tracked, and the demo folder is ignored'
   }
 });
 
+const TRACKED_CSV = ['comedy-festival-map.csv', 'festinfo.csv', 'tests/fixtures/props-shopify-export-current.csv', 'tests/fixtures/props-shopify-export-legacy.csv'];
+
+test('raw vendor responses stay in the ignored cache, and only known CSV files are tracked', () => {
+  assert.equal(git('ls-files', '.props-cache').stdout, '');
+  for (const file of ['.props-cache/dezzign-central/dz-2026-10-17/0123456789abcdef.body', '.props-demo/originals/dezzign-central/0123456789abcdef.body']) {
+    assert.equal(git('check-ignore', '-q', file).status, 0, file);
+  }
+  const tracked = git('ls-files').stdout.split('\n');
+  assert.deepEqual(tracked.filter((file) => /\.csv$/i.test(file) && !TRACKED_CSV.includes(file)), [], 'a vendor export or other CSV is tracked');
+  assert.deepEqual(tracked.filter((file) => /\.html?$/i.test(file)), [], 'an HTML page is tracked');
+});
+
 class Response extends Writable {
   headers = {};
   body = '';

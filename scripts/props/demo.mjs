@@ -4,28 +4,20 @@ import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
-import { isAbsolute, join, relative, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { ROOT, VENDORS_FILE, extractCatalog, findCatalog, sha256 } from './catalog-pdf.mjs';
 import { pdfBox, readDemoManifest } from './demo-links.mjs';
 import { buildItems, cardIdentity, identityOf } from './normalize.mjs';
+import { privateOutputProblem } from './private-output.mjs';
+
+export { privateOutputProblem };
 
 export const DEMO_DIR = join(ROOT, '.props-demo');
 const CROPPER = join(ROOT, 'scripts/props/crop_thumbs.py');
 const DEMO_PORT = 4321;
 const DEMO_API_URL = 'https://pgh-prop-search.sdanzig.workers.dev';
-
-export function privateOutputProblem(path, root = ROOT) {
-  const resolved = resolve(root, path);
-  const inside = relative(root, resolved);
-  if (inside.startsWith('..') || isAbsolute(inside)) return `${resolved} is outside the repository`;
-  const top = inside.split(/[\\/]/)[0];
-  if (top === 'public' || top === 'src') return `${resolved} is under ${top}/`;
-  const check = spawnSync('git', ['-C', root, 'check-ignore', '-q', join(resolved, 'probe.webp')]);
-  if (check.status !== 0) return `git does not ignore ${resolved}`;
-  return null;
-}
 
 function assertPrivate(directory) {
   const problem = privateOutputProblem(directory);

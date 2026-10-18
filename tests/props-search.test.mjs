@@ -225,6 +225,7 @@ test('the vendor strip matches a vendor by its name or its own words, never by o
   assert.deepEqual(ids('antique'), ['wagon-wheel-antiques'], 'by its name, and not PCCR, whose type label says antiques');
   assert.deepEqual(ids('costume'), ['public-theater-costumes']);
   assert.deepEqual(ids('tents'), ['windswept'], 'by its own words');
+  assert.deepEqual(ids('furniture').sort(), ['cleveland-play-house-props', 'wagon-wheel-antiques', 'windswept'], "Wagon Wheel by its home page's stock list, beside the two vendors whose own words already say furniture");
   assert.deepEqual(ids('typewriters'), [], 'Cleveland Prop Shop, now with searchable items, leaves the strip');
   assert.deepEqual(ids('film'), ['pittsburgh-clo-construction-center'], 'a vendor with searchable items leaves the strip');
   assert.deepEqual(ids('the props'), [], 'stopwords alone match nothing');

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { FetchStopped, JITTER_MS, MIN_GAP_MS, TIMEOUT_MS, USER_AGENT, cacheName, createSiteFetcher, hostProblem } from '../scripts/props/site-fetch.mjs';
-import { robotsAllow, robotsRules, robotsStopReason } from '../scripts/props/robots.mjs';
+import { robotsAllow, robotsRules, robotsStopReason, robotsTarget } from '../scripts/props/robots.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const HOST = 'vendor.example.com';
@@ -166,7 +166,7 @@ test('missingOk reads 401, 403, 404 or 410 as missing (RFC 9309: robots.txt unav
   }
 });
 
-test('robots rules: our named group beats *, plain prefixes only, anything else is reported instead of guessed', () => {
+test('robots rules: our named group beats *, groups for the same agent merge, and a rule we cannot apply is reported instead of guessed', () => {
   assert.deepEqual(robotsRules(''), { group: null, disallow: [], crawlDelaySeconds: null, unsupported: [] });
   const star = robotsRules('User-agent: *\nDisallow: /private/\nCrawl-delay: 5\nAllow: /private/ok\n');
   assert.deepEqual(star, { group: '*', disallow: ['/private/'], crawlDelaySeconds: 5, unsupported: [] });
@@ -177,8 +177,10 @@ test('robots rules: our named group beats *, plain prefixes only, anything else 
   assert.deepEqual(robotsRules('User-agent: other\nUser-agent: *\nDisallow: /x\n').disallow, ['/x'], 'a group can name several agents');
   assert.deepEqual(robotsRules('User-agent: *\nDisallow:\n').disallow, [], 'an empty Disallow allows everything');
   for (const eol of ['\n', '\r\n', '\r']) assert.deepEqual(robotsRules(`User-agent: *${eol}Disallow: /private/${eol}`).disallow, ['/private/'], JSON.stringify(eol));
-  assert.deepEqual(robotsRules('User-agent: *\nDisallow: /*.jpg$\n').unsupported, ['Disallow: /*.jpg$']);
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow: /*.jpg$\n').disallow, ['/*.jpg$'], 'wildcards and a final $ are applied');
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow: /a$b\n').unsupported, ['Disallow: /a$b'], 'a $ before the end is not');
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: images\n').unsupported, ['Disallow: images']);
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow: /a/\n\nUser-agent: *\nDisallow: /b/\n').disallow, ['/a/', '/b/'], 'two * groups merge');
   assert.deepEqual(robotsRules('User-agent: *\nCrawl-delay: soon\n').unsupported, ['Crawl-delay: soon']);
   assert.deepEqual(robotsRules('User-agent: other\nDisallow: /*\n').unsupported, [], "another agent's rules don't apply to us");
   for (const name of ['search', 'Pittsburgh', 'p', 'PittsburghPropSearchBot']) {
@@ -200,5 +202,31 @@ test('photo downloads stop before any request when robots.txt disallows a photo 
   assert.equal(robotsStopReason(robotsRules(''), photos, 'cdn.example'), null);
   assert.equal(robotsStopReason(robotsRules('User-agent: *\nDisallow: /private/\n'), photos, 'cdn.example'), null);
   assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /a/\n'), photos, 'cdn.example'), /disallows 1 of the 2 photo paths, for example \/a\/opt\/one-640w\.jpg/);
-  assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /*.jpg$\n'), photos, 'cdn.example'), /can't apply with certainty \(Disallow: \/\*\.jpg\$\)/);
+  assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /*.jpg$\n'), photos, 'cdn.example'), /disallows 2 of the 2 photo paths/);
+  assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /a$b\n'), photos, 'cdn.example'), /can't apply with certainty \(Disallow: \/a\$b\)/);
+  const sized = ['https://cdn.example/u/one.jpeg?width=640'];
+  assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /*?width=\n'), sized, 'cdn.example'), /disallows 1 of the 1 photo paths, for example \/u\/one\.jpeg\?width=640/, 'the query is part of what a rule matches');
+  assert.equal(robotsStopReason(robotsRules('User-agent: *\nDisallow: /*.jpeg$\n'), sized, 'cdn.example'), null, 'a final $ ends at the path and query');
+});
+
+test("robots rules match the path and query as RFC 9309's examples do, with regex characters taken literally", () => {
+  const vectors = [
+    ['/fish', '/fish', true], ['/fish', '/fish.html', true], ['/fish', '/fish/salmon.html', true], ['/fish', '/fishheads', true],
+    ['/fish', '/fish.php?id=anything', true], ['/fish', '/Fish.asp', false], ['/fish', '/catfish', false], ['/fish', '/?id=fish', false],
+    ['/fish*', '/fishheads/yummy.html', true], ['/fish*', '/catfish', false],
+    ['/fish/', '/fish/?id=anything', true], ['/fish/', '/fish', false],
+    ['/*.php', '/index.php', true], ['/*.php', '/folder/filename.php?parameters', true], ['/*.php', '/windows.PHP', false],
+    ['/*.php$', '/folder/filename.php', true], ['/*.php$', '/filename.php?parameters', false], ['/*.php$', '/filename.php5', false],
+    ['/fish*.php', '/fishheads/catfish.php?parameters', true], ['/fish*.php', '/Fish.PHP', false],
+    ['/', '/anything?x=1', true], ['/$', '/', true], ['/$', '/a', false],
+    ['/*?add-to-basket=', '/shop/', false], ['/*?add-to-basket=', '/shop/?add-to-basket=5', true],
+    ['/*?*add-to-basket=', '/shop/?a=1&add-to-basket=5', true], ['/*?*add-to-basket=', '/shop/?view=list', false],
+    ['/item/*/*/review', '/item/lamp/42/review', true], ['/item/*/*/review', '/item/lamp/42', false],
+    ['/?q=', '/?q=lamp', true], ['/?q=', '/', false], ['/page/*/?q=', '/shop/page/2/', false],
+    ['/a.b', '/axb', false], ['/a.b', '/a.b', true], ['/a+b', '/a+b', true], ['/a+b', '/aab', false], ['/a(b)', '/a(b)/c', true], ['/a**b', '/a-x-b', true],
+  ];
+  for (const [rule, target, disallowed] of vectors) {
+    assert.equal(!robotsAllow(robotsRules(`User-agent: *\nDisallow: ${rule}\n`), target), disallowed, `${rule} on ${target}`);
+  }
+  assert.equal(robotsTarget('https://cdn.example/a/b.jpeg?width=640'), '/a/b.jpeg?width=640');
 });

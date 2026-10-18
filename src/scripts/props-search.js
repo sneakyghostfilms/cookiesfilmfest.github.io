@@ -145,10 +145,7 @@ export function search(index, query = '', { category = '', decade = '', vendor =
   const terms = splitTerms(index, queryTerms(query));
   const decades = parseDecades(query);
   if (!terms.words.length && !terms.years.length && !decades.size) return index.alphabetical.filter(passes);
-  // Event rentals follow every other match, each group in score order, so bulk event stock can't crowd out the rest.
-  // rankText, which the Worker uses, keeps one order.
-  const matches = rank(index, terms, decades, passes);
-  return [...matches.filter((doc) => doc.kind !== 'event-rental'), ...matches.filter((doc) => doc.kind === 'event-rental')];
+  return rank(index, terms, decades, passes);
 }
 
 export function rankText(index, text) {

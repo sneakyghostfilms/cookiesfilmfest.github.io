@@ -37,12 +37,12 @@ test('parseDecades understands the ways people write a decade', () => {
   assert.deepEqual(decades('police jacket size 40'), []);
 });
 
-test('the page lists event rentals after every other match, each group in score order, and filters by kind', () => {
+test("the page's search filters by kind and keeps the ranking's order for every kind", () => {
   const doc = (key, name, kind, order) => ({ key, name, description: '', categories: [], tags: [], decades: [], vendor: 'v', kind, order });
   const kindIndex = buildIndex([doc('e1', 'red chair red', 'event-rental', 0), doc('f1', 'red chair', 'film-prop', 1), doc('a1', 'chair', 'antique', 2), doc('e2', 'chair', 'event-rental', 3)]);
   const keysOf = (docs) => docs.map((one) => one.key);
-  assert.deepEqual(keysOf(rankText(kindIndex, 'red chair')), ['e1', 'f1', 'a1', 'e2'], 'the ranking the Worker uses keeps one order');
-  assert.deepEqual(keysOf(search(kindIndex, 'red chair')), ['f1', 'a1', 'e1', 'e2']);
+  assert.deepEqual(keysOf(rankText(kindIndex, 'red chair')), ['e1', 'f1', 'a1', 'e2']);
+  assert.deepEqual(keysOf(search(kindIndex, 'red chair')), ['e1', 'f1', 'a1', 'e2'], 'an event rental that ranks first stays first');
   assert.deepEqual(keysOf(search(kindIndex, 'red chair', { kind: 'event-rental' })), ['e1', 'e2']);
   assert.deepEqual(keysOf(search(kindIndex, 'chair', { kind: 'antique' })), ['a1']);
   assert.deepEqual(keysOf(search(kindIndex, '')), keysOf(kindIndex.alphabetical), 'the plain list stays alphabetical');

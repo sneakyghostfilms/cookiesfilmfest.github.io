@@ -176,15 +176,18 @@ test('a Kind filter sits between Vendor and Decade, and each card draws its kind
   assert.ok(pageScript.includes('props-badge'), 'the card view draws the badge');
 });
 
-test("on today's data the page's search moves event rentals after every other match and keeps each group's order", () => {
+test("on today's data the page's search keeps the ranking's order, and the Kind filter keeps that order within a kind", () => {
   const index = buildIndex(cards.map((card) => searchDocFromCard(card)));
-  const isEvent = (doc) => doc.kind === 'event-rental';
-  assert.ok(isEvent(rankText(index, 'neon sign')[0]), 'the plain ranking puts an event rental first for "neon sign"');
+  const keysOf = (docs) => docs.map((doc) => doc.key);
+  assert.equal(search(index, 'neon sign')[0].kind, 'event-rental', 'the two real neon signs, event rentals, lead "neon sign"');
   for (const query of ['neon sign', 'table', 'camera']) {
     const plain = rankText(index, query);
-    const listed = search(index, query).map((doc) => doc.key);
-    assert.deepEqual(listed, [...plain.filter((doc) => !isEvent(doc)), ...plain.filter(isEvent)].map((doc) => doc.key), query);
-    assert.ok(plain.some(isEvent) && plain.some((doc) => !isEvent(doc)), `${query} matches both`);
+    assert.deepEqual(keysOf(search(index, query)), keysOf(plain), query);
+    for (const kind of ['event-rental', 'film-prop']) {
+      const ofKind = plain.filter((doc) => doc.kind === kind);
+      assert.ok(ofKind.length, `${query} matches a ${kind}`);
+      assert.deepEqual(keysOf(search(index, query, { kind })), keysOf(ofKind), `${query}, ${kind}`);
+    }
   }
 });
 

@@ -486,6 +486,7 @@
     {
       "id": "creative-reuse",
       "name": "Pittsburgh Center for Creative Reuse",
+      "keyPrefix": "pccr",
       "siteUrl": "https://pccr.org/",
       "sourceType": {
         "value": "antique-reuse",
@@ -536,7 +537,29 @@
       },
       "notice": null,
       "lastVerified": "2026-10-17",
-      "catalogs": []
+      "catalogs": [
+        {
+          "id": "pccr-2026-10-18",
+          "type": "square-store",
+          "title": "Vintage & Collectables in the Creative Reuse online store",
+          "sourceUrl": "https://creativereuse.square.site/shop/vintage/12",
+          "listUrl": "https://creativereuse.square.site/app/store/api/v28/editor/users/131361290/sites/903204450217500132/products?categories[]=12&per_page=100",
+          "siteUrl": "https://creativereuse.square.site/",
+          "itemLinkLabel": "Open product page",
+          "photoHost": "131361290.cdn6.editmysite.com",
+          "expected": {
+            "products": 174,
+            "items": 172,
+            "excluded": {
+              "not in the category": 0,
+              "not visible": 0,
+              "not physical": 0,
+              "sold out": 2,
+              "listed twice": 0
+            }
+          }
+        }
+      ]
     },
     {
       "id": "pittsburgh-clo-construction-center",

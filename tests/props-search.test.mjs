@@ -57,7 +57,7 @@ test('keyword queries rank the matching items first', () => {
   assert.equal(keys('telephone book')[0], 'scp-051');
   assert.equal(keys('secretary handbook')[0], 'scp-024');
   assert.deepEqual(top('handcuffs', 2).sort(), ['scp-142', 'scp-280']);
-  assert.deepEqual(keys('santa').sort(), ['scp-210', 'scp-370', 'va-lnoa73'], "Steel City's two Santa costumes and Vintage Alley's Santa's Chair");
+  assert.deepEqual(keys('santa').sort(), ['pccr-w9w5ab', 'scp-210', 'scp-370', 'va-lnoa73'], "Steel City's two Santa costumes, Vintage Alley's Santa's Chair and Creative Reuse's Santa tea towel");
   assert.deepEqual(keys('wig'), ['scp-082']);
   assert.equal(keys('fake blood')[0], 'scp-057');
   for (const key of ['scp-204', 'scp-236', 'scp-237']) assert.ok(top('police jacket', 3).includes(key), key);
@@ -101,7 +101,7 @@ test('a bare year finds its decade unless the year itself is printed', () => {
   const year = keys('1965');
   assert.ok(year.length > 0);
   assert.deepEqual(year, keys('60s'));
-  assert.deepEqual(top('1991', 3).sort(), ['scp-286-2', 'scp-342', 'scp-351']);
+  assert.deepEqual(top('1991', 4).sort(), ['pccr-1nfvei', 'scp-286-2', 'scp-342', 'scp-351']);
   const printed = buildIndex([
     { key: 'calendar', name: 'PIN-UP CALENDAR 1991', description: 'PIN-UP CALENDAR 1991', categories: [], tags: [], decades: [], order: 0 },
     { key: 'phone', name: 'CORDLESS PHONE', description: 'CORDLESS PHONE 1990S', categories: [], tags: [], decades: [1990], order: 1 },

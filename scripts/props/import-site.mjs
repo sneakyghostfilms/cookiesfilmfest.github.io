@@ -8,18 +8,39 @@ import { parseArgs } from 'node:util';
 import { ROOT, VENDORS_FILE, sha256 } from './catalog-pdf.mjs';
 import { replaceCatalog, serializeInventory } from './normalize.mjs';
 import { exportLocationProblem } from './private-output.mjs';
-import { createSiteFetcher } from './site-fetch.mjs';
+import { robotsAllow, robotsRules, robotsTarget } from './robots.mjs';
+import { FetchStopped, createSiteFetcher } from './site-fetch.mjs';
 import { checkSiteItems } from './site-items.mjs';
+import { parseStore, storeListPage, storePageCount } from './sites/creative-reuse.mjs';
 import { parsePages } from './sites/dezzign-central.mjs';
 import { parseExport } from './sites/retro-on-8th.mjs';
 import { parseCollections } from './sites/vintage-alley.mjs';
 
 const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
-const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export']);
+const ITEM_EXCLUSIONS_FILE = join(ROOT, 'scripts/props/item-exclusions.json');
+export const ITEM_EXCLUSION_REASONS = new Set(["name or photo carries a private individual's name"]);
+const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store']);
 const WORDPRESS_PAGE_SIZE = 10;
 
 const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
+
+export async function robotsCheckedFetcher(fetcher, siteUrl, directory) {
+  const host = new URL(siteUrl).hostname;
+  const robots = await fetcher.get(`https://${host}/robots.txt`, directory, { missingOk: true });
+  const rules = robotsRules(robots.missing ? '' : robots.body.toString('utf8'));
+  if (rules.unsupported.length) {
+    throw new FetchStopped(`robots.txt on ${host} has rules this tool can't apply with certainty (${rules.unsupported.join('; ')}); stopping before any page`, { reason: 'robots' });
+  }
+  if (rules.crawlDelaySeconds) fetcher.raiseGap(rules.crawlDelaySeconds * 1000);
+  return {
+    rules,
+    async get(url, dir, options) {
+      if (!robotsAllow(rules, robotsTarget(url))) throw new FetchStopped(`robots.txt on ${host} disallows ${url}; not requesting it`, { url, reason: 'robots' });
+      return fetcher.get(url, dir, options);
+    },
+  };
+}
 
 const SOURCES = {
   async 'wordpress-pages'({ vendor, catalog, fetcher, cacheRoot }) {
@@ -35,6 +56,23 @@ const SOURCES = {
     const { body, meta } = await pageFetcher.get(catalog.sourceUrl, join(cacheRoot, vendor.id, catalog.id));
     return { ...parseCollections(body.toString('utf8'), { vendor, catalog }), capturedAt: localDate(meta.fetchedAt) };
   },
+  async 'square-store'({ vendor, catalog, fetcher, cacheRoot }) {
+    const directory = join(cacheRoot, vendor.id, catalog.id);
+    const site = await robotsCheckedFetcher(fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.sourceUrl).hostname] }), catalog.sourceUrl, directory);
+    const categoryPage = (await site.get(catalog.sourceUrl, directory)).body.toString('utf8');
+    const listings = [];
+    let firstFetchedAt;
+    for (let page = 1, pages = 1; page <= pages; page += 1) {
+      const { body, meta } = await site.get(storeListPage(catalog, page), directory);
+      const listing = JSON.parse(body.toString('utf8'));
+      if (page === 1) {
+        pages = storePageCount(listing);
+        firstFetchedAt = meta.fetchedAt;
+      }
+      listings.push(listing);
+    }
+    return { ...parseStore(categoryPage, listings, { vendor, catalog }), capturedAt: localDate(firstFetchedAt) };
+  },
   async 'shopify-export'({ catalog, vendor, exportPath }) {
     if (!exportPath) throw new Error(`${vendor.name} is imported from the vendor's Shopify product export: pass --export "<file.csv>".`);
     const misplaced = exportLocationProblem(exportPath);
@@ -47,8 +85,21 @@ const SOURCES = {
   },
 };
 
-export function loadSite({ vendor, catalog, cacheRoot = CACHE_ROOT, fetcher, exportPath }) {
-  return SOURCES[catalog.type]({ vendor, catalog, cacheRoot, fetcher, exportPath });
+export function withholdItems(parsed, exclusions, keyPrefix) {
+  const withheld = new Set(parsed.items.map((item) => item.key).filter((key) => Object.hasOwn(exclusions, key)));
+  const stale = Object.keys(exclusions).filter((key) => key.startsWith(`${keyPrefix}-`) && !parsed.items.some((item) => item.key === key));
+  return {
+    ...parsed,
+    items: parsed.items.filter((item) => !withheld.has(item.key)),
+    images: new Map([...parsed.images].filter(([key]) => !withheld.has(key))),
+    counts: withheld.size ? { ...parsed.counts, items: parsed.counts.items - withheld.size, withheld: withheld.size } : parsed.counts,
+    report: [...parsed.report, `Withheld by scripts/props/item-exclusions.json: ${withheld.size}${stale.length ? `; ${stale.length} listed for this vendor are not in this snapshot (sold or renamed)` : ''}`],
+  };
+}
+
+export async function loadSite({ vendor, catalog, cacheRoot = CACHE_ROOT, fetcher, exportPath, exclusions }) {
+  const parsed = await SOURCES[catalog.type]({ vendor, catalog, cacheRoot, fetcher, exportPath });
+  return withholdItems(parsed, exclusions ?? JSON.parse(await readFile(ITEM_EXCLUSIONS_FILE, 'utf8')), vendor.keyPrefix);
 }
 
 export function findSiteCatalog(vendors, vendorId) {
@@ -59,9 +110,9 @@ export function findSiteCatalog(vendors, vendorId) {
   return { vendor, catalog: catalogs[0] };
 }
 
-export async function importSite({ vendorId, vendors, outFile = INVENTORY_FILE, cacheRoot = CACHE_ROOT, fetcher, exportPath, log = console.log, today = () => localDate(Date.now()) }) {
+export async function importSite({ vendorId, vendors, outFile = INVENTORY_FILE, cacheRoot = CACHE_ROOT, fetcher, exportPath, exclusions, log = console.log, today = () => localDate(Date.now()) }) {
   const { vendor, catalog } = findSiteCatalog(vendors, vendorId);
-  const parsed = await loadSite({ vendor, catalog, cacheRoot, fetcher, exportPath });
+  const parsed = await loadSite({ vendor, catalog, cacheRoot, fetcher, exportPath, exclusions });
   const { items, counts, report, capturedAt } = parsed;
   log([`${vendor.name} · ${catalog.id} (captured ${capturedAt})`, ...report].join('\n'));
   const actual = { ...counts };

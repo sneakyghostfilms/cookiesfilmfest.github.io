@@ -23,6 +23,15 @@ function groupsOf(text) {
   return groups;
 }
 
+// RFC 9309 §2.2.3: '*' matches any run of characters and a final '$' anchors the end; rules are matched from the start
+// of the path and query. A '$' anywhere else, or a rule not starting with '/', is not something we apply.
+function patternOf(rule) {
+  const anchored = rule.endsWith('$');
+  const body = anchored ? rule.slice(0, -1) : rule;
+  if (!body.startsWith('/') || body.includes('$')) return null;
+  return new RegExp(`^${body.split('*').map((part) => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}${anchored ? '$' : ''}`);
+}
+
 export function robotsRules(text, agent = PRODUCT_TOKEN) {
   const groups = groupsOf(text);
   const named = groups.filter((group) => group.agents.includes(agent.toLowerCase()));
@@ -31,7 +40,7 @@ export function robotsRules(text, agent = PRODUCT_TOKEN) {
   for (const { key, value } of chosen.flatMap((group) => group.rules)) {
     if (key === 'disallow') {
       if (!value) continue;
-      if (!value.startsWith('/') || /[*$]/.test(value)) rules.unsupported.push(`Disallow: ${value}`);
+      if (!patternOf(value)) rules.unsupported.push(`Disallow: ${value}`);
       else rules.disallow.push(value);
     } else if (key === 'crawl-delay') {
       const seconds = Number(value);
@@ -42,13 +51,18 @@ export function robotsRules(text, agent = PRODUCT_TOKEN) {
   return rules;
 }
 
-export function robotsAllow(rules, path) {
-  return !rules.disallow.some((prefix) => path.startsWith(prefix));
+export function robotsAllow(rules, target) {
+  return !rules.disallow.some((rule) => patternOf(rule).test(target));
+}
+
+export function robotsTarget(url) {
+  const { pathname, search } = new URL(url);
+  return pathname + search;
 }
 
 export function robotsStopReason(rules, urls, host) {
   if (rules.unsupported.length) return `robots.txt on ${host} has rules this tool can't apply with certainty (${rules.unsupported.join('; ')}); stopping before any request to it`;
-  const disallowed = urls.map((url) => new URL(url).pathname).filter((path) => !robotsAllow(rules, path));
+  const disallowed = urls.map(robotsTarget).filter((target) => !robotsAllow(rules, target));
   if (disallowed.length) return `robots.txt on ${host} disallows ${disallowed.length} of the ${urls.length} photo paths, for example ${disallowed.slice(0, 3).join(', ')}; stopping before any photo`;
   return null;
 }

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { eraDecades } from './normalize.mjs';
 
 const ITEM_FIELDS = new Set(['key', 'vendor', 'catalog', 'name', 'description', 'categories', 'era', 'decades', 'url']);
-const PRICED_TYPES = new Set(['shopify-export']);
+const PRICED_TYPES = new Set(['shopify-export', 'square-store']);
 
 export function siteKey(prefix, input) {
   const digest = createHash('sha256').update(input, 'utf8').digest('hex');

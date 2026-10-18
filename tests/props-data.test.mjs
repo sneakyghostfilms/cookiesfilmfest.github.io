@@ -28,7 +28,7 @@ const NAMED_ON_VENDOR_PAGES = new Set([
   'a762048a21c020d2bea56f4505e9bceb6a64bdc84d91063ffebf0e29be1a5c97',
   'd64d04ba625edb1fabfcd66fd4144143d734e5cdf9c7720daa6f244643b33289',
 ]);
-const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'duda-gallery', 'shopify-export']);
+const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store']);
 
 function keysOf(value, found = new Set()) {
   if (value && typeof value === 'object') {
@@ -161,6 +161,17 @@ test('reviewed tag removals stay removed', async () => {
     assert.ok(byKey.has(key), `exclusion for an unknown item: ${key}`);
     assert.ok(reason, key);
     for (const tag of drop) assert.ok(!(tagsFile.tags[key] ?? []).includes(tag), `${key} still has "${tag}"`);
+  }
+});
+
+test('items withheld for naming a private individual stay out of the inventory, each with a generic reason', async () => {
+  const { ITEM_EXCLUSION_REASONS } = await import('../scripts/props/import-site.mjs');
+  const exclusions = JSON.parse(await readFile(new URL('../scripts/props/item-exclusions.json', import.meta.url), 'utf8'));
+  for (const [key, entry] of Object.entries(exclusions)) {
+    assert.match(key, /^[a-z0-9]+-[0-9a-z]{6}$/, key);
+    assert.ok(!byKey.has(key), `${key} is withheld but in the inventory`);
+    assert.deepEqual(Object.keys(entry), ['reason'], key);
+    assert.ok(ITEM_EXCLUSION_REASONS.has(entry.reason), `${key}: the reason must be one of the generic reasons, with no name`);
   }
 });
 

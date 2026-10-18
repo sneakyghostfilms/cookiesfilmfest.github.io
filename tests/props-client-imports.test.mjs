@@ -91,7 +91,8 @@ test('import specifiers are found in every form the client code could use', () =
 });
 
 test("the walk starts at each props page's script and follows imports to the bottom", () => {
-  assert.deepEqual(PAGES, ['src/pages/props.astro', 'src/pages/props/scene.astro']);
+  assert.deepEqual(PAGES, ['src/pages/props.astro', 'src/pages/props/scene.astro', 'src/pages/props/sources.astro']);
+  assert.deepEqual([...walk('src/pages/props/sources.astro').importer.keys()], ['src/layouts/props-layout.astro'], 'the sources page runs no script');
   for (const page of PAGES) assert.deepEqual([...astroFiles(page).keys()], [page, 'src/layouts/props-layout.astro'], page);
   const keyword = walk('src/pages/props.astro').importer;
   assert.equal(chain(keyword, 'src/scripts/props-card-text.js'), 'src/pages/props.astro → src/scripts/props-page.ts → src/scripts/props-card-text.js');

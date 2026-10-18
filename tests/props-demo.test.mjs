@@ -144,9 +144,12 @@ test('private vendor notes are read only from the ignored folder, and only for t
   assert.equal(readPrivateVendors(directory), null);
   await writeFile(path.join(directory, 'vendors.json'), JSON.stringify({ 'steel-city-props': { notes: 'n' } }));
   assert.deepEqual(readPrivateVendors(directory), { 'steel-city-props': { notes: 'n' } });
-  const page = await readFile(path.join(root, 'src/pages/props.astro'), 'utf8');
+  const page = await readFile(path.join(root, 'src/pages/props/sources.astro'), 'utf8');
   assert.match(page, /const privateVendors = privateVendorsFor\(process\.env\);/);
-  assert.doesNotMatch(page, /readPrivateVendors/, 'the page reads private notes only through privateVendorsFor');
+  assert.doesNotMatch(page, /readPrivateVendors/, 'the sources page reads private notes only through privateVendorsFor');
+  for (const other of ['src/pages/props.astro', 'src/pages/props/scene.astro']) {
+    assert.doesNotMatch(await readFile(path.join(root, other), 'utf8'), /privateVendors|readPrivateVendors/, `${other} reads no private notes`);
+  }
 });
 
 test('private notes need both the demo and PROPS_SHOW_PRIVATE=1, which npm run props:demo never sets', async () => {

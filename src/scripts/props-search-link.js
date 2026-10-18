@@ -4,7 +4,7 @@ export function keywordSearchHref(prop) {
   return `/props#q=${encodeURIComponent(prop)}`;
 }
 
-// The keyword page's search text from its URL fragment; "" for any other fragment, such as #prop-sources.
+// The keyword page's search text from its URL fragment; "" for any other fragment, such as #top.
 export function queryFromHash(hash) {
   return new URLSearchParams(hash.replace(/^#/, '')).get('q') ?? '';
 }

@@ -92,8 +92,18 @@
   color: var(--pp-muted);
 }
 
+.props-page .props-nav {
+  flex-basis: 100%;
+  order: 3;
+  font-size: 14px;
+}
+
+.props-page .props-nav [aria-current="page"] {
+  font-weight: 600;
+}
+
 .props-page .props-back,
-.props-page .props-switch a {
+.props-page .props-nav a {
   font-size: 14px;
   font-weight: 600;
   display: inline-flex;

@@ -9,7 +9,7 @@ const apiUrl: string = import.meta.env.PUBLIC_PROPS_API_URL || propsConfig.apiUr
 const cardsUrl = `/props/cards.json?v=${cardsVersion(cardsText(process.env))}`;
 ---
 
-<PropsLayout title="Paste a Scene | Pittsburgh Prop Search | Cookies and Comedy Film Festival" description={description}>
+<PropsLayout title="Paste a Scene | Pittsburgh Prop Search | Cookies and Comedy Film Festival" description={description} current="scene">
   <section class="props-box">
     <h2 class="scene-title">Paste a scene to find props (AI)</h2>
     <form id="scene-form" class="scene-form" data-api-url={apiUrl} data-cards-url={cardsUrl}>
@@ -26,8 +26,7 @@ const cardsUrl = `/props/cards.json?v=${cardsVersion(cardsText(process.env))}`;
       {!apiUrl && <p class="scene-off">AI scene matching isn't switched on yet. Keyword search works.</p>}
       <button id="scene-submit" type="submit" class="props-button" disabled={!apiUrl}>Find props for this scene</button>
     </form>
-    <p class="props-switch"><a href="/props">Search by keyword instead</a></p>
-    <noscript><p class="props-note">Scene matching needs JavaScript. The prop sources, with their contact details, are listed without it on <a href="/props#prop-sources">the keyword search page</a>.</p></noscript>
+    <noscript><p class="props-note">Scene matching needs JavaScript. The prop sources, with their contact details, are listed without it on <a href="/props/sources">the prop sources page</a>.</p></noscript>
     <p id="scene-status" class="scene-status" aria-live="polite" hidden></p>
     <div id="scene-results" class="scene-results"></div>
   </section>

@@ -9,7 +9,7 @@ export function siteKey(prefix, input) {
   return `${prefix}-${(BigInt(`0x${digest.slice(0, 12)}`) % 36n ** 6n).toString(36).padStart(6, '0')}`;
 }
 
-export function listingProblem(text) {
+function listingProblem(text) {
   if (typeof text !== 'string' || !text.trim()) return 'is empty';
   if (/[\u0000-\u001f\u007f]/.test(text)) return 'holds a control character or line break';
   if (text.includes(' | ')) return 'holds " | ", which would break a listing line';

@@ -24,7 +24,7 @@ const SOLD_MARKERS = new Set(['sold items', 'sold', 'sold-items']);
 const DECADE = String.raw`(?:['’]?[2-9]0|1[89]\d0|20[0-2]0)['’]?s`;
 const DECADE_RANGE = new RegExp(String.raw`(?<![\p{L}\p{N}'’])${DECADE}(?:\s*[-–—/]\s*${DECADE})*(?![\p{L}\p{N}])`, 'iu');
 const YEAR = /(?<![\p{L}\p{N}'’.\/-])(?:19\d{2}|20[0-2]\d)(?![\p{L}\p{N}'’\/-])/u;
-export const EXCLUSIONS = ['not active', 'not published', 'marked sold', 'sold out', 'gift card'];
+const EXCLUSIONS = ['not active', 'not published', 'marked sold', 'sold out', 'gift card'];
 export const IMAGE_HOST = 'cdn.shopify.com';
 const HANDLE = /^[A-Za-z0-9][A-Za-z0-9-]*$/;
 

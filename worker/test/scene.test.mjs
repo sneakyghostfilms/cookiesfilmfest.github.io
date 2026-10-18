@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { handleRequest } from '../src/index.js';
 import { inventoryKeys, prepareScene } from '../src/inventory.js';
-import { BadOutput, LIMITS, OUTPUT_SCHEMA, buildRequest, readModelOutput, validateScene } from '../src/scene.js';
+import { BadOutput, LIMITS, OUTPUT_SCHEMA, readModelOutput, validateScene } from '../src/scene.js';
 import { MODEL, SCENE, answer, fakeAI, fixedClock, goodOutput, makeEnv, sceneRequest } from './helpers.mjs';
 
 async function sceneWith(respond) {

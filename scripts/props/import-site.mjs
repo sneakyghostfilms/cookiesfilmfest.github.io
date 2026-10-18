@@ -15,10 +15,10 @@ import { parseExport } from './sites/retro-on-8th.mjs';
 
 const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
-export const SITE_TYPES = new Set(['wordpress-pages', 'shopify-export']);
+const SITE_TYPES = new Set(['wordpress-pages', 'shopify-export']);
 const WORDPRESS_PAGE_SIZE = 10;
 
-export const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
+const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
 
 const SOURCES = {
   async 'wordpress-pages'({ vendor, catalog, fetcher, cacheRoot }) {

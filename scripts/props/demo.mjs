@@ -13,6 +13,7 @@ import { CACHE_ROOT, findSiteCatalog, loadSite } from './import-site.mjs';
 import { buildItems, cardIdentity, identityOf } from './normalize.mjs';
 import { privateOutputProblem } from './private-output.mjs';
 import { createSiteFetcher } from './site-fetch.mjs';
+import { IMAGE_HOST as SHOPIFY_IMAGE_HOST } from './sites/retro-on-8th.mjs';
 
 export { privateOutputProblem };
 
@@ -21,7 +22,6 @@ const CROPPER = join(ROOT, 'scripts/props/crop_thumbs.py');
 const DEMO_PORT = 4321;
 const DEMO_API_URL = 'https://pgh-prop-search.sdanzig.workers.dev';
 const THUMB_WIDTH = 320;
-const SHOPIFY_IMAGE_HOST = 'cdn.shopify.com';
 
 export function photoUrl(url) {
   const parsed = new URL(url);

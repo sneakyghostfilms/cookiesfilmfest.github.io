@@ -155,7 +155,7 @@ export function parseExport(text, { vendor, catalog }) {
     stockKnown ? 'Sold-out rule applied (stock columns present; their values are never stored).' : 'Sold-out rule skipped: the export has no complete set of stock columns.',
     `Items with no category: ${items.filter((item) => !item.categories.length).length}; with no image: ${[...images.values()].filter((entry) => !entry.urls.length).length}`,
     `Products whose variants have different prices (the first is kept): ${products.filter((product) => !exclusionOf(product) && product.prices.size > 1).length}`,
-    `First images not on ${IMAGE_HOST}, which the demo will not download: ${[...images.values()].filter((entry) => entry.urls.length && new URL(entry.urls[0]).hostname !== IMAGE_HOST).length}`,
+    `First images not on ${IMAGE_HOST}, which stop the demo's photo download: ${[...images.values()].filter((entry) => entry.urls.length && new URL(entry.urls[0]).hostname !== IMAGE_HOST).length}`,
     'Items (key · name · era · categories):',
     ...items.map((item) => `  ${item.key} · ${item.name} · ${item.era ?? 'no era'} · ${item.categories.join(' / ') || 'none'}`),
   ];

@@ -116,7 +116,7 @@ test('items map the vendor fields: Type and Tags as categories, an era from the 
   assert.deepEqual(byName.get('Space Age Set of 6 Mod Cups').categories, []);
   assert.equal(byName.get('Set of 4 Mod Glasses').listedPrice, '12.00');
   assert.deepEqual(parsed.images.get(byName.get('Set of 4 Mod Glasses').key).urls, ['https://cdn.shopify.com/s/files/1/0000/0000/0001/products/glasses-1.jpg']);
-  assert.match(parsed.report.join('\n'), /First images not on cdn\.shopify\.com, which the demo will not download: 1/);
+  assert.match(parsed.report.join('\n'), /First images not on cdn\.shopify\.com, which stop the demo's photo download: 1/);
   const eras = {
     "Vintage '57 Bel Air Telephone": null, 'Space Age Set of 6 Mod Cups': null, 'The Riverboat 1938': '1938', "Vintage 60's/70's Lamp": "60's/70's",
     '1950s-70s Barware': '1950s-70s', '1950s–70s Desk Fan': '1950s–70s', "'50s Diner Sign": "'50s", 'Pocket R70 Radio': null, 'Game Console 2600': null,

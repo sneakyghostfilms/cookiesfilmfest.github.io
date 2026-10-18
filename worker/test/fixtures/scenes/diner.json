@@ -3,6 +3,13 @@
   "text": "INT. DOT'S LUNCHEONETTE - LAWRENCEVILLE - EARLY MORNING (1965)\nRain streaks the front window. A neon sign buzzes OPEN backwards against the glass. Steam rises from the green coffee dispenser behind the counter.\nDOT (50s), in a teal retro diner waitress dress and a white tie-waist apron, pours from a clear coffee pot with gold decals into a row of mismatched mugs. A white tea pot with a blue floral decal waits on a hot plate for the one regular who drinks tea.\nOn the counter: steel coffee, tea and sugar canisters, a clear square decanter of syrup, and a lady-shaped brass ashtray already half full. A retro pink alarm clock radio plays the farm report too loud.\nAt the grill, FRANKIE (20s), in a white double-breasted chef's coat and checkered chef's pants, flips eggs. His half apron is stained with grease. He pounds the bottom of a glass ketchup bottle over the hash browns.\nFRANKIE: Who keeps watering down the ketchup?\nDOT: Same guy who keeps watering down your jokes.\nThe bell over the door jingles. OFFICER BRESLIN (40s) shakes rain off his heavy police jacket and takes a stool. He slides a folded newspaper onto the counter and taps the headline.\nBRESLIN: You see this? Coker Tire is closing the Etna store.\nDOT: Coffee first, gossip second.\nShe sets down a cup. Breslin unwraps a stick of bubble gum, thinks better of it, and pockets it.\nIn the corner booth, two teenagers share a milkshake from the milkshake machine and feed dimes into the jukebox. One of them flips through a stack of magazines; the other keeps glancing at the pay phone on the wall, waiting for a call.\nThe pay phone rings. Everyone freezes.\nDOT picks up the receiver, listens, and hands it across the counter to Breslin without a word.\nBRESLIN (into phone): Diaz? Slow down.\nHe pulls a pistol from his holster to check it, clips it back, drops two bills next to his cup, and is gone before the coffee cools.\nDOT wipes the counter, turns off the radio, and looks at the empty stool. Frankie sets a cigarette behind his ear and goes back to the eggs.\nFRANKIE: Every Tuesday.\nDOT: Every Tuesday.\nShe flips the neon sign to CLOSED, though it is only seven in the morning, and pours herself the last of the coffee.",
   "required": [
     {
+      "prop": "neon sign",
+      "acceptableKeys": [
+        "cbr-g0fs8o",
+        "cbr-e3xubm"
+      ]
+    },
+    {
       "prop": "coffee dispenser",
       "acceptableKeys": [
         "scp-004"
@@ -109,7 +116,8 @@
       "acceptableKeys": [
         "scp-285",
         "scp-149",
-        "cps-p8xafv"
+        "cps-p8xafv",
+        "cbr-b2t8b2"
       ]
     },
     {
@@ -164,7 +172,6 @@
     }
   ],
   "absent": [
-    "neon sign",
     "ketchup bottle",
     "jukebox",
     "milkshake machine"

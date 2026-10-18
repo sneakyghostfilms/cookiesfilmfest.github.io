@@ -161,7 +161,7 @@ A local-only version of `/props` for screenshare pitches. It adds photo thumbnai
   - The scripts refuse to write anywhere git doesn't ignore, or under `public/` or `src/`.
   - `astro build` refuses to run with `PROPS_DEMO=1`.
   - `npm test` fails if a `.pdf`, any `.webp` other than the site's own two, any `.html`, or any `.csv` other than the known four, is tracked.
-  - `git add -f` bypasses all of this, and the repository is public, so never force-add anything from `.props-demo/`.
+  - `git add -f` bypasses all of this, and the repository is public, so never force-add anything from `.props-demo/`, `.props-cache/` or `.props-private/`.
 - **Without `PROPS_DEMO=1`, `/props` is byte-for-byte unchanged.** The assets are served only by the dev server, under `/props-demo/`. The Vite dev server also serves project files, but only on localhost.
 - **Browser support for the PDF links:** Chrome's built-in viewer opens the item's page and photo with `#page=N&zoom=150,left,top`. Firefox and Safari are untested.
 

@@ -28,7 +28,7 @@ const NAMED_ON_VENDOR_PAGES = new Set([
   'a762048a21c020d2bea56f4505e9bceb6a64bdc84d91063ffebf0e29be1a5c97',
   'd64d04ba625edb1fabfcd66fd4144143d734e5cdf9c7720daa6f244643b33289',
 ]);
-const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store']);
+const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store', 'woocommerce-listing']);
 
 function keysOf(value, found = new Set()) {
   if (value && typeof value === 'object') {

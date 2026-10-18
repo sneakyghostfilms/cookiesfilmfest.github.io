@@ -161,11 +161,12 @@ test('tabs under the tagline link each props page to the other two and name the 
   for (const [page] of pages) assert.doesNotMatch(page, /props-switch|instead<\/a>/, 'the tabs are the one way between the pages');
 });
 
-test('the sources page holds every vendor box, and no item, card, scene box or script; the other pages hold no vendor box', () => {
-  const ids = [...sourcesHtml.matchAll(/<section class="props-box props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
+test('the sources page holds every vendor row, collapsed, and no item, card, scene box or script; the other pages hold no vendor row', () => {
+  const ids = [...sourcesHtml.matchAll(/<details class="props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
   assert.deepEqual([...ids].sort(), vendors.vendors.map((entry) => entry.id).sort());
+  assert.doesNotMatch(sourcesHtml, /<details\b[^>]*\sopen[\s>=]/, 'every row starts closed');
   assert.doesNotMatch(sourcesHtml, /prop-card|props-results|data-cards-url|scene-form|<script\b/);
-  for (const page of [html, sceneHtml]) assert.doesNotMatch(page, /class="props-box props-vendor"|id="prop-sources"/);
+  for (const page of [html, sceneHtml]) assert.doesNotMatch(page, /class="props-vendor"|id="prop-sources"/);
 });
 
 test("the scene and sources pages share /props's header but for the tabs, its About box, opt-out line and byline; the scene page holds no item and draws from the same cards.json", () => {
@@ -220,15 +221,15 @@ test('every card names its vendor, and the vendor filter appears only with more 
   assert.equal(/<select id="props-vendor">/.test(html), withItems.length > 1);
 });
 
-const vendorSection = (id) => sourcesHtml.match(new RegExp(`<section class="props-box props-vendor" id="vendor-${id}"[\\s\\S]*?</section>`))?.[0] ?? '';
+const vendorSection = (id) => sourcesHtml.match(new RegExp(`<details class="props-vendor" id="vendor-${id}"[\\s\\S]*?</details>`))?.[0] ?? '';
 const withItems = new Set(inventory.items.map((item) => item.vendor));
 const byName = (a, b) => a.name.localeCompare(b.name, 'en');
 
-test('vendor boxes show the published facts with their sources, and nothing private on any page', () => {
+test('vendor rows show the published facts with their sources, and nothing private on any page', () => {
   const steelCity = visibleText(vendorSection('steel-city-props'));
-  assert.ok(steelCity.includes('Inquiries: official contact form · steelcitypropsllc@gmail.com'));
+  assert.ok(steelCity.includes('Inquiries official contact form · steelcitypropsllc@gmail.com · Instagram · Linktree Terms they publish: “We will send a quote back as soon we review your request.” Their form asks for the item number printed at the top left of each catalog photo.'), 'the Inquiries group: routes and social links, then the terms, then the inquiry hint');
   assert.ok(sourcesText.includes('Terms they publish: “We will send a quote back as soon we review your request.”'));
-  assert.ok(vendorSection('steel-city-props').includes('<span class="props-badge">Prop house</span><span class="props-badge">Rentals</span>'));
+  assert.ok(vendorSection('steel-city-props').includes('<span class="props-vendor-type">Prop house · Rentals</span>'));
   assert.ok(sourcesText.includes('Address: Pittsburgh, PA'));
   assert.match(sourcesText, /Details as the vendor publishes them, last checked 2026-10-17: instagram\.com\/steelcityprops · catalog page 3 · catalog page 1 · forms\.gle\/JJqcgmxkJFwqKLXF9 · linktr\.ee\/steelcityprops \./);
   assert.ok(sourcesHtml.includes('href="https://linktr.ee/steelcityprops"'));
@@ -238,11 +239,33 @@ test('vendor boxes show the published facts with their sources, and nothing priv
     assert.ok(!/permission|not asked/i.test(pageText));
   }
   assert.ok(sourcesText.includes('Prop pages on dezzigncentralpgh.com · captured 2026-10-17 · 23 items · indexed 2026-10-17 · Open site'));
-  assert.ok(sourcesText.includes('Hours: please call or email us to schedule an appointment Pricing and terms: ask the vendor'));
+  const dezzign = visibleText(vendorSection('dezzign-central'));
+  assert.ok(dezzign.includes('Pricing and terms: ask the vendor Searchable here Prop pages on dezzigncentralpgh.com'), 'with no published terms, the Inquiries group says to ask');
+  assert.match(dezzign, /Where and when Address \(prop warehouse\): .+? Mailing address: .+? Hours: please call or email us to schedule an appointment Details as the vendor publishes them/);
 });
 
-test('every vendor has one box with an anchor: vendors with searchable items first, each group by name', () => {
-  const ids = [...sourcesHtml.matchAll(/<section class="props-box props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
+test('each row names the vendor, its type and modes, its place and its searchable items, with no link inside', () => {
+  const summaryText = (id) => visibleText(vendorSection(id).match(/<summary class="props-vendor-row">([\s\S]*?)<\/summary>/)?.[1] ?? '').trim();
+  assert.equal(summaryText('steel-city-props'), 'Steel City Props Prop house · Rentals Pittsburgh, PA 353 items searchable');
+  assert.equal(summaryText('dezzign-central'), 'Dezzign Central Prop house · By inquiry pittsburgh, pa 23 items searchable', 'the place as published');
+  assert.equal(summaryText('cleveland-prop-shop'), 'Cleveland Prop Shop Prop house · Rentals · Sales Cleveland, OH Regional 846 items searchable');
+  assert.equal(summaryText('route-30-retro'), 'Route 30 Retro Sales Jeannette/Irwin, PA Not indexed');
+  for (const entry of vendors.vendors) {
+    const count = inventory.items.filter((item) => item.vendor === entry.id).length;
+    const summary = vendorSection(entry.id).match(/<summary class="props-vendor-row">[\s\S]*?<\/summary>/)?.[0] ?? '';
+    assert.ok(summaryText(entry.id).endsWith(count ? ` ${count.toLocaleString('en-US')} ${count === 1 ? 'item' : 'items'} searchable` : ' Not indexed'), entry.id);
+    assert.doesNotMatch(summary, /<a\b/, entry.id);
+  }
+});
+
+test("a row's details list the vendor's facts in a fixed order, each group only when the vendor publishes it", () => {
+  const terms = (id) => [...vendorSection(id).matchAll(/<dt>([^<]+)<\/dt>/g)].map(([, term]) => term);
+  assert.deepEqual(terms('public-theater-costumes'), ['Inquiries', 'Notice on their site', 'In their words', 'Searchable here', 'Where and when']);
+  assert.deepEqual(terms('steel-city-props'), ['Inquiries', 'Searchable here', 'Where and when']);
+});
+
+test('every vendor has one row with an anchor: vendors with searchable items first, each group by name', () => {
+  const ids = [...sourcesHtml.matchAll(/<details class="props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
   const expected = [...vendors.vendors.filter((entry) => withItems.has(entry.id)).sort(byName), ...vendors.vendors.filter((entry) => !withItems.has(entry.id)).sort(byName)];
   assert.deepEqual(ids, expected.map((entry) => entry.id));
   assert.ok(html.includes(`<p class="props-lede"><strong>${inventory.items.length.toLocaleString('en-US')}</strong> items from <strong>${withItems.size}</strong> prop sources, searchable here. <a href="/props/sources">${vendors.vendors.length - withItems.size} more sources</a> are listed with the contact details they publish.</p>`));
@@ -265,21 +288,22 @@ test('the vendor strip holds exactly the vendors without searchable items, hidde
     assert.deepEqual([decode(name), decode(specialties ?? '')], [doc.name, doc.description], id);
   }
   const links = [...strip.matchAll(/<a class="vendor-match-name" href="([^"]+)">/g)].map(([, href]) => href);
-  assert.deepEqual(links, expected.map((entry) => `/props/sources#vendor-${entry.id}`), "each strip link goes to the vendor's box on the sources page");
+  assert.deepEqual(links, expected.map((entry) => `/props/sources#vendor-${entry.id}`), "each strip link goes to the vendor's row on the sources page");
   for (const entry of expected) assert.ok(sourcesHtml.includes(`id="vendor-${entry.id}"`), entry.id);
 });
 
-test('regional badges mark only the sources outside Pennsylvania', () => {
+test('a Regional chip marks only the sources outside Pennsylvania', () => {
   const regional = vendors.vendors.filter((entry) => vendorBadges(entry).some((badge) => badge.regional)).map((entry) => entry.id);
   assert.deepEqual(regional.sort(), ['cleveland-play-house-props', 'cleveland-prop-shop']);
-  for (const id of regional) assert.ok(vendorSection(id).includes('<span class="props-badge props-badge-regional">Regional: Cleveland, OH</span>'), id);
+  for (const id of regional) assert.ok(vendorSection(id).includes('<span class="props-vendor-place">Cleveland, OH <span class="props-regional">Regional</span></span>'), id);
+  assert.equal(sourcesHtml.match(/class="props-regional"/g).length, regional.length, 'no other row carries the chip');
 });
 
 test('Route 30 Retro shows only its Facebook Page facts, cited as read, with no type of our own', () => {
   const box = vendorSection('route-30-retro');
   assert.ok(visibleText(box).includes('Route 30 Retro Facebook Page (About), as read on 2026-10-17 · not fetched by our scripts'));
   assert.ok(box.includes('href="https://www.facebook.com/p/Route-30-Retro-100063856903288"'));
-  assert.deepEqual([...box.matchAll(/<span class="props-badge">([^<]*)<\/span>/g)].map(([, label]) => label), ['Sales']);
+  assert.equal(box.match(/<span class="props-vendor-type">([^<]*)<\/span>/)?.[1], 'Sales');
 });
 
 test('the page builds its search documents from cards.json the same way the Worker builds them from the inventory', async () => {

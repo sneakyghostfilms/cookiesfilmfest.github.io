@@ -106,17 +106,21 @@ Festival coordinates are stored separately in `src/data/festival-locations.json`
   - The page is text only: no photos and no copy of the catalog layout. Prices captured from a vendor are never shown.
 
 #### Vendor records (`vendors.json`)
-Each vendor records only what the vendor itself publishes, and every fact names its `source`: one or more URLs or short notes such as "catalog page 3", separated by "; ". A fact the vendor doesn't publish is `null`; nothing is filled in by inference. Fields:
+Each vendor records only what the vendor itself publishes, and every fact names its `source`: one or more URLs or short notes such as "catalog page 3", separated by "; ". A fact the vendor doesn't publish is `null`; nothing is filled in by inference. Use the vendor's visible text: a fact found only in hidden structured data (such as a JSON-LD street address) is not used. A fact read from a page our scripts don't fetch, such as a Facebook Page, says so in its source, for example "Route 30 Retro Facebook Page (About), as read on 2026-10-17; not fetched by our scripts". No person is named anywhere in the file: owners and staff stay out, and so do personal e-mail addresses (`npm test` checks for the names found on vendor pages so far). Fields:
 - `id`, `name`, `keyPrefix` (needed only with catalogs), `siteUrl`, `lastVerified` (the date the facts were last checked)
 - `sourceType`: `{ value, source }`, where value is one of `prop-house`, `vintage-rental`, `event-rental`, `antique-reuse`, `theater-stock` or `specialty`
-- `address` and `mailingAddress`: `{ label, street, city, state, zip, source }` as published. A PO box goes in `mailingAddress`.
+- `address` and `mailingAddress`: `{ label, street, city, state, zip, source }` as published. A PO box goes in `mailingAddress`. Label an address that isn't where the stock is, for example "organization's address; costume storage location not stated". A vendor whose state isn't PA or Pennsylvania gets a "Regional" badge.
 - `hours`: `{ text, source }`, as published, for example their appointment wording
 - `modes`: `{ values, source }`, from `rent`, `sale` and `inquire`
 - `terms`: `{ text, source }`: deposits, minimums, delivery, pickup or pricing, as published
 - `contact`: `{ formUrl, email, phone, pageUrl, source }`
 - `social`: `{ instagram, facebook, linktree, source }`
 - `inquiryHint`: `{ text, source }`: what their form or page asks renters to cite
+- `specialties`: `{ values, source }`: the vendor's own words for what it stocks, verbatim, such as its gallery or category names. The box quotes them as "In their words".
+- `notice`: `{ text, source }`: a status notice the vendor publishes, such as a merger or a clearance sale, quoted on the box
 - `catalogs`: may be empty for a supplier whose inventory isn't indexed. Its box then says "Inventory not indexed; contact the vendor."
+
+The page lists every vendor under "Prop sources", vendors with searchable items first, with badges for the source type and modes. A keyword search also shows, above the items, the vendors without searchable items whose name or `specialties` match the query. The source-type label is our classification, not the vendor's words, so it is never matched.
 
 Anything about our relationship with a vendor goes in the gitignored `.props-private/vendors.json`, keyed by vendor id: listing and photo permissions (`not-asked`, `asked`, `granted` or `declined`, with `asOf`), notes, and facts that came from Scott's conversations rather than the vendor's own pages. `npm test` fails if `vendors.json` holds `permissions` or `notes`, or if anything under `.props-private/` is tracked. The page shows the private file only in the local demo, and only with `PROPS_SHOW_PRIVATE=1` (see below).
 

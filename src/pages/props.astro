@@ -19,75 +19,76 @@ const vendorsWithItems = vendorsData.vendors.filter((vendor) => inventory.items.
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "en");
 const vendorsWithoutItems = vendorsData.vendors.filter((vendor) => !vendorsWithItems.includes(vendor)).sort(byName);
 const moreSources = vendorsWithoutItems.length;
-const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
-  vendor,
-  doc: vendorSearchDoc(vendor, order),
-  badges: vendorBadges(vendor),
-  specialties: specialtiesLine(vendor),
-  route: contactRoutes(vendor.contact)[0] ?? null,
-}));
+const vendorMatches = vendorsWithoutItems.map((vendor, order) => {
+  const badges = vendorBadges(vendor);
+  return {
+    vendor,
+    doc: vendorSearchDoc(vendor, order),
+    type: badges.filter((badge) => !badge.regional).map((badge) => badge.text).join(" · "),
+    regional: badges.find((badge) => badge.regional)?.text ?? null,
+    specialties: specialtiesLine(vendor),
+    route: contactRoutes(vendor.contact)[0] ?? null,
+  };
+});
 ---
 
 <PropsLayout title="Pittsburgh Prop Search | Cookies and Comedy Film Festival" description={description} current="keyword">
   <p class="props-lede"><strong>{inventory.items.length.toLocaleString("en-US")}</strong> items from <strong>{vendorsWithItems.length}</strong> prop {vendorsWithItems.length === 1 ? "source" : "sources"}, searchable here.{moreSources > 0 && <> <a href="/props/sources">{moreSources} more {moreSources === 1 ? "source" : "sources"}</a> {moreSources === 1 ? "is" : "are"} listed with the contact details they publish.</>}</p>
 
-  <section class="props-box props-search">
-    <form id="props-form" class="props-controls" role="search">
-      <label class="props-field props-query">
-        <span>Search props</span>
-        <input id="props-query" type="search" placeholder="e.g. rotary phone, police jacket, 60s office" autocomplete="off" />
-      </label>
+  <form id="props-form" class="props-controls" role="search">
+    <label class="props-field props-query">
+      <span>Search props</span>
+      <input id="props-query" type="search" placeholder="e.g. rotary phone, police jacket, 60s office" autocomplete="off" />
+    </label>
+    <label class="props-field">
+      <span>Section</span>
+      <select id="props-category">
+        <option value="">All sections</option>
+        {categories.map((category) => <option value={category}>{category}</option>)}
+      </select>
+    </label>
+    {vendorsWithItems.length > 1 && (
       <label class="props-field">
-        <span>Section</span>
-        <select id="props-category">
-          <option value="">All sections</option>
-          {categories.map((category) => <option value={category}>{category}</option>)}
+        <span>Vendor</span>
+        <select id="props-vendor">
+          <option value="">All vendors</option>
+          {vendorsWithItems.map((vendor) => <option value={vendor.id}>{vendor.name}</option>)}
         </select>
       </label>
-      {vendorsWithItems.length > 1 && (
-        <label class="props-field">
-          <span>Vendor</span>
-          <select id="props-vendor">
-            <option value="">All vendors</option>
-            {vendorsWithItems.map((vendor) => <option value={vendor.id}>{vendor.name}</option>)}
-          </select>
-        </label>
-      )}
-      <label class="props-field">
-        <span>Kind</span>
-        <select id="props-kind">
-          <option value="">All kinds</option>
-          {kinds.map((kind) => <option value={kind.id}>{kind.label}</option>)}
-        </select>
-      </label>
-      <label class="props-field">
-        <span>Stated decade</span>
-        <select id="props-decade">
-          <option value="">Any decade</option>
-          {decades.map((decade) => <option value={decade}>{decade}s</option>)}
-        </select>
-      </label>
-    </form>
-    {vendorMatches.length > 0 && (
-      <section id="props-vendor-matches" class="vendor-matches" hidden>
-        <h2 class="vendor-matches-title">Prop sources that match this search; inventory not indexed</h2>
-        <ul class="vendor-match-list">
-          {vendorMatches.map(({ vendor, doc, badges, specialties, route }) => (
-            <li class="vendor-match" data-vendor={vendor.id} data-name={doc.name} data-specialties={doc.description} hidden>
-              <p class="vendor-match-line"><a class="vendor-match-name" href={`/props/sources#vendor-${vendor.id}`}>{vendor.name}</a>{badges.map((badge) => <span class:list={["props-badge", { "props-badge-regional": badge.regional }]}>{badge.text}</span>)}</p>
-              {specialties && <p class="props-note">{specialties}</p>}
-              <p class="props-note">Inventory not indexed; contact the vendor{route && <>: <a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>}.</p>
-            </li>
-          ))}
-        </ul>
-      </section>
     )}
-    <p id="props-count" class="props-count" aria-live="polite"></p>
-    <noscript><p class="props-note">Search needs JavaScript, and so does the item list. The prop sources, with their contact details, are listed without it on <a href="/props/sources">the prop sources page</a>.</p></noscript>
-    <p id="props-empty" class="props-empty" hidden></p>
-    <ol id="props-results" class="props-results" data-cards-url={cardsUrl}></ol>
-    <button id="props-more" type="button" class="props-more" hidden>Show more</button>
-  </section>
+    <label class="props-field">
+      <span>Kind</span>
+      <select id="props-kind">
+        <option value="">All kinds</option>
+        {kinds.map((kind) => <option value={kind.id}>{kind.label}</option>)}
+      </select>
+    </label>
+    <label class="props-field">
+      <span>Stated decade</span>
+      <select id="props-decade">
+        <option value="">Any decade</option>
+        {decades.map((decade) => <option value={decade}>{decade}s</option>)}
+      </select>
+    </label>
+  </form>
+  {vendorMatches.length > 0 && (
+    <section id="props-vendor-matches" class="vendor-matches" hidden>
+      <h2 class="vendor-matches-title">Sources that match your search (inventory not indexed)</h2>
+      <ul class="vendor-match-list">
+        {vendorMatches.map(({ vendor, doc, type, regional, specialties, route }) => (
+          <li class="vendor-match" data-vendor={vendor.id} data-name={doc.name} data-specialties={doc.description} hidden>
+            <p class="vendor-match-line"><a class="vendor-match-name" href={`/props/sources#vendor-${vendor.id}`}>{vendor.name}</a>{type && <> <span class="vendor-match-type">{type}</span></>}{regional && <> <span class="props-regional">{regional}</span></>}</p>
+            <p class="vendor-match-detail">{specialties && <>{specialties} </>}<span class="vendor-match-contact">Contact the vendor{route && <>: <a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>}.</span></p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+  <p id="props-count" class="props-count" aria-live="polite"></p>
+  <noscript><p class="props-note">Search needs JavaScript, and so does the item list. The prop sources, with their contact details, are listed without it on <a href="/props/sources">the prop sources page</a>.</p></noscript>
+  <p id="props-empty" class="props-empty" hidden></p>
+  <ol id="props-results" class="props-results" data-cards-url={cardsUrl}></ol>
+  <button id="props-more" type="button" class="props-more" hidden>Show more</button>
 
   <script>import "../scripts/props-page.ts";</script>
 </PropsLayout>

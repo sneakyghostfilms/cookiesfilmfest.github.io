@@ -188,10 +188,13 @@ test('scene results tell the reader that unlisted props were not identified or h
   assert.ok(!pageScript.includes('Matched by AI'), 'the keyword page carries no scene code');
 });
 
-test('a Kind filter sits between Vendor and Decade, and each card draws its kind as a badge', () => {
+test('a Kind filter sits between Vendor and Decade, and each card names its kind, with no badge, citation or photo line', () => {
   assert.match(html, /<span>Vendor<\/span>[\s\S]*?<\/label><label class="props-field"><span>Kind<\/span><select id="props-kind"><option value="">All kinds<\/option><option value="film-prop">Film prop<\/option><option value="set-dressing">Set dressing<\/option><option value="event-rental">Event rental<\/option><option value="antique">Antiques and reuse<\/option><\/select><\/label><label class="props-field"><span>Stated decade<\/span>/);
   for (const label of ['Film prop', 'Set dressing', 'Event rental', 'Antiques and reuse']) assert.ok(pageScript.includes(label), label);
-  assert.ok(pageScript.includes('props-badge'), 'the card view draws the badge');
+  assert.ok(pageScript.includes('prop-kind'), 'the card view draws the kind');
+  for (const script of [pageScript, sceneScript]) {
+    for (const gone of ['props-badge', 'prop-cite', 'prop-photo']) assert.ok(!script.includes(gone), gone);
+  }
 });
 
 test("on today's data the page's search keeps the ranking's order, and the Kind filter keeps that order within a kind", () => {
@@ -252,7 +255,7 @@ test('every vendor has one box with an anchor: vendors with searchable items fir
 test('the vendor strip holds exactly the vendors without searchable items, hidden until a search matches their name or own words', () => {
   const strip = html.match(/<section id="props-vendor-matches" class="vendor-matches" hidden>[\s\S]*?<\/section>/)?.[0];
   assert.ok(strip, 'the strip is built and starts hidden');
-  assert.ok(visibleText(strip).includes('Prop sources that match this search; inventory not indexed'));
+  assert.ok(visibleText(strip).includes('Sources that match your search (inventory not indexed)'));
   assert.doesNotMatch(visibleText(strip), /speciali[sz]e/i, 'a name-only match makes no specialty claim');
   const cards = [...strip.matchAll(/<li class="vendor-match" data-vendor="([^"]+)" data-name="([^"]*)" data-specialties(?:="([^"]*)")? hidden>/g)];
   const expected = vendors.vendors.filter((entry) => !withItems.has(entry.id)).sort(byName);

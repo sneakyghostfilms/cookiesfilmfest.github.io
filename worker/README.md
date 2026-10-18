@@ -97,6 +97,13 @@ node scripts/eval-models.mjs --url http://localhost:8788
 
 `wrangler dev` uses the real AI binding, which bills the account, but a local copy of the budget object.
 
+The output ends with the deploy gate, which must pass before a redeploy that changes the inventory or the tags:
+- On the four original scenes (diner, hospital, office, police): every counted required prop is found, with 0 wrong keys, 0 invalid keys and no truncated output.
+- At least 4 of the 6 props those scenes name that the catalogs lack are reported as "no match". The target is 5 of 6, the 2026-10-17 baseline. The floor is 4 because the baseline setup varies on its own: an identical 6,762-token office request left out both of that scene's absent props, where the baseline had reported one.
+- Every other scene (today the morgue) meets the S1 floor: 70% of required props found, at most 1 wrong and 1 invalid key, and no truncation.
+
+When new items match a scene's required prop, add their keys to that prop's `acceptableKeys` before the run, so that a correct pick doesn't count as a wrong key.
+
 ## Local development without Cloudflare
 
 ```sh

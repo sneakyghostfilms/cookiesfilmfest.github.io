@@ -6,6 +6,7 @@ export const REDACTED = 'REDACTED';
 
 const NAME_PATTERN = TRACKING_PARAMETERS.map((name) => (name.endsWith('*') ? `${name.slice(0, -1)}[a-z0-9_]+` : name)).join('|');
 const IS_TRACKING = new RegExp(`^(?:${NAME_PATTERN})$`, 'i');
+export const isTrackingParameter = (name) => IS_TRACKING.test(name);
 // A name right after ?, & or ; (the end of &amp; or &#38;) or a JSON-escaped ampersand (a backslash, then u0026),
 // then =, then the value up to the next &, #, quote, space, <, >, backslash or ).
 const IN_QUERY = new RegExp(`([?&;]|\\x5cu0026)(${NAME_PATTERN})=([^&#"'\\s<>\\x5c)]+)`, 'gi');

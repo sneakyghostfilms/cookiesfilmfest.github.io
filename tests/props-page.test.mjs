@@ -194,6 +194,7 @@ test('a Kind filter sits between Vendor and Decade, and each card names its kind
   assert.match(html, /<span>Vendor<\/span>[\s\S]*?<\/label><label class="props-field"><span>Kind<\/span><select id="props-kind"><option value="">All kinds<\/option><option value="film-prop">Film prop<\/option><option value="set-dressing">Set dressing<\/option><option value="event-rental">Event rental<\/option><option value="antique">Antiques and reuse<\/option><\/select><\/label><label class="props-field"><span>Stated decade<\/span>/);
   for (const label of ['Film prop', 'Set dressing', 'Event rental', 'Antiques and reuse']) assert.ok(pageScript.includes(label), label);
   assert.ok(pageScript.includes('prop-kind'), 'the card view draws the kind');
+  assert.match(html, /<select id="props-decade"><option value="">All \+ unspecified<\/option>/, 'the decade filter says that unspecified eras are included');
   for (const script of [pageScript, sceneScript]) {
     for (const gone of ['props-badge', 'prop-cite', 'prop-photo']) assert.ok(!script.includes(gone), gone);
   }

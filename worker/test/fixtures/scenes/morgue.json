@@ -1,0 +1,91 @@
+{
+  "id": "morgue",
+  "text": "INT. COUNTY MORGUE - NIGHT (1957)\nFluorescent tubes flicker over a steel autopsy slab where a young man lies covered to the chin. DR. ABEL MARSH (60s), sleeves rolled, in a short-sleeved white coroner's shirt, presses a stethoscope to the dead man's chest out of habit, then checks his wristwatch and writes down the time.\nThe old fridge in the corner shudders and hums. The radiator under the frosted window knocks and hisses.\nDEPUTY RUTH OKAFOR (30s) waits on a red chair by the door, a two-way radio crackling on her hip.\nRUTH: Sheriff wants your report tonight.\nMARSH: Then the sheriff can type it.\nHe drags a portable typewriter onto the bench beside her and pecks out two lines. The rotary phone on the wall rings. Neither of them moves to answer it.\nMarsh reaches for his bone saw, thinks better of it, and seals a sample in a specimen jar instead.",
+  "required": [
+    {
+      "prop": "autopsy slab",
+      "acceptableKeys": [
+        "dz-eafo2u"
+      ]
+    },
+    {
+      "prop": "coroner's shirt",
+      "acceptableKeys": [
+        "scp-207"
+      ]
+    },
+    {
+      "prop": "stethoscope",
+      "acceptableKeys": [
+        "scp-241",
+        "scp-277"
+      ]
+    },
+    {
+      "prop": "wristwatch",
+      "acceptableKeys": [
+        "scp-002"
+      ]
+    },
+    {
+      "prop": "fridge",
+      "acceptableKeys": [
+        "dz-30a5ea",
+        "dz-myssj4",
+        "dz-mts92r",
+        "dz-0c77rb",
+        "dz-urna7r",
+        "dz-4s2yk7",
+        "dz-7u38md"
+      ]
+    },
+    {
+      "prop": "radiator",
+      "acceptableKeys": [
+        "dz-myjmbu"
+      ]
+    },
+    {
+      "prop": "red chair",
+      "acceptableKeys": [
+        "dz-qm795a"
+      ]
+    },
+    {
+      "prop": "two-way radio",
+      "acceptableKeys": [
+        "scp-173",
+        "dz-z04pfr"
+      ]
+    },
+    {
+      "prop": "typewriter",
+      "acceptableKeys": [
+        "scp-077",
+        "scp-078",
+        "scp-079",
+        "scp-331"
+      ]
+    },
+    {
+      "prop": "bench",
+      "acceptableKeys": [
+        "dz-jsz7x9"
+      ]
+    },
+    {
+      "prop": "rotary phone",
+      "acceptableKeys": [
+        "scp-296",
+        "scp-054-1",
+        "scp-054-2",
+        "scp-055",
+        "scp-134"
+      ]
+    }
+  ],
+  "absent": [
+    "bone saw",
+    "specimen jar"
+  ]
+}

@@ -13,7 +13,7 @@ const { vendors } = await readJson('../src/data/props/vendors.json');
 const { tags } = await readJson('../src/data/props/tags.json');
 const catalogsById = new Map(vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { catalog, vendor }])));
 // The card fields the page draws; alt matters only beside a thumbnail.
-const drawn = ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, tags: cardTags, link, inquire, cite, thumb, alt, photoCredit }) => ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, tags: cardTags, link, inquire, cite, thumb, alt: thumb ? alt : null, photoCredit });
+const drawn = ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, link, inquire, cite, thumb, alt, photoCredit }) => ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, link, inquire, cite, thumb, alt: thumb ? alt : null, photoCredit });
 
 const pdfVendor = { id: 'steel-city-props', name: 'Steel City Props', contact: { formUrl: 'https://forms.example/form', email: 'shop@example.com', phone: null, pageUrl: null } };
 const pdfCatalog = { id: 'scp-2026-09-30', type: 'pdf', sourceUrl: 'https://drive.example/catalog' };

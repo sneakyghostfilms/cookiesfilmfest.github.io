@@ -79,7 +79,7 @@ test('cards follow the spec format and carry the source link and inquiry route',
   assert.equal(spec.inquire, vendor.contact.formUrl);
   assert.ok(html.includes(`href="mailto:${vendor.contact.email}"`), "the vendor box keeps the vendor's e-mail");
   assert.ok(!cardsJson.includes('go to page'), 'no deep-link wording: Drive ignores #page');
-  assert.ok(pageScript.includes('AI-suggested search terms: '), 'the page script draws the tags line');
+  for (const script of [pageScript, sceneScript]) assert.ok(!script.includes('AI-suggested search terms'), 'a card shows no search-terms line');
 });
 
 test("the props pages' scripts run in the browser only: no Node module or file call is bundled into them", () => {

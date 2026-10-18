@@ -298,7 +298,6 @@
 }
 
 .props-page .prop-category,
-.props-page .prop-tags,
 .props-page .prop-cite {
   font-size: 13px;
   color: var(--pp-muted);

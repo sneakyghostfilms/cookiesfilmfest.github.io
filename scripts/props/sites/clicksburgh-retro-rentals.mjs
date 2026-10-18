@@ -22,8 +22,10 @@ export const SECTIONS = new Map([
   ['Pittsburgh Wedding Cookie Table Displays & Bridges', 'kept'],
   ['Speciality Packages', 'package'],
 ]);
-// Tiles in a kept section that the photo review found to be services.
-export const SERVICE_TILES = new Set();
+// Tiles in a kept section that the photo review found to be services (the lead's rulings, 2026-10-18). The Greenery
+// wall's photo shows a hidden server's hand passing a glass through it, and the white wall is the same product, with a
+// serving hatch and a doorbell for the hidden server, as "Living" says.
+export const SERVICE_TILES = new Set(['Living Champagne Wall', 'Greenery Living Champagne Wall']);
 // A rich text outside the tiles is a section heading when it has at most HEADING_WORDS words, and a section's
 // description when it has more than DESCRIPTION_WORDS (the page's headings have 2 to 7 words, its descriptions 51 or
 // more). Anything between stops the import, so a renamed heading can't pass as a description and file its tiles under

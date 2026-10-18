@@ -5,5 +5,13 @@
   "cps-psmw3m": { "reason": "vendor photo shows a different object" },
   "cps-ifgtjm": { "reason": "vendor photo shows a different object" },
   "cps-j7cy82": { "reason": "private names in photo; item shown without its thumbnail" },
-  "cps-u233i0": { "reason": "people in photo; item shown without its thumbnail" }
+  "cps-u233i0": { "reason": "people in photo; item shown without its thumbnail" },
+  "cbr-6gcxg3": { "reason": "people in photo; item shown without its thumbnail" },
+  "cbr-2i5oms": { "reason": "people in photo; item shown without its thumbnail" },
+  "cbr-5zabmv": { "reason": "people in photo; item shown without its thumbnail" },
+  "cbr-i0gnfn": { "reason": "a customer's personalization shows a private name; item shown without its thumbnail" },
+  "cbr-5wegf2": { "reason": "a customer's personalization shows a private name; item shown without its thumbnail" },
+  "cbr-r3ludh": { "reason": "a customer's personalization shows a private name; item shown without its thumbnail" },
+  "cbr-vmd2p6": { "reason": "a customer's personalization shows a private name; item shown without its thumbnail" },
+  "cbr-3t0oz6": { "reason": "a customer's personalization shows a private name; item shown without its thumbnail" }
 }

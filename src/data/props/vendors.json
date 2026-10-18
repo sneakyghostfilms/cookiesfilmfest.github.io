@@ -391,9 +391,9 @@
           ],
           "expected": {
             "tiles": 86,
-            "items": 72,
+            "items": 70,
             "excluded": {
-              "service": 9,
+              "service": 11,
               "package": 4
             }
           }

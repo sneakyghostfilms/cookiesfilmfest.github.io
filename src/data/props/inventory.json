@@ -7,7 +7,7 @@
     "pccr-2026-10-18": {"indexedAt":"2026-10-18","capturedAt":"2026-10-18","products":174,"excluded":{"not in the category":0,"not visible":0,"not physical":0,"sold out":2,"listed twice":0}},
     "cj-2026-10-18": {"indexedAt":"2026-10-18","capturedAt":"2026-10-18","pages":29,"cards":344,"excluded":{"not in stock":0,"building material":76,"repeated":0},"withheld":1},
     "cps-2026-10-17": {"indexedAt":"2026-10-18","capturedAt":"2026-10-17","pages":23,"photos":879},
-    "cbr-2026-10-17": {"indexedAt":"2026-10-18","capturedAt":"2026-10-17","tiles":86,"excluded":{"service":9,"package":4}}
+    "cbr-2026-10-17": {"indexedAt":"2026-10-18","capturedAt":"2026-10-17","tiles":86,"excluded":{"service":11,"package":4}}
   },
   "items": [
     {"key":"scp-056","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["056"],"printedIds":["[056]"],"name":"GREEN CHANGE MACHINE","description":"GREEN CHANGE MACHINE 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
@@ -1894,8 +1894,6 @@
     {"key":"cbr-jv5lvf","vendor":"clicksburgh-retro-rentals","catalog":"cbr-2026-10-17","name":"Pgh Incline Card Box (holds 75-100 cards)","description":null,"categories":["Wedding Card Boxes"],"era":null,"decades":[],"url":"https://www.clicksburghretrorentals.com/our-rental-collection"},
     {"key":"cbr-5wegf2","vendor":"clicksburgh-retro-rentals","catalog":"cbr-2026-10-17","name":"Wedding Post Box with Customizations (holds 300+ cards)","description":null,"categories":["Wedding Card Boxes"],"era":null,"decades":[],"url":"https://www.clicksburghretrorentals.com/our-rental-collection"},
     {"key":"cbr-s9gzx0","vendor":"clicksburgh-retro-rentals","catalog":"cbr-2026-10-17","name":"Pgh Incline Card Box (holds 300+ cards)","description":null,"categories":["Wedding Card Boxes"],"era":null,"decades":[],"url":"https://www.clicksburghretrorentals.com/our-rental-collection"},
-    {"key":"cbr-0e4bnt","vendor":"clicksburgh-retro-rentals","catalog":"cbr-2026-10-17","name":"Living Champagne Wall","description":null,"categories":["Interactive Displays"],"era":null,"decades":[],"url":"https://www.clicksburghretrorentals.com/our-rental-collection"},
-    {"key":"cbr-uy86bz","vendor":"clicksburgh-retro-rentals","catalog":"cbr-2026-10-17","name":"Greenery Living Champagne Wall","description":null,"categories":["Interactive Displays"],"era":null,"decades":[],"url":"https://www.clicksburghretrorentals.com/our-rental-collection"},
     {"key":"cbr-c5zy51","vendor":"clicksburgh-retro-rentals","catalog":"cbr-2026-10-17","name":"Make & Take Flower Bar Display","description":null,"categories":["Interactive Displays"],"era":null,"decades":[],"url":"https://www.clicksburghretrorentals.com/our-rental-collection"},
     {"key":"cbr-6gcxg3","vendor":"clicksburgh-retro-rentals","catalog":"cbr-2026-10-17","name":"Life-Size Vintage Frame with Customizable Drapery","description":null,"categories":["Interactive Displays"],"era":null,"decades":[],"url":"https://www.clicksburghretrorentals.com/our-rental-collection"},
     {"key":"cbr-p9n0je","vendor":"clicksburgh-retro-rentals","catalog":"cbr-2026-10-17","name":"Candy Wall","description":null,"categories":["Interactive Displays"],"era":null,"decades":[],"url":"https://www.clicksburghretrorentals.com/our-rental-collection"},

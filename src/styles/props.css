@@ -699,6 +699,10 @@
   margin-top: 3px;
 }
 
+.props-page .props-vendor-routes a[href^="tel:"] {
+  white-space: nowrap;
+}
+
 .props-page .props-vendor-sources {
   margin-top: 12px;
   padding-top: 8px;

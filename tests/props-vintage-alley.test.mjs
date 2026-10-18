@@ -51,7 +51,7 @@ test('items keep only names, sections and the page link, and pass the site-item 
 test('importSite reads the collections page through the fetcher it is given and writes the snapshot', async () => {
   const outFile = path.join(await mkdtemp(path.join(tmpdir(), 'props-va-')), 'inventory.json');
   const requested = [];
-  const fetcher = { get: async (url) => (requested.push(url), { body: Buffer.from(html), meta: { url, fetchedAt: '2026-10-18T01:49:45Z' } }) };
+  const fetcher = { get: async (url) => (requested.push(url), { body: Buffer.from(html), meta: { url, fetchedAt: '2026-10-17T12:00:00Z' } }) };
   const vendors = { vendors: [{ ...vendor, catalogs: [{ ...catalog, expected: { sections: 3, photos: 6, items: 5 } }] }] };
   const lines = [];
   await importSite({ vendorId: vendor.id, vendors, outFile, fetcher, log: (line) => lines.push(line), today: () => '2026-10-17' });
@@ -64,7 +64,7 @@ test('importSite reads the collections page through the fetcher it is given and 
 
 test('an item listed in item-exclusions.json is withheld from the snapshot and its photos, and counted', async () => {
   const outFile = path.join(await mkdtemp(path.join(tmpdir(), 'props-va-')), 'inventory.json');
-  const fetcher = { get: async (url) => ({ body: Buffer.from(html), meta: { url, fetchedAt: '2026-10-18T01:49:45Z' } }) };
+  const fetcher = { get: async (url) => ({ body: Buffer.from(html), meta: { url, fetchedAt: '2026-10-17T12:00:00Z' } }) };
   const withheldKey = byName.get('Test Sofa One').key;
   const exclusions = { [withheldKey]: { reason: "name or photo carries a private individual's name" }, 'va-zzzzzz': { reason: "name or photo carries a private individual's name" }, 'dz-aaaaaa': { reason: "name or photo carries a private individual's name" } };
   const vendors = { vendors: [{ ...vendor, catalogs: [{ ...catalog, expected: { sections: 3, photos: 6, items: 4, withheld: 1 } }] }] };

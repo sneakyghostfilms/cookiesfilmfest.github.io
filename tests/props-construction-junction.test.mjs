@@ -161,7 +161,7 @@ function stubFetcher(pages) {
       requested.push(url);
       const body = typeof pages === 'function' ? pages(url) : pages[url];
       if (body === undefined) throw new Error(`unexpected request ${url}`);
-      return { body: Buffer.from(body), meta: { url, fetchedAt: '2026-10-18T06:30:00Z' }, missing: false };
+      return { body: Buffer.from(body), meta: { url, fetchedAt: '2026-10-18T12:00:00Z' }, missing: false };
     },
     raiseGap: (ms) => gaps.push(ms),
   };

@@ -110,7 +110,7 @@ test("importSite reads robots.txt, the category page and each list page built fr
     get: async (url) => {
       requested.push(url);
       if (!(url in pages)) throw new Error(`unexpected request ${url}`);
-      return { body: Buffer.from(pages[url]), meta: { url, fetchedAt: '2026-10-18T05:15:23Z' }, missing: false };
+      return { body: Buffer.from(pages[url]), meta: { url, fetchedAt: '2026-10-18T12:00:00Z' }, missing: false };
     },
     raiseGap: (ms) => gaps.push(ms),
   };

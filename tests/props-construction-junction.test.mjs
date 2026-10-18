@@ -111,15 +111,37 @@ test('photos: the smallest variant at least 320 px wide, or else the widest, and
   assert.ok(parsed.report.includes('Photo variant used: 320w 1, 480w 1, 300w, narrower than 320 1, data-src only 1'), parsed.report.join('\n'));
 });
 
-test('the walk takes each page\'s own next link, and a wrong or disagreeing link stops it', () => {
-  assert.equal(nextListingPage(page([]), catalog.sourceUrl, 1), 'https://shop.example/shop/page/2/');
+test('the walk follows rel="next" when it is the next page and the visible link is the same page without its query; anything else stops it', () => {
+  const clean = 'https://shop.example/shop/page/2/';
+  assert.equal(nextListingPage(page([]), catalog.sourceUrl, 1), clean);
   assert.equal(nextListingPage(page([], { number: 28 }), catalog.sourceUrl, 28), 'https://shop.example/shop/page/29/');
   assert.equal(nextListingPage(page([], { last: true }), catalog.sourceUrl, 29), null);
-  assert.throws(() => nextListingPage(page([], { next: 'https://shop.example/shop/page/3/' }), catalog.sourceUrl, 1), /next link is https:\/\/shop\.example\/shop\/page\/3\/, not https:\/\/shop\.example\/shop\/page\/2\//);
-  assert.throws(() => nextListingPage(page([], { next: 'https://other.example/shop/page/2/' }), catalog.sourceUrl, 1), /not https:\/\/shop\.example\/shop\/page\/2\//);
-  assert.throws(() => nextListingPage(page([], { rel: 'https://shop.example/shop/page/3/' }), catalog.sourceUrl, 1), /next links disagree/);
-  assert.throws(() => nextListingPage(page([], { rel: null }), catalog.sourceUrl, 1), /next links disagree/);
-  assert.throws(() => nextListingPage(page([], { next: null, rel: 'https://shop.example/shop/page/2/' }), catalog.sourceUrl, 1), /next links disagree/);
+  assert.equal(nextListingPage(page([], { next: `${clean}?_kx=made-up-value`, rel: clean }), catalog.sourceUrl, 1), clean, 'a query on the visible link only is dropped');
+  const twoVisible = page([]).replace('</ul></nav>', `<li><a class="next page-numbers" href="${clean}">next</a></li></ul></nav>`);
+  const stops = [
+    [page([], { next: 'https://shop.example/shop/page/3/' }), /rel="next" is https:\/\/shop\.example\/shop\/page\/3\/, not https:\/\/shop\.example\/shop\/page\/2\//],
+    [page([], { next: `${clean}?_kx=made-up-value` }), /rel="next" is https:\/\/shop\.example\/shop\/page\/2\/\?_kx=…, not/],
+    [page([], { next: 'https://shop.example/shop/page/3/', rel: clean }), /next link is https:\/\/shop\.example\/shop\/page\/3\/, not/],
+    [page([], { next: 'https://shop.example/shop/page/3/?_kx=made-up-value', rel: clean }), /next link is https:\/\/shop\.example\/shop\/page\/3\/\?_kx=…, not/],
+    [page([], { next: 'https://other.example/shop/page/2/', rel: clean }), /next link is https:\/\/other\.example\/shop\/page\/2\/, not/],
+    [page([], { next: '/shop/page/2/', rel: clean }), /next link is \/shop\/page\/2\/, not/],
+    [page([], { rel: null }), /next links disagree \(visible \[https:\/\/shop\.example\/shop\/page\/2\/\], rel="next" \[\]\)/],
+    [page([], { next: null, rel: clean }), /next links disagree/],
+    [page([], { next: `${clean}?_kx=made-up-value`, rel: null }), /next links disagree \(visible \[https:\/\/shop\.example\/shop\/page\/2\/\?_kx=…\], rel="next" \[\]\)/],
+    [twoVisible, /next links disagree/],
+  ];
+  for (const [html, message] of stops) {
+    assert.throws(() => nextListingPage(html, catalog.sourceUrl, 1), (error) => message.test(error.message) && !error.message.includes('made-up-value'), String(message));
+  }
+});
+
+test('a product link or photo URL with a query stops the parse, naming only the parameter, and a pager query is reported by name', () => {
+  assert.throws(() => parse(page([card({ post: 106, href: 'https://shop.example/shop/test-lamp-106/?_kx=made-up-value' })], { last: true })), (error) => /Post 106 on page 1 links to its product with a query \(_kx\)/.test(error.message) && !error.message.includes('made-up-value'));
+  const tracked = card({ post: 107 }).replaceAll('.jpg ', '.jpg?utm_source=made-up-value ');
+  assert.throws(() => parse(page([tracked], { last: true })), (error) => /Post 107 on page 1 has a photo URL with a query \(utm_source\)/.test(error.message) && !error.message.includes('made-up-value'));
+  const parsed = parse(page([card({ post: 108 })], { next: 'https://shop.example/shop/page/2/?_kx=made-up-value', rel: 'https://shop.example/shop/page/2/' }));
+  assert.ok(parsed.report.includes("  page 1's pager links carry a query (_kx), which is never sent"), parsed.report.join('\n'));
+  assert.ok(!parsed.report.join('\n').includes('made-up-value'));
 });
 
 test('a post already seen on an earlier page is kept once and flagged as listing drift', () => {
@@ -149,14 +171,14 @@ test('importSite reads robots.txt, then the first page, then each next page, and
   const outFile = path.join(await mkdtemp(path.join(tmpdir(), 'props-lt-')), 'inventory.json');
   const fetcher = stubFetcher({
     'https://shop.example/robots.txt': 'User-agent: *\nDisallow: /*?add-to-cart=\nDisallow: /page/*/?s=\nCrawl-delay: 3\n',
-    'https://shop.example/shop/': page([card({ post: 701 }), card({ post: 702, cats: ['online', 'pipe'] })]),
+    'https://shop.example/shop/': page([card({ post: 701 }), card({ post: 702, cats: ['online', 'pipe'] })], { next: 'https://shop.example/shop/page/2/?_kx=made-up-value', rel: 'https://shop.example/shop/page/2/' }),
     'https://shop.example/shop/page/2/': page([card({ post: 703, stock: 'outofstock' }), card({ post: 704 })], { number: 2, last: true }),
   });
   const expected = { pages: 2, cards: 4, items: 2, excluded: { 'not in stock': 1, 'building material': 1, repeated: 0 } };
   const vendors = { vendors: [{ ...vendor, catalogs: [{ ...catalog, expected }] }] };
   const lines = [];
   await importSite({ vendorId: vendor.id, vendors, outFile, fetcher, exclusions: {}, log: (line) => lines.push(line), today: () => '2026-10-18' });
-  assert.deepEqual(fetcher.requested, ['https://shop.example/robots.txt', 'https://shop.example/shop/', 'https://shop.example/shop/page/2/']);
+  assert.deepEqual(fetcher.requested, ['https://shop.example/robots.txt', 'https://shop.example/shop/', 'https://shop.example/shop/page/2/'], 'the query on page 1\'s visible next link is never sent');
   assert.deepEqual(fetcher.gaps, [3000]);
   const written = JSON.parse(await readFile(outFile, 'utf8'));
   assert.deepEqual(written.items.map((item) => item.key), ['701', '704'].map((post) => siteKey('lt', post)));

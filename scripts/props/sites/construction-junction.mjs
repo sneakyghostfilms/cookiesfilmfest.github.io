@@ -43,6 +43,15 @@ const textOf = (html) => decodeEntities(String(html).replace(/<[^>]*>/g, ' ')).r
 const tagsOf = (html, name) => [...html.matchAll(new RegExp(`<${name}\\b[^>]*>`, 'gi'))].map(([tag]) => tag);
 const classesOf = (tag) => (attribute(tag, 'class') ?? '').split(/\s+/).filter(Boolean);
 
+// Query values can identify someone (an email-click token baked into a cached page's links), so only names are shown.
+const queryNames = (href) => [...new Set(new URL(href, 'https://relative.invalid/').searchParams.keys())];
+function shownUrl(href) {
+  const url = new URL(href, 'https://relative.invalid/');
+  const names = queryNames(href);
+  return `${url.origin === 'https://relative.invalid' ? '' : url.origin}${url.pathname}${names.length ? `?${names.map((name) => `${name}=…`).join('&')}` : ''}`;
+}
+const withoutQuery = (href) => (/^https?:\/\//.test(href) ? `${new URL(href).origin}${new URL(href).pathname}` : href);
+
 // The category widget ends a parent category's name with " -" ("Chair -"): its punctuation, not part of the name.
 export const categoryName = (html) => textOf(html).replace(/\s+-$/, '');
 
@@ -71,17 +80,20 @@ export function categoryNames(html, siteUrl) {
   return names;
 }
 
-// The walk follows each page's own next link, and stops before any request when that link isn't the next page number
-// or when the visible link and rel="next" disagree. No page URL is built, so no guessed URL can 404.
+// The walk follows each page's own next link, and stops before any request unless rel="next" is exactly the next page
+// number and the visible next link is the same page once its query is dropped. A page cache can bake a visitor's
+// tracking query into the visible links (the lead's ruling, 2026-10-18), and a query is never sent. No page URL is built,
+// so no guessed URL can 404.
 export function nextListingPage(html, sourceUrl, page) {
-  const visible = tagsOf(html, 'a').filter((tag) => ['next', 'page-numbers'].every((name) => classesOf(tag).includes(name))).map((tag) => attribute(tag, 'href'));
-  const rel = tagsOf(html, 'link').filter((tag) => attribute(tag, 'rel') === 'next').map((tag) => attribute(tag, 'href'));
+  const visible = tagsOf(html, 'a').filter((tag) => ['next', 'page-numbers'].every((name) => classesOf(tag).includes(name))).map((tag) => attribute(tag, 'href') ?? '');
+  const rel = tagsOf(html, 'link').filter((tag) => attribute(tag, 'rel') === 'next').map((tag) => attribute(tag, 'href') ?? '');
   if (!visible.length && !rel.length) return null;
-  if (visible.length !== 1 || rel.length !== 1 || visible[0] !== rel[0]) {
-    throw new Error(`Page ${page}'s next links disagree (visible ${JSON.stringify(visible)}, rel="next" ${JSON.stringify(rel)}); stopping before any further request.`);
+  if (visible.length !== 1 || rel.length !== 1) {
+    throw new Error(`Page ${page}'s next links disagree (visible [${visible.map(shownUrl).join(', ')}], rel="next" [${rel.map(shownUrl).join(', ')}]); stopping before any further request.`);
   }
   const expected = `${sourceUrl}page/${page + 1}/`;
-  if (visible[0] !== expected) throw new Error(`Page ${page}'s next link is ${visible[0]}, not ${expected}; stopping before any further request.`);
+  if (rel[0] !== expected) throw new Error(`Page ${page}'s rel="next" is ${shownUrl(rel[0])}, not ${expected}; stopping before any further request.`);
+  if (withoutQuery(visible[0]) !== expected) throw new Error(`Page ${page}'s next link is ${shownUrl(visible[0])}, not ${expected}; stopping before any further request.`);
   return expected;
 }
 
@@ -138,6 +150,8 @@ export function parseListing(pages, { vendor, catalog }) {
   const leftOut = [];
   let cards = 0;
   pages.forEach((html, index) => {
+    const pagerQueries = [...new Set(tagsOf(html, 'a').filter((tag) => classesOf(tag).includes('page-numbers')).flatMap((tag) => queryNames(attribute(tag, 'href') ?? '')))];
+    if (pagerQueries.length) flags.push(`page ${index + 1}'s pager links carry a query (${pagerQueries.join(', ')}), which is never sent`);
     for (const card of cardsOf(html)) {
       cards += 1;
       const page = index + 1;
@@ -146,7 +160,8 @@ export function parseListing(pages, { vendor, catalog }) {
       if (!postId || !link) throw new Error(`A card on page ${page} has no post id or no title link; the page layout has changed.`);
       const url = attribute(`<a${link[1]}>`, 'href');
       const name = textOf(link[2]);
-      if (!url?.startsWith(catalog.sourceUrl)) throw new Error(`Post ${postId} on page ${page} links to ${url}, outside ${catalog.sourceUrl}.`);
+      if (!url?.startsWith(catalog.sourceUrl)) throw new Error(`Post ${postId} on page ${page} links to ${shownUrl(url ?? '')}, outside ${catalog.sourceUrl}.`);
+      if (queryNames(url).length) throw new Error(`Post ${postId} on page ${page} links to its product with a query (${queryNames(url).join(', ')}); a URL with a query is never stored.`);
       if (seen.has(postId)) {
         excluded.repeated += 1;
         flags.push(`listing drift: post ${postId} ("${name}") is on page ${seen.get(postId)} and again on page ${page}; kept once`);
@@ -174,6 +189,7 @@ export function parseListing(pages, { vendor, catalog }) {
       const price = priceOf(card.html);
       tally(prices, price.kind);
       const photo = photoOf(card.html);
+      if (photo.url && queryNames(photo.url).length) throw new Error(`Post ${postId} on page ${page} has a photo URL with a query (${queryNames(photo.url).join(', ')}); a URL with a query is never stored.`);
       tally(variants, photo.variant);
       if (photo.url && new URL(photo.url, catalog.siteUrl).hostname !== new URL(catalog.siteUrl).hostname) flags.push(`post ${postId}'s photo is not on ${new URL(catalog.siteUrl).hostname}: ${photo.url}`);
       const key = siteKey(vendor.keyPrefix, postId);

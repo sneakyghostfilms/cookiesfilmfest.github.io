@@ -13,6 +13,7 @@ import { FetchStopped, createSiteFetcher } from './site-fetch.mjs';
 import { checkSiteItems } from './site-items.mjs';
 import { LISTING_PAGE_LIMIT, nextListingPage, parseListing } from './sites/construction-junction.mjs';
 import { nextSubcategoryPage, parseCatalog, subcategoryPages } from './sites/bespoke-event-rentals.mjs';
+import { categoryPage, checkPages, parseCategories } from './sites/event-source.mjs';
 import { galleryPages, parseGalleries } from './sites/cleveland-prop-shop.mjs';
 import { parseCollection } from './sites/clicksburgh-retro-rentals.mjs';
 import { parseStore, storeListPage, storePageCount } from './sites/creative-reuse.mjs';
@@ -24,7 +25,7 @@ const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
 const ITEM_EXCLUSIONS_FILE = join(ROOT, 'scripts/props/item-exclusions.json');
 export const ITEM_EXCLUSION_REASONS = new Set(["name or photo carries a private individual's name"]);
-const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store', 'woocommerce-listing', 'weebly-gallery', 'wix-repeater', 'tapgoods-catalog']);
+const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store', 'woocommerce-listing', 'weebly-gallery', 'wix-repeater', 'tapgoods-catalog', 'magento-category']);
 const WORDPRESS_PAGE_SIZE = 10;
 
 const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
@@ -130,6 +131,24 @@ const SOURCES = {
     // The capture date is the earliest page's, since a snapshot can mix pages seeded earlier with fresh ones.
     const capturedAt = localDate(Math.min(...pages.map((page) => Date.parse(page.fetchedAt))));
     return { ...parseCatalog({ collections, pages }, { vendor, catalog }), capturedAt };
+  },
+  async 'magento-category'({ vendor, catalog, fetcher, cacheRoot }) {
+    const directory = join(cacheRoot, vendor.id, catalog.id);
+    const pageFetcher = fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.siteUrl).hostname] });
+    // The sitemap is read only from the cache, where the snapshot was seeded, to check the page list; a miss stops the
+    // import before any request.
+    const sitemap = (await pageFetcher.get(catalog.sitemapUrl, directory, { cacheOnly: true })).body.toString('utf8');
+    checkPages(catalog.pages, sitemap, catalog.siteUrl);
+    const site = await robotsCheckedFetcher(pageFetcher, catalog.siteUrl, directory);
+    const pages = [];
+    for (const url of catalog.pages) {
+      const { body, meta } = await site.get(url, directory);
+      // Each page is checked as it arrives, so a page that fails stops the import before the next request.
+      pages.push({ ...categoryPage(body.toString('utf8'), url, catalog.siteUrl), fetchedAt: meta.fetchedAt });
+    }
+    // The capture date is the earliest page's, since a snapshot can mix pages seeded earlier with fresh ones.
+    const capturedAt = localDate(Math.min(...pages.map((page) => Date.parse(page.fetchedAt))));
+    return { ...parseCategories(pages, { vendor, catalog }), capturedAt };
   },
   async 'shopify-export'({ catalog, vendor, exportPath }) {
     if (!exportPath) throw new Error(`${vendor.name} is imported from the vendor's Shopify product export: pass --export "<file.csv>".`);

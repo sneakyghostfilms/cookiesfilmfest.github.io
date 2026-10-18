@@ -176,6 +176,7 @@ test('robots rules: our named group beats *, plain prefixes only, anything else 
   assert.deepEqual([named.group, named.disallow], ['PittsburghPropSearch', ['/tmp/']]);
   assert.deepEqual(robotsRules('User-agent: other\nUser-agent: *\nDisallow: /x\n').disallow, ['/x'], 'a group can name several agents');
   assert.deepEqual(robotsRules('User-agent: *\nDisallow:\n').disallow, [], 'an empty Disallow allows everything');
+  for (const eol of ['\n', '\r\n', '\r']) assert.deepEqual(robotsRules(`User-agent: *${eol}Disallow: /private/${eol}`).disallow, ['/private/'], JSON.stringify(eol));
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: /*.jpg$\n').unsupported, ['Disallow: /*.jpg$']);
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: images\n').unsupported, ['Disallow: images']);
   assert.deepEqual(robotsRules('User-agent: *\nCrawl-delay: soon\n').unsupported, ['Crawl-delay: soon']);

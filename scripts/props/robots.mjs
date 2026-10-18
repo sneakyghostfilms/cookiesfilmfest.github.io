@@ -3,7 +3,7 @@ import { USER_AGENT } from './site-fetch.mjs';
 const PRODUCT_TOKEN = USER_AGENT.split('/')[0];
 
 function linesOf(text) {
-  return String(text).split(/\r?\n/).map((line) => line.replace(/#.*$/, '').trim()).filter(Boolean).map((line) => {
+  return String(text).split(/\r\n|\r|\n/).map((line) => line.replace(/#.*$/, '').trim()).filter(Boolean).map((line) => {
     const colon = line.indexOf(':');
     return colon < 0 ? { key: '', value: line } : { key: line.slice(0, colon).trim().toLowerCase(), value: line.slice(colon + 1).trim() };
   });

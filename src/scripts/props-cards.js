@@ -154,25 +154,35 @@ export function vendorSearchDoc(vendor, order) {
 
 const quoted = (texts) => texts.map((text) => `“${text}”`).join(', ');
 
-export function specialtiesLine(vendor) {
-  return vendor.specialties ? `In their words: ${quoted(vendor.specialties.values)}` : null;
-}
-
 function placeText(address) {
   const region = [address.state, address.zip].filter(Boolean).join(' ');
   return [address.street, address.city, region].filter(Boolean).join(', ');
 }
 
+// A vendor's published facts in the groups its row shows: the notice and its own words, quoted; the address, mailing
+// address and hours lines; the terms line; and the inquiry hint. vendorFacts gives the same lines, labelled, in one list.
+export function vendorFactGroups(vendor) {
+  return {
+    notice: vendor.notice ? quoted([vendor.notice.text]) : null,
+    words: vendor.specialties ? quoted(vendor.specialties.values) : null,
+    where: [
+      vendor.address && `Address${vendor.address.label ? ` (${vendor.address.label})` : ''}: ${placeText(vendor.address)}`,
+      vendor.mailingAddress && `Mailing address: ${placeText(vendor.mailingAddress)}`,
+      vendor.hours && `Hours: ${vendor.hours.text}`,
+    ].filter(Boolean),
+    terms: vendor.terms ? `Terms they publish: “${vendor.terms.text}”` : 'Pricing and terms: ask the vendor',
+    hint: vendor.inquiryHint ? vendor.inquiryHint.text : null,
+  };
+}
+
+export function specialtiesLine(vendor) {
+  const { words } = vendorFactGroups(vendor);
+  return words === null ? null : `In their words: ${words}`;
+}
+
 export function vendorFacts(vendor) {
-  const lines = [];
-  if (vendor.notice) lines.push(`Notice on their site: ${quoted([vendor.notice.text])}`);
-  if (vendor.specialties) lines.push(specialtiesLine(vendor));
-  if (vendor.address) lines.push(`Address${vendor.address.label ? ` (${vendor.address.label})` : ''}: ${placeText(vendor.address)}`);
-  if (vendor.mailingAddress) lines.push(`Mailing address: ${placeText(vendor.mailingAddress)}`);
-  if (vendor.hours) lines.push(`Hours: ${vendor.hours.text}`);
-  lines.push(vendor.terms ? `Terms they publish: “${vendor.terms.text}”` : 'Pricing and terms: ask the vendor');
-  if (vendor.inquiryHint) lines.push(vendor.inquiryHint.text);
-  return lines;
+  const { notice, where, terms, hint } = vendorFactGroups(vendor);
+  return [notice === null ? null : `Notice on their site: ${notice}`, specialtiesLine(vendor), ...where, terms, hint].filter((line) => line !== null);
 }
 
 const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint', 'specialties', 'notice'];

@@ -5,7 +5,7 @@ import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { cardsText } from '../src/scripts/props-cards-file.js';
 import { kindOf } from '../src/scripts/props-kinds.js';
 import {
-  NOT_AFFILIATED, cardFor, cardsFile, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, specialtiesLine, telHref, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources,
+  NOT_AFFILIATED, cardFor, cardsFile, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, specialtiesLine, telHref, vendorBadges, vendorFactGroups, vendorFacts, vendorSearchDoc, vendorSources,
 } from '../src/scripts/props-cards.js';
 
 const readJson = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
@@ -168,6 +168,27 @@ test('contact routes and facts come only from what the vendor publishes', () => 
   }
   assert.deepEqual(socialLinks(null), []);
   assert.deepEqual(socialLinks({ instagram: 'https://instagram.example/v', facebook: null, linktree: 'https://linktree.example/v' }).map((link) => link.label), ['Instagram', 'Linktree']);
+});
+
+test('the facts are grouped as the sources rows show them, in the words of the fact lines', () => {
+  const full = {
+    ...siteVendor,
+    notice: { text: 'We have moved!', source: 'https://vendor.example/' },
+    specialties: { values: ['Typewriters', 'Period and Modern Props'], source: 'https://vendor.example/' },
+    terms: { text: 'Deposits by quote.', source: 'https://vendor.example/' },
+    inquiryHint: { text: 'Cite the item number.', source: 'https://vendor.example/contact/' },
+  };
+  const where = ['Address (prop warehouse): 1 test street, pittsburgh, pa 15201', 'Mailing address: p.o. box 1, pittsburgh, pa 15235', 'Hours: please call or email us to schedule an appointment'];
+  assert.deepEqual(vendorFactGroups(full), {
+    notice: '“We have moved!”',
+    words: '“Typewriters”, “Period and Modern Props”',
+    where,
+    terms: 'Terms they publish: “Deposits by quote.”',
+    hint: 'Cite the item number.',
+  });
+  assert.deepEqual(vendorFacts(full), ['Notice on their site: “We have moved!”', 'In their words: “Typewriters”, “Period and Modern Props”', ...where, 'Terms they publish: “Deposits by quote.”', 'Cite the item number.']);
+  const quiet = { ...siteVendor, sourceType: null, modes: null, address: null, mailingAddress: null, hours: null };
+  assert.deepEqual(vendorFactGroups(quiet), { notice: null, words: null, where: [], terms: 'Pricing and terms: ask the vendor', hint: null }, 'nothing is filled in by inference');
 });
 
 test('sources are listed once each, links shortened and notes trimmed', () => {

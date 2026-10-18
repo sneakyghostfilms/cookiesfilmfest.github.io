@@ -31,7 +31,7 @@ function element(tag: string, className: string, text?: string) {
 function propBlock(entry: SceneEntry, cardsByKey: Map<string, Card>) {
   const block = element("div", "scene-prop");
   block.append(element("h4", "scene-prop-name", entry.prop));
-  if (entry.reason) block.append(element("p", "scene-reason", `AI: ${entry.reason}`));
+  if (entry.reason) block.append(element("p", "scene-reason", `Why: ${entry.reason}`));
   if (entry.keys.length) {
     const matches = element("ol", "props-results scene-matches");
     for (const key of entry.keys) {
@@ -58,11 +58,11 @@ function group(title: string, entries: SceneEntry[], cardsByKey: Map<string, Car
 
 const MESSAGES: Record<string, string> = {
   rate_limited: "Too many requests right now. Wait a minute and try again.",
-  busy: "The AI service is busy. Try again in a minute.",
-  unavailable: "AI matching isn't available right now. Keyword search still works.",
-  timeout: "AI matching didn't work this time. Keyword search still works. Try again later.",
-  network: "AI matching didn't work this time. Keyword search still works. Try again later.",
-  error: "AI matching didn't work this time. Keyword search still works. Try again later.",
+  busy: "The matching service is busy. Try again in a minute.",
+  unavailable: "Scene matching isn't available right now. Keyword search still works.",
+  timeout: "Scene matching didn't work this time. Keyword search still works. Try again later.",
+  network: "Scene matching didn't work this time. Keyword search still works. Try again later.",
+  error: "Scene matching didn't work this time. Keyword search still works. Try again later.",
 };
 
 sceneText.addEventListener("input", () => {
@@ -100,24 +100,24 @@ sceneForm.addEventListener("submit", async (event) => {
     const cardsByKey = new Map((loaded.cards as Card[]).map((card) => [card.key, card]));
     const kept = keepKnownKeys(state, new Set(cardsByKey.keys()));
     if (!kept.required.length && !kept.optional.length) {
-      showStatus("The AI didn't identify props in this text.");
+      showStatus("No props were identified in this text.");
       return;
     }
     showStatus("");
     sceneResults.append(group("Required by the scene", kept.required, cardsByKey), group("Optional set dressing", kept.optional, cardsByKey));
     const notes = [
-      "The AI chose from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them.",
-      `Matched by AI (${kept.model}). AI can be wrong; check each item in the catalog and confirm availability with the vendor.`,
+      "The matches were picked from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them.",
+      "Matches can be wrong; check each item in the catalog and confirm availability with the vendor.",
     ];
     const excluded = periodNote(period);
     if (excluded) notes.push(excluded);
-    if (kept.ignored) notes.push(`${kept.ignored} AI ${kept.ignored === 1 ? "suggestion referred to an item that wasn't" : "suggestions referred to items that weren't"} on the list the AI was given and ${kept.ignored === 1 ? "was" : "were"} ignored.`);
+    if (kept.ignored) notes.push(`${kept.ignored} ${kept.ignored === 1 ? "suggestion referred to an item that wasn't" : "suggestions referred to items that weren't"} on the candidate list and ${kept.ignored === 1 ? "was" : "were"} ignored.`);
     for (const note of notes) sceneResults.append(element("p", "props-note", note));
     return;
   }
   if (state.kind === "quota") {
     const local = state.resetsAt ? ` (about ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit", timeZoneName: "short" }).format(state.resetsAt)})` : "";
-    showStatus(`Today's AI matching budget is used up. Keyword search still works. AI matching resets at midnight UTC${local}.`);
+    showStatus(`Today's scene matching budget is used up. Keyword search still works. Scene matching resets at midnight UTC${local}.`);
     return;
   }
   showStatus(state.kind === "invalid" ? state.message ?? "Check the scene text and try again." : MESSAGES[state.kind]);

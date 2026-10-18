@@ -5,8 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { createHash } from 'node:crypto';
+import postcss from 'postcss';
 import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
+import { filterValues, photosFirst } from '../src/scripts/props-results.js';
 import { buildIndex, compareByName, rankText, search, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -95,6 +97,7 @@ test('every props page states what the search is not and how vendors can opt out
     assert.ok(pageText.includes('Always confirm availability, condition, sizes and price with the vendor.'));
     assert.ok(pageText.includes(NOT_AFFILIATED));
     assert.ok(pageText.includes('Keyword search runs in your browser. Keyword search also matches search terms an AI suggested for each item.'), 'the intro discloses the AI-suggested search terms the cards no longer show');
+    assert.ok(pageText.includes("When you inquire, cite the item number and page, or the item's page link."), 'the About box says what to cite, since a card shows its citation only as the Inquire link\'s title');
     assert.ok(pageText.includes('want your inventory listed, corrected or removed?'));
     assert.ok(page.includes('href="/#contact"'));
   }
@@ -103,7 +106,7 @@ test('every props page states what the search is not and how vendors can opt out
 test('every props page carries the festival byline and requests no fonts of its own', () => {
   for (const [page, pageText] of pages) {
     assert.match(page, /<p class="props-byline"><a href="\/">A Cookies &amp; Comedy Film Festival project<\/a><\/p>/);
-    assert.ok(pageText.includes('Back to Main Site'));
+    assert.ok(pageText.includes('Back to main site'));
     assert.ok(!page.includes('fonts.googleapis.com'), 'the page links no font stylesheet itself');
   }
 });
@@ -133,12 +136,16 @@ test('the main page nav links to /props from the desktop link groups and the mob
   assert.match(mobile, /data-dropdown="resources"[\s\S]*?Resources[\s\S]*?<a class="mobile-menu-link mobile-submenu-link" href="\/props"[^>]*>\s*Prop Search\s*<\/a>/);
 });
 
-test('the scene page discloses AI processing and stays switched off until a Worker URL is configured', async () => {
+test('the scene page discloses that the text goes to Cloudflare and stays switched off until a Worker URL is configured', async () => {
   const config = JSON.parse(await read('src/data/props/config.json'));
   assert.equal(config.apiUrl, '', 'the committed site must not call the Worker until the site owner approves');
-  assert.ok(sceneText.includes('Paste a scene to find props (AI)'));
-  assert.ok(sceneText.includes("Your text is sent to Cloudflare Workers AI to pick props from these catalogs. This site doesn't store or log it."));
-  assert.ok(sceneText.includes("AI scene matching isn't switched on yet. Keyword search works."));
+  assert.ok(sceneText.includes('Paste a scene to find props'));
+  assert.ok(sceneText.includes("Your scene text and time period are sent to Cloudflare, where a language model picks props from these catalogs. This site doesn't store or log them."));
+  assert.ok(sceneText.includes("Scene matching isn't switched on yet. Keyword search works."));
+  const outsideAbout = visibleText(sceneHtml.replace(/<section class="props-about">[\s\S]*?<\/section>/, ''));
+  assert.ok(outsideAbout.includes('sent to Cloudflare'), 'the About box is cut out, and only the About box');
+  assert.doesNotMatch(outsideAbout, /\bAI\b/, 'the scene page labels nothing "AI" outside the About box');
+  assert.doesNotMatch(sceneScript, /\bAI\b/, 'nor do its results or messages');
   assert.match(sceneHtml, /<form id="scene-form" class="scene-form" data-api-url(="")? data-cards-url="\/props\/cards\.json\?v=[0-9a-f]{8}">/);
   assert.match(sceneHtml, /<textarea id="scene-text"[^>]*\sdisabled[\s>]/);
   assert.match(sceneHtml, /<button id="scene-submit"[^>]*\sdisabled[\s>]/);
@@ -146,30 +153,31 @@ test('the scene page discloses AI processing and stays switched off until a Work
   assert.match(sceneHtml, /<input id="scene-period"[^>]*maxlength="40"[^>]*placeholder="1960s, WWII, present day"[^>]*\sdisabled[\s>]/);
 });
 
-test('the keyword page holds no scene box, and the Workers AI note sits on the scene page only', () => {
-  assert.doesNotMatch(html, /id="scene-|Paste a scene to find props|Cloudflare Workers AI/);
-  assert.match(sceneHtml, /Cloudflare Workers AI/);
+test('the keyword page holds no scene box, and the Cloudflare note sits on the scene page only', () => {
+  assert.doesNotMatch(html, /id="scene-|Paste a scene to find props|sent to Cloudflare/);
+  assert.match(sceneHtml, /sent to Cloudflare/);
 });
 
-test('a nav line under the subtitle links each props page to the other two and names the current one, unlinked', () => {
+test('tabs under the tagline link each props page to the other two and name the current one, unlinked', () => {
   const nav = (page) => page.match(/<p class="props-subtitle">[^<]*<\/p><nav class="props-nav" aria-label="Prop search pages">([\s\S]*?)<\/nav>/)?.[1];
-  assert.equal(nav(html), '<span aria-current="page">Search by keyword</span> · <a href="/props/scene">Paste a scene</a> · <a href="/props/sources">Prop sources</a>');
-  assert.equal(nav(sceneHtml), '<a href="/props">Search by keyword</a> · <span aria-current="page">Paste a scene</span> · <a href="/props/sources">Prop sources</a>');
-  assert.equal(nav(sourcesHtml), '<a href="/props">Search by keyword</a> · <a href="/props/scene">Paste a scene</a> · <span aria-current="page">Prop sources</span>');
-  for (const [page] of pages) assert.doesNotMatch(page, /props-switch|instead<\/a>/, 'the nav line is the one way between the pages');
+  assert.equal(nav(html), '<span aria-current="page">Search by keyword</span><a href="/props/scene">Paste a scene</a><a href="/props/sources">Prop sources</a>');
+  assert.equal(nav(sceneHtml), '<a href="/props">Search by keyword</a><span aria-current="page">Paste a scene</span><a href="/props/sources">Prop sources</a>');
+  assert.equal(nav(sourcesHtml), '<a href="/props">Search by keyword</a><a href="/props/scene">Paste a scene</a><span aria-current="page">Prop sources</span>');
+  for (const [page] of pages) assert.doesNotMatch(page, /props-switch|instead<\/a>/, 'the tabs are the one way between the pages');
 });
 
-test('the sources page holds every vendor box, and no item, card, scene box or script; the other pages hold no vendor box', () => {
-  const ids = [...sourcesHtml.matchAll(/<section class="props-box props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
+test('the sources page holds every vendor row, collapsed, and no item, card, scene box or script; the other pages hold no vendor row', () => {
+  const ids = [...sourcesHtml.matchAll(/<details class="props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
   assert.deepEqual([...ids].sort(), vendors.vendors.map((entry) => entry.id).sort());
+  assert.doesNotMatch(sourcesHtml, /<details\b[^>]*\sopen[\s>=]/, 'every row starts closed');
   assert.doesNotMatch(sourcesHtml, /prop-card|props-results|data-cards-url|scene-form|<script\b/);
-  for (const page of [html, sceneHtml]) assert.doesNotMatch(page, /class="props-box props-vendor"|id="prop-sources"/);
+  for (const page of [html, sceneHtml]) assert.doesNotMatch(page, /class="props-vendor"|id="prop-sources"/);
 });
 
-test("the scene and sources pages share /props's header but for the nav line, its disclosures, opt-out line and byline; the scene page holds no item and draws from the same cards.json", () => {
+test("the scene and sources pages share /props's header but for the tabs, its About box, opt-out line and byline; the scene page holds no item and draws from the same cards.json", () => {
   const part = (page, start, end) => page.slice(page.indexOf(start), page.indexOf(end, page.indexOf(start)) + end.length).replace(/<nav class="props-nav"[\s\S]*?<\/nav>/, '');
   for (const other of [sceneHtml, sourcesHtml]) {
-    for (const [start, end] of [['<header class="props-header">', '</header>'], ['<section class="props-box props-about"><p>', '</p>'], ['<p class="props-footer">', '</html>']]) {
+    for (const [start, end] of [['<header class="props-header">', '</header>'], ['<section class="props-about">', '</section>'], ['<p class="props-footer">', '</html>']]) {
       assert.ok(other.includes(start), start);
       assert.equal(part(other, start, end), part(html, start, end), start);
     }
@@ -180,16 +188,21 @@ test("the scene and sources pages share /props's header but for the nav line, it
 });
 
 test('scene results tell the reader that unlisted props were not identified or have no match', () => {
-  assert.ok(sceneScript.includes('The AI chose from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them.'));
-  assert.ok(sceneScript.includes('were left out of AI matching.'), 'a period filter is disclosed');
+  assert.ok(sceneScript.includes('The matches were picked from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them.'));
+  assert.ok(sceneScript.includes('were left out of scene matching.'), 'a period filter is disclosed');
   assert.ok(!sceneScript.includes('differs from your period'), 'the old era note is gone');
-  assert.ok(!pageScript.includes('Matched by AI'), 'the keyword page carries no scene code');
+  assert.ok(sceneScript.includes('Matches can be wrong; check each item in the catalog'), 'the scene script holds the note the next check looks for');
+  assert.ok(!pageScript.includes('Matches can be wrong; check each item in the catalog'), 'the keyword page carries no scene code');
 });
 
-test('a Kind filter sits between Vendor and Decade, and each card draws its kind as a badge', () => {
+test('a Kind filter sits between Vendor and Decade, and each card names its kind, with no badge, citation or photo line', () => {
   assert.match(html, /<span>Vendor<\/span>[\s\S]*?<\/label><label class="props-field"><span>Kind<\/span><select id="props-kind"><option value="">All kinds<\/option><option value="film-prop">Film prop<\/option><option value="set-dressing">Set dressing<\/option><option value="event-rental">Event rental<\/option><option value="antique">Antiques and reuse<\/option><\/select><\/label><label class="props-field"><span>Stated decade<\/span>/);
   for (const label of ['Film prop', 'Set dressing', 'Event rental', 'Antiques and reuse']) assert.ok(pageScript.includes(label), label);
-  assert.ok(pageScript.includes('props-badge'), 'the card view draws the badge');
+  assert.ok(pageScript.includes('prop-kind'), 'the card view draws the kind');
+  assert.match(html, /<select id="props-decade"><option value="">All \+ unspecified<\/option>/, 'the decade filter says that unspecified eras are included');
+  for (const script of [pageScript, sceneScript]) {
+    for (const gone of ['props-badge', 'prop-cite', 'prop-photo']) assert.ok(!script.includes(gone), gone);
+  }
 });
 
 test("on today's data the page's search keeps the ranking's order, and the Kind filter keeps that order within a kind", () => {
@@ -215,15 +228,15 @@ test('every card names its vendor, and the vendor filter appears only with more 
   assert.equal(/<select id="props-vendor">/.test(html), withItems.length > 1);
 });
 
-const vendorSection = (id) => sourcesHtml.match(new RegExp(`<section class="props-box props-vendor" id="vendor-${id}"[\\s\\S]*?</section>`))?.[0] ?? '';
+const vendorSection = (id) => sourcesHtml.match(new RegExp(`<details class="props-vendor" id="vendor-${id}"[\\s\\S]*?</details>`))?.[0] ?? '';
 const withItems = new Set(inventory.items.map((item) => item.vendor));
 const byName = (a, b) => a.name.localeCompare(b.name, 'en');
 
-test('vendor boxes show the published facts with their sources, and nothing private on any page', () => {
+test('vendor rows show the published facts with their sources, and nothing private on any page', () => {
   const steelCity = visibleText(vendorSection('steel-city-props'));
-  assert.ok(steelCity.includes('Inquiries: official contact form · steelcitypropsllc@gmail.com'));
+  assert.ok(steelCity.includes('Inquiries official contact form · steelcitypropsllc@gmail.com · Instagram · Linktree Terms they publish: “We will send a quote back as soon we review your request.” Their form asks for the item number printed at the top left of each catalog photo.'), 'the Inquiries group: routes and social links, then the terms, then the inquiry hint');
   assert.ok(sourcesText.includes('Terms they publish: “We will send a quote back as soon we review your request.”'));
-  assert.ok(vendorSection('steel-city-props').includes('<span class="props-badge">Prop house</span><span class="props-badge">Rentals</span>'));
+  assert.ok(vendorSection('steel-city-props').includes('<span class="props-vendor-type">Prop house · Rentals</span>'));
   assert.ok(sourcesText.includes('Address: Pittsburgh, PA'));
   assert.match(sourcesText, /Details as the vendor publishes them, last checked 2026-10-17: instagram\.com\/steelcityprops · catalog page 3 · catalog page 1 · forms\.gle\/JJqcgmxkJFwqKLXF9 · linktr\.ee\/steelcityprops \./);
   assert.ok(sourcesHtml.includes('href="https://linktr.ee/steelcityprops"'));
@@ -233,14 +246,37 @@ test('vendor boxes show the published facts with their sources, and nothing priv
     assert.ok(!/permission|not asked/i.test(pageText));
   }
   assert.ok(sourcesText.includes('Prop pages on dezzigncentralpgh.com · captured 2026-10-17 · 23 items · indexed 2026-10-17 · Open site'));
-  assert.ok(sourcesText.includes('Hours: please call or email us to schedule an appointment Pricing and terms: ask the vendor'));
+  const dezzign = visibleText(vendorSection('dezzign-central'));
+  assert.ok(dezzign.includes('Pricing and terms: ask the vendor Searchable here Prop pages on dezzigncentralpgh.com'), 'with no published terms, the Inquiries group says to ask');
+  assert.match(dezzign, /Where and when Address \(prop warehouse\): .+? Mailing address: .+? Hours: please call or email us to schedule an appointment Details as the vendor publishes them/);
 });
 
-test('every vendor has one box with an anchor: vendors with searchable items first, each group by name', () => {
-  const ids = [...sourcesHtml.matchAll(/<section class="props-box props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
+test('each row names the vendor, its type and modes, its place and its searchable items, with no link inside', () => {
+  const summaryText = (id) => visibleText(vendorSection(id).match(/<summary class="props-vendor-row">([\s\S]*?)<\/summary>/)?.[1] ?? '').trim();
+  assert.equal(summaryText('steel-city-props'), 'Steel City Props Prop house · Rentals Pittsburgh, PA 353 items searchable');
+  assert.equal(summaryText('dezzign-central'), 'Dezzign Central Prop house · By inquiry Pittsburgh, PA 23 items searchable', 'the row capitalizes a place the vendor publishes in lowercase');
+  assert.ok(visibleText(vendorSection('dezzign-central')).includes('pittsburgh, pa 15201'), "the row's details keep the address verbatim");
+  assert.equal(summaryText('cleveland-prop-shop'), 'Cleveland Prop Shop Prop house · Rentals · Sales Cleveland, OH Regional 846 items searchable');
+  assert.equal(summaryText('route-30-retro'), 'Route 30 Retro Sales Jeannette/Irwin, PA Not indexed');
+  for (const entry of vendors.vendors) {
+    const count = inventory.items.filter((item) => item.vendor === entry.id).length;
+    const summary = vendorSection(entry.id).match(/<summary class="props-vendor-row">[\s\S]*?<\/summary>/)?.[0] ?? '';
+    assert.ok(summaryText(entry.id).endsWith(count ? ` ${count.toLocaleString('en-US')} ${count === 1 ? 'item' : 'items'} searchable` : ' Not indexed'), entry.id);
+    assert.doesNotMatch(summary, /<a\b/, entry.id);
+  }
+});
+
+test("a row's details list the vendor's facts in a fixed order, each group only when the vendor publishes it", () => {
+  const terms = (id) => [...vendorSection(id).matchAll(/<dt>([^<]+)<\/dt>/g)].map(([, term]) => term);
+  assert.deepEqual(terms('public-theater-costumes'), ['Inquiries', 'Notice on their site', 'In their words', 'Searchable here', 'Where and when']);
+  assert.deepEqual(terms('steel-city-props'), ['Inquiries', 'Searchable here', 'Where and when']);
+});
+
+test('every vendor has one row with an anchor: vendors with searchable items first, each group by name', () => {
+  const ids = [...sourcesHtml.matchAll(/<details class="props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
   const expected = [...vendors.vendors.filter((entry) => withItems.has(entry.id)).sort(byName), ...vendors.vendors.filter((entry) => !withItems.has(entry.id)).sort(byName)];
   assert.deepEqual(ids, expected.map((entry) => entry.id));
-  assert.ok(html.includes(`<p class="props-contact">${vendors.vendors.length} prop sources are listed on <a href="/props/sources">the prop sources page</a>, with the contact details they publish; ${withItems.size} have searchable inventory.</p>`));
+  assert.ok(html.includes(`<p class="props-lede"><strong>${inventory.items.length.toLocaleString('en-US')}</strong> items from <strong>${withItems.size}</strong> prop sources, searchable here. <a href="/props/sources">${vendors.vendors.length - withItems.size} more sources</a> are listed with the contact details they publish.</p>`));
   assert.ok(sourcesHtml.includes(`<h2 id="prop-sources" class="props-sources-title">Prop sources (${vendors.vendors.length})</h2>`));
   for (const entry of vendors.vendors.filter((one) => !withItems.has(one.id))) {
     assert.ok(visibleText(vendorSection(entry.id)).includes('Inventory not indexed; contact the vendor.'), entry.id);
@@ -250,7 +286,7 @@ test('every vendor has one box with an anchor: vendors with searchable items fir
 test('the vendor strip holds exactly the vendors without searchable items, hidden until a search matches their name or own words', () => {
   const strip = html.match(/<section id="props-vendor-matches" class="vendor-matches" hidden>[\s\S]*?<\/section>/)?.[0];
   assert.ok(strip, 'the strip is built and starts hidden');
-  assert.ok(visibleText(strip).includes('Prop sources that match this search; inventory not indexed'));
+  assert.ok(visibleText(strip).includes('Sources that match your search (inventory not indexed)'));
   assert.doesNotMatch(visibleText(strip), /speciali[sz]e/i, 'a name-only match makes no specialty claim');
   const cards = [...strip.matchAll(/<li class="vendor-match" data-vendor="([^"]+)" data-name="([^"]*)" data-specialties(?:="([^"]*)")? hidden>/g)];
   const expected = vendors.vendors.filter((entry) => !withItems.has(entry.id)).sort(byName);
@@ -260,21 +296,22 @@ test('the vendor strip holds exactly the vendors without searchable items, hidde
     assert.deepEqual([decode(name), decode(specialties ?? '')], [doc.name, doc.description], id);
   }
   const links = [...strip.matchAll(/<a class="vendor-match-name" href="([^"]+)">/g)].map(([, href]) => href);
-  assert.deepEqual(links, expected.map((entry) => `/props/sources#vendor-${entry.id}`), "each strip link goes to the vendor's box on the sources page");
+  assert.deepEqual(links, expected.map((entry) => `/props/sources#vendor-${entry.id}`), "each strip link goes to the vendor's row on the sources page");
   for (const entry of expected) assert.ok(sourcesHtml.includes(`id="vendor-${entry.id}"`), entry.id);
 });
 
-test('regional badges mark only the sources outside Pennsylvania', () => {
+test('a Regional chip marks only the sources outside Pennsylvania', () => {
   const regional = vendors.vendors.filter((entry) => vendorBadges(entry).some((badge) => badge.regional)).map((entry) => entry.id);
   assert.deepEqual(regional.sort(), ['cleveland-play-house-props', 'cleveland-prop-shop']);
-  for (const id of regional) assert.ok(vendorSection(id).includes('<span class="props-badge props-badge-regional">Regional: Cleveland, OH</span>'), id);
+  for (const id of regional) assert.ok(vendorSection(id).includes('<span class="props-vendor-place">Cleveland, OH <span class="props-regional">Regional</span></span>'), id);
+  assert.equal(sourcesHtml.match(/class="props-regional"/g).length, regional.length, 'no other row carries the chip');
 });
 
 test('Route 30 Retro shows only its Facebook Page facts, cited as read, with no type of our own', () => {
   const box = vendorSection('route-30-retro');
   assert.ok(visibleText(box).includes('Route 30 Retro Facebook Page (About), as read on 2026-10-17 · not fetched by our scripts'));
   assert.ok(box.includes('href="https://www.facebook.com/p/Route-30-Retro-100063856903288"'));
-  assert.deepEqual([...box.matchAll(/<span class="props-badge">([^<]*)<\/span>/g)].map(([, label]) => label), ['Sales']);
+  assert.equal(box.match(/<span class="props-vendor-type">([^<]*)<\/span>/)?.[1], 'Sales');
 });
 
 test('the page builds its search documents from cards.json the same way the Worker builds them from the inventory', async () => {
@@ -292,4 +329,54 @@ test('the page builds its search documents from cards.json the same way the Work
       name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, kind: doc.kind, order: doc.order,
     }, doc.key);
   }
+});
+
+test('every props.css rule is scoped under .props-page, so nothing leaks to the festival pages', async () => {
+  const css = postcss.parse(await read('src/styles/props.css'));
+  const selectors = [];
+  css.walkRules((rule) => selectors.push(...rule.selectors));
+  assert.ok(selectors.length > 50, 'the walk reaches the rules, including those inside @media');
+  assert.deepEqual(selectors.filter((selector) => !/^\.props-page(?=$|[\s.:[>+~])/.test(selector)), []);
+});
+
+// The keyword page's index, built from cards.json the way the page builds it.
+const pageIndex = buildIndex(cards.map((card) => ({ ...searchDocFromCard(card), card })));
+const FACETS = { category: (doc) => doc.categories, vendor: (doc) => [doc.vendor], kind: (doc) => [doc.kind], decade: (doc) => doc.decades.map(String) };
+const NO_FILTERS = { category: '', vendor: '', kind: '', decade: '' };
+const optionValues = (id) => [...html.match(new RegExp(`<select id="${id}">([\\s\\S]*?)</select>`))[1].matchAll(/<option value="([^"]*)">/g)].map(([, value]) => decode(value)).filter(Boolean);
+
+test('with nothing typed and no filter set, every filter keeps every option the page was built with', () => {
+  const values = filterValues(pageIndex, '', NO_FILTERS, search(pageIndex, '', NO_FILTERS));
+  for (const [facet, id] of [['category', 'props-category'], ['vendor', 'props-vendor'], ['kind', 'props-kind'], ['decade', 'props-decade']]) {
+    assert.deepEqual([...values[facet]].sort(), optionValues(id).sort(), facet);
+  }
+});
+
+test("each filter offers the values found under the query and every other filter, so a set filter can still switch", () => {
+  const narrowed = filterValues(pageIndex, 'rotary phone', NO_FILTERS, search(pageIndex, 'rotary phone', NO_FILTERS));
+  assert.ok(narrowed.category.size > 0 && narrowed.category.size < optionValues('props-category').length, 'a query narrows the sections');
+  const cases = [
+    ['phone', {}],
+    ['phone', { vendor: 'steel-city-props' }],
+    ['phone', { vendor: 'steel-city-props', kind: 'film-prop' }],
+    ['chair', { kind: 'set-dressing', decade: '1960' }],
+    ['1960s', { category: 'Telephones' }],
+  ];
+  for (const [query, set] of cases) {
+    const filters = { ...NO_FILTERS, ...set };
+    const values = filterValues(pageIndex, query, filters, search(pageIndex, query, filters));
+    for (const [facet, valuesOf] of Object.entries(FACETS)) {
+      const expected = new Set(search(pageIndex, query, { ...filters, [facet]: '' }).flatMap(valuesOf));
+      assert.deepEqual(values[facet], expected, `${query} ${JSON.stringify(set)} → ${facet}`);
+    }
+  }
+  const oneVendor = filterValues(pageIndex, 'phone', { ...NO_FILTERS, vendor: 'steel-city-props' }, search(pageIndex, 'phone', { ...NO_FILTERS, vendor: 'steel-city-props' }));
+  assert.ok(oneVendor.vendor.size > 1, 'with a vendor chosen, the other vendors with matches stay in its list');
+});
+
+test('cards with a photo come first, each group in the ranking order, and production has no photo to move', () => {
+  const doc = (key, thumb) => ({ key, card: { thumb } });
+  assert.deepEqual(photosFirst([doc('a', null), doc('b', { src: 'b' }), doc('c', null), doc('d', { src: 'd' })]).map((one) => one.key), ['b', 'd', 'a', 'c']);
+  const ranked = search(pageIndex, 'rotary phone', NO_FILTERS);
+  assert.deepEqual(photosFirst(ranked).map((one) => one.key), ranked.map((one) => one.key), 'production cards have no photo, so the ranking order stands');
 });

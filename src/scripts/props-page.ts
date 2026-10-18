@@ -1,9 +1,11 @@
 import { searchDocFromCard } from "./props-card-text.js";
 import { type Card, loadCards, renderCard } from "./props-card-view.ts";
 import { buildIndex, rankText, search } from "./props-search.js";
+import { filterValues, photosFirst } from "./props-results.js";
 import { queryFromHash } from "./props-search-link.js";
 
 const PAGE_SIZE = 24;
+const formatNumber = (value: number) => value.toLocaleString("en-US");
 const LOAD_FAILED = "The item list couldn't load. Reload the page to try again.";
 const list = document.getElementById("props-results") as HTMLOListElement;
 const query = document.getElementById("props-query") as HTMLInputElement;
@@ -33,9 +35,30 @@ const vendorDocs = [...(vendorMatches?.querySelectorAll<HTMLElement>(".vendor-ma
   order,
 }));
 const vendorIndex = buildIndex(vendorDocs);
+// Each filter's full list of options, as the page was built, for narrowing to the values the results hold.
+const selects = { category, vendor, kind, decade };
+const optionsOf = new Map<HTMLSelectElement, HTMLOptionElement[]>();
+for (const select of Object.values(selects)) if (select) optionsOf.set(select, [...select.options]);
+
+function filterSettings() {
+  return { category: category.value, decade: decade.value, vendor: vendor?.value ?? "", kind: kind.value };
+}
+
+// Each select keeps its "All" option, the values the results under the other filters hold, and its current choice.
+function narrowFilters() {
+  const values = filterValues(index, query.value, filterSettings(), results);
+  for (const [name, select] of Object.entries(selects)) {
+    if (!select) continue;
+    const [all, ...options] = optionsOf.get(select)!;
+    const chosen = select.value;
+    select.replaceChildren(all, ...options.filter((option) => option.value === chosen || values[name].has(option.value)));
+    select.value = chosen;
+  }
+}
 
 function render() {
-  list.replaceChildren(...results.slice(0, shown).map((doc) => renderCard(doc.card)));
+  const ordered = photosFirst(results);
+  list.replaceChildren(...ordered.slice(0, shown).map((doc) => renderCard(doc.card)));
   more.hidden = results.length <= shown;
   const text = query.value.trim();
   empty.hidden = results.length > 0;
@@ -43,9 +66,12 @@ function render() {
     ? `No catalog items matched “${text}”. Try fewer or simpler words, or clear the filters.`
     : "No items match these filters. Clear a filter to see more.";
   const filtered = text || category.value || decade.value || vendor?.value || kind.value;
+  const showing = results.length > shown ? `, showing ${formatNumber(shown)}` : "";
+  // The photos lead only when some results have a photo and some don't; otherwise the ranking's order stands.
+  const photosLead = Boolean(ordered[0]?.card.thumb) && !ordered[ordered.length - 1].card.thumb;
   count.textContent = filtered
-    ? `${results.length} matching ${results.length === 1 ? "item" : "items"}${results.length > shown ? `, showing ${shown}` : ""}`
-    : `${docs.length} items, listed alphabetically${results.length > shown ? `, showing ${shown}` : ""}`;
+    ? `${formatNumber(results.length)} matching ${results.length === 1 ? "item" : "items"}${photosLead ? ", photos first" : ""}${showing}`
+    : `${formatNumber(docs.length)} items, ${photosLead ? "photos first" : "listed alphabetically"}${showing}`;
 }
 
 function showVendorMatches() {
@@ -60,7 +86,8 @@ function showVendorMatches() {
 function update() {
   showVendorMatches();
   if (!index) return;
-  results = search(index, query.value, { category: category.value, decade: decade.value, vendor: vendor?.value ?? "", kind: kind.value });
+  results = search(index, query.value, filterSettings());
+  narrowFilters();
   shown = PAGE_SIZE;
   render();
 }

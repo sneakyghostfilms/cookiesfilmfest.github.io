@@ -48,20 +48,24 @@ export function renderCard(card: Card) {
     image.width = card.thumb.width;
     image.height = card.thumb.height;
     image.alt = card.alt ?? "";
+    if (card.photoCredit) image.title = card.photoCredit;
     image.loading = "lazy";
     image.decoding = "async";
     item.append(image);
   }
-  const line = paragraph("prop-line", span("prop-vendor", card.vendorName));
-  if (card.ids) line.append(" · ", span("prop-ids", card.ids));
-  line.append(" · ", span("prop-name", card.name));
-  if (card.era) line.append(" · ", span("prop-era", card.era));
-  if (card.pages) line.append(" · ", span("prop-page", card.pages));
-  item.append(line, paragraph("props-badges", span("props-badge", KIND_LABELS[card.kind])));
-  if (card.categories.length) item.append(paragraph("prop-category", card.categories.join(" · ")));
-  if (card.photoCredit) item.append(paragraph("prop-photo", card.photoCredit));
+  const meta = paragraph("prop-meta", span("prop-vendor", card.vendorName));
+  if (card.ids) meta.append(" ", span("prop-ids", card.ids));
+  if (card.pages) meta.append(" ", span("prop-page", card.pages));
+  if (card.era) meta.append(" ", span("prop-era", card.era));
+  meta.append(" ", span("prop-kind", KIND_LABELS[card.kind]));
+  item.append(paragraph("prop-name", card.name), meta);
+  if (card.categories.length) item.append(paragraph("prop-category", card.categories.join(", ")));
   const actions = paragraph("prop-actions", externalLink(card.link.href, card.link.label));
-  if (card.inquire) actions.append(externalLink(card.inquire, "Inquire"));
-  item.append(actions, paragraph("prop-cite", card.cite));
+  if (card.inquire) {
+    const inquire = externalLink(card.inquire, "Inquire");
+    inquire.title = card.cite;
+    actions.append(" ", inquire);
+  }
+  item.append(actions);
   return item;
 }

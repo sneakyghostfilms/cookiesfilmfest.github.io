@@ -1,11 +1,13 @@
 .props-page {
-  --pp-paper: #f5f6f7;
+  --pp-paper: #e9e6df;
   --pp-surface: #ffffff;
   --pp-ink: #000000;
-  --pp-muted: #4b5157;
-  --pp-rule: #d5d8dc;
-  --pp-field: #767c83;
+  --pp-muted: #5c5750;
+  --pp-rule: #d6d1c6;
+  --pp-field: #8d877c;
   --pp-gold: #ffb612;
+  --pp-well: #f3f1ec;
+  --pp-display: "League Gothic", Impact, "Arial Narrow", sans-serif;
   margin: 0;
   background-color: var(--pp-paper);
   color: var(--pp-ink);
@@ -15,14 +17,20 @@
   line-height: 1.5;
 }
 
+.props-page *,
+.props-page ::before,
+.props-page ::after {
+  transition: none;
+}
+
 .props-page [hidden] {
   display: none !important;
 }
 
 .props-page .props-wrap {
-  max-width: 1200px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 24px 32px 40px;
+  padding: 24px 32px 48px;
 }
 
 .props-page h1,
@@ -30,10 +38,28 @@
 .props-page h3,
 .props-page h4 {
   font-family: inherit;
+  font-weight: 700;
   color: var(--pp-ink);
   letter-spacing: normal;
   line-height: 1.25;
   margin: 0;
+}
+
+.props-page p {
+  line-height: inherit;
+}
+
+.props-page section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.props-page section:hover {
+  box-shadow: none;
 }
 
 .props-page a {
@@ -42,7 +68,6 @@
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
-  transition: none;
 }
 
 .props-page a::after {
@@ -68,47 +93,102 @@
   outline-offset: 2px;
 }
 
+.props-page :is(.props-title, .props-nav, .props-about-title) {
+  font-family: var(--pp-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
 .props-page .props-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px 24px;
-  padding: 0 0 16px;
-  margin: 0 0 20px;
-  border-bottom: 2px solid var(--pp-ink);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: 24px;
+}
+
+.props-page .props-header > * {
+  grid-column: 1 / -1;
 }
 
 .props-page .props-title {
-  font-size: 28px;
-  font-weight: 750;
-  letter-spacing: -0.01em;
+  grid-row: 1;
+  grid-column: 1;
+  font-size: 64px;
+  line-height: 0.95;
+  letter-spacing: 0.005em;
 }
 
-.props-page .props-subtitle {
-  flex-basis: 100%;
-  order: 3;
-  margin: 0;
-  color: var(--pp-muted);
-}
-
-.props-page .props-nav {
-  flex-basis: 100%;
-  order: 3;
-  font-size: 14px;
-}
-
-.props-page .props-nav [aria-current="page"] {
-  font-weight: 600;
-}
-
-.props-page .props-back,
-.props-page .props-nav a {
-  font-size: 14px;
-  font-weight: 600;
+.props-page .props-back {
+  grid-row: 1;
+  grid-column: 2;
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.props-page .props-back:hover {
+  text-decoration: underline;
+}
+
+.props-page .props-subtitle {
+  margin-top: 6px;
+  font-size: 16px;
+  color: var(--pp-muted);
+}
+
+.props-page .props-header .props-demo-marker {
+  order: 0;
+  margin-top: 6px;
+}
+
+.props-page .props-nav {
+  display: flex;
+  gap: 6px;
+  margin-top: 22px;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+}
+
+.props-page .props-nav > * {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 18px 6px;
+  border: 1px solid var(--pp-rule);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background-color: var(--pp-well);
+  color: var(--pp-muted);
+  text-decoration: none;
+}
+
+.props-page .props-nav a:hover {
+  color: var(--pp-ink);
+}
+
+.props-page .props-nav [aria-current="page"] {
+  position: relative;
+  top: 1px;
+  background-color: var(--pp-surface);
+  color: var(--pp-ink);
+  box-shadow: inset 0 4px 0 var(--pp-gold);
+}
+
+.props-page .props-sheet {
+  padding: 22px 26px 26px;
+  background-color: var(--pp-surface);
+  border: 1px solid var(--pp-rule);
+}
+
+.props-page .props-lede {
+  max-width: 70ch;
+  margin-bottom: 16px;
+  font-size: 17px;
 }
 
 .props-page .props-box {
@@ -242,6 +322,10 @@
 .props-page .props-more {
   margin: 16px auto 0;
   display: flex;
+}
+
+.props-page :is(.props-button, .props-more):is(:hover, :active) {
+  transform: none;
 }
 
 .props-page .props-count {
@@ -456,17 +540,43 @@
   font-weight: 700;
 }
 
+.props-page .props-about {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 28px;
+  padding: 18px 24px 20px;
+  background-color: var(--pp-surface);
+  border: 1px solid var(--pp-rule);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--pp-muted);
+}
+
+.props-page .props-about-title {
+  font-size: 26px;
+}
+
+.props-page .props-about-text {
+  max-width: 78ch;
+}
+
+.props-page .props-about-text p + p {
+  margin-top: 6px;
+}
+
 .props-page .props-footer,
 .props-page .props-byline {
-  margin: 0;
   font-size: 13px;
   color: var(--pp-muted);
 }
 
-.props-page .props-byline {
+.props-page .props-footer {
   margin-top: 24px;
-  padding-top: 4px;
-  border-top: 1px solid var(--pp-rule);
+}
+
+.props-page .props-byline {
+  margin-top: 8px;
 }
 
 .props-page .props-byline a {
@@ -480,12 +590,41 @@
     padding: 16px 16px 32px;
   }
 
-  .props-page .props-title {
-    font-size: 24px;
+  .props-page .props-header {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .props-page .props-back {
-    order: 4;
+    grid-row: 1;
+    grid-column: 1;
+    justify-self: end;
+  }
+
+  .props-page .props-title {
+    grid-row: 2;
+    font-size: 44px;
+  }
+
+  .props-page .props-nav {
+    gap: 4px;
+    margin-top: 16px;
+    font-size: 17px;
+  }
+
+  .props-page .props-nav > * {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 8px 10px 6px;
+  }
+
+  .props-page .props-sheet {
+    padding: 16px 14px 20px;
+  }
+
+  .props-page .props-about {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 14px 16px 16px;
   }
 
   .props-page .props-box {

@@ -1,19 +1,21 @@
 ---
 import "../styles/index.css";
 import "@fontsource-variable/inter";
+import "@fontsource/league-gothic";
 import "../styles/props.css";
 import { DEMO_STYLES } from "../../scripts/props/demo-links.mjs";
 import { NOT_AFFILIATED } from "../scripts/props-cards.js";
 
-// The frame the props pages share: the head, the header with the nav line and the demo marker, the intro's disclosures,
-// the vendor opt-out line and the byline. A page adds its own header markers and intro lines through the named slots.
+// The frame the props pages share: the head, the masthead with the demo markers and the tabs, the sheet each page
+// fills, the "About this tool" box with the disclosures, the vendor opt-out line and the byline. A page adds its own
+// masthead markers through the named slot.
 export interface Props {
   title: string;
   description: string;
   current: "keyword" | "scene" | "sources";
 }
 
-// The nav line is the one way between the three pages; the current one is named, not linked.
+// The tabs are the one way between the three pages; the current one is named, not linked.
 const PAGES = [
   { id: "keyword", href: "/props", label: "Search by keyword" },
   { id: "scene", href: "/props/scene", label: "Paste a scene" },
@@ -43,21 +45,27 @@ const demoMode = process.env.PROPS_DEMO === "1";
     <div class="props-wrap">
       <header class="props-header">
         <h1 class="props-title">Pittsburgh Prop Search</h1>
-        <p class="props-subtitle">Search local prop rental catalogs in plain English.</p>
-        <nav class="props-nav" aria-label="Prop search pages">{PAGES.map((page, position) => (
-          <>{position > 0 && " · "}{page.id === current ? <span aria-current="page">{page.label}</span> : <a href={page.href}>{page.label}</a>}</>
-        ))}</nav>
-        <a href="/" class="props-back">Back to Main Site</a>
+        <a href="/" class="props-back">Back to main site</a>
+        <p class="props-subtitle">Local prop rental catalogs, searchable in plain English.</p>
         {demoMode && <p class="props-demo-marker"><span>Local demo, not public</span></p>}
         <slot name="markers" />
+        <nav class="props-nav" aria-label="Prop search pages">{PAGES.map((page) => (
+          page.id === current ? <span aria-current="page">{page.label}</span> : <a href={page.href}>{page.label}</a>
+        ))}</nav>
       </header>
 
-      <section class="props-box props-about">
-        <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> Names, item numbers, eras and pages are copied from each vendor's catalog or website. {NOT_AFFILIATED} Keyword search runs in your browser. Keyword search also matches search terms an AI suggested for each item.</p>
-        <slot name="about" />
-      </section>
+      <main class="props-sheet">
+        <slot />
+      </main>
 
-      <slot />
+      <section class="props-about">
+        <h2 class="props-about-title">About this tool</h2>
+        <div class="props-about-text">
+          <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. {NOT_AFFILIATED}</p>
+          <p>Names, item numbers, eras and pages are copied from each vendor's catalog or website. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> When you inquire, cite the item number and page, or the item's page link.</p>
+          <p>Keyword search runs in your browser. Keyword search also matches search terms an AI suggested for each item.</p>
+        </div>
+      </section>
 
       <p class="props-footer">Prop owners: want your inventory listed, corrected or removed? <a href="/#contact">Contact us</a>. Know another Pittsburgh prop source? <a href="/#contact">Let us know</a>.</p>
       <p class="props-byline"><a href="/">A Cookies &amp; Comedy Film Festival project</a></p>

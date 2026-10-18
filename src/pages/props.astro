@@ -18,6 +18,7 @@ const kinds = KINDS.filter((kind) => kindsPresent.has(kind.id));
 const vendorsWithItems = vendorsData.vendors.filter((vendor) => inventory.items.some((item) => item.vendor === vendor.id));
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "en");
 const vendorsWithoutItems = vendorsData.vendors.filter((vendor) => !vendorsWithItems.includes(vendor)).sort(byName);
+const moreSources = vendorsWithoutItems.length;
 const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
   vendor,
   doc: vendorSearchDoc(vendor, order),
@@ -28,7 +29,7 @@ const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
 ---
 
 <PropsLayout title="Pittsburgh Prop Search | Cookies and Comedy Film Festival" description={description} current="keyword">
-  <p slot="about" class="props-contact">{vendorsData.vendors.length} prop sources are listed on <a href="/props/sources">the prop sources page</a>, with the contact details they publish; {vendorsWithItems.length} {vendorsWithItems.length === 1 ? "has" : "have"} searchable inventory.</p>
+  <p class="props-lede"><strong>{inventory.items.length.toLocaleString("en-US")}</strong> items from <strong>{vendorsWithItems.length}</strong> prop {vendorsWithItems.length === 1 ? "source" : "sources"}, searchable here.{moreSources > 0 && <> <a href="/props/sources">{moreSources} more {moreSources === 1 ? "source" : "sources"}</a> {moreSources === 1 ? "is" : "are"} listed with the contact details they publish.</>}</p>
 
   <section class="props-box props-search">
     <form id="props-form" class="props-controls" role="search">

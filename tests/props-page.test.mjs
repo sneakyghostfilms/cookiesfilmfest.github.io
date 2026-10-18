@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { createHash } from 'node:crypto';
+import postcss from 'postcss';
 import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
 import { buildIndex, compareByName, rankText, search, tokenize } from '../src/scripts/props-search.js';
@@ -95,6 +96,7 @@ test('every props page states what the search is not and how vendors can opt out
     assert.ok(pageText.includes('Always confirm availability, condition, sizes and price with the vendor.'));
     assert.ok(pageText.includes(NOT_AFFILIATED));
     assert.ok(pageText.includes('Keyword search runs in your browser. Keyword search also matches search terms an AI suggested for each item.'), 'the intro discloses the AI-suggested search terms the cards no longer show');
+    assert.ok(pageText.includes("When you inquire, cite the item number and page, or the item's page link."), 'the About box says what to cite, since a card shows its citation only as the Inquire link\'s title');
     assert.ok(pageText.includes('want your inventory listed, corrected or removed?'));
     assert.ok(page.includes('href="/#contact"'));
   }
@@ -103,7 +105,7 @@ test('every props page states what the search is not and how vendors can opt out
 test('every props page carries the festival byline and requests no fonts of its own', () => {
   for (const [page, pageText] of pages) {
     assert.match(page, /<p class="props-byline"><a href="\/">A Cookies &amp; Comedy Film Festival project<\/a><\/p>/);
-    assert.ok(pageText.includes('Back to Main Site'));
+    assert.ok(pageText.includes('Back to main site'));
     assert.ok(!page.includes('fonts.googleapis.com'), 'the page links no font stylesheet itself');
   }
 });
@@ -151,12 +153,12 @@ test('the keyword page holds no scene box, and the Workers AI note sits on the s
   assert.match(sceneHtml, /Cloudflare Workers AI/);
 });
 
-test('a nav line under the subtitle links each props page to the other two and names the current one, unlinked', () => {
+test('tabs under the tagline link each props page to the other two and name the current one, unlinked', () => {
   const nav = (page) => page.match(/<p class="props-subtitle">[^<]*<\/p><nav class="props-nav" aria-label="Prop search pages">([\s\S]*?)<\/nav>/)?.[1];
-  assert.equal(nav(html), '<span aria-current="page">Search by keyword</span> · <a href="/props/scene">Paste a scene</a> · <a href="/props/sources">Prop sources</a>');
-  assert.equal(nav(sceneHtml), '<a href="/props">Search by keyword</a> · <span aria-current="page">Paste a scene</span> · <a href="/props/sources">Prop sources</a>');
-  assert.equal(nav(sourcesHtml), '<a href="/props">Search by keyword</a> · <a href="/props/scene">Paste a scene</a> · <span aria-current="page">Prop sources</span>');
-  for (const [page] of pages) assert.doesNotMatch(page, /props-switch|instead<\/a>/, 'the nav line is the one way between the pages');
+  assert.equal(nav(html), '<span aria-current="page">Search by keyword</span><a href="/props/scene">Paste a scene</a><a href="/props/sources">Prop sources</a>');
+  assert.equal(nav(sceneHtml), '<a href="/props">Search by keyword</a><span aria-current="page">Paste a scene</span><a href="/props/sources">Prop sources</a>');
+  assert.equal(nav(sourcesHtml), '<a href="/props">Search by keyword</a><a href="/props/scene">Paste a scene</a><span aria-current="page">Prop sources</span>');
+  for (const [page] of pages) assert.doesNotMatch(page, /props-switch|instead<\/a>/, 'the tabs are the one way between the pages');
 });
 
 test('the sources page holds every vendor box, and no item, card, scene box or script; the other pages hold no vendor box', () => {
@@ -166,10 +168,10 @@ test('the sources page holds every vendor box, and no item, card, scene box or s
   for (const page of [html, sceneHtml]) assert.doesNotMatch(page, /class="props-box props-vendor"|id="prop-sources"/);
 });
 
-test("the scene and sources pages share /props's header but for the nav line, its disclosures, opt-out line and byline; the scene page holds no item and draws from the same cards.json", () => {
+test("the scene and sources pages share /props's header but for the tabs, its About box, opt-out line and byline; the scene page holds no item and draws from the same cards.json", () => {
   const part = (page, start, end) => page.slice(page.indexOf(start), page.indexOf(end, page.indexOf(start)) + end.length).replace(/<nav class="props-nav"[\s\S]*?<\/nav>/, '');
   for (const other of [sceneHtml, sourcesHtml]) {
-    for (const [start, end] of [['<header class="props-header">', '</header>'], ['<section class="props-box props-about"><p>', '</p>'], ['<p class="props-footer">', '</html>']]) {
+    for (const [start, end] of [['<header class="props-header">', '</header>'], ['<section class="props-about">', '</section>'], ['<p class="props-footer">', '</html>']]) {
       assert.ok(other.includes(start), start);
       assert.equal(part(other, start, end), part(html, start, end), start);
     }
@@ -240,7 +242,7 @@ test('every vendor has one box with an anchor: vendors with searchable items fir
   const ids = [...sourcesHtml.matchAll(/<section class="props-box props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
   const expected = [...vendors.vendors.filter((entry) => withItems.has(entry.id)).sort(byName), ...vendors.vendors.filter((entry) => !withItems.has(entry.id)).sort(byName)];
   assert.deepEqual(ids, expected.map((entry) => entry.id));
-  assert.ok(html.includes(`<p class="props-contact">${vendors.vendors.length} prop sources are listed on <a href="/props/sources">the prop sources page</a>, with the contact details they publish; ${withItems.size} have searchable inventory.</p>`));
+  assert.ok(html.includes(`<p class="props-lede"><strong>${inventory.items.length.toLocaleString('en-US')}</strong> items from <strong>${withItems.size}</strong> prop sources, searchable here. <a href="/props/sources">${vendors.vendors.length - withItems.size} more sources</a> are listed with the contact details they publish.</p>`));
   assert.ok(sourcesHtml.includes(`<h2 id="prop-sources" class="props-sources-title">Prop sources (${vendors.vendors.length})</h2>`));
   for (const entry of vendors.vendors.filter((one) => !withItems.has(one.id))) {
     assert.ok(visibleText(vendorSection(entry.id)).includes('Inventory not indexed; contact the vendor.'), entry.id);
@@ -292,4 +294,12 @@ test('the page builds its search documents from cards.json the same way the Work
       name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, kind: doc.kind, order: doc.order,
     }, doc.key);
   }
+});
+
+test('every props.css rule is scoped under .props-page, so nothing leaks to the festival pages', async () => {
+  const css = postcss.parse(await read('src/styles/props.css'));
+  const selectors = [];
+  css.walkRules((rule) => selectors.push(...rule.selectors));
+  assert.ok(selectors.length > 50, 'the walk reaches the rules, including those inside @media');
+  assert.deepEqual(selectors.filter((selector) => !/^\.props-page(?=$|[\s.:[>+~])/.test(selector)), []);
 });

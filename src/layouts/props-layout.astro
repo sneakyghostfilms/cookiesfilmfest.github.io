@@ -5,14 +5,21 @@ import "../styles/props.css";
 import { DEMO_STYLES } from "../../scripts/props/demo-links.mjs";
 import { NOT_AFFILIATED } from "../scripts/props-cards.js";
 
-// The frame both props pages share: the head, the header with the demo marker, the intro's disclosures, the vendor
-// opt-out line and the byline. A page adds its own header markers and intro lines through the named slots.
+// The frame the props pages share: the head, the header with the nav line and the demo marker, the intro's disclosures,
+// the vendor opt-out line and the byline. A page adds its own header markers and intro lines through the named slots.
 export interface Props {
   title: string;
   description: string;
+  current: "keyword" | "scene" | "sources";
 }
 
-const { title, description } = Astro.props;
+// The nav line is the one way between the three pages; the current one is named, not linked.
+const PAGES = [
+  { id: "keyword", href: "/props", label: "Search by keyword" },
+  { id: "scene", href: "/props/scene", label: "Paste a scene" },
+  { id: "sources", href: "/props/sources", label: "Prop sources" },
+];
+const { title, description, current } = Astro.props;
 const { generator } = Astro;
 const demoMode = process.env.PROPS_DEMO === "1";
 ---
@@ -37,6 +44,9 @@ const demoMode = process.env.PROPS_DEMO === "1";
       <header class="props-header">
         <h1 class="props-title">Pittsburgh Prop Search</h1>
         <p class="props-subtitle">Search local prop rental catalogs in plain English.</p>
+        <nav class="props-nav" aria-label="Prop search pages">{PAGES.map((page, position) => (
+          <>{position > 0 && " · "}{page.id === current ? <span aria-current="page">{page.label}</span> : <a href={page.href}>{page.label}</a>}</>
+        ))}</nav>
         <a href="/" class="props-back">Back to Main Site</a>
         {demoMode && <p class="props-demo-marker"><span>Local demo, not public</span></p>}
         <slot name="markers" />

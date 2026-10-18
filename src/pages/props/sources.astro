@@ -1,0 +1,56 @@
+---
+import PropsLayout from "../../layouts/props-layout.astro";
+import vendorsData from "../../data/props/vendors.json";
+import inventory from "../../data/props/inventory.json";
+import { privateVendorsFor } from "../../../scripts/props/demo-links.mjs";
+import { catalogLines, contactRoutes, privateFacts, socialLinks, vendorBadges, vendorFacts, vendorSources } from "../../scripts/props-cards.js";
+
+const description = "Pittsburgh prop rental sources, with the contact details each publishes and the catalogs that are searchable.";
+const privateVendors = privateVendorsFor(process.env);
+const itemCounts = new Map<string, number>();
+for (const item of inventory.items) itemCounts.set(item.catalog, (itemCounts.get(item.catalog) ?? 0) + 1);
+const vendorsWithItems = vendorsData.vendors.filter((vendor) => inventory.items.some((item) => item.vendor === vendor.id));
+const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "en");
+const vendorsWithoutItems = vendorsData.vendors.filter((vendor) => !vendorsWithItems.includes(vendor)).sort(byName);
+const indexed = inventory.catalogs as Record<string, { indexedAt: string; capturedAt?: string }>;
+const vendorBoxes = [...[...vendorsWithItems].sort(byName), ...vendorsWithoutItems].map((vendor) => ({
+  vendor,
+  badges: vendorBadges(vendor),
+  facts: vendorFacts(vendor),
+  routes: contactRoutes(vendor.contact),
+  social: socialLinks(vendor.social),
+  sources: vendorSources(vendor),
+  private: privateFacts(privateVendors?.[vendor.id]),
+  catalogs: catalogLines(vendor, { indexed, itemCounts }),
+}));
+---
+
+<PropsLayout title="Prop Sources | Pittsburgh Prop Search | Cookies and Comedy Film Festival" description={description} current="sources">
+  {privateVendors && <p slot="markers" class="props-demo-marker"><span>Private vendor notes visible: do not screenshare</span></p>}
+
+  <h2 id="prop-sources" class="props-sources-title">Prop sources ({vendorBoxes.length})</h2>
+  {vendorBoxes.map(({ vendor, badges, facts, routes, social, sources, private: privateLines, catalogs: vendorCatalogs }) => (
+    <section class="props-box props-vendor" id={`vendor-${vendor.id}`} data-vendor={vendor.id}>
+      <h3 class="props-vendor-name">{vendor.name}</h3>
+      {badges.length > 0 && <p class="props-badges">{badges.map((badge) => <span class:list={["props-badge", { "props-badge-regional": badge.regional }]}>{badge.text}</span>)}</p>}
+      {vendorCatalogs.map((line) => (
+        <p class="props-catalog">{line.text}{line.href && <a href={line.href} target="_blank" rel="noopener noreferrer">{line.linkLabel}</a>}{line.links?.map((link, position) => (
+          <>{position > 0 && " · "}<a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a></>
+        ))}</p>
+      ))}
+      <p class="props-contact">Inquiries: {routes.map((route, position) => (
+        <>{position > 0 && " · "}<a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>
+      ))}{social.map((link) => <> · <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a></>)}</p>
+      {facts.map((fact) => <p class="props-note">{fact}</p>)}
+      <p class="props-note props-vendor-sources">Details as the vendor publishes them, last checked {vendor.lastVerified}: {sources.map((source, position) => (
+        <>{position > 0 && " · "}{source.href ? <a href={source.href} target="_blank" rel="noopener noreferrer">{source.label}</a> : source.label}</>
+      ))}.</p>
+      {privateLines.length > 0 && (
+        <div class="props-vendor-private">
+          <p class="props-note">Private, local demo only:</p>
+          {privateLines.map((line) => <p class="props-note">{line}</p>)}
+        </div>
+      )}
+    </section>
+  ))}
+</PropsLayout>

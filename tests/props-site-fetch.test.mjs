@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { FetchStopped, JITTER_MS, MIN_GAP_MS, TIMEOUT_MS, USER_AGENT, cacheName, createSiteFetcher, hostProblem } from '../scripts/props/site-fetch.mjs';
+import { robotsAllow, robotsRules } from '../scripts/props/robots.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const HOST = 'vendor.example.com';
@@ -137,4 +138,44 @@ test('a cache entry must belong to the URL asked for', async () => {
   const { calls, fetcher } = harness({});
   await assert.rejects(fetcher.get(url('a'), directory), (error) => error.reason === 'cache');
   assert.equal(calls.length, 0);
+});
+
+test('a run can slow down to a declared delay, but never below the minimum gap', async () => {
+  const directory = await freshDirectory();
+  const { waits, fetcher } = harness({ [url('a')]: ok('a'), [url('b')]: ok('b'), [url('c')]: ok('c') });
+  await fetcher.get(url('a'), directory);
+  fetcher.raiseGap(500);
+  await fetcher.get(url('b'), directory);
+  fetcher.raiseGap(10_000);
+  await fetcher.get(url('c'), directory);
+  assert.deepEqual(waits, [MIN_GAP_MS + JITTER_MS / 2, 10_000 + JITTER_MS / 2]);
+});
+
+test('missingOk reads a 404 or 410 as missing and caches it; other errors, and the same URL without missingOk, still stop', async () => {
+  const directory = await freshDirectory();
+  const { calls, fetcher } = harness({ [url('robots.txt')]: status(404), [url('gone.txt')]: status(410), [url('busy.txt')]: status(503) });
+  const first = await fetcher.get(url('robots.txt'), directory, { missingOk: true });
+  assert.equal(first.missing, true);
+  const again = await fetcher.get(url('robots.txt'), directory, { missingOk: true });
+  assert.deepEqual([again.cached, again.missing, calls.length], [true, true, 1]);
+  assert.equal((await fetcher.get(url('gone.txt'), directory, { missingOk: true })).missing, true);
+  await assert.rejects(fetcher.get(url('robots.txt'), directory), FetchStopped);
+  const fresh = harness({ [url('busy.txt')]: status(503) }).fetcher;
+  await assert.rejects(fresh.get(url('busy.txt'), await freshDirectory(), { missingOk: true }), (error) => error instanceof FetchStopped && error.status === 503);
+});
+
+test('robots rules: our named group beats *, plain prefixes only, anything else is reported instead of guessed', () => {
+  assert.deepEqual(robotsRules(''), { group: null, disallow: [], crawlDelaySeconds: null, unsupported: [] });
+  const star = robotsRules('User-agent: *\nDisallow: /private/\nCrawl-delay: 5\nAllow: /private/ok\n');
+  assert.deepEqual(star, { group: '*', disallow: ['/private/'], crawlDelaySeconds: 5, unsupported: [] });
+  assert.equal(robotsAllow(star, '/private/a.jpg'), false);
+  assert.equal(robotsAllow(star, '/public/a.jpg'), true);
+  const named = robotsRules('User-agent: *\nDisallow: /\n\nUser-agent: PittsburghPropSearch\nDisallow: /tmp/ # ours\n');
+  assert.deepEqual([named.group, named.disallow], ['PittsburghPropSearch', ['/tmp/']]);
+  assert.deepEqual(robotsRules('User-agent: other\nUser-agent: *\nDisallow: /x\n').disallow, ['/x'], 'a group can name several agents');
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow:\n').disallow, [], 'an empty Disallow allows everything');
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow: /*.jpg$\n').unsupported, ['Disallow: /*.jpg$']);
+  assert.deepEqual(robotsRules('User-agent: *\nDisallow: images\n').unsupported, ['Disallow: images']);
+  assert.deepEqual(robotsRules('User-agent: *\nCrawl-delay: soon\n').unsupported, ['Crawl-delay: soon']);
+  assert.deepEqual(robotsRules('User-agent: other\nDisallow: /*\n').unsupported, [], "another agent's rules don't apply to us");
 });

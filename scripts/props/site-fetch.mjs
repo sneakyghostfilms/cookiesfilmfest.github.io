@@ -42,11 +42,13 @@ function stopMessage({ url, status, location, retryAfter }) {
   return `${url} answered HTTP ${status}`;
 }
 
+const MISSING = new Set([404, 410]);
+
 async function readCached(url, files) {
   if (!existsSync(files.meta) || !existsSync(files.body)) return null;
   const meta = JSON.parse(await readFile(files.meta, 'utf8'));
   if (meta.url !== url) throw new FetchStopped(`cache entry ${files.meta} belongs to ${meta.url}, not ${url}`, { url, reason: 'cache' });
-  return { body: await readFile(files.body), meta, cached: true };
+  return { body: await readFile(files.body), meta, cached: true, missing: MISSING.has(meta.status) };
 }
 
 export function createSiteFetcher({
@@ -59,6 +61,7 @@ export function createSiteFetcher({
   timeoutMs = TIMEOUT_MS,
 }) {
   let lastFinishedAt = null;
+  let gapMs = MIN_GAP_MS;
   let stopped = null;
   let queue = Promise.resolve();
   const stats = { requests: 0, cacheHits: 0 };
@@ -68,12 +71,13 @@ export function createSiteFetcher({
     throw error;
   }
 
-  async function get(url, directory) {
+  async function get(url, directory, { missingOk = false } = {}) {
     const name = cacheName(url);
     const files = { body: join(directory, `${name}.body`), meta: join(directory, `${name}.meta.json`) };
     const problem = hostProblem(url, allowHosts);
     if (problem) stop(new FetchStopped(problem, { url, reason: 'refused' }));
     const cached = await readCached(url, files);
+    if (cached?.missing && !missingOk) stop(new FetchStopped(`${url} answered HTTP ${cached.meta.status} (cached)`, { url, status: cached.meta.status }));
     if (cached) {
       stats.cacheHits += 1;
       return cached;
@@ -82,7 +86,7 @@ export function createSiteFetcher({
     const unsafe = guard(directory);
     if (unsafe) stop(new FetchStopped(`refusing to cache vendor content: ${unsafe}`, { url, reason: 'guard' }));
     if (lastFinishedAt !== null) {
-      const wait = lastFinishedAt + MIN_GAP_MS + Math.floor(random() * JITTER_MS) - now();
+      const wait = lastFinishedAt + gapMs + Math.floor(random() * JITTER_MS) - now();
       if (wait > 0) await sleep(wait);
     }
     stats.requests += 1;
@@ -90,7 +94,7 @@ export function createSiteFetcher({
     let body;
     try {
       response = await send(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'manual', signal: AbortSignal.timeout(timeoutMs) });
-      if (response.status >= 200 && response.status <= 299) body = Buffer.from(await response.arrayBuffer());
+      if ((response.status >= 200 && response.status <= 299) || (missingOk && MISSING.has(response.status))) body = Buffer.from(await response.arrayBuffer());
     } catch (error) {
       stop(new FetchStopped(`${url} could not be fetched: ${error.message}`, { url, reason: 'network' }));
     } finally {
@@ -104,14 +108,17 @@ export function createSiteFetcher({
     await mkdir(directory, { recursive: true });
     await writeFile(files.body, body);
     await writeFile(files.meta, `${JSON.stringify(meta, null, 1)}\n`);
-    return { body, meta, cached: false };
+    return { body, meta, cached: false, missing: MISSING.has(response.status) };
   }
 
   return {
-    get(url, directory) {
-      const result = queue.then(() => get(url, directory));
+    get(url, directory, options) {
+      const result = queue.then(() => get(url, directory, options));
       queue = result.catch(() => undefined);
       return result;
+    },
+    raiseGap(ms) {
+      gapMs = Math.max(gapMs, Math.ceil(ms));
     },
     stats: () => ({ ...stats }),
   };

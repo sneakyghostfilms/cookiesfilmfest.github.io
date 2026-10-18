@@ -42,7 +42,7 @@ function stopMessage({ url, status, location, retryAfter }) {
   return `${url} answered HTTP ${status}`;
 }
 
-const MISSING = new Set([404, 410]);
+const MISSING = new Set([401, 403, 404, 410]);
 
 async function readCached(url, files) {
   if (!existsSync(files.meta) || !existsSync(files.body)) return null;

@@ -120,7 +120,7 @@ async function buildSiteAssets(vendorId, exportPath) {
   const stopReason = robotsStopReason(rules, firstPhotos, photoHost);
   if (stopReason) throw new Error(stopReason);
   if (rules.crawlDelaySeconds) fetcher.raiseGap(rules.crawlDelaySeconds * 1000);
-  console.log(`robots.txt on ${photoHost}: ${robots.missing ? `none (HTTP ${robots.meta.status})` : `${rules.group ? `group ${rules.group}, ` : 'no group for us, '}${rules.disallow.length} Disallow prefixes, Crawl-delay ${rules.crawlDelaySeconds ?? 'none'}`}`);
+  console.log(`robots.txt on ${photoHost}: ${robots.missing ? `unavailable, so no rules (HTTP ${robots.meta.status})` : `${rules.group ? `group ${rules.group}, ` : 'no group for us, '}${rules.disallow.length} Disallow prefixes, Crawl-delay ${rules.crawlDelaySeconds ?? 'none'}`}`);
   const { default: sharp } = await import('sharp');
   await mkdir(thumbs, { recursive: true });
   const entries = [];

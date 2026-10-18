@@ -151,17 +151,19 @@ test('a run can slow down to a declared delay, but never below the minimum gap',
   assert.deepEqual(waits, [MIN_GAP_MS + JITTER_MS / 2, 10_000 + JITTER_MS / 2]);
 });
 
-test('missingOk reads a 404 or 410 as missing and caches it; other errors, and the same URL without missingOk, still stop', async () => {
+test('missingOk reads 401, 403, 404 or 410 as missing (RFC 9309: robots.txt unavailable) and caches it; 429, 5xx and the same URL without missingOk still stop', async () => {
   const directory = await freshDirectory();
-  const { calls, fetcher } = harness({ [url('robots.txt')]: status(404), [url('gone.txt')]: status(410), [url('busy.txt')]: status(503) });
+  const { calls, fetcher } = harness({ [url('robots.txt')]: status(404), [url('gone.txt')]: status(410), [url('denied.txt')]: status(403), [url('auth.txt')]: status(401) });
   const first = await fetcher.get(url('robots.txt'), directory, { missingOk: true });
   assert.equal(first.missing, true);
   const again = await fetcher.get(url('robots.txt'), directory, { missingOk: true });
   assert.deepEqual([again.cached, again.missing, calls.length], [true, true, 1]);
-  assert.equal((await fetcher.get(url('gone.txt'), directory, { missingOk: true })).missing, true);
+  for (const page of ['gone.txt', 'denied.txt', 'auth.txt']) assert.equal((await fetcher.get(url(page), directory, { missingOk: true })).missing, true, page);
   await assert.rejects(fetcher.get(url('robots.txt'), directory), FetchStopped);
-  const fresh = harness({ [url('busy.txt')]: status(503) }).fetcher;
-  await assert.rejects(fresh.get(url('busy.txt'), await freshDirectory(), { missingOk: true }), (error) => error instanceof FetchStopped && error.status === 503);
+  for (const code of [429, 500, 503]) {
+    const fresh = harness({ [url('busy.txt')]: status(code) }).fetcher;
+    await assert.rejects(fresh.get(url('busy.txt'), await freshDirectory(), { missingOk: true }), (error) => error instanceof FetchStopped && error.status === code, String(code));
+  }
 });
 
 test('robots rules: our named group beats *, plain prefixes only, anything else is reported instead of guessed', () => {

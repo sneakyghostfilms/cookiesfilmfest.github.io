@@ -19,6 +19,7 @@ export function cardText(entry, { vendors, catalogs }) {
     categories: entry.categories,
     decades: entry.decades ?? [],
     tags: entry.tags ?? [],
+    kind: entry.kind ?? vendor.kind,
     link: entry.link ?? { href: catalog.website ? entry.url : catalog.link, label: catalog.linkLabel },
     inquire: vendor.inquire,
     cite: catalog.website ? `When you inquire, cite “${entry.name}” and its page link` : `When you inquire, cite ${ids} · ${entry.name} · ${pages}`,
@@ -29,7 +30,8 @@ export function cardText(entry, { vendors, catalogs }) {
   };
 }
 
-// The fields the keyword index reads, the same ones the Worker's searchDocs builds from the inventory.
+// The fields the keyword index reads, and the kind it filters on: the same ones the Worker's searchDocs builds from the
+// inventory.
 export function searchDocFromCard(card) {
   return {
     key: card.key,
@@ -39,6 +41,7 @@ export function searchDocFromCard(card) {
     vendor: card.vendorId,
     tags: card.tags,
     decades: card.decades,
+    kind: card.kind,
     order: card.order,
   };
 }

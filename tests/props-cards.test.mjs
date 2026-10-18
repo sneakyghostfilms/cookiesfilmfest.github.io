@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { cardsText } from '../src/scripts/props-cards-file.js';
+import { kindOf } from '../src/scripts/props-kinds.js';
 import {
   NOT_AFFILIATED, cardFor, cardsFile, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, specialtiesLine, telHref, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources,
 } from '../src/scripts/props-cards.js';
@@ -11,6 +12,7 @@ const readJson = async (path) => JSON.parse(await readFile(new URL(path, import.
 const inventory = await readJson('../src/data/props/inventory.json');
 const { vendors } = await readJson('../src/data/props/vendors.json');
 const { tags } = await readJson('../src/data/props/tags.json');
+const kinds = await readJson('../src/data/props/kinds.json');
 const catalogsById = new Map(vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { catalog, vendor }])));
 // The card fields the page draws; alt matters only beside a thumbnail.
 const drawn = ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, link, inquire, cite, thumb, alt, photoCredit }) => ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, link, inquire, cite, thumb, alt: thumb ? alt : null, photoCredit });
@@ -60,7 +62,7 @@ test('a website card has no item number or page and links to the vendor page', (
 });
 
 test('every card the page draws from cards.json equals the card cardFor gives for the same item', () => {
-  const file = JSON.parse(cardsFile({ items: inventory.items, vendors, tags }));
+  const file = JSON.parse(cardsFile({ items: inventory.items, vendors, kinds, tags }));
   assert.equal(file.items.length, inventory.items.length);
   const byKey = new Map(inventory.items.map((item, order) => [item.key, { item, order }]));
   for (const entry of file.items) {
@@ -69,23 +71,26 @@ test('every card the page draws from cards.json equals the card cardFor gives fo
     const card = cardText(entry, file);
     assert.deepEqual(drawn(card), drawn(cardFor(item, { vendor, catalog, tags: tags[item.key] ?? [] })), entry.key);
     assert.equal(card.order, order, entry.key);
+    assert.equal(card.kind, kindOf(item, kinds), entry.key);
+    if (entry.kind) assert.notEqual(entry.kind, file.vendors[file.catalogs[entry.catalog].vendor].kind, `${entry.key} stores a kind only when it overrides its vendor's`);
   }
   const spec = cardText(file.items.find((entry) => entry.key === 'scp-056'), file);
   assert.equal(`${spec.vendorName} · ${spec.ids} · ${spec.name} · ${spec.era} · ${spec.pages}`, 'Steel City Props · #056 · GREEN CHANGE MACHINE · 1960s · page 5');
-  assert.deepEqual(searchDocFromCard(spec), { key: 'scp-056', name: 'GREEN CHANGE MACHINE', description: 'GREEN CHANGE MACHINE 1960s', categories: ['THE OFFICE'], vendor: 'steel-city-props', tags: spec.tags, decades: [1960], order: spec.order });
+  assert.deepEqual(searchDocFromCard(spec), { key: 'scp-056', name: 'GREEN CHANGE MACHINE', description: 'GREEN CHANGE MACHINE 1960s', categories: ['THE OFFICE'], vendor: 'steel-city-props', tags: spec.tags, decades: [1960], kind: 'film-prop', order: spec.order });
 });
 
 test('cards.json is the same text for the same inputs, and only the local demo puts thumbnails and local PDF links in it', () => {
   const items = [pdfItem, siteItem];
   const fileVendors = [{ ...pdfVendor, catalogs: [pdfCatalog] }, { ...siteVendor, catalogs: [siteCatalog] }];
+  const fileKinds = { vendors: { [pdfVendor.id]: { kind: 'film-prop' }, [siteVendor.id]: { kind: 'film-prop' } } };
   const demo = { items: {
     'scp-056': { catalog: pdfCatalog.id, page: 5, box: { left: 14, top: 841, right: 154, bottom: 700 }, thumb: { width: 320, height: 300 } },
     'dz-1nfqu2': { catalog: siteCatalog.id, thumb: { width: 320, height: 240 }, image: 'https://vendor.example/a.jpg' },
   } };
-  const plain = cardsFile({ items, vendors: fileVendors });
-  assert.equal(cardsFile({ items, vendors: fileVendors }), plain);
+  const plain = cardsFile({ items, vendors: fileVendors, kinds: fileKinds });
+  assert.equal(cardsFile({ items, vendors: fileVendors, kinds: fileKinds }), plain);
   assert.doesNotMatch(plain, /thumb|props-demo|local PDF/);
-  const local = JSON.parse(cardsFile({ items, vendors: fileVendors, demo }));
+  const local = JSON.parse(cardsFile({ items, vendors: fileVendors, kinds: fileKinds, demo }));
   for (const item of items) {
     const { catalog, vendor } = { [pdfItem.key]: { catalog: pdfCatalog, vendor: pdfVendor }, [siteItem.key]: { catalog: siteCatalog, vendor: siteVendor } }[item.key];
     const expected = cardFor(item, { vendor, catalog, demoEntry: demo.items[item.key] });

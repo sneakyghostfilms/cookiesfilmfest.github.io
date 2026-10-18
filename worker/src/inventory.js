@@ -1,5 +1,7 @@
 import inventory from '../../src/data/props/inventory.json' with { type: 'json' };
+import kindsFile from '../../src/data/props/kinds.json' with { type: 'json' };
 import tagsFile from '../../src/data/props/tags.json' with { type: 'json' };
+import { kindOf } from '../../src/scripts/props-kinds.js';
 import { buildIndex, parseDecades, rankText, sceneTermMatches } from '../../src/scripts/props-search.js';
 import { LIMITS, buildRequest } from './scene.js';
 
@@ -16,7 +18,7 @@ export function listing(items) {
   return [...sections].map(([section, lines]) => `## ${section}\n${lines.join('\n')}`).join('\n');
 }
 
-export function searchDocs(items, tags) {
+export function searchDocs(items, tags, kinds) {
   return items.map((item, order) => ({
     key: item.key,
     name: item.name,
@@ -25,12 +27,13 @@ export function searchDocs(items, tags) {
     tags: tags[item.key] ?? [],
     decades: item.decades,
     vendor: item.vendor,
+    kind: kindOf(item, kinds),
     order,
     item,
   }));
 }
 
-const index = buildIndex(searchDocs(inventory.items, tagsFile.tags));
+const index = buildIndex(searchDocs(inventory.items, tagsFile.tags, kindsFile));
 
 export function ranked(text, period = '') {
   const periodDecades = parseDecades(period);

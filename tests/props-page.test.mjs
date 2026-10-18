@@ -238,15 +238,16 @@ test('Route 30 Retro shows only its Facebook Page facts, cited as read, with no 
 test('the page builds its search documents from cards.json the same way the Worker builds them from the inventory', async () => {
   const { searchDocs } = await import('../worker/src/inventory.js');
   const tagsFile = JSON.parse(await read('src/data/props/tags.json'));
+  const kindsFile = JSON.parse(await read('src/data/props/kinds.json'));
   const fromPage = new Map(cards.map((card) => {
     const doc = searchDocFromCard(card);
-    return [doc.key, { name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, order: doc.order }];
+    return [doc.key, { name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, kind: doc.kind, order: doc.order }];
   }));
-  const workerDocs = searchDocs(inventory.items, tagsFile.tags);
+  const workerDocs = searchDocs(inventory.items, tagsFile.tags, kindsFile);
   assert.equal(fromPage.size, workerDocs.length);
   for (const doc of workerDocs) {
     assert.deepEqual(fromPage.get(doc.key), {
-      name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, order: doc.order,
+      name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, kind: doc.kind, order: doc.order,
     }, doc.key);
   }
 });

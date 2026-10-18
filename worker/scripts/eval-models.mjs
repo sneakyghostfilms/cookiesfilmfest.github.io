@@ -110,15 +110,17 @@ const baseline = scored.filter((row) => BASELINE_SCENES.includes(row.fixture.id)
 const others = scored.filter((row) => !BASELINE_SCENES.includes(row.fixture.id));
 const baselineFitting = baseline.filter((row) => !row.result.dense);
 const gate = [
+  ['every scene answered', rows.length === scored.length, rows.filter((row) => row.error).map((row) => `${row.fixture.id} ${row.error}`).join(', ') || `${scored.length}/${rows.length}`],
   ['the four original scenes all answered', baseline.length === BASELINE_SCENES.length, baseline.map((row) => row.fixture.id).join(', ')],
   ['every counted required prop found (office 5/5, police 7/7, hospital 5/5, diner 12/12)', baseline.every((row) => row.result.counted === row.result.countable), baseline.map((row) => `${row.fixture.id} ${row.result.counted}/${row.result.countable}`).join(', ')],
   ['0 wrong keys', baseline.every((row) => row.result.wrongKeys.length === 0), baseline.map((row) => `${row.fixture.id} ${row.result.wrongKeys.length}`).join(', ')],
   ['0 invalid keys', baseline.every((row) => row.body.ignoredSuggestions === 0), baseline.map((row) => `${row.fixture.id} ${row.body.ignoredSuggestions}`).join(', ')],
   ['no truncated output', baseline.every((row) => !row.truncated), baseline.filter((row) => row.truncated).map((row) => row.fixture.id).join(', ') || 'none'],
   [`absent props reported as no match at least ${BASELINE_ABSENT_REPORTED} of 6`, sum((row) => row.result.honest, baselineFitting) >= BASELINE_ABSENT_REPORTED, `${sum((row) => row.result.honest, baselineFitting)}/${sum((row) => row.result.absent.length, baselineFitting)}`],
-  ...others.map((row) => [`${row.fixture.id} meets the S1 floor (70% found, at most 1 wrong key, no truncation)`,
-    row.result.countable > 0 && row.result.counted / row.result.countable >= FLOOR.requiredShare && row.result.wrongKeys.length <= FLOOR.wrongKeysPerScene && !row.truncated,
-    `${row.result.counted}/${row.result.countable} found, ${row.result.wrongKeys.length} wrong, ${row.truncated ? 'truncated' : 'not truncated'}`]),
+  ...others.map((row) => [`${row.fixture.id} meets the S1 floor (70% found, at most 1 wrong and 1 invalid key, no truncation)`,
+    row.result.countable > 0 && row.result.counted / row.result.countable >= FLOOR.requiredShare && row.result.wrongKeys.length <= FLOOR.wrongKeysPerScene
+      && row.body.ignoredSuggestions <= FLOOR.invalidKeysPerScene && !row.truncated,
+    `${row.result.counted}/${row.result.countable} found, ${row.result.wrongKeys.length} wrong, ${row.body.ignoredSuggestions} invalid, ${row.truncated ? 'truncated' : 'not truncated'}`]),
 ];
 lines.push('\nDeploy gate (lead, round 3):');
 for (const [label, passed, detail] of gate) lines.push(`- ${passed ? 'PASS' : 'FAIL'} ${label}: ${detail}`);

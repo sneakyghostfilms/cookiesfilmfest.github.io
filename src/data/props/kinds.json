@@ -1,0 +1,18 @@
+{
+  "vendors": {
+    "steel-city-props": { "kind": "film-prop", "source": "sourceType prop-house" },
+    "dezzign-central": { "kind": "film-prop", "source": "sourceType prop-house" },
+    "cleveland-prop-shop": { "kind": "film-prop", "source": "sourceType prop-house" },
+    "clicksburgh-retro-rentals": {
+      "kind": "event-rental",
+      "source": "sourceType event-rental: cookie-table displays, card boxes, seating charts, wedding displays and signage, event cameras",
+      "categories": {
+        "Audio Guestbooks": { "kind": "set-dressing", "source": "the photo review in PR #13: vintage-style telephones" },
+        "Audio Guestbook Displays": { "kind": "set-dressing", "source": "the photo review in PR #13: telephone booths, gossip benches, mirrors, a seating area" }
+      }
+    },
+    "construction-junction": { "kind": "antique", "source": "sourceType antique-reuse" },
+    "creative-reuse": { "kind": "antique", "source": "sourceType antique-reuse" },
+    "vintage-alley": { "kind": "set-dressing", "source": "sourceType vintage-rental" }
+  }
+}

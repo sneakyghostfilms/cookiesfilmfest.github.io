@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import postcss from 'postcss';
 import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
+import { filterValues } from '../src/scripts/props-results.js';
 import { buildIndex, compareByName, rankText, search, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -329,4 +330,39 @@ test('every props.css rule is scoped under .props-page, so nothing leaks to the 
   css.walkRules((rule) => selectors.push(...rule.selectors));
   assert.ok(selectors.length > 50, 'the walk reaches the rules, including those inside @media');
   assert.deepEqual(selectors.filter((selector) => !/^\.props-page(?=$|[\s.:[>+~])/.test(selector)), []);
+});
+
+// The keyword page's index, built from cards.json the way the page builds it.
+const pageIndex = buildIndex(cards.map((card) => ({ ...searchDocFromCard(card), card })));
+const FACETS = { category: (doc) => doc.categories, vendor: (doc) => [doc.vendor], kind: (doc) => [doc.kind], decade: (doc) => doc.decades.map(String) };
+const NO_FILTERS = { category: '', vendor: '', kind: '', decade: '' };
+const optionValues = (id) => [...html.match(new RegExp(`<select id="${id}">([\\s\\S]*?)</select>`))[1].matchAll(/<option value="([^"]*)">/g)].map(([, value]) => decode(value)).filter(Boolean);
+
+test('with nothing typed and no filter set, every filter keeps every option the page was built with', () => {
+  const values = filterValues(pageIndex, '', NO_FILTERS, search(pageIndex, '', NO_FILTERS));
+  for (const [facet, id] of [['category', 'props-category'], ['vendor', 'props-vendor'], ['kind', 'props-kind'], ['decade', 'props-decade']]) {
+    assert.deepEqual([...values[facet]].sort(), optionValues(id).sort(), facet);
+  }
+});
+
+test("each filter offers the values found under the query and every other filter, so a set filter can still switch", () => {
+  const narrowed = filterValues(pageIndex, 'rotary phone', NO_FILTERS, search(pageIndex, 'rotary phone', NO_FILTERS));
+  assert.ok(narrowed.category.size > 0 && narrowed.category.size < optionValues('props-category').length, 'a query narrows the sections');
+  const cases = [
+    ['phone', {}],
+    ['phone', { vendor: 'steel-city-props' }],
+    ['phone', { vendor: 'steel-city-props', kind: 'film-prop' }],
+    ['chair', { kind: 'set-dressing', decade: '1960' }],
+    ['1960s', { category: 'Telephones' }],
+  ];
+  for (const [query, set] of cases) {
+    const filters = { ...NO_FILTERS, ...set };
+    const values = filterValues(pageIndex, query, filters, search(pageIndex, query, filters));
+    for (const [facet, valuesOf] of Object.entries(FACETS)) {
+      const expected = new Set(search(pageIndex, query, { ...filters, [facet]: '' }).flatMap(valuesOf));
+      assert.deepEqual(values[facet], expected, `${query} ${JSON.stringify(set)} → ${facet}`);
+    }
+  }
+  const oneVendor = filterValues(pageIndex, 'phone', { ...NO_FILTERS, vendor: 'steel-city-props' }, search(pageIndex, 'phone', { ...NO_FILTERS, vendor: 'steel-city-props' }));
+  assert.ok(oneVendor.vendor.size > 1, 'with a vendor chosen, the other vendors with matches stay in its list');
 });

@@ -1,6 +1,7 @@
 import { searchDocFromCard } from "./props-card-text.js";
 import { type Card, loadCards, renderCard } from "./props-card-view.ts";
 import { buildIndex, rankText, search } from "./props-search.js";
+import { filterValues } from "./props-results.js";
 import { queryFromHash } from "./props-search-link.js";
 
 const PAGE_SIZE = 24;
@@ -34,6 +35,26 @@ const vendorDocs = [...(vendorMatches?.querySelectorAll<HTMLElement>(".vendor-ma
   order,
 }));
 const vendorIndex = buildIndex(vendorDocs);
+// Each filter's full list of options, as the page was built, for narrowing to the values the results hold.
+const selects = { category, vendor, kind, decade };
+const optionsOf = new Map<HTMLSelectElement, HTMLOptionElement[]>();
+for (const select of Object.values(selects)) if (select) optionsOf.set(select, [...select.options]);
+
+function filterSettings() {
+  return { category: category.value, decade: decade.value, vendor: vendor?.value ?? "", kind: kind.value };
+}
+
+// Each select keeps its "All" option, the values the results under the other filters hold, and its current choice.
+function narrowFilters() {
+  const values = filterValues(index, query.value, filterSettings(), results);
+  for (const [name, select] of Object.entries(selects)) {
+    if (!select) continue;
+    const [all, ...options] = optionsOf.get(select)!;
+    const chosen = select.value;
+    select.replaceChildren(all, ...options.filter((option) => option.value === chosen || values[name].has(option.value)));
+    select.value = chosen;
+  }
+}
 
 function render() {
   list.replaceChildren(...results.slice(0, shown).map((doc) => renderCard(doc.card)));
@@ -62,7 +83,8 @@ function showVendorMatches() {
 function update() {
   showVendorMatches();
   if (!index) return;
-  results = search(index, query.value, { category: category.value, decade: decade.value, vendor: vendor?.value ?? "", kind: kind.value });
+  results = search(index, query.value, filterSettings());
+  narrowFilters();
   shown = PAGE_SIZE;
   render();
 }

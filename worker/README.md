@@ -123,6 +123,20 @@ How an answer is scored (`scripts/rubric.mjs`). A suggested prop "names" a fixtu
 
 The gate allows at most 1 misfiled key per scene.
 
+`scripts/compare-retrievers.mjs` measures the shortlist offline, calling no model, with and without the AI tags in the ranking. It first checks that its with-tags list is the Worker's own, then reports, for each fixture scene and the long scene:
+- the required props with an acceptable item in the 100-item list
+- each absent prop's exposure: the listed items whose name or tags hold the prop's last word
+- the request each list makes and its reservation
+- the items per kind
+
+`--cpu 300` adds the time to rank and select.
+
+```sh
+node scripts/compare-retrievers.mjs [--cpu 300]
+```
+
+The long scene (`test/fixtures/long-scene.json`) is the diner, morgue and office scenes and the start of the police scene, 4,000 characters, the most the API accepts. Its props are references to the fixtures' props, such as `diner:mugs`, so it always takes their current keys. When a fixture gains a prop its text names, add the reference there too; a test checks this for the scenes it holds whole.
+
 ## Local development without Cloudflare
 
 ```sh

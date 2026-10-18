@@ -8,7 +8,8 @@ import { parseArgs } from 'node:util';
 import { ROOT, VENDORS_FILE, sha256 } from './catalog-pdf.mjs';
 import { replaceCatalog, serializeInventory } from './normalize.mjs';
 import { exportLocationProblem } from './private-output.mjs';
-import { createSiteFetcher } from './site-fetch.mjs';
+import { robotsAllow, robotsRules, robotsTarget } from './robots.mjs';
+import { FetchStopped, createSiteFetcher } from './site-fetch.mjs';
 import { checkSiteItems } from './site-items.mjs';
 import { parsePages } from './sites/dezzign-central.mjs';
 import { parseExport } from './sites/retro-on-8th.mjs';
@@ -20,6 +21,23 @@ const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export']
 const WORDPRESS_PAGE_SIZE = 10;
 
 const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
+
+export async function robotsCheckedFetcher(fetcher, siteUrl, directory) {
+  const host = new URL(siteUrl).hostname;
+  const robots = await fetcher.get(`https://${host}/robots.txt`, directory, { missingOk: true });
+  const rules = robotsRules(robots.missing ? '' : robots.body.toString('utf8'));
+  if (rules.unsupported.length) {
+    throw new FetchStopped(`robots.txt on ${host} has rules this tool can't apply with certainty (${rules.unsupported.join('; ')}); stopping before any page`, { reason: 'robots' });
+  }
+  if (rules.crawlDelaySeconds) fetcher.raiseGap(rules.crawlDelaySeconds * 1000);
+  return {
+    rules,
+    async get(url, dir, options) {
+      if (!robotsAllow(rules, robotsTarget(url))) throw new FetchStopped(`robots.txt on ${host} disallows ${url}; not requesting it`, { url, reason: 'robots' });
+      return fetcher.get(url, dir, options);
+    },
+  };
+}
 
 const SOURCES = {
   async 'wordpress-pages'({ vendor, catalog, fetcher, cacheRoot }) {

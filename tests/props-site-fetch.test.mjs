@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { FetchStopped, JITTER_MS, MIN_GAP_MS, TIMEOUT_MS, USER_AGENT, cacheName, createSiteFetcher, hostProblem } from '../scripts/props/site-fetch.mjs';
+import { robotsCheckedFetcher } from '../scripts/props/import-site.mjs';
 import { robotsAllow, robotsRules, robotsStopReason, robotsTarget } from '../scripts/props/robots.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -212,7 +213,7 @@ test('photo downloads stop before any request when robots.txt disallows a photo 
 test("robots rules match the path and query as RFC 9309's examples do, with regex characters taken literally", () => {
   const vectors = [
     ['/fish', '/fish', true], ['/fish', '/fish.html', true], ['/fish', '/fish/salmon.html', true], ['/fish', '/fishheads', true],
-    ['/fish', '/fish.php?id=anything', true], ['/fish', '/Fish.asp', false], ['/fish', '/catfish', false], ['/fish', '/?id=fish', false],
+    ['/fish', '/fish.php?id=anything', true], ['/fish', '/Fish.asp', false], ['/fish', '/catfish', false], ['/fish', '/?id=fish', false], ['/fish', '/desert/fish', false],
     ['/fish*', '/fishheads/yummy.html', true], ['/fish*', '/catfish', false],
     ['/fish/', '/fish/?id=anything', true], ['/fish/', '/fish', false],
     ['/*.php', '/index.php', true], ['/*.php', '/folder/filename.php?parameters', true], ['/*.php', '/windows.PHP', false],
@@ -229,4 +230,25 @@ test("robots rules match the path and query as RFC 9309's examples do, with rege
     assert.equal(!robotsAllow(robotsRules(`User-agent: *\nDisallow: ${rule}\n`), target), disallowed, `${rule} on ${target}`);
   }
   assert.equal(robotsTarget('https://cdn.example/a/b.jpeg?width=640'), '/a/b.jpeg?width=640');
+});
+
+test("a store host's robots.txt is read first: a Crawl-delay slows the run, a disallowed page is refused before any request, and a rule we can't apply stops it", async () => {
+  const robotsFile = 'User-agent: *\nDisallow: /private/\nDisallow: /*?basket=\nCrawl-delay: 5\n';
+  const directory = await freshDirectory();
+  const { calls, waits, fetcher } = harness({ [url('robots.txt')]: () => new Response(robotsFile, { status: 200 }), [url('shop/1')]: ok('[]'), [url('shop/2')]: ok('[]') });
+  const site = await robotsCheckedFetcher(fetcher, url('shop/'), directory);
+  assert.equal(site.rules.crawlDelaySeconds, 5);
+  await site.get(url('shop/1'), directory);
+  await site.get(url('shop/2'), directory);
+  assert.deepEqual(calls.map((call) => call.url), [url('robots.txt'), url('shop/1'), url('shop/2')]);
+  assert.ok(waits.every((ms) => ms >= 5000) && waits.length === 2, `gaps ${waits.join(', ')}`);
+  for (const refused of [url('private/a'), url('shop/?basket=1')]) {
+    await assert.rejects(site.get(refused, directory), (error) => error instanceof FetchStopped && /disallows/.test(error.message), refused);
+  }
+  assert.equal(calls.length, 3, 'nothing disallowed was requested');
+  const unsure = harness({ [url('robots.txt')]: () => new Response('User-agent: *\nDisallow: /a$b\n', { status: 200 }) });
+  await assert.rejects(robotsCheckedFetcher(unsure.fetcher, url('shop/'), await freshDirectory()), /can't apply with certainty/);
+  const none = harness({ [url('robots.txt')]: status(404), [url('shop/1')]: ok('[]') });
+  const open = await robotsCheckedFetcher(none.fetcher, url('shop/'), await freshDirectory());
+  assert.deepEqual([open.rules.disallow, open.rules.crawlDelaySeconds], [[], null], 'a missing robots.txt means no rules');
 });

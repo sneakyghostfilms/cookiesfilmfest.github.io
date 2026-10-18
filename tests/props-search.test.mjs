@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { buildIndex, compareByName, parseDecades, queryTerms, rankText, search, stem, tokenize } from '../src/scripts/props-search.js';
+import { buildIndex, compareByName, parseDecades, queryTerms, rankText, sceneTermMatches, search, stem, tokenize } from '../src/scripts/props-search.js';
 
 const read = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
 const inventory = await read('../src/data/props/inventory.json');
@@ -216,4 +216,26 @@ test('the vendor strip matches a vendor by its name or its own words, never by o
   assert.deepEqual(ids('the props'), [], 'stopwords alone match nothing');
   assert.deepEqual(ids(''), []);
   assert.ok(!ids('theater stock').includes('cleveland-play-house-props'), 'a type label is not search text');
+});
+
+test('sceneTermMatches lists the items each scene word matches, then each pair of adjacent words that match the same item', () => {
+  const names = { a: 'Red Chair', b: 'Blue Chair', c: 'Red Lamp', d: 'Rotary Phone', e: 'Office Phone' };
+  const small = buildIndex(Object.entries(names).map(([key, name], order) => ({ key, name, description: name, categories: [], tags: [], decades: [], order })));
+  const matches = Object.fromEntries(sceneTermMatches(small, 'The red chair by the rotary phone. A red chair again, then a chair chair, 1957.').map(({ term, keys }) => [term, [...keys].sort()]));
+  assert.deepEqual(matches, {
+    red: ['a', 'c'],
+    chair: ['a', 'b'],
+    rotary: ['d'],
+    phone: ['d', 'e'],
+    again: [],
+    then: [],
+    'red chair': ['a'],
+    'chair rotary': [],
+    'rotary phone': ['d'],
+    'phone red': [],
+    'chair again': [],
+    'again then': [],
+    'then chair': [],
+  }, 'stopwords and years are skipped, a repeated pair is listed once, and a word next to itself is no pair');
+  assert.deepEqual(sceneTermMatches(small, 'the and of'), []);
 });

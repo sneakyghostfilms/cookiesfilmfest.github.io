@@ -151,3 +151,17 @@ export function search(index, query = '', { category = '', decade = '', vendor =
 export function rankText(index, text) {
   return rank(index, splitTerms(index, queryTerms(text)), new Set(), () => true);
 }
+
+export function sceneTermMatches(index, text) {
+  const { words } = splitTerms(index, queryTerms(text));
+  const keysOf = new Map(words.map((term) => [term, termScores(index, term).map(([position]) => index.entries[position].doc.key)]));
+  const sequence = tokenize(text).filter((token) => keysOf.has(token));
+  const pairs = new Map();
+  for (let at = 1; at < sequence.length; at += 1) {
+    const term = `${sequence[at - 1]} ${sequence[at]}`;
+    if (sequence[at - 1] === sequence[at] || pairs.has(term)) continue;
+    const second = new Set(keysOf.get(sequence[at]));
+    pairs.set(term, keysOf.get(sequence[at - 1]).filter((key) => second.has(key)));
+  }
+  return [...keysOf, ...pairs].map(([term, keys]) => ({ term, keys }));
+}

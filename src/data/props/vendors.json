@@ -363,6 +363,7 @@
     {
       "id": "construction-junction",
       "name": "Construction Junction",
+      "keyPrefix": "cj",
       "siteUrl": "https://cjreuse.org/",
       "sourceType": {
         "value": "antique-reuse",
@@ -421,7 +422,27 @@
       },
       "notice": null,
       "lastVerified": "2026-10-17",
-      "catalogs": []
+      "catalogs": [
+        {
+          "id": "cj-2026-10-18",
+          "type": "woocommerce-listing",
+          "title": "In-stock items on cjreuse.org/shop",
+          "sourceUrl": "https://cjreuse.org/shop/",
+          "siteUrl": "https://cjreuse.org/",
+          "itemLinkLabel": "Open product page",
+          "expected": {
+            "pages": 29,
+            "cards": 344,
+            "items": 267,
+            "excluded": {
+              "not in stock": 0,
+              "building material": 76,
+              "repeated": 0
+            },
+            "withheld": 1
+          }
+        }
+      ]
     },
     {
       "id": "event-source-pittsburgh",

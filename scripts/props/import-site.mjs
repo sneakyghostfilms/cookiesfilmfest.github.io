@@ -11,6 +11,7 @@ import { exportLocationProblem } from './private-output.mjs';
 import { robotsAllow, robotsRules, robotsTarget } from './robots.mjs';
 import { FetchStopped, createSiteFetcher } from './site-fetch.mjs';
 import { checkSiteItems } from './site-items.mjs';
+import { LISTING_PAGE_LIMIT, nextListingPage, parseListing } from './sites/construction-junction.mjs';
 import { parseStore, storeListPage, storePageCount } from './sites/creative-reuse.mjs';
 import { parsePages } from './sites/dezzign-central.mjs';
 import { parseExport } from './sites/retro-on-8th.mjs';
@@ -20,7 +21,7 @@ const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
 const ITEM_EXCLUSIONS_FILE = join(ROOT, 'scripts/props/item-exclusions.json');
 export const ITEM_EXCLUSION_REASONS = new Set(["name or photo carries a private individual's name"]);
-const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store']);
+const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store', 'woocommerce-listing']);
 const WORDPRESS_PAGE_SIZE = 10;
 
 const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
@@ -72,6 +73,19 @@ const SOURCES = {
       listings.push(listing);
     }
     return { ...parseStore(categoryPage, listings, { vendor, catalog }), capturedAt: localDate(firstFetchedAt) };
+  },
+  async 'woocommerce-listing'({ vendor, catalog, fetcher, cacheRoot }) {
+    const directory = join(cacheRoot, vendor.id, catalog.id);
+    const site = await robotsCheckedFetcher(fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.sourceUrl).hostname] }), catalog.sourceUrl, directory);
+    const pages = [];
+    let firstFetchedAt;
+    for (let url = catalog.sourceUrl; url; url = nextListingPage(pages.at(-1), catalog.sourceUrl, pages.length)) {
+      if (pages.length === LISTING_PAGE_LIMIT) throw new Error(`The listing goes on past ${LISTING_PAGE_LIMIT} pages; stopping before page ${LISTING_PAGE_LIMIT + 1}.`);
+      const { body, meta } = await site.get(url, directory);
+      firstFetchedAt ??= meta.fetchedAt;
+      pages.push(body.toString('utf8'));
+    }
+    return { ...parseListing(pages, { vendor, catalog }), capturedAt: localDate(firstFetchedAt) };
   },
   async 'shopify-export'({ catalog, vendor, exportPath }) {
     if (!exportPath) throw new Error(`${vendor.name} is imported from the vendor's Shopify product export: pass --export "<file.csv>".`);

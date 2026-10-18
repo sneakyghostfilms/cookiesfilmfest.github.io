@@ -10,7 +10,7 @@ const cardsUrl = `/props/cards.json?v=${cardsVersion(cardsText(process.env))}`;
 ---
 
 <PropsLayout title="Paste a Scene | Pittsburgh Prop Search | Cookies and Comedy Film Festival" description={description} current="scene">
-  <h2 class="scene-title">Paste a scene to find props (AI)</h2>
+  <h2 class="scene-title">Paste a scene to find props</h2>
   <form id="scene-form" class="scene-form" data-api-url={apiUrl} data-cards-url={cardsUrl}>
     <label class="props-field">
       <span>Scene text</span>
@@ -23,8 +23,8 @@ const cardsUrl = `/props/cards.json?v=${cardsVersion(cardsText(process.env))}`;
       </label>
       <p class="props-note scene-count"><span id="scene-count">0</span> / 4,000 characters</p>
     </div>
-    <p class="props-note scene-disclosure">Your text is sent to Cloudflare Workers AI to pick props from these catalogs. This site doesn't store or log it. AI can be wrong, so check each item with its vendor.</p>
-    {!apiUrl && <p class="scene-off">AI scene matching isn't switched on yet. Keyword search works.</p>}
+    <p class="props-note scene-disclosure">Your scene text and time period are sent to Cloudflare, where a language model picks props from these catalogs. This site doesn't store or log them. Matches can be wrong, so check each item with its vendor.</p>
+    {!apiUrl && <p class="scene-off">Scene matching isn't switched on yet. Keyword search works.</p>}
     <button id="scene-submit" type="submit" class="props-button" disabled={!apiUrl}>Find props for this scene</button>
   </form>
   <noscript><p class="props-note">Scene matching needs JavaScript. The prop sources, with their contact details, are listed without it on <a href="/props/sources">the prop sources page</a>.</p></noscript>

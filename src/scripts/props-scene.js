@@ -14,7 +14,7 @@ export function checkSceneText(text, period = '') {
 
 export function periodNote(period) {
   const text = period.trim();
-  return text && parseDecades(text).size ? `Items whose stated era is outside ${text} were left out of AI matching.` : null;
+  return text && parseDecades(text).size ? `Items whose stated era is outside ${text} were left out of scene matching.` : null;
 }
 
 function stateFor(response, body, now) {

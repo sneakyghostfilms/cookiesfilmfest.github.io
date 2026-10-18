@@ -35,9 +35,9 @@ test('the period is sent trimmed, and only when it is not blank', async () => {
   }
 });
 
-test('a period that names decades is disclosed as a filter on AI matching', () => {
-  assert.equal(periodNote(' 1990s '), 'Items whose stated era is outside 1990s were left out of AI matching.');
-  assert.equal(periodNote('late sixties'), 'Items whose stated era is outside late sixties were left out of AI matching.');
+test('a period that names decades is disclosed as a filter on scene matching', () => {
+  assert.equal(periodNote(' 1990s '), 'Items whose stated era is outside 1990s were left out of scene matching.');
+  assert.equal(periodNote('late sixties'), 'Items whose stated era is outside late sixties were left out of scene matching.');
   assert.equal(periodNote('WWII'), null, 'a period without decades filters nothing');
   assert.equal(periodNote(''), null);
   assert.ok(parseDecades('late sixties').size > 0);

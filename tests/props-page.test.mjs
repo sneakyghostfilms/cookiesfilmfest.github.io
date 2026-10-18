@@ -136,12 +136,16 @@ test('the main page nav links to /props from the desktop link groups and the mob
   assert.match(mobile, /data-dropdown="resources"[\s\S]*?Resources[\s\S]*?<a class="mobile-menu-link mobile-submenu-link" href="\/props"[^>]*>\s*Prop Search\s*<\/a>/);
 });
 
-test('the scene page discloses AI processing and stays switched off until a Worker URL is configured', async () => {
+test('the scene page discloses that the text goes to Cloudflare and stays switched off until a Worker URL is configured', async () => {
   const config = JSON.parse(await read('src/data/props/config.json'));
   assert.equal(config.apiUrl, '', 'the committed site must not call the Worker until the site owner approves');
-  assert.ok(sceneText.includes('Paste a scene to find props (AI)'));
-  assert.ok(sceneText.includes("Your text is sent to Cloudflare Workers AI to pick props from these catalogs. This site doesn't store or log it."));
-  assert.ok(sceneText.includes("AI scene matching isn't switched on yet. Keyword search works."));
+  assert.ok(sceneText.includes('Paste a scene to find props'));
+  assert.ok(sceneText.includes("Your scene text and time period are sent to Cloudflare, where a language model picks props from these catalogs. This site doesn't store or log them."));
+  assert.ok(sceneText.includes("Scene matching isn't switched on yet. Keyword search works."));
+  const outsideAbout = visibleText(sceneHtml.replace(/<section class="props-about">[\s\S]*?<\/section>/, ''));
+  assert.ok(outsideAbout.includes('sent to Cloudflare'), 'the About box is cut out, and only the About box');
+  assert.doesNotMatch(outsideAbout, /\bAI\b/, 'the scene page labels nothing "AI" outside the About box');
+  assert.doesNotMatch(sceneScript, /\bAI\b/, 'nor do its results or messages');
   assert.match(sceneHtml, /<form id="scene-form" class="scene-form" data-api-url(="")? data-cards-url="\/props\/cards\.json\?v=[0-9a-f]{8}">/);
   assert.match(sceneHtml, /<textarea id="scene-text"[^>]*\sdisabled[\s>]/);
   assert.match(sceneHtml, /<button id="scene-submit"[^>]*\sdisabled[\s>]/);
@@ -149,9 +153,9 @@ test('the scene page discloses AI processing and stays switched off until a Work
   assert.match(sceneHtml, /<input id="scene-period"[^>]*maxlength="40"[^>]*placeholder="1960s, WWII, present day"[^>]*\sdisabled[\s>]/);
 });
 
-test('the keyword page holds no scene box, and the Workers AI note sits on the scene page only', () => {
-  assert.doesNotMatch(html, /id="scene-|Paste a scene to find props|Cloudflare Workers AI/);
-  assert.match(sceneHtml, /Cloudflare Workers AI/);
+test('the keyword page holds no scene box, and the Cloudflare note sits on the scene page only', () => {
+  assert.doesNotMatch(html, /id="scene-|Paste a scene to find props|sent to Cloudflare/);
+  assert.match(sceneHtml, /sent to Cloudflare/);
 });
 
 test('tabs under the tagline link each props page to the other two and name the current one, unlinked', () => {
@@ -184,10 +188,11 @@ test("the scene and sources pages share /props's header but for the tabs, its Ab
 });
 
 test('scene results tell the reader that unlisted props were not identified or have no match', () => {
-  assert.ok(sceneScript.includes('The AI chose from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them.'));
-  assert.ok(sceneScript.includes('were left out of AI matching.'), 'a period filter is disclosed');
+  assert.ok(sceneScript.includes('The matches were picked from the catalog items whose words match your scene. Props not listed above were not identified or have no match among them; try keyword search for them.'));
+  assert.ok(sceneScript.includes('were left out of scene matching.'), 'a period filter is disclosed');
   assert.ok(!sceneScript.includes('differs from your period'), 'the old era note is gone');
-  assert.ok(!pageScript.includes('Matched by AI'), 'the keyword page carries no scene code');
+  assert.ok(sceneScript.includes('Matches can be wrong; check each item in the catalog'), 'the scene script holds the note the next check looks for');
+  assert.ok(!pageScript.includes('Matches can be wrong; check each item in the catalog'), 'the keyword page carries no scene code');
 });
 
 test('a Kind filter sits between Vendor and Decade, and each card names its kind, with no badge, citation or photo line', () => {

@@ -50,8 +50,8 @@ test('current and legacy Shopify exports of the same products give identical ite
   assert.deepEqual(old.counts, parsed.counts);
   assert.deepEqual([...old.images], [...parsed.images]);
   assert.deepEqual(parsed.items.map((item) => item.name), [
-    "Vintage 1960's Rotary Phone", '1950s–70s Desk Fan', 'Metal TV Tray', 'Set of 4 Mod Glasses', 'The Tugboat 1936',
-    "Vintage '63 Corvette Stingray Telephone", 'Space Age Set of 4 Mod Mugs', "Vintage 60's/70's Lamp", '1950s-70s Barware',
+    "Vintage 1960's Rotary Phone", '1950s–70s Desk Fan', 'Metal TV Tray', 'Set of 4 Mod Glasses', 'The Riverboat 1938',
+    "Vintage '57 Bel Air Telephone", 'Space Age Set of 6 Mod Cups', "Vintage 60's/70's Lamp", '1950s-70s Barware',
   ]);
 });
 
@@ -76,6 +76,13 @@ test('continuation rows may repeat product values, but never contradict them or 
   assert.throws(() => parseExport(reappearing, { vendor, catalog }), /"test-rotary-phone" appears again/);
   const handleless = rewrite(current, (header, rows) => { rows[0][1] = ''; return [header, ...rows]; });
   assert.throws(() => parseExport(handleless, { vendor, catalog }), /has no handle/);
+  for (const handle of ['../x', 'lamp/brass', 'lamp?x=1', 'lamp brass']) {
+    const odd = rewrite(current, (header, rows) => {
+      for (const row of rows) if (row[1] === 'test-rotary-phone') row[1] = handle;
+      return [header, ...rows];
+    });
+    assert.throws(() => parseExport(odd, { vendor, catalog }), /handles hold only letters, numbers and dashes/, handle);
+  }
 });
 
 test('exclusions are counted per reason, and the sold-out rule reads variant rows only', () => {
@@ -87,7 +94,7 @@ test('exclusions are counted per reason, and the sold-out rule reads variant row
   assert.ok(!byName.has('Transistor Radio'), 'one tracked variant at 0 with deny, plus two image-only rows, is sold out');
   assert.ok(byName.has('1950s–70s Desk Fan'), 'a blank quantity is unknown, not zero');
   assert.ok(byName.has('Metal TV Tray'), 'continue selling keeps it');
-  assert.ok(byName.has('The Tugboat 1936'), 'untracked stock is never sold out');
+  assert.ok(byName.has('The Riverboat 1938'), 'untracked stock is never sold out');
   assert.ok(byName.has('Set of 4 Mod Glasses'), 'one variant still in stock keeps it');
   const noStock = rewrite(current, (header, rows) => {
     const keep = header.map((name, index) => (['Inventory tracker', 'Inventory quantity', 'Continue selling when out of stock'].includes(name) ? -1 : index)).filter((index) => index >= 0);
@@ -106,13 +113,15 @@ test('items map the vendor fields: Type and Tags as categories, an era from the 
     categories: ['Electronics', 'Phones', 'Mid Century'], era: "1960's", decades: [1960], url: 'https://retroon8th.com/products/test-rotary-phone', listedPrice: '45.00',
   });
   assert.equal(phone.key, 'ro8-tl0ui5');
-  assert.deepEqual(byName.get('Space Age Set of 4 Mod Mugs').categories, []);
+  assert.deepEqual(byName.get('Space Age Set of 6 Mod Cups').categories, []);
   assert.equal(byName.get('Set of 4 Mod Glasses').listedPrice, '12.00');
   assert.deepEqual(parsed.images.get(byName.get('Set of 4 Mod Glasses').key).urls, ['https://cdn.shopify.com/s/files/1/0000/0000/0001/products/glasses-1.jpg']);
   assert.match(parsed.report.join('\n'), /First images not on cdn\.shopify\.com, which the demo will not download: 1/);
   const eras = {
-    "Vintage '63 Corvette Stingray Telephone": null, 'Space Age Set of 4 Mod Mugs': null, 'The Tugboat 1936': '1936', "Vintage 60's/70's Lamp": "60's/70's",
-    '1950s-70s Barware': '1950s-70s', '1950s–70s Desk Fan': '1950s–70s', "'50s Diner Sign": "'50s", 'Panasonic R70 Radio': null, 'Atari 2600 Console': null,
+    "Vintage '57 Bel Air Telephone": null, 'Space Age Set of 6 Mod Cups': null, 'The Riverboat 1938': '1938', "Vintage 60's/70's Lamp": "60's/70's",
+    '1950s-70s Barware': '1950s-70s', '1950s–70s Desk Fan': '1950s–70s', "'50s Diner Sign": "'50s", 'Pocket R70 Radio': null, 'Game Console 2600': null,
+    'Vintage 45s Record Case': null, "Record Carry Case 45's": null, 'Box of 78s': null, 'Set of 12s': null, 'Size 10s Boots': null, 'Lot of 33s': null,
+    '1910s Parlor Chair': '1910s', 'Late 1890s Trunk': '1890s',
   };
   for (const [title, era] of Object.entries(eras)) assert.equal(titleEra(title), era, title);
   assert.deepEqual(byName.get('1950s–70s Desk Fan').decades, [1950, 1960, 1970]);

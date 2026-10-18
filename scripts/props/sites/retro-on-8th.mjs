@@ -21,11 +21,12 @@ const REQUIRED = ['handle', 'title', 'type', 'tags', 'published', 'status', 'pri
 const STOCK = ['stockTracker', 'stockQuantity', 'stockPolicy'];
 const PRODUCT_FIELDS = ['title', 'type', 'tags', 'published', 'status', 'giftCard'];
 const SOLD_MARKERS = new Set(['sold items', 'sold', 'sold-items']);
-const DECADE = String.raw`(?:['’]?\d{2}|\d{4})['’]?s`;
+const DECADE = String.raw`(?:['’]?[2-9]0|1[89]\d0|20[0-2]0)['’]?s`;
 const DECADE_RANGE = new RegExp(String.raw`(?<![\p{L}\p{N}'’])${DECADE}(?:\s*[-–—/]\s*${DECADE})*(?![\p{L}\p{N}])`, 'iu');
 const YEAR = /(?<![\p{L}\p{N}'’.\/-])(?:19\d{2}|20[0-2]\d)(?![\p{L}\p{N}'’\/-])/u;
 export const EXCLUSIONS = ['not active', 'not published', 'marked sold', 'sold out', 'gift card'];
 export const IMAGE_HOST = 'cdn.shopify.com';
+const HANDLE = /^[A-Za-z0-9][A-Za-z0-9-]*$/;
 
 export function titleEra(title) {
   return title.match(DECADE_RANGE)?.[0] ?? title.match(YEAR)?.[0] ?? null;
@@ -56,6 +57,7 @@ function groupRows(rows, index) {
   for (const [offset, row] of rows.entries()) {
     const handle = (row[index.handle] ?? '').trim();
     if (!handle) throw new Error(`Export row ${offset + 2} has no handle.`);
+    if (!HANDLE.test(handle)) throw new Error(`Export row ${offset + 2} has the handle "${handle}"; Shopify handles hold only letters, numbers and dashes.`);
     const current = groups.at(-1);
     if (current?.handle === handle) {
       current.rows.push(row);

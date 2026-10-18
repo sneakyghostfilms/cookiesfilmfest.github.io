@@ -18,7 +18,7 @@ const byName = new Map(parsed.items.map((item) => [item.name, item]));
 
 test('site keys are short, stable hashes of a stable input', () => {
   assert.equal(siteKey('dz', 'chairs|yellow chair'), 'dz-1nfqu2');
-  assert.equal(siteKey('ro8', 'olivetti-studio-45-typewriter'), 'ro8-kp0xnl');
+  assert.equal(siteKey('ro8', 'test-typewriter'), 'ro8-23kj0f');
   assert.match(siteKey('dz', ''), /^dz-[0-9a-z]{6}$/);
   assert.ok(Math.max(...parsed.items.map((item) => item.key.length)) <= 16, 'keys fit the Worker output cap');
 });

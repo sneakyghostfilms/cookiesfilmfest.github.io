@@ -7,10 +7,12 @@ import test from 'node:test';
 
 // The props pages' browser scripts must reach no Node module and no build-side code. The built bundle alone can't
 // show it: a stray import of a build-side module makes the build pull in its Node imports, yet tree-shaking can drop
-// every trace of them from the bundle. So this walks the import graph from each props page's <script> instead.
+// every trace of them from the bundle. So this walks the import graph from the <script> tags of each props page and of
+// every .astro component it uses, such as the shared layout, since a component's script ships with the page.
 const root = fileURLToPath(new URL('../', import.meta.url));
 const NODE_MODULES = new Set([...builtinModules, ...builtinModules.map((name) => `node:${name}`)]);
 const BUILD_SIDE = /^(scripts\/props\/|src\/scripts\/props-cards(-file)?\.js$)/;
+const SCRIPT = /<script\b(?![^>]*\bis:inline\b)[^>]*>([\s\S]*?)<\/script>/g;
 const PAGES = ['src/pages/props.astro', ...readdirSync(path.join(root, 'src/pages/props'))
   .filter((file) => file.endsWith('.astro')).map((file) => `src/pages/props/${file}`)];
 
@@ -20,20 +22,38 @@ function specifiers(source) {
   return [...source.matchAll(pattern)].map((match) => match[1] ?? match[2] ?? match[3]);
 }
 
+const resolve = (from, specifier) => path.posix.normalize(path.posix.join(path.posix.dirname(from), specifier));
+
+// A page and every .astro component its frontmatter imports, at any depth, each with the file that imports it.
+function astroFiles(page) {
+  const parent = new Map([[page, null]]);
+  for (const file of parent.keys()) {
+    const frontmatter = readFileSync(path.join(root, file), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+    for (const specifier of specifiers(frontmatter)) {
+      const component = resolve(file, specifier);
+      if (specifier.endsWith('.astro') && !parent.has(component)) parent.set(component, file);
+    }
+  }
+  return parent;
+}
+
 function chain(importer, file) {
   const files = [file];
   while (importer.has(files[0])) files.unshift(importer.get(files[0]));
   return files.join(' → ');
 }
 
-// Every file a page's bundled <script> tags reach through relative imports (each with the file that first imported
-// it), and every import of a Node module or build-side file on the way.
+// Every file the bundled <script> tags of a page and its components reach through relative imports (each with the
+// file that first imported it), and every import of a Node module or build-side file on the way.
 function walk(page) {
-  const markup = readFileSync(path.join(root, page), 'utf8');
-  const scripts = [...markup.matchAll(/<script\b(?![^>]*\bis:inline\b)[^>]*>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
   const importer = new Map();
   const problems = [];
-  const queue = [[page, scripts.join('\n')]];
+  const queue = [];
+  for (const [file, parent] of astroFiles(page)) {
+    if (parent) importer.set(file, parent);
+    const scripts = [...readFileSync(path.join(root, file), 'utf8').matchAll(SCRIPT)].map((match) => match[1]);
+    if (scripts.length) queue.push([file, scripts.join('\n')]);
+  }
   while (queue.length) {
     const [file, source] = queue.shift();
     for (const specifier of specifiers(source)) {
@@ -42,7 +62,7 @@ function walk(page) {
         continue;
       }
       if (!specifier.startsWith('.')) continue;
-      const target = path.posix.normalize(path.posix.join(path.posix.dirname(file), specifier));
+      const target = resolve(file, specifier);
       if (BUILD_SIDE.test(target)) {
         problems.push(`${chain(importer, file)} imports ${target}`);
         continue;
@@ -72,6 +92,7 @@ test('import specifiers are found in every form the client code could use', () =
 
 test("the walk starts at each props page's script and follows imports to the bottom", () => {
   assert.deepEqual(PAGES, ['src/pages/props.astro', 'src/pages/props/scene.astro']);
+  for (const page of PAGES) assert.deepEqual([...astroFiles(page).keys()], [page, 'src/layouts/props-layout.astro'], page);
   const keyword = walk('src/pages/props.astro').importer;
   assert.equal(chain(keyword, 'src/scripts/props-card-text.js'), 'src/pages/props.astro → src/scripts/props-page.ts → src/scripts/props-card-text.js');
   assert.ok(keyword.has('src/scripts/props-card-view.ts') && keyword.has('src/scripts/props-search.js') && keyword.has('src/scripts/props-search-link.js'));

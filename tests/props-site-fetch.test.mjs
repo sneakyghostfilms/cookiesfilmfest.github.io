@@ -233,6 +233,19 @@ test('robots rules: our named group beats *, groups for the same agent merge, an
   }
 });
 
+test('lines before the first User-agent apply to every agent, and can only make us more careful', () => {
+  const bespoke = '\tCrawl-delay: 10\n# START YOAST BLOCK\n# ---------------------------\nUser-agent: *\nDisallow:\n\nSitemap: https://shop.example/sitemap_index.xml\n# ---------------------------\n# END YOAST BLOCK\n';
+  assert.deepEqual(robotsRules(bespoke), { group: '*', disallow: [], crawlDelaySeconds: 10, unsupported: [] }, "Bespoke's tab-indented Crawl-delay above Yoast's * group");
+  assert.equal(robotsRules('Crawl-delay: 10\nUser-agent: *\nCrawl-delay: 2\n').crawlDelaySeconds, 10, 'the longer delay wins');
+  const ours = robotsRules('Crawl-delay: 10\nDisallow: /private/\nUser-agent: *\nDisallow: /\n\nUser-agent: PittsburghPropSearch\nDisallow: /tmp/\n');
+  assert.deepEqual(ours, { group: 'PittsburghPropSearch', disallow: ['/private/', '/tmp/'], crawlDelaySeconds: 10, unsupported: [] }, 'they apply beside a group named for us');
+  assert.equal(robotsAllow(robotsRules('Disallow: /private/\nUser-agent: *\nDisallow:\n'), '/private/a'), false, 'a pre-group Disallow refuses');
+  assert.deepEqual(robotsRules('Crawl-delay: 4\nDisallow: /x/\n'), { group: null, disallow: ['/x/'], crawlDelaySeconds: 4, unsupported: [] }, 'with no group at all');
+  assert.deepEqual(robotsRules('Crawl-delay: soon\nUser-agent: *\nDisallow:\n').unsupported, ['Crawl-delay: soon'], 'one we cannot read stops the run');
+  assert.equal(robotsAllow(robotsRules('Allow: /x/\nUser-agent: *\nDisallow: /x/\n'), '/x/a'), false, 'a pre-group Allow is ignored, like every Allow');
+  assert.deepEqual(robotsRules('User-agent: other\nDisallow: /\n'), { group: null, disallow: [], crawlDelaySeconds: null, unsupported: [] }, "another agent's group is still not ours");
+});
+
 test('photo downloads stop before any request when robots.txt disallows a photo path or has a rule we cannot apply', () => {
   const photos = ['https://cdn.example/a/opt/one-640w.jpg', 'https://cdn.example/b/two-640w.jpg'];
   assert.equal(robotsStopReason(robotsRules(''), photos, 'cdn.example'), null);

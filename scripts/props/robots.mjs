@@ -9,8 +9,12 @@ function linesOf(text) {
   });
 }
 
+// Lines before the first User-agent belong to no group. RFC 9309 ignores them, but a site can put its Crawl-delay there
+// (Bespoke's sits above Yoast's block, indented with a tab), so they apply to every agent. Only Disallow and Crawl-delay
+// are ever read, so they can only make us more careful.
 function groupsOf(text) {
   const groups = [];
+  const preamble = [];
   let current = null;
   for (const { key, value } of linesOf(text)) {
     if (key === 'user-agent') {
@@ -18,9 +22,11 @@ function groupsOf(text) {
       current.agents.push(value.split('/')[0].trim().toLowerCase());
     } else if (current) {
       current.rules.push({ key, value });
+    } else {
+      preamble.push({ key, value });
     }
   }
-  return groups;
+  return { groups, preamble };
 }
 
 // RFC 9309 §2.2.3: '*' matches any run of characters and a final '$' anchors the end; rules are matched from the start
@@ -35,11 +41,11 @@ function patternOf(rule) {
 }
 
 export function robotsRules(text, agent = PRODUCT_TOKEN) {
-  const groups = groupsOf(text);
+  const { groups, preamble } = groupsOf(text);
   const named = groups.filter((group) => group.agents.includes(agent.toLowerCase()));
   const chosen = named.length ? named : groups.filter((group) => group.agents.includes('*'));
   const rules = { group: named.length ? agent : chosen.length ? '*' : null, disallow: [], crawlDelaySeconds: null, unsupported: [] };
-  for (const { key, value } of chosen.flatMap((group) => group.rules)) {
+  for (const { key, value } of [...preamble, ...chosen.flatMap((group) => group.rules)]) {
     if (key === 'disallow') {
       if (!value) continue;
       if (!patternOf(value)) rules.unsupported.push(`Disallow: ${value}`);

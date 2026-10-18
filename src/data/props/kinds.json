@@ -2,6 +2,32 @@
   "vendors": {
     "steel-city-props": { "kind": "film-prop", "source": "sourceType prop-house" },
     "dezzign-central": { "kind": "film-prop", "source": "sourceType prop-house" },
+    "bespoke-event-rentals": {
+      "kind": "event-rental",
+      "source": "sourceType event-rental: an event and party rental catalog (tents, staging, linens, banquet tables and chairs, food service, sanitation) that also rents furniture and decor",
+      "categories": {
+        "Artificial Trees": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Benches": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Chairs": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Coffee & End Tables": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Furniture Tables": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Modern Tables": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Ottomans": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Outdoor Collection": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "SoHo Collection": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Sofa & Loveseats": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Specialty Chairs": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Throw Pillows": { "kind": "set-dressing", "source": "PR #18: rental furniture, set dressing by the lead's ruling" },
+        "Bar Back Collection": { "kind": "set-dressing", "source": "PR #18: bar backs and shelving displays, set dressing by the lead's ruling" },
+        "Heritage Bar Collection": { "kind": "set-dressing", "source": "PR #18: bars, set dressing by the lead's ruling" },
+        "Specialty Bar Collection": { "kind": "set-dressing", "source": "PR #18: bars, set dressing by the lead's ruling" },
+        "Podiums": { "kind": "set-dressing", "source": "PR #18: podiums, set dressing by the lead's ruling" },
+        "Coat Racks & Accessories": { "kind": "set-dressing", "source": "PR #18: coat stands and racks, set dressing by majority (the lead's ruling); its coat-check tickets are an event supply" },
+        "Easels": { "kind": "event-rental", "source": "PR #18: trade-show sign easels, event equipment by the lead's ruling" },
+        "Hedges & Screens": { "kind": "set-dressing", "source": "PR #18: folding screens, a divider and a hedge wall, set dressing by the lead's ruling" },
+        "Stanchions": { "kind": "set-dressing", "source": "PR #18: rope stanchions and posts, set dressing by majority (the lead's ruling); its belt stanchions and sign frames are event equipment" }
+      }
+    },
     "cleveland-prop-shop": { "kind": "film-prop", "source": "sourceType prop-house" },
     "clicksburgh-retro-rentals": {
       "kind": "event-rental",

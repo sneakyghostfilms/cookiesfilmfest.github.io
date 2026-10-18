@@ -12,6 +12,7 @@ import { robotsAllow, robotsRules, robotsTarget } from './robots.mjs';
 import { FetchStopped, createSiteFetcher } from './site-fetch.mjs';
 import { checkSiteItems } from './site-items.mjs';
 import { LISTING_PAGE_LIMIT, nextListingPage, parseListing } from './sites/construction-junction.mjs';
+import { nextSubcategoryPage, parseCatalog, subcategoryPages } from './sites/bespoke-event-rentals.mjs';
 import { galleryPages, parseGalleries } from './sites/cleveland-prop-shop.mjs';
 import { parseCollection } from './sites/clicksburgh-retro-rentals.mjs';
 import { parseStore, storeListPage, storePageCount } from './sites/creative-reuse.mjs';
@@ -23,7 +24,7 @@ const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
 const ITEM_EXCLUSIONS_FILE = join(ROOT, 'scripts/props/item-exclusions.json');
 export const ITEM_EXCLUSION_REASONS = new Set(["name or photo carries a private individual's name"]);
-const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store', 'woocommerce-listing', 'weebly-gallery', 'wix-repeater']);
+const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store', 'woocommerce-listing', 'weebly-gallery', 'wix-repeater', 'tapgoods-catalog']);
 const WORDPRESS_PAGE_SIZE = 10;
 
 const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
@@ -107,6 +108,28 @@ const SOURCES = {
     const site = await robotsCheckedFetcher(fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.sourceUrl).hostname] }), catalog.sourceUrl, directory);
     const { body, meta } = await site.get(catalog.sourceUrl, directory);
     return { ...parseCollection(body.toString('utf8'), { vendor, catalog }), capturedAt: localDate(meta.fetchedAt) };
+  },
+  async 'tapgoods-catalog'({ vendor, catalog, fetcher, cacheRoot }) {
+    const directory = join(cacheRoot, vendor.id, catalog.id);
+    const site = await robotsCheckedFetcher(fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.siteUrl).hostname] }), catalog.siteUrl, directory);
+    // Every collection page is read, and its list checked against its tiles, before any subcategory page is requested.
+    const collections = [];
+    for (const collection of catalog.collections) {
+      const html = (await site.get(collection.url, directory)).body.toString('utf8');
+      collections.push({ ...collection, html, listed: subcategoryPages(html, collection).listed });
+    }
+    const pages = [];
+    for (const subcategory of collections.flatMap((collection) => collection.listed)) {
+      for (let url = subcategory.url, number = 1; url; number += 1) {
+        const { body, meta } = await site.get(url, directory);
+        const html = body.toString('utf8');
+        pages.push({ url, html, fetchedAt: meta.fetchedAt, subcategory: subcategory.url, number });
+        url = nextSubcategoryPage(html, subcategory.url, number);
+      }
+    }
+    // The capture date is the earliest page's, since a snapshot can mix pages seeded earlier with fresh ones.
+    const capturedAt = localDate(Math.min(...pages.map((page) => Date.parse(page.fetchedAt))));
+    return { ...parseCatalog({ collections, pages }, { vendor, catalog }), capturedAt };
   },
   async 'shopify-export'({ catalog, vendor, exportPath }) {
     if (!exportPath) throw new Error(`${vendor.name} is imported from the vendor's Shopify product export: pass --export "<file.csv>".`);

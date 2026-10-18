@@ -1,8 +1,19 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
+import { cardsText } from '../src/scripts/props-cards-file.js';
 import {
-  NOT_AFFILIATED, cardFor, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, specialtiesLine, telHref, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources,
+  NOT_AFFILIATED, cardFor, cardsFile, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, specialtiesLine, telHref, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources,
 } from '../src/scripts/props-cards.js';
+
+const readJson = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
+const inventory = await readJson('../src/data/props/inventory.json');
+const { vendors } = await readJson('../src/data/props/vendors.json');
+const { tags } = await readJson('../src/data/props/tags.json');
+const catalogsById = new Map(vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { catalog, vendor }])));
+// The card fields the page draws; alt matters only beside a thumbnail.
+const drawn = ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, tags: cardTags, link, inquire, cite, thumb, alt, photoCredit }) => ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, tags: cardTags, link, inquire, cite, thumb, alt: thumb ? alt : null, photoCredit });
 
 const pdfVendor = { id: 'steel-city-props', name: 'Steel City Props', contact: { formUrl: 'https://forms.example/form', email: 'shop@example.com', phone: null, pageUrl: null } };
 const pdfCatalog = { id: 'scp-2026-09-30', type: 'pdf', sourceUrl: 'https://drive.example/catalog' };
@@ -46,6 +57,58 @@ test('a website card has no item number or page and links to the vendor page', (
   const demo = cardFor(siteItem, { vendor: siteVendor, catalog: siteCatalog, demoEntry: { catalog: siteCatalog.id, thumb: { width: 320, height: 240 }, image: 'https://vendor.example/a.jpg' } });
   assert.equal(demo.link.href, 'https://vendor.example/props/refrigerators/', 'a website item never links to a local PDF');
   assert.equal(demo.photoCredit, 'Photo: Dezzign Central website');
+});
+
+test('every card the page draws from cards.json equals the card cardFor gives for the same item', () => {
+  const file = JSON.parse(cardsFile({ items: inventory.items, vendors, tags }));
+  assert.equal(file.items.length, inventory.items.length);
+  const byKey = new Map(inventory.items.map((item, order) => [item.key, { item, order }]));
+  for (const entry of file.items) {
+    const { item, order } = byKey.get(entry.key);
+    const { catalog, vendor } = catalogsById.get(item.catalog);
+    const card = cardText(entry, file);
+    assert.deepEqual(drawn(card), drawn(cardFor(item, { vendor, catalog, tags: tags[item.key] ?? [] })), entry.key);
+    assert.equal(card.order, order, entry.key);
+  }
+  const spec = cardText(file.items.find((entry) => entry.key === 'scp-056'), file);
+  assert.equal(`${spec.vendorName} · ${spec.ids} · ${spec.name} · ${spec.era} · ${spec.pages}`, 'Steel City Props · #056 · GREEN CHANGE MACHINE · 1960s · page 5');
+  assert.deepEqual(searchDocFromCard(spec), { key: 'scp-056', name: 'GREEN CHANGE MACHINE', description: 'GREEN CHANGE MACHINE 1960s', categories: ['THE OFFICE'], vendor: 'steel-city-props', tags: spec.tags, decades: [1960], order: spec.order });
+});
+
+test('cards.json is the same text for the same inputs, and only the local demo puts thumbnails and local PDF links in it', () => {
+  const items = [pdfItem, siteItem];
+  const fileVendors = [{ ...pdfVendor, catalogs: [pdfCatalog] }, { ...siteVendor, catalogs: [siteCatalog] }];
+  const demo = { items: {
+    'scp-056': { catalog: pdfCatalog.id, page: 5, box: { left: 14, top: 841, right: 154, bottom: 700 }, thumb: { width: 320, height: 300 } },
+    'dz-1nfqu2': { catalog: siteCatalog.id, thumb: { width: 320, height: 240 }, image: 'https://vendor.example/a.jpg' },
+  } };
+  const plain = cardsFile({ items, vendors: fileVendors });
+  assert.equal(cardsFile({ items, vendors: fileVendors }), plain);
+  assert.doesNotMatch(plain, /thumb|props-demo|local PDF/);
+  const local = JSON.parse(cardsFile({ items, vendors: fileVendors, demo }));
+  for (const item of items) {
+    const { catalog, vendor } = { [pdfItem.key]: { catalog: pdfCatalog, vendor: pdfVendor }, [siteItem.key]: { catalog: siteCatalog, vendor: siteVendor } }[item.key];
+    const expected = cardFor(item, { vendor, catalog, demoEntry: demo.items[item.key] });
+    assert.deepEqual(drawn(cardText(local.items.find((entry) => entry.key === item.key), local)), drawn(expected), item.key);
+  }
+  assert.equal(cardText(local.items.find((entry) => entry.key === 'scp-056'), local).link.label, 'Open catalog (local PDF)');
+  assert.equal(cardText(local.items.find((entry) => entry.key === 'dz-1nfqu2'), local).thumb.src, '/props-demo/thumbs/dz-1nfqu2.webp');
+});
+
+test('the page and the endpoint make cards.json in one call, which reads the demo manifest only for the local demo', async () => {
+  let reads = 0;
+  const manifest = () => {
+    reads += 1;
+    return { items: { 'scp-056': { catalog: 'scp-2026-09-30', page: 5, box: { left: 14, top: 841, right: 154, bottom: 700 }, thumb: { width: 320, height: 300 } } } };
+  };
+  assert.doesNotMatch(cardsText({}, manifest), /thumb/);
+  assert.doesNotMatch(cardsText({ PROPS_DEMO: 'true' }, manifest), /thumb/);
+  assert.equal(reads, 0, 'the manifest is not even read outside the demo');
+  assert.match(cardsText({ PROPS_DEMO: '1' }, manifest), /"key":"scp-056"[^}]*"link":\{"href":"\/props-demo\/catalogs\/scp-2026-09-30\.pdf#page=5/);
+  for (const file of ['../src/pages/props.astro', '../src/pages/props/cards.json.js']) {
+    const source = await readFile(new URL(file, import.meta.url), 'utf8');
+    assert.match(source, /cardsText\(process\.env\)/, `${file} makes cards.json through cardsText(process.env)`);
+  }
 });
 
 test('a listed price is stored but never shown', () => {

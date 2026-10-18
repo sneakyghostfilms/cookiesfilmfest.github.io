@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { SCENE_TIMEOUT_MS, checkSceneText, keepKnownKeys, periodNote, requestScene } from '../src/scripts/props-scene.js';
+import { SCENE_TIMEOUT_MS, cardsForScene, checkSceneText, keepKnownKeys, periodNote, requestScene, trackCards } from '../src/scripts/props-scene.js';
 import { parseDecades } from '../src/scripts/props-search.js';
 import { GUARD_TIMEOUT_MS } from '../worker/src/budget.js';
 
@@ -103,6 +103,22 @@ test('the page shows only items it knows, and counts the rest as ignored', () =>
   assert.deepEqual(kept.required, [{ prop: 'phone', reason: 'r', keys: ['scp-056'] }]);
   assert.deepEqual(kept.optional, [{ prop: 'lamp', reason: 'r', keys: [] }]);
   assert.equal(kept.ignored, 2);
+});
+
+test('scene results wait for the card data: at once when it has loaded, with a waiting line while it loads, and a failure when it failed', async () => {
+  const waits = [];
+  const loaded = trackCards(Promise.resolve(['card']));
+  await loaded.promise;
+  assert.deepEqual(await cardsForScene(loaded, () => waits.push('loaded')), { ok: true, cards: ['card'] });
+  let finish;
+  const loading = trackCards(new Promise((resolve) => { finish = resolve; }));
+  const pending = cardsForScene(loading, () => waits.push('loading'));
+  finish(['late card']);
+  assert.deepEqual(await pending, { ok: true, cards: ['late card'] });
+  const failed = trackCards(Promise.reject(new Error('HTTP 404')));
+  failed.promise.catch(() => {});
+  assert.deepEqual(await cardsForScene(failed, () => waits.push('failed')), { ok: false });
+  assert.deepEqual(waits, ['loading', 'failed'], 'the waiting line shows only while the data is not in yet');
 });
 
 test('the page waits longer than the Worker can take to answer', async () => {

@@ -4,6 +4,8 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { createHash } from 'node:crypto';
+import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
 import { compareByName, tokenize } from '../src/scripts/props-search.js';
 
@@ -13,6 +15,14 @@ const read = async (relative) => readFile(path.join(root, relative), 'utf8');
 const vendors = JSON.parse(await read('src/data/props/vendors.json'));
 const inventory = JSON.parse(await read('src/data/props/inventory.json'));
 const html = await read('dist/props/index.html');
+const cardsJson = await read('dist/props/cards.json');
+const cardsData = JSON.parse(cardsJson);
+const cards = cardsData.items.map((entry) => cardText(entry, cardsData));
+const pageScript = await (async () => {
+  const scripts = (await readdir(path.join(dist, '_astro'))).filter((file) => file.endsWith('.js'));
+  const sources = await Promise.all(scripts.map((file) => readFile(path.join(dist, '_astro', file), 'utf8')));
+  return sources.find((source) => source.includes('Matched by AI'));
+})();
 const vendor = vendors.vendors[0];
 const catalog = vendor.catalogs[0];
 
@@ -36,21 +46,35 @@ async function filesUnder(directory) {
   return nested.flat();
 }
 
-test('/props renders one card per inventory item, alphabetically by name', () => {
-  assert.equal((html.match(/<li class="prop-card"/g) ?? []).length, inventory.items.length);
-  const names = [...html.matchAll(/<span class="prop-name">([^<]*)<\/span>/g)].map(([, name]) => decode(name));
-  assert.deepEqual(names, names.map((name) => ({ name, key: '' })).sort(compareByName).map((entry) => entry.name));
+test('/props holds no card: cards.json holds one entry per inventory item, alphabetically by name, for the page to draw', () => {
+  assert.doesNotMatch(html, /prop-card/);
+  assert.match(html, /<ol id="props-results" class="props-results" data-cards-url="\/props\/cards\.json\?v=[0-9a-f]{8}"><\/ol>/);
+  assert.equal(cards.length, inventory.items.length);
+  assert.deepEqual(new Set(cards.map((card) => card.key)), new Set(inventory.items.map((item) => item.key)));
+  assert.deepEqual(cards.map((card) => card.key), [...cards].sort(compareByName).map((card) => card.key));
+  assert.ok(text.includes('Search needs JavaScript, and so does the item list. The prop sources below, with their contact details, are listed without it.'));
+});
+
+test("cards.json's ?v= is the first 8 hex of its sha256, and the file holds nothing that changes from build to build", () => {
+  const version = html.match(/data-cards-url="\/props\/cards\.json\?v=([0-9a-f]{8})"/)[1];
+  assert.equal(version, createHash('sha256').update(cardsJson).digest('hex').slice(0, 8));
+  assert.doesNotMatch(cardsJson, /\d{4}-\d{2}-\d{2}T\d{2}:/, 'no timestamp');
 });
 
 test('cards follow the spec format and carry the source link and inquiry route', () => {
-  assert.ok(text.includes('Steel City Props · #056 · GREEN CHANGE MACHINE · 1960s · page 5'), 'spec example line');
-  assert.ok(text.includes('When you inquire, cite #056 · GREEN CHANGE MACHINE · page 5'));
-  assert.ok(html.includes(`href="${catalog.sourceUrl}"`));
-  assert.ok(text.includes('Open catalog on Google Drive'));
-  assert.ok(!text.includes('go to page'), 'no deep-link wording: Drive ignores #page');
-  assert.ok(html.includes(`href="${vendor.contact.formUrl}"`));
-  assert.ok(html.includes(`href="mailto:${vendor.contact.email}"`));
-  assert.ok(text.includes('AI-suggested search terms:'));
+  const spec = cards.find((card) => card.key === 'scp-056');
+  assert.deepEqual([spec.vendorName, spec.ids, spec.name, spec.era, spec.pages], ['Steel City Props', '#056', 'GREEN CHANGE MACHINE', '1960s', 'page 5'], 'spec example line');
+  assert.equal(spec.cite, 'When you inquire, cite #056 · GREEN CHANGE MACHINE · page 5');
+  assert.deepEqual(spec.link, { href: catalog.sourceUrl, label: 'Open catalog on Google Drive' });
+  assert.equal(spec.inquire, vendor.contact.formUrl);
+  assert.ok(html.includes(`href="mailto:${vendor.contact.email}"`), "the vendor box keeps the vendor's e-mail");
+  assert.ok(!cardsJson.includes('go to page'), 'no deep-link wording: Drive ignores #page');
+  assert.ok(pageScript.includes('AI-suggested search terms: '), 'the page script draws the tags line');
+});
+
+test("the page script runs in the browser only: no Node module or file call is bundled into it", () => {
+  assert.ok(pageScript, 'the /props script is built');
+  assert.doesNotMatch(pageScript, /node:|readFileSync|existsSync/);
 });
 
 test('/props states what it is not and how vendors can opt out', () => {
@@ -69,6 +93,8 @@ test('/props carries the festival byline and requests no fonts of its own', () =
 
 test('no vendor photos or catalog PDFs are published', async () => {
   assert.ok(!/<img\b/i.test(html));
+  for (const card of cards) assert.deepEqual([card.thumb, card.alt, card.photoCredit], [null, null, null], card.key);
+  assert.doesNotMatch(cardsJson, /props-demo|"thumb"|"alt"|listedPrice|\$\s*\d/, 'no demo field, demo path or price in the production data');
   assert.deepEqual((await filesUnder(dist)).filter((file) => file.toLowerCase().endsWith('.pdf')), []);
 });
 
@@ -112,8 +138,9 @@ test('scene results tell the reader that unlisted props were not identified or h
 });
 
 test('every card names its vendor, and the vendor filter appears only with more than one vendor', () => {
-  const cardVendors = [...html.matchAll(/<li class="prop-card" data-key="[^"]+" data-vendor="([^"]+)"/g)].map(([, id]) => id);
-  assert.equal(cardVendors.length, inventory.items.length);
+  const vendorOf = new Map(inventory.items.map((item) => [item.key, item.vendor]));
+  for (const card of cards) assert.equal(card.vendorId, vendorOf.get(card.key), card.key);
+  for (const card of cards) assert.equal(card.vendorName, vendors.vendors.find((entry) => entry.id === card.vendorId).name, card.key);
   const withItems = vendors.vendors.filter((entry) => inventory.items.some((item) => item.vendor === entry.id));
   assert.equal(/<select id="props-vendor">/.test(html), withItems.length > 1);
 });
@@ -175,26 +202,18 @@ test('Route 30 Retro shows only its Facebook Page facts, cited as read, with no 
   assert.deepEqual([...box.matchAll(/<span class="props-badge">([^<]*)<\/span>/g)].map(([, label]) => label), ['Sales']);
 });
 
-test('the page builds its search documents from the cards the same way the Worker builds them from the inventory', async () => {
+test('the page builds its search documents from cards.json the same way the Worker builds them from the inventory', async () => {
   const { searchDocs } = await import('../worker/src/inventory.js');
   const tagsFile = JSON.parse(await read('src/data/props/tags.json'));
-  const fromPage = new Map([...html.matchAll(/<li class="prop-card"[\s\S]*?<\/li>/g)].map(([card]) => {
-    const pick = (pattern) => decode(card.match(pattern)?.[1] ?? '');
-    const name = pick(/<span class="prop-name">([^<]*)<\/span>/);
-    const era = pick(/<span class="prop-era">([^<]*)<\/span>/);
-    const categories = pick(/data-categories="([^"]*)"/);
-    return [pick(/data-key="([^"]*)"/), {
-      name: tokenize(name),
-      description: tokenize(`${name} ${era}`),
-      categories: categories ? categories.split('|') : [],
-      tags: pick(/<span class="prop-tag-list">([^<]*)<\/span>/) ? pick(/<span class="prop-tag-list">([^<]*)<\/span>/).split(', ') : [],
-      decades: pick(/data-decades="([^"]*)"/) ? pick(/data-decades="([^"]*)"/).split(' ').map(Number) : [],
-      vendor: pick(/data-vendor="([^"]*)"/),
-    }];
+  const fromPage = new Map(cards.map((card) => {
+    const doc = searchDocFromCard(card);
+    return [doc.key, { name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, order: doc.order }];
   }));
-  for (const doc of searchDocs(inventory.items, tagsFile.tags)) {
+  const workerDocs = searchDocs(inventory.items, tagsFile.tags);
+  assert.equal(fromPage.size, workerDocs.length);
+  for (const doc of workerDocs) {
     assert.deepEqual(fromPage.get(doc.key), {
-      name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor,
+      name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, order: doc.order,
     }, doc.key);
   }
 });

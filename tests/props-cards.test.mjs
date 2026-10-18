@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { affiliation, cardFor, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, vendorFacts, vendorSources } from '../src/scripts/props-cards.js';
+import {
+  NOT_AFFILIATED, cardFor, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, specialtiesLine, telHref, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources,
+} from '../src/scripts/props-cards.js';
 
 const pdfVendor = { id: 'steel-city-props', name: 'Steel City Props', contact: { formUrl: 'https://forms.example/form', email: 'shop@example.com', phone: null, pageUrl: null } };
 const pdfCatalog = { id: 'scp-2026-09-30', type: 'pdf', sourceUrl: 'https://drive.example/catalog' };
@@ -51,10 +53,31 @@ test('a listed price is stored but never shown', () => {
   assert.doesNotMatch(JSON.stringify(card), /145/);
 });
 
-test('the affiliation line names every vendor', () => {
-  assert.equal(affiliation([pdfVendor]), 'Not affiliated with Steel City Props.');
-  assert.equal(affiliation([pdfVendor, siteVendor]), 'Not affiliated with Steel City Props or Dezzign Central.');
-  assert.equal(affiliation([pdfVendor, siteVendor, { name: 'Retro on 8th' }]), 'Not affiliated with Steel City Props, Dezzign Central, or Retro on 8th.');
+test('the affiliation line covers every vendor listed, however many there are', () => {
+  assert.equal(NOT_AFFILIATED, 'Not affiliated with any vendor listed here.');
+});
+
+test('badges show the source type and modes, and a regional badge outside Pennsylvania', () => {
+  assert.deepEqual(vendorBadges(siteVendor), [{ text: 'Prop house' }, { text: 'By inquiry' }]);
+  const cleveland = { ...siteVendor, modes: { values: ['rent', 'sale'] }, address: { city: 'Cleveland', state: 'OH' } };
+  assert.deepEqual(vendorBadges(cleveland), [{ text: 'Prop house' }, { text: 'Rentals' }, { text: 'Sales' }, { text: 'Regional: Cleveland, OH', regional: true }]);
+  for (const state of ['PA', 'pa', 'Pennsylvania', ' PA ']) {
+    assert.ok(!vendorBadges({ ...siteVendor, address: { city: 'Pittsburgh', state } }).some((badge) => badge.regional), state);
+  }
+  assert.deepEqual(vendorBadges({ ...siteVendor, sourceType: null, modes: null, address: null }), [], 'nothing is filled in by inference');
+});
+
+test('a phone published with an extension dials the main number', () => {
+  for (const phone of ['(216) 862-5445 x4', '(216) 862-5445 ext. 4', '216-862-5445 x 6']) assert.equal(telHref(phone), 'tel:+12168625445', phone);
+});
+
+test('notices and specialties are quoted as the vendor wrote them', () => {
+  const vendor = { ...siteVendor, notice: { text: 'We have moved!', source: 'https://vendor.example/' }, specialties: { values: ['Typewriters', 'Period and Modern Props'], source: 'https://vendor.example/' } };
+  assert.equal(specialtiesLine(vendor), 'In their words: “Typewriters”, “Period and Modern Props”');
+  assert.deepEqual(vendorFacts(vendor).slice(0, 2), ['Notice on their site: “We have moved!”', 'In their words: “Typewriters”, “Period and Modern Props”']);
+  assert.equal(specialtiesLine(siteVendor), null);
+  assert.deepEqual(vendorSearchDoc(vendor, 3), { key: 'dezzign-central', name: 'Dezzign Central', description: 'Typewriters Period and Modern Props', categories: [], tags: [], decades: [], order: 3 });
+  assert.equal(vendorSearchDoc(siteVendor, 0).description, '', 'the source-type label is never search text');
 });
 
 test('contact routes and facts come only from what the vendor publishes', () => {
@@ -65,7 +88,6 @@ test('contact routes and facts come only from what the vendor publishes', () => 
   ]);
   assert.equal(inquiryHref({ formUrl: null, pageUrl: null, email: 'a@example.com' }), 'mailto:a@example.com');
   assert.deepEqual(vendorFacts(siteVendor), [
-    'Prop house. Offers: by inquiry',
     'Address (prop warehouse): 1 test street, pittsburgh, pa 15201',
     'Mailing address: p.o. box 1, pittsburgh, pa 15235',
     'Hours: please call or email us to schedule an appointment',

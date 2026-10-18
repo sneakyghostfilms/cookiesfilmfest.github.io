@@ -1,4 +1,4 @@
-import { buildIndex, search } from "./props-search.js";
+import { buildIndex, rankText, search } from "./props-search.js";
 import { checkSceneText, keepKnownKeys, periodNote, requestScene } from "./props-scene.js";
 
 const PAGE_SIZE = 24;
@@ -28,6 +28,18 @@ const docs = [...list.querySelectorAll<HTMLElement>(".prop-card")].map((card) =>
   };
 });
 const index = buildIndex(docs);
+const vendorMatches = document.getElementById("props-vendor-matches");
+const vendorDocs = [...(vendorMatches?.querySelectorAll<HTMLElement>(".vendor-match") ?? [])].map((card, order) => ({
+  card,
+  key: card.dataset.vendor!,
+  name: card.dataset.name ?? "",
+  description: card.dataset.specialties ?? "",
+  categories: [],
+  tags: [],
+  decades: [],
+  order,
+}));
+const vendorIndex = buildIndex(vendorDocs);
 let results = docs;
 let shown = PAGE_SIZE;
 
@@ -48,7 +60,17 @@ function render() {
     : `${docs.length} items, listed alphabetically${results.length > shown ? `, showing ${shown}` : ""}`;
 }
 
+function showVendorMatches() {
+  if (!vendorMatches) return;
+  const found = rankText(vendorIndex, query.value);
+  const shownCards = new Set(found.map((doc) => doc.card));
+  vendorMatches.querySelector("ul")!.replaceChildren(...found.map((doc) => doc.card), ...vendorDocs.filter((doc) => !shownCards.has(doc.card)).map((doc) => doc.card));
+  for (const doc of vendorDocs) doc.card.hidden = !shownCards.has(doc.card);
+  vendorMatches.hidden = found.length === 0;
+}
+
 function update() {
+  showVendorMatches();
   results = search(index, query.value, { category: category.value, decade: decade.value, vendor: vendor?.value ?? "" });
   shown = PAGE_SIZE;
   render();

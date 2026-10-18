@@ -396,6 +396,75 @@
   margin: 0 0 8px;
 }
 
+.props-page .props-sources-title,
+.props-page .vendor-matches-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.props-page .props-sources-title {
+  margin-top: 28px;
+}
+
+.props-page .props-badges,
+.props-page .vendor-match-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.props-page .props-badge {
+  padding: 1px 8px;
+  border: 1px solid var(--pp-rule);
+  border-radius: 2px;
+  font-size: 12px;
+  color: var(--pp-muted);
+}
+
+.props-page .props-badge-regional {
+  border-color: var(--pp-gold);
+  background-color: var(--pp-gold);
+  color: var(--pp-ink);
+  font-weight: 600;
+}
+
+.props-page .props-vendor,
+.props-page .vendor-matches {
+  overflow-wrap: anywhere;
+}
+
+.props-page .vendor-matches {
+  margin: 0 0 12px;
+  padding: 12px 16px;
+  background-color: var(--pp-surface);
+  border: 1px solid var(--pp-rule);
+  border-radius: 2px;
+}
+
+.props-page .vendor-match-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.props-page .vendor-match {
+  padding: 8px 0;
+  border-top: 1px solid var(--pp-rule);
+}
+
+.props-page .vendor-match p {
+  margin: 0;
+}
+
+.props-page .vendor-match-name {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+}
+
 .props-page .props-footer,
 .props-page .props-byline {
   margin: 0;

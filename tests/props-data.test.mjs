@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { checkItems } from '../scripts/props/normalize.mjs';
@@ -14,7 +15,19 @@ const byKey = new Map(inventory.items.map((item) => [item.key, item]));
 
 const SOURCE_TYPES = new Set(['prop-house', 'vintage-rental', 'event-rental', 'antique-reuse', 'theater-stock', 'specialty']);
 const MODES = new Set(['rent', 'sale', 'inquire']);
-const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint'];
+const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint', 'specialties', 'notice'];
+const NAMED_ON_VENDOR_PAGES = new Set([
+  '19e0f50bcf2f64571e4cbac622e7b6f4ef0decf6145c95c2c0d176adf4cbd549',
+  '289d731509399b68d445a54dc0979679a054e116bd2c480534af66fe2c2a8c22',
+  '2d01dd0d4f757baecf59964c3407a6b3220c148cba35406257ffdaa405cfa263',
+  '42fe2ba55e1fef4fe3a1b515308ceb697d1f59e8c3f2af1a82726896e7a3ef52',
+  '4f9859006b6133f13134d4dceb7f71d00e173799060b31431ec05aebfdfd569d',
+  '545f5aaa374f2dfc7812f4f4c69cb7a30bdfd39f42c2240230fc374a0287114a',
+  'a3842af3c839ea4cabb100168d3ff307d4de3d144c8ade0664f925c9409c3d60',
+  'a6ae07ad556c5f9348cc09c16ed17a437e65acc71e689c1b19f872f1dab3c9c1',
+  'a762048a21c020d2bea56f4505e9bceb6a64bdc84d91063ffebf0e29be1a5c97',
+  'd64d04ba625edb1fabfcd66fd4144143d734e5cdf9c7720daa6f244643b33289',
+]);
 const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'shopify-export']);
 
 function keysOf(value, found = new Set()) {
@@ -37,11 +50,20 @@ test('vendors.json holds only facts each vendor publishes, every one with its so
     }
     if (vendor.sourceType) assert.ok(SOURCE_TYPES.has(vendor.sourceType.value), `${vendor.id} sourceType`);
     if (vendor.modes) assert.ok(vendor.modes.values.length && vendor.modes.values.every((mode) => MODES.has(mode)), `${vendor.id} modes`);
+    if (vendor.specialties) assert.ok(vendor.specialties.values.length && vendor.specialties.values.every((value) => /\S/.test(value)), `${vendor.id} specialties`);
+    if (vendor.notice) assert.match(vendor.notice.text, /\S/, `${vendor.id} notice`);
     assert.match(vendor.lastVerified, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(contactRoutes(vendor.contact).length > 0, `${vendor.id} publishes no contact route`);
     assert.ok(Array.isArray(vendor.catalogs));
     if (vendor.catalogs.length) assert.match(vendor.keyPrefix, /^[a-z0-9]+$/);
     else assert.ok(!inventory.items.some((item) => item.vendor === vendor.id), `${vendor.id} lists no catalog but has items`);
+  }
+});
+
+test('vendors.json names no person: owners and staff named on vendor pages stay out, e-mail addresses included', async () => {
+  const raw = await readFile(new URL('../src/data/props/vendors.json', import.meta.url), 'utf8');
+  for (const token of new Set(raw.toLowerCase().split(/[^a-z]+/))) {
+    assert.ok(!NAMED_ON_VENDOR_PAGES.has(createHash('sha256').update(token).digest('hex')), `vendors.json names a person: "${token}"`);
   }
 });
 

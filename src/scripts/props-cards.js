@@ -1,7 +1,9 @@
 import { DEMO_URL, demoCatalogHref } from '../../scripts/props/demo-links.mjs';
 import { displayEra } from '../../scripts/props/normalize.mjs';
 
-const MODE_LABELS = { rent: 'rentals', sale: 'sales', inquire: 'by inquiry' };
+const MODE_LABELS = { rent: 'Rentals', sale: 'Sales', inquire: 'By inquiry' };
+const HOME_STATE = /^(pa|pennsylvania)$/i;
+export const NOT_AFFILIATED = 'Not affiliated with any vendor listed here.';
 const SOURCE_TYPE_LABELS = {
   'prop-house': 'Prop house',
   'vintage-rental': 'Vintage rental',
@@ -52,12 +54,8 @@ export function cardFor(item, { vendor, catalog, tags = [], demoEntry = null }) 
   };
 }
 
-export function affiliation(vendors) {
-  return `Not affiliated with ${new Intl.ListFormat('en', { type: 'disjunction' }).format(vendors.map((vendor) => vendor.name))}.`;
-}
-
-function telHref(phone) {
-  const digits = phone.replace(/\D/g, '');
+export function telHref(phone) {
+  const digits = phone.replace(/\s*(?:x|ext\.?|extension)\s*\d+\s*$/i, '').replace(/\D/g, '');
   return `tel:+${digits.length === 11 && digits.startsWith('1') ? digits : `1${digits}`}`;
 }
 
@@ -93,6 +91,25 @@ export function socialLinks(social) {
   ].filter(Boolean);
 }
 
+export function vendorBadges(vendor) {
+  const badges = [];
+  if (vendor.sourceType) badges.push({ text: SOURCE_TYPE_LABELS[vendor.sourceType.value] });
+  for (const mode of vendor.modes?.values ?? []) badges.push({ text: MODE_LABELS[mode] });
+  const state = vendor.address?.state?.trim();
+  if (state && !HOME_STATE.test(state)) badges.push({ text: `Regional: ${[vendor.address.city, state].filter(Boolean).join(', ')}`, regional: true });
+  return badges;
+}
+
+export function vendorSearchDoc(vendor, order) {
+  return { key: vendor.id, name: vendor.name, description: vendor.specialties?.values.join(' ') ?? '', categories: [], tags: [], decades: [], order };
+}
+
+const quoted = (texts) => texts.map((text) => `“${text}”`).join(', ');
+
+export function specialtiesLine(vendor) {
+  return vendor.specialties ? `In their words: ${quoted(vendor.specialties.values)}` : null;
+}
+
 function placeText(address) {
   const region = [address.state, address.zip].filter(Boolean).join(' ');
   return [address.street, address.city, region].filter(Boolean).join(', ');
@@ -100,9 +117,8 @@ function placeText(address) {
 
 export function vendorFacts(vendor) {
   const lines = [];
-  if (vendor.sourceType || vendor.modes) {
-    lines.push([vendor.sourceType && SOURCE_TYPE_LABELS[vendor.sourceType.value], vendor.modes && `Offers: ${vendor.modes.values.map((mode) => MODE_LABELS[mode]).join(', ')}`].filter(Boolean).join('. '));
-  }
+  if (vendor.notice) lines.push(`Notice on their site: ${quoted([vendor.notice.text])}`);
+  if (vendor.specialties) lines.push(specialtiesLine(vendor));
   if (vendor.address) lines.push(`Address${vendor.address.label ? ` (${vendor.address.label})` : ''}: ${placeText(vendor.address)}`);
   if (vendor.mailingAddress) lines.push(`Mailing address: ${placeText(vendor.mailingAddress)}`);
   if (vendor.hours) lines.push(`Hours: ${vendor.hours.text}`);
@@ -111,7 +127,7 @@ export function vendorFacts(vendor) {
   return lines;
 }
 
-const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint'];
+const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint', 'specialties', 'notice'];
 
 export function vendorSources(vendor) {
   const sources = [];

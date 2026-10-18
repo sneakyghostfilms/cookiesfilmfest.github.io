@@ -4,7 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { affiliation } from '../src/scripts/props-cards.js';
+import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
 import { compareByName, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -56,8 +56,7 @@ test('cards follow the spec format and carry the source link and inquiry route',
 test('/props states what it is not and how vendors can opt out', () => {
   assert.ok(text.includes('It does not book rentals or show live availability.'));
   assert.ok(text.includes('Always confirm availability, condition, sizes and price with the vendor.'));
-  assert.ok(text.includes(affiliation(vendors.vendors)));
-  assert.ok(text.includes('Not affiliated with Steel City Props or Dezzign Central.'));
+  assert.ok(text.includes(NOT_AFFILIATED));
   assert.ok(text.includes('want your inventory listed, corrected or removed?'));
   assert.ok(html.includes('href="/#contact"'));
 });
@@ -119,10 +118,15 @@ test('every card names its vendor, and the vendor filter appears only with more 
   assert.equal(/<select id="props-vendor">/.test(html), withItems.length > 1);
 });
 
+const vendorSection = (id) => html.match(new RegExp(`<section class="props-box props-vendor" id="vendor-${id}"[\\s\\S]*?</section>`))?.[0] ?? '';
+const withItems = new Set(inventory.items.map((item) => item.vendor));
+const byName = (a, b) => a.name.localeCompare(b.name, 'en');
+
 test('vendor boxes show the published facts with their sources, and nothing private', () => {
-  assert.ok(text.includes('To rent from Steel City Props: official contact form · steelcitypropsllc@gmail.com'));
+  const steelCity = visibleText(vendorSection('steel-city-props'));
+  assert.ok(steelCity.includes('Inquiries: official contact form · steelcitypropsllc@gmail.com'));
   assert.ok(text.includes('Terms they publish: “We will send a quote back as soon we review your request.”'));
-  assert.ok(text.includes('Prop house. Offers: rentals'));
+  assert.ok(vendorSection('steel-city-props').includes('<span class="props-badge">Prop house</span><span class="props-badge">Rentals</span>'));
   assert.ok(text.includes('Address: Pittsburgh, PA'));
   assert.match(text, /Details as the vendor publishes them, last checked 2026-10-17: instagram\.com\/steelcityprops · catalog page 3 · catalog page 1 · forms\.gle\/JJqcgmxkJFwqKLXF9 · linktr\.ee\/steelcityprops \./);
   assert.ok(html.includes('href="https://linktr.ee/steelcityprops"'));
@@ -131,6 +135,44 @@ test('vendor boxes show the published facts with their sources, and nothing priv
   assert.ok(text.includes('Prop pages on dezzigncentralpgh.com · captured 2026-10-17 · 23 items · indexed 2026-10-17 · Open site'));
   assert.ok(text.includes('Hours: please call or email us to schedule an appointment Pricing and terms: ask the vendor'));
   assert.ok(!/permission|not asked/i.test(text));
+});
+
+test('every vendor has one box with an anchor: vendors with searchable items first, each group by name', () => {
+  const ids = [...html.matchAll(/<section class="props-box props-vendor" id="vendor-([^"]+)" data-vendor="\1">/g)].map(([, id]) => id);
+  const expected = [...vendors.vendors.filter((entry) => withItems.has(entry.id)).sort(byName), ...vendors.vendors.filter((entry) => !withItems.has(entry.id)).sort(byName)];
+  assert.deepEqual(ids, expected.map((entry) => entry.id));
+  assert.ok(text.includes(`${vendors.vendors.length} prop sources are listed below with the contact details they publish; ${withItems.size} have searchable inventory.`));
+  assert.ok(html.includes(`<h2 id="prop-sources" class="props-sources-title">Prop sources (${vendors.vendors.length})</h2>`));
+  for (const entry of vendors.vendors.filter((one) => !withItems.has(one.id))) {
+    assert.ok(visibleText(vendorSection(entry.id)).includes('Inventory not indexed; contact the vendor.'), entry.id);
+  }
+});
+
+test('the vendor strip holds exactly the vendors without searchable items, hidden until a search matches their name or own words', () => {
+  const strip = html.match(/<section id="props-vendor-matches" class="vendor-matches" hidden>[\s\S]*?<\/section>/)?.[0];
+  assert.ok(strip, 'the strip is built and starts hidden');
+  assert.ok(visibleText(strip).includes('Prop sources that match this search; inventory not indexed'));
+  assert.doesNotMatch(visibleText(strip), /speciali[sz]e/i, 'a name-only match makes no specialty claim');
+  const cards = [...strip.matchAll(/<li class="vendor-match" data-vendor="([^"]+)" data-name="([^"]*)" data-specialties(?:="([^"]*)")? hidden>/g)];
+  const expected = vendors.vendors.filter((entry) => !withItems.has(entry.id)).sort(byName);
+  assert.deepEqual(cards.map(([, id]) => id), expected.map((entry) => entry.id));
+  for (const [[, id, name, specialties], entry] of cards.map((card, order) => [card, expected[order]])) {
+    const doc = vendorSearchDoc(entry, 0);
+    assert.deepEqual([decode(name), decode(specialties ?? '')], [doc.name, doc.description], id);
+  }
+});
+
+test('regional badges mark only the sources outside Pennsylvania', () => {
+  const regional = vendors.vendors.filter((entry) => vendorBadges(entry).some((badge) => badge.regional)).map((entry) => entry.id);
+  assert.deepEqual(regional.sort(), ['cleveland-play-house-props', 'cleveland-prop-shop']);
+  for (const id of regional) assert.ok(vendorSection(id).includes('<span class="props-badge props-badge-regional">Regional: Cleveland, OH</span>'), id);
+});
+
+test('Route 30 Retro shows only its Facebook Page facts, cited as read, with no type of our own', () => {
+  const box = vendorSection('route-30-retro');
+  assert.ok(visibleText(box).includes('Route 30 Retro Facebook Page (About), as read on 2026-10-17 · not fetched by our scripts'));
+  assert.ok(box.includes('href="https://www.facebook.com/p/Route-30-Retro-100063856903288"'));
+  assert.deepEqual([...box.matchAll(/<span class="props-badge">([^<]*)<\/span>/g)].map(([, label]) => label), ['Sales']);
 });
 
 test('the page builds its search documents from the cards the same way the Worker builds them from the inventory', async () => {

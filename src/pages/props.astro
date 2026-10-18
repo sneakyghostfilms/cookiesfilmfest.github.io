@@ -7,7 +7,7 @@ import inventory from "../data/props/inventory.json";
 import tagsData from "../data/props/tags.json";
 import propsConfig from "../data/props/config.json";
 import { DEMO_STYLES, privateVendorsFor, readDemoManifest } from "../../scripts/props/demo-links.mjs";
-import { affiliation, cardFor, catalogLines, contactRoutes, privateFacts, socialLinks, vendorFacts, vendorSources } from "../scripts/props-cards.js";
+import { NOT_AFFILIATED, cardFor, catalogLines, contactRoutes, privateFacts, socialLinks, specialtiesLine, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources } from "../scripts/props-cards.js";
 import { compareByName } from "../scripts/props-search.js";
 
 const { generator } = Astro;
@@ -35,15 +35,25 @@ const decades = [...new Set(inventory.items.flatMap((item) => item.decades))].so
 const itemCounts = new Map<string, number>();
 for (const item of inventory.items) itemCounts.set(item.catalog, (itemCounts.get(item.catalog) ?? 0) + 1);
 const vendorsWithItems = vendorsData.vendors.filter((vendor) => inventory.items.some((item) => item.vendor === vendor.id));
+const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "en");
+const vendorsWithoutItems = vendorsData.vendors.filter((vendor) => !vendorsWithItems.includes(vendor)).sort(byName);
 const indexed = inventory.catalogs as Record<string, { indexedAt: string; capturedAt?: string }>;
-const vendorBoxes = vendorsData.vendors.map((vendor) => ({
+const vendorBoxes = [...[...vendorsWithItems].sort(byName), ...vendorsWithoutItems].map((vendor) => ({
   vendor,
+  badges: vendorBadges(vendor),
   facts: vendorFacts(vendor),
   routes: contactRoutes(vendor.contact),
   social: socialLinks(vendor.social),
   sources: vendorSources(vendor),
   private: privateFacts(privateVendors?.[vendor.id]),
   catalogs: catalogLines(vendor, { indexed, itemCounts }),
+}));
+const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
+  vendor,
+  doc: vendorSearchDoc(vendor, order),
+  badges: vendorBadges(vendor),
+  specialties: specialtiesLine(vendor),
+  route: contactRoutes(vendor.contact)[0] ?? null,
 }));
 ---
 
@@ -73,12 +83,8 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
       </header>
 
       <section class="props-box props-about">
-        <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> Names, item numbers, eras and pages are copied from each vendor's catalog or website. {affiliation(vendorsData.vendors)} Keyword search runs in your browser.</p>
-        {vendorBoxes.map(({ vendor, routes }) => (
-          <p class="props-contact">{vendor.modes?.values.includes("rent") ? "To rent from" : "To inquire with"} {vendor.name}: {routes.map((route, position) => (
-            <>{position > 0 && " · "}<a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>
-          ))}.</p>
-        ))}
+        <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> Names, item numbers, eras and pages are copied from each vendor's catalog or website. {NOT_AFFILIATED} Keyword search runs in your browser.</p>
+        <p class="props-contact"><a href="#prop-sources">{vendorBoxes.length} prop sources are listed below</a> with the contact details they publish; {vendorsWithItems.length} {vendorsWithItems.length === 1 ? "has" : "have"} searchable inventory.</p>
       </section>
 
       <section class="props-box props-search">
@@ -130,6 +136,20 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
           <p id="scene-status" class="scene-status" aria-live="polite" hidden></p>
           <div id="scene-results" class="scene-results"></div>
         </details>
+        {vendorMatches.length > 0 && (
+          <section id="props-vendor-matches" class="vendor-matches" hidden>
+            <h2 class="vendor-matches-title">Prop sources that match this search; inventory not indexed</h2>
+            <ul class="vendor-match-list">
+              {vendorMatches.map(({ vendor, doc, badges, specialties, route }) => (
+                <li class="vendor-match" data-vendor={vendor.id} data-name={doc.name} data-specialties={doc.description} hidden>
+                  <p class="vendor-match-line"><a class="vendor-match-name" href={`#vendor-${vendor.id}`}>{vendor.name}</a>{badges.map((badge) => <span class:list={["props-badge", { "props-badge-regional": badge.regional }]}>{badge.text}</span>)}</p>
+                  {specialties && <p class="props-note">{specialties}</p>}
+                  <p class="props-note">Inventory not indexed; contact the vendor{route && <>: <a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>}.</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <p id="props-count" class="props-count" aria-live="polite">{cards.length} items, listed alphabetically</p>
         <noscript><p class="props-note">Search needs JavaScript. All {cards.length} items are listed below alphabetically.</p></noscript>
         <p id="props-empty" class="props-empty" hidden></p>
@@ -156,9 +176,11 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         <button id="props-more" type="button" class="props-more" hidden>Show more</button>
       </section>
 
-      {vendorBoxes.map(({ vendor, facts, routes, social, sources, private: privateLines, catalogs: vendorCatalogs }) => (
-        <section class="props-box props-vendor" data-vendor={vendor.id}>
-          <h2 class="props-vendor-name">{vendor.name}</h2>
+      <h2 id="prop-sources" class="props-sources-title">Prop sources ({vendorBoxes.length})</h2>
+      {vendorBoxes.map(({ vendor, badges, facts, routes, social, sources, private: privateLines, catalogs: vendorCatalogs }) => (
+        <section class="props-box props-vendor" id={`vendor-${vendor.id}`} data-vendor={vendor.id}>
+          <h3 class="props-vendor-name">{vendor.name}</h3>
+          {badges.length > 0 && <p class="props-badges">{badges.map((badge) => <span class:list={["props-badge", { "props-badge-regional": badge.regional }]}>{badge.text}</span>)}</p>}
           {vendorCatalogs.map((line) => (
             <p class="props-catalog">{line.text}{line.href && <a href={line.href} target="_blank" rel="noopener noreferrer">{line.linkLabel}</a>}</p>
           ))}

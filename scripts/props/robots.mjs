@@ -13,7 +13,7 @@ function groupsOf(text) {
   for (const { key, value } of linesOf(text)) {
     if (key === 'user-agent') {
       if (!current || current.rules.length) groups.push((current = { agents: [], rules: [] }));
-      current.agents.push(value.toLowerCase());
+      current.agents.push(value.split('/')[0].trim().toLowerCase());
     } else if (current) {
       current.rules.push({ key, value });
     }
@@ -23,7 +23,7 @@ function groupsOf(text) {
 
 export function robotsRules(text, agent = ROBOTS_AGENT) {
   const groups = groupsOf(text);
-  const named = groups.filter((group) => group.agents.some((name) => name !== '*' && agent.toLowerCase().includes(name)));
+  const named = groups.filter((group) => group.agents.includes(agent.toLowerCase()));
   const chosen = named.length ? named : groups.filter((group) => group.agents.includes('*'));
   const rules = { group: named.length ? agent : chosen.length ? '*' : null, disallow: [], crawlDelaySeconds: null, unsupported: [] };
   for (const { key, value } of chosen.flatMap((group) => group.rules)) {

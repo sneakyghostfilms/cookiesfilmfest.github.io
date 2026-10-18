@@ -178,6 +178,13 @@ test('robots rules: our named group beats *, plain prefixes only, anything else 
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: images\n').unsupported, ['Disallow: images']);
   assert.deepEqual(robotsRules('User-agent: *\nCrawl-delay: soon\n').unsupported, ['Crawl-delay: soon']);
   assert.deepEqual(robotsRules('User-agent: other\nDisallow: /*\n').unsupported, [], "another agent's rules don't apply to us");
+  for (const name of ['search', 'Pittsburgh', 'p', 'PittsburghPropSearchBot']) {
+    const rules = robotsRules(`User-agent: *\nDisallow: /\n\nUser-agent: ${name}\nDisallow:\n`);
+    assert.deepEqual([rules.group, rules.disallow], ['*', ['/']], `"${name}" is not our product token`);
+  }
+  for (const name of ['PittsburghPropSearch/0.1', 'pittsburghpropsearch']) {
+    assert.deepEqual(robotsRules(`User-agent: *\nDisallow: /\n\nUser-agent: ${name}\nDisallow: /x/\n`).disallow, ['/x/'], `"${name}" names us`);
+  }
 });
 
 test('photo downloads stop before any request when robots.txt disallows a photo path or has a rule we cannot apply', () => {

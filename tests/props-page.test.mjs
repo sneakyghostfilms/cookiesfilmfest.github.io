@@ -91,6 +91,7 @@ test('both props pages state what the search is not and how vendors can opt out'
     assert.ok(pageText.includes('It does not book rentals or show live availability.'));
     assert.ok(pageText.includes('Always confirm availability, condition, sizes and price with the vendor.'));
     assert.ok(pageText.includes(NOT_AFFILIATED));
+    assert.ok(pageText.includes('Keyword search runs in your browser. Keyword search also matches search terms an AI suggested for each item.'), 'the intro discloses the AI-suggested search terms the cards no longer show');
     assert.ok(pageText.includes('want your inventory listed, corrected or removed?'));
     assert.ok(page.includes('href="/#contact"'));
   }

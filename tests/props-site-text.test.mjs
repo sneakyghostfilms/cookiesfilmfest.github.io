@@ -17,6 +17,8 @@ test('visible text joins inline elements with nothing, puts a space at block end
   assert.equal(visibleText('<h2>&#8203;&#8203;<font color="#d5d5d5">Lamps</font></h2><p>Brass<br>and tin</p><div>One</div><div>Two</div>'), 'Lamps Brass and tin One Two');
   assert.equal(visibleText('<span>  D&eacute;cor\n\t and   Linens </span>'), 'Décor and Linens');
   assert.equal(visibleText(`<p>${String.fromCodePoint(0x200b)}</p>`), '');
+  assert.equal(visibleText('A<div>B</div>'), 'A B', 'an opening block tag adds a space too');
+  assert.equal(visibleText('<span>A</span><p class="x">B</p>'), 'A B');
 });
 
 test('a name, category or era that still holds an entity is refused, naming only the entity', () => {

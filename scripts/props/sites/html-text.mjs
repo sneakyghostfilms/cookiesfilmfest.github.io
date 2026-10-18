@@ -21,10 +21,10 @@ export function attribute(tag, name) {
   return match ? decodeEntities(match[1] ?? match[2]) : null;
 }
 
-// The text a browser shows for a piece of markup: tags inside a line add nothing ("Mimosas" + ", Mascara"), the end of
-// a block or a line break adds a space; then entities are decoded, zero-width and other format characters dropped,
-// and spaces collapsed.
+// The text a browser shows for a piece of markup: tags inside a line add nothing ("Mimosas" + ", Mascara"), a block
+// tag or a line break adds a space; then entities are decoded, zero-width and other format characters dropped, and
+// spaces collapsed.
 export function visibleText(html) {
-  const text = String(html).replace(/<br\s*\/?>|<\/(?:p|div|li|h[1-6])>/gi, ' ').replace(/<[^>]*>/g, '');
+  const text = String(html).replace(/<br\s*\/?>|<\/?(?:p|div|li|h[1-6])\b[^>]*>/gi, ' ').replace(/<[^>]*>/g, '');
   return decodeEntities(text).replace(/\p{Cf}/gu, '').replace(/\s+/g, ' ').trim();
 }

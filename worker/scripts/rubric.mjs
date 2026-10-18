@@ -11,9 +11,9 @@ const sharedWords = (a, b) => {
   return words(a).filter((word) => other.has(word)).length;
 };
 
-const namesAll = (prop, absentName) => {
+const namesAll = (prop, name) => {
   const propWords = new Set(words(prop));
-  return words(absentName).every((word) => propWords.has(word));
+  return words(name).every((word) => propWords.has(word));
 };
 
 // How a suggestion with keys is scored:

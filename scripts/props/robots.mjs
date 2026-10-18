@@ -24,10 +24,12 @@ function groupsOf(text) {
 }
 
 // RFC 9309 §2.2.3: '*' matches any run of characters and a final '$' anchors the end; rules are matched from the start
-// of the path and query. A '$' anywhere else, or a rule not starting with '/', is not something we apply.
+// of the path and query. Every path starts with '/', so a rule that starts with '*' matches exactly what '/' followed by
+// that rule matches, and is read that way (as Google's matcher does). A '$' anywhere else, or a rule starting with
+// anything but '/' or '*', is not something we apply.
 function patternOf(rule) {
   const anchored = rule.endsWith('$');
-  const body = anchored ? rule.slice(0, -1) : rule;
+  const body = (anchored ? rule.slice(0, -1) : rule).replace(/^\*/, '/*');
   if (!body.startsWith('/') || body.includes('$')) return null;
   return new RegExp(`^${body.split('*').map((part) => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}${anchored ? '$' : ''}`);
 }

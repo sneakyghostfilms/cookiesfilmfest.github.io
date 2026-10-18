@@ -205,6 +205,14 @@ test('robots rules: our named group beats *, groups for the same agent merge, an
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: /*.jpg$\n').disallow, ['/*.jpg$'], 'wildcards and a final $ are applied');
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: /a$b\n').unsupported, ['Disallow: /a$b'], 'a $ before the end is not');
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: images\n').unsupported, ['Disallow: images']);
+  const leadingStar = robotsRules('User-agent: *\nAllow: /\nDisallow: *?lightbox=\n');
+  assert.deepEqual([leadingStar.disallow, leadingStar.unsupported], [['*?lightbox='], []], 'a rule starting with * is read as / plus the rule');
+  assert.equal(robotsAllow(leadingStar, '/our-rental-collection'), true);
+  assert.equal(robotsAllow(leadingStar, '/x?lightbox=1'), false);
+  assert.equal(robotsAllow(leadingStar, '/a/b?c=1&lightbox=2'), true, 'the rule needs ?lightbox=, not &lightbox=');
+  assert.equal(robotsAllow(robotsRules('User-agent: *\nDisallow: *\n'), '/anything'), false, '* alone disallows everything');
+  assert.equal(robotsAllow(robotsRules('User-agent: *\nDisallow: *.jpg$\n'), '/a/b.jpg'), false);
+  for (const rule of ['*a$b', '?x=', '$']) assert.deepEqual(robotsRules(`User-agent: *\nDisallow: ${rule}\n`).unsupported, [`Disallow: ${rule}`], rule);
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: /a/\n\nUser-agent: *\nDisallow: /b/\n').disallow, ['/a/', '/b/'], 'two * groups merge');
   assert.deepEqual(robotsRules('User-agent: *\nCrawl-delay: soon\n').unsupported, ['Crawl-delay: soon']);
   assert.deepEqual(robotsRules('User-agent: other\nDisallow: /*\n').unsupported, [], "another agent's rules don't apply to us");

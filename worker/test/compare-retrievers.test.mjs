@@ -34,7 +34,9 @@ test('the long scene keeps its original 4,000-character text, and each of its pr
 });
 
 test('the long scene names every prop of the fixtures whose whole text it holds', () => {
-  for (const fixture of fixtures.filter((entry) => longFixture.text.includes(entry.text))) {
+  const whole = fixtures.filter((entry) => longFixture.text.includes(entry.text));
+  assert.deepEqual(whole.map((entry) => entry.id), ['diner', 'morgue', 'office'], 'a fixture text changed: decide what the long scene holds');
+  for (const fixture of whole) {
     for (const prop of fixture.required) assert.ok(longFixture.required.includes(`${fixture.id}:${prop.prop}`), `${fixture.id}:${prop.prop}`);
     for (const prop of fixture.absent) assert.ok(longFixture.absent.includes(`${fixture.id}:${prop}`), `${fixture.id}:${prop}`);
   }

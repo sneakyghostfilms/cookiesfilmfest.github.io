@@ -35,7 +35,7 @@ test('era decades read whole ranges, whatever the dash or apostrophe', () => {
 
 test('pages are read in the vendor menu order, with categories as published', () => {
   assert.deepEqual([...new Set(parsed.items.map((item) => item.categories[0]))], ['signs', 'lamps', 'iceboxes & coolers']);
-  assert.deepEqual(parsed.counts, { pages: 3, photos: 9, items: 8 });
+  assert.deepEqual(parsed.counts, { pages: 3, photos: 10, items: 9 });
 });
 
 test('photos with the same title are one item; untitled photos are named honestly and flagged', () => {
@@ -45,10 +45,16 @@ test('photos with the same title are one item; untitled photos are named honestl
   ]);
   assert.ok(byName.has('lamps item 1 (no title given)'));
   assert.ok(byName.has('lamps item 2 (no title given)'), 'a filename is not a title');
+  assert.ok(byName.has('lamps item 3 (no title given)'), 'two photos without titles are never merged into one object');
+  assert.notEqual(byName.get('lamps item 1 (no title given)').key, byName.get('lamps item 3 (no title given)').key);
+  assert.ok(!byName.has('lamp with no file'), 'a photo without a src is skipped');
   const flags = parsed.report.join('\n');
   assert.match(flags, /"green desk lamp side view" may be another view of "green desk lamp"/);
   assert.match(flags, /"lamps" only repeats its category/);
   assert.match(flags, /has no usable photo title \(alt "IMG_2041.jpg"\)/);
+  assert.match(flags, /props\/lamps\/ photo 8 has no src and was skipped/);
+  assert.match(flags, new RegExp(`${byName.get('green desk lamp').key} · green desk lamp · lamps · no era · 2`));
+  assert.match(flags, new RegExp(`${byName.get('oak icebox').key} · oak icebox · iceboxes & coolers · era 1920 · 1`));
   assert.equal(isDescriptive('IMG_2041.jpg'), false);
   assert.equal(isDescriptive('DSC 0042'), false);
   assert.equal(isDescriptive('photo'), false);
@@ -98,14 +104,14 @@ test('the parser refuses pages outside the props section and empty answers', () 
 test('importSite writes the snapshot through the shared inventory writer and reports the counts', async () => {
   const directory = await mkdtemp(path.join(tmpdir(), 'props-site-'));
   const outFile = path.join(directory, 'inventory.json');
-  const vendors = { vendors: [{ ...vendor, catalogs: [{ ...catalog, expected: { pages: 3, photos: 9, items: 7 } }] }] };
+  const vendors = { vendors: [{ ...vendor, catalogs: [{ ...catalog, expected: { pages: 3, photos: 10, items: 7 } }] }] };
   const fetcher = { get: async (url) => ({ body: Buffer.from(JSON.stringify(pages)), meta: { url, fetchedAt: '2026-10-17T16:00:00.000Z' } }) };
   const lines = [];
   await importSite({ vendorId: vendor.id, vendors, outFile, fetcher, log: (line) => lines.push(line), today: () => '2026-10-17' });
   const written = JSON.parse(await readFile(outFile, 'utf8'));
-  assert.deepEqual(written.catalogs['dz-test'], { indexedAt: '2026-10-17', capturedAt: '2026-10-17', pages: 3, photos: 9 });
+  assert.deepEqual(written.catalogs['dz-test'], { indexedAt: '2026-10-17', capturedAt: '2026-10-17', pages: 3, photos: 10 });
   assert.deepEqual(written.items, parsed.items);
-  assert.match(lines.join('\n'), /items 8 \(expected 7\)/);
+  assert.match(lines.join('\n'), /items 9 \(expected 7\)/);
   await importSite({ vendorId: vendor.id, vendors, outFile, fetcher, log: () => {}, today: () => '2026-10-18' });
   assert.equal(JSON.parse(await readFile(outFile, 'utf8')).catalogs['dz-test'].indexedAt, '2026-10-17', 'an unchanged snapshot keeps its date');
   await assert.rejects(importSite({ vendorId: 'nobody', vendors, outFile, fetcher }), /No vendor "nobody"/);

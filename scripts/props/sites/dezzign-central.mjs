@@ -19,11 +19,10 @@ export function splitAltEra(alt) {
 }
 
 function photosOf(html, link) {
-  return [...String(html).matchAll(/<img\b[^>]*>/gi)].map((match, index) => ({
-    position: index + 1,
-    src: new URL(attribute(match[0], 'src') ?? '', link).href,
-    alt: (attribute(match[0], 'alt') ?? '').trim(),
-  }));
+  return [...String(html).matchAll(/<img\b[^>]*>/gi)].map((match, index) => {
+    const src = (attribute(match[0], 'src') ?? '').trim();
+    return { position: index + 1, src: src ? new URL(src, link).href : null, alt: (attribute(match[0], 'alt') ?? '').trim() };
+  });
 }
 
 export function parsePages(pages, { vendor, catalog }) {
@@ -39,7 +38,9 @@ export function parsePages(pages, { vendor, catalog }) {
   let photoCount = 0;
   for (const page of [...pages].sort((a, b) => a.id - b.id)) {
     const category = decodeEntities(page.title.rendered).trim();
-    const photos = photosOf(page.content.rendered, page.link);
+    const found = photosOf(page.content.rendered, page.link);
+    for (const photo of found.filter((entry) => !entry.src)) flags.push(`${page.link} photo ${photo.position} has no src and was skipped`);
+    const photos = found.filter((entry) => entry.src);
     photoCount += photos.length;
     const groups = [];
     for (const photo of photos) {
@@ -73,7 +74,8 @@ export function parsePages(pages, { vendor, catalog }) {
   const report = [
     `Pages: ${counts.pages}; photos: ${counts.photos}; items: ${counts.items} (photos with the same title are one item)`,
     ...pages.slice().sort((a, b) => a.id - b.id).map((page) => `  ${decodeEntities(page.title.rendered).trim()}: ${page.link}`),
-    `Items with a stated era: ${items.filter((item) => item.era).map((item) => `${item.key} "${item.name}" ${item.era}`).join('; ') || 'none'}`,
+    'Items (key · name · category · era · photos):',
+    ...items.map((item) => `  ${item.key} · ${item.name} · ${item.categories[0]} · ${item.era ?? 'no era'} · ${images.get(item.key).urls.length}`),
     `Flags: ${flags.length ? `\n  ${flags.join('\n  ')}` : 'none'}`,
   ];
   return { items, images, counts, report };

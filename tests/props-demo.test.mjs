@@ -154,6 +154,13 @@ test('website photos are fetched at a modest size where the CDN offers one, and 
   assert.deepEqual(merged.catalogs['scp-2026-09-30'], { sha256: 'x' });
 });
 
+test("photos come from the catalog's photo host, or else the site host, or Shopify's image host for an export", async () => {
+  const { photoHostFor } = await import('../scripts/props/demo.mjs');
+  assert.equal(photoHostFor({ type: 'duda-gallery', siteUrl: 'https://www.vendor.example/', photoHost: 'irp.cdn-website.com' }), 'irp.cdn-website.com');
+  assert.equal(photoHostFor({ type: 'wordpress-pages', siteUrl: 'https://vendor.example/props/' }), 'vendor.example');
+  assert.equal(photoHostFor({ type: 'shopify-export', siteUrl: 'https://shop.example/products/' }), 'cdn.shopify.com');
+});
+
 test('npm run props:demo warns about missing website photos and about visible private notes', () => {
   const vendors = { vendors: [
     { name: 'Steel City Props', id: 'steel-city-props', catalogs: [{ id: 'scp-2026-09-30', type: 'pdf' }] },

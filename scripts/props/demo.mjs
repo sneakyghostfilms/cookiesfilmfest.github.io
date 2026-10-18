@@ -12,6 +12,7 @@ import { pdfBox, readDemoManifest } from './demo-links.mjs';
 import { CACHE_ROOT, findSiteCatalog, loadSite } from './import-site.mjs';
 import { buildItems, cardIdentity, identityOf } from './normalize.mjs';
 import { privateOutputProblem } from './private-output.mjs';
+import { robotsRules, robotsStopReason } from './robots.mjs';
 import { createSiteFetcher } from './site-fetch.mjs';
 import { IMAGE_HOST as SHOPIFY_IMAGE_HOST } from './sites/retro-on-8th.mjs';
 
@@ -27,6 +28,11 @@ export function photoUrl(url) {
   const parsed = new URL(url);
   if (parsed.hostname === SHOPIFY_IMAGE_HOST) parsed.searchParams.set('width', '640');
   return parsed.href;
+}
+
+export function photoHostFor(catalog) {
+  if (catalog.photoHost) return catalog.photoHost;
+  return catalog.type === 'shopify-export' ? SHOPIFY_IMAGE_HOST : new URL(catalog.siteUrl).hostname;
 }
 
 export function mergeManifest(previous, catalogId, catalogEntry, entries) {
@@ -106,8 +112,15 @@ async function buildSiteAssets(vendorId, exportPath) {
     },
   });
   const { items, images } = await loadSite({ vendor, catalog, cacheRoot: CACHE_ROOT, fetcher: cachedOnly, exportPath });
-  const photoHost = catalog.type === 'shopify-export' ? SHOPIFY_IMAGE_HOST : new URL(catalog.siteUrl).hostname;
+  const photoHost = photoHostFor(catalog);
   const fetcher = createSiteFetcher({ allowHosts: [photoHost] });
+  const robots = await fetcher.get(`https://${photoHost}/robots.txt`, originals, { missingOk: true });
+  const rules = robotsRules(robots.missing ? '' : robots.body.toString('utf8'));
+  const firstPhotos = items.map((item) => images.get(item.key)?.urls[0]).filter(Boolean).map(photoUrl);
+  const stopReason = robotsStopReason(rules, firstPhotos, photoHost);
+  if (stopReason) throw new Error(stopReason);
+  if (rules.crawlDelaySeconds) fetcher.raiseGap(rules.crawlDelaySeconds * 1000);
+  console.log(`robots.txt on ${photoHost}: ${robots.missing ? `none (HTTP ${robots.meta.status})` : `${rules.group ? `group ${rules.group}, ` : 'no group for us, '}${rules.disallow.length} Disallow prefixes, Crawl-delay ${rules.crawlDelaySeconds ?? 'none'}`}`);
   const { default: sharp } = await import('sharp');
   await mkdir(thumbs, { recursive: true });
   const entries = [];

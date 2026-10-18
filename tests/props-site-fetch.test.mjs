@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { FetchStopped, JITTER_MS, MIN_GAP_MS, TIMEOUT_MS, USER_AGENT, cacheName, createSiteFetcher, hostProblem } from '../scripts/props/site-fetch.mjs';
-import { robotsAllow, robotsRules } from '../scripts/props/robots.mjs';
+import { robotsAllow, robotsRules, robotsStopReason } from '../scripts/props/robots.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const HOST = 'vendor.example.com';
@@ -178,4 +178,12 @@ test('robots rules: our named group beats *, plain prefixes only, anything else 
   assert.deepEqual(robotsRules('User-agent: *\nDisallow: images\n').unsupported, ['Disallow: images']);
   assert.deepEqual(robotsRules('User-agent: *\nCrawl-delay: soon\n').unsupported, ['Crawl-delay: soon']);
   assert.deepEqual(robotsRules('User-agent: other\nDisallow: /*\n').unsupported, [], "another agent's rules don't apply to us");
+});
+
+test('photo downloads stop before any request when robots.txt disallows a photo path or has a rule we cannot apply', () => {
+  const photos = ['https://cdn.example/a/opt/one-640w.jpg', 'https://cdn.example/b/two-640w.jpg'];
+  assert.equal(robotsStopReason(robotsRules(''), photos, 'cdn.example'), null);
+  assert.equal(robotsStopReason(robotsRules('User-agent: *\nDisallow: /private/\n'), photos, 'cdn.example'), null);
+  assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /a/\n'), photos, 'cdn.example'), /disallows 1 of the 2 photo paths, for example \/a\/opt\/one-640w\.jpg/);
+  assert.match(robotsStopReason(robotsRules('User-agent: *\nDisallow: /*.jpg$\n'), photos, 'cdn.example'), /can't apply with certainty \(Disallow: \/\*\.jpg\$\)/);
 });

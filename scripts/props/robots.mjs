@@ -43,3 +43,10 @@ export function robotsRules(text, agent = ROBOTS_AGENT) {
 export function robotsAllow(rules, path) {
   return !rules.disallow.some((prefix) => path.startsWith(prefix));
 }
+
+export function robotsStopReason(rules, urls, host) {
+  if (rules.unsupported.length) return `robots.txt on ${host} has rules this tool can't apply with certainty (${rules.unsupported.join('; ')}); stopping before any request to it`;
+  const disallowed = urls.map((url) => new URL(url).pathname).filter((path) => !robotsAllow(rules, path));
+  if (disallowed.length) return `robots.txt on ${host} disallows ${disallowed.length} of the ${urls.length} photo paths, for example ${disallowed.slice(0, 3).join(', ')}; stopping before any photo`;
+  return null;
+}

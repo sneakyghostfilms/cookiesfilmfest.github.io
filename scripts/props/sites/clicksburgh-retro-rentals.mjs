@@ -24,7 +24,12 @@ export const SECTIONS = new Map([
 ]);
 // Tiles in a kept section that the photo review found to be services.
 export const SERVICE_TILES = new Set();
+// A rich text outside the tiles is a section heading when it has at most HEADING_WORDS words, and a section's
+// description when it has more than DESCRIPTION_WORDS (the page's headings have 2 to 7 words, its descriptions 51 or
+// more). Anything between stops the import, so a renamed heading can't pass as a description and file its tiles under
+// the section before it.
 const HEADING_WORDS = 8;
+const DESCRIPTION_WORDS = 20;
 const PHOTO_WIDTH = 320;
 const PRICE_LINE = /^(?:\$\s*\d|inquire for pricing)/i;
 const EXCLUSIONS = ['service', 'package'];
@@ -78,7 +83,8 @@ export function parseCollection(html, { vendor, catalog }, { sections = SECTIONS
   for (const part of partsOf(html, catalog.sourceUrl)) {
     if (part.kind === 'text' && !part.inTile) {
       const words = part.text ? part.text.split(' ').length : 0;
-      if (!words || words > HEADING_WORDS) continue;
+      if (!words || words > DESCRIPTION_WORDS) continue;
+      if (words > HEADING_WORDS) throw new Error(`The collection page has a text of ${words} words outside the tiles, too long for a section heading and too short for a description, "${part.text}"; stopping before the inventory is written.`);
       if (!sections.has(part.text)) throw new Error(`The collection page has a section heading this import doesn't know, "${part.text}"; stopping before the inventory is written.`);
       section = part.text;
       if (sections.get(section) !== 'title') seen.push(section);

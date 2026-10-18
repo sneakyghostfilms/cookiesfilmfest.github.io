@@ -106,7 +106,7 @@ test('importSite writes the snapshot through the shared inventory writer and rep
   const directory = await mkdtemp(path.join(tmpdir(), 'props-site-'));
   const outFile = path.join(directory, 'inventory.json');
   const vendors = { vendors: [{ ...vendor, catalogs: [{ ...catalog, expected: { pages: 3, photos: 10, items: 7 } }] }] };
-  const fetcher = { get: async (url) => ({ body: Buffer.from(JSON.stringify(pages)), meta: { url, fetchedAt: '2026-10-17T16:00:00.000Z' } }) };
+  const fetcher = { get: async (url) => ({ body: Buffer.from(JSON.stringify(pages)), meta: { url, fetchedAt: '2026-10-17T12:00:00.000Z' } }) };
   const lines = [];
   await importSite({ vendorId: vendor.id, vendors, outFile, fetcher, log: (line) => lines.push(line), today: () => '2026-10-17' });
   const written = JSON.parse(await readFile(outFile, 'utf8'));
@@ -117,6 +117,6 @@ test('importSite writes the snapshot through the shared inventory writer and rep
   assert.equal(JSON.parse(await readFile(outFile, 'utf8')).catalogs['dz-test'].indexedAt, '2026-10-17', 'an unchanged snapshot keeps its date');
   await assert.rejects(importSite({ vendorId: 'nobody', vendors, outFile, fetcher }), /No vendor "nobody"/);
   const tenPages = { vendors: [{ ...vendor, catalogs: [{ ...catalog, sourceUrl: 'https://dezzigncentralpgh.com/wp-json/wp/v2/pages?parent=76' }] }] };
-  const fullPage = { get: async (url) => ({ body: Buffer.from(JSON.stringify(Array(10).fill(pages[0]))), meta: { url, fetchedAt: '2026-10-17T16:00:00.000Z' } }) };
+  const fullPage = { get: async (url) => ({ body: Buffer.from(JSON.stringify(Array(10).fill(pages[0]))), meta: { url, fetchedAt: '2026-10-17T12:00:00.000Z' } }) };
   await assert.rejects(importSite({ vendorId: vendor.id, vendors: tenPages, outFile, fetcher: fullPage, log: () => {} }), /full page of 10/);
 });

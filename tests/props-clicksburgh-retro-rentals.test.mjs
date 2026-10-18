@@ -10,7 +10,8 @@ import { SECTIONS, parseCollection } from '../scripts/props/sites/clicksburgh-re
 const SITE = 'https://rentals.example/';
 const vendor = { id: 'repeater-test', name: 'Test Rentals', keyPrefix: 'rt' };
 const catalog = { id: 'rt-test', type: 'wix-repeater', sourceUrl: `${SITE}collection`, siteUrl: SITE, itemLinkLabel: 'Open collection page', photoHost: 'media.example' };
-const sections = new Map([['Our Things', 'title'], ['Lamps', 'kept'], ['Chairs', 'kept'], ['Hosted Booths', 'service'], ['Bundles', 'package'], ['Plates', 'kept']]);
+const SEVEN_WORDS = 'Tin Signs, Shop Boards & Window Cards';
+const sections = new Map([['Our Things', 'title'], ['Lamps', 'kept'], ['Chairs', 'kept'], ['Hosted Booths', 'service'], ['Bundles', 'package'], ['Plates', 'kept'], [SEVEN_WORDS, 'kept']]);
 const ZERO_WIDTH = String.fromCodePoint(0x200b);
 
 const mediaUrl = (id, width, host = 'media.example') => `https://${host}/media/${id}~mv2.jpg/v1/crop/x_0,y_4,w_900,h_900/fill/w_${width},h_${width},al_c,q_80,enc_avif,quality_auto/${id}.jpg`;
@@ -25,6 +26,7 @@ function tile({ name, price, width = 215, media = `m${(counter += 1)}`, host }) 
 const repeater = (tiles) => `<div id="comp-rep${(counter += 1)}" class=" comp-rep wixui-repeater"><div role="list">${tiles.join('')}</div></div>`;
 const heading = (text, tag = 'h4') => richText(`comp-h${(counter += 1)}`, `<span>${text}</span>`, tag);
 const description = (text) => richText(`comp-d${(counter += 1)}`, `<span>${text}</span>`);
+const wordsLong = (count) => Array.from({ length: count }, (_, at) => `word${at + 1}`).join(' ');
 const page = (content, title = 'Our Things') => `<html><body><header>${heading('Lamps')}<a href="/collection">${title}</a></header><main id="PAGES_CONTAINER">${heading(title, 'h1')}${description('Welcome to the collection of things you can rent from us for your events, shoots and parties; ask us for anything you do not see here, and we will find it for you.')}${content}</main><footer>${heading('Somewhere, Pennsylvania', 'h2')}</footer></body></html>`;
 const parse = (html, options = { sections }) => parseCollection(html, { vendor, catalog }, options);
 
@@ -52,8 +54,8 @@ test('kept tiles become items named as shown, under their section, linking the p
 });
 
 test('photos: the smallest variant at least 320 px wide, else the widest; off the photo host is flagged; a query stops', () => {
-  const parsed = parse(page(`${heading('Lamps')}${repeater([tile({ name: 'A', width: 215, media: 'a' }), tile({ name: 'B', width: 332, media: 'b' }), tile({ name: 'C', width: 120, media: 'c' }), tile({ name: 'D', media: 'd', host: 'other.example' })])}`));
-  assert.deepEqual(parsed.items.map((item) => parsed.images.get(item.key).urls[0]), [mediaUrl('a', 430), mediaUrl('b', 332), mediaUrl('c', 240), mediaUrl('d', 430, 'other.example')]);
+  const parsed = parse(page(`${heading('Lamps')}${repeater([tile({ name: 'A', width: 215, media: 'a' }), tile({ name: 'B', width: 332, media: 'b' }), tile({ name: 'C', width: 120, media: 'c' }), tile({ name: 'D', media: 'd', host: 'other.example' }), tile({ name: 'E', width: 320, media: 'e' })])}`));
+  assert.deepEqual(parsed.items.map((item) => parsed.images.get(item.key).urls[0]), [mediaUrl('a', 430), mediaUrl('b', 332), mediaUrl('c', 240), mediaUrl('d', 430, 'other.example'), mediaUrl('e', 320)]);
   assert.ok(parsed.report.some((line) => line.includes('"D"\'s photo is not on media.example')));
   const queried = page(`${heading('Lamps')}${repeater([tile({ name: 'A', media: 'q' })])}`).replaceAll('/q.jpg', '/q.jpg?made-up=1');
   assert.throws(() => parse(queried), /a URL with a query \(made-up\)/);
@@ -73,6 +75,12 @@ test('tiles of one name in a section are one item; the same name in two sections
 test('only headings inside <main> count: an unknown one stops, an empty one is skipped, and a tile before any section stops', () => {
   const parsed = parse(page(`${richText('comp-zw', `<span>${ZERO_WIDTH}</span>`)}${heading('Lamps')}${repeater([tile({ name: 'A' })])}`));
   assert.equal(parsed.items.length, 1, 'the header and footer texts and a zero-width paragraph are no headings');
+  const long = parse(page(`${heading(SEVEN_WORDS)}${description(wordsLong(21))}${repeater([tile({ name: 'B' })])}`));
+  assert.deepEqual(long.items.map((item) => item.categories), [[SEVEN_WORDS]], 'a 7-word heading is a heading, and a 21-word text is a description');
+  assert.throws(() => parse(page(`${heading(wordsLong(8))}${repeater([tile({ name: 'A' })])}`)), /a section heading this import doesn't know, "word1 word2 word3 word4 word5 word6 word7 word8"/);
+  for (const count of [9, 20]) {
+    assert.throws(() => parse(page(`${heading('Lamps')}${heading(wordsLong(count))}${repeater([tile({ name: 'A' })])}`)), new RegExp(`a text of ${count} words outside the tiles, too long for a section heading and too short for a description`), `${count} words`);
+  }
   assert.throws(() => parse(page(`${heading('Brand New Things')}${repeater([tile({ name: 'A' })])}`)), /a section heading this import doesn't know, "Brand New Things"/);
   assert.throws(() => parse(page(repeater([tile({ name: 'A' })]))), /comes before the first section heading/);
   assert.throws(() => parse('<html><body><p>Nothing here</p></body></html>'), /no <main> content/);
@@ -90,7 +98,7 @@ test('the import reads robots.txt, honouring a rule that starts with *, then the
   const fetcher = {
     get: async (url) => {
       requested.push(url);
-      return { body: Buffer.from(responses.get(url)), meta: { url, status: 200, fetchedAt: '2026-10-17T22:00:00.000Z' }, cached: false, missing: false };
+      return { body: Buffer.from(responses.get(url)), meta: { url, status: 200, fetchedAt: '2026-10-17T12:00:00.000Z' }, cached: false, missing: false };
     },
     raiseGap: () => {},
   };

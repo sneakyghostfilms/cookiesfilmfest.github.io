@@ -102,10 +102,10 @@ export function parseCatalog({ collections, pages }, { vendor, catalog }) {
     tileCount += tiles.length;
     const archive = page.subcategory ? tagArchivePager(page.html, page.subcategory, page.number) : null;
     if (archive) flags.push(`${heading}: pager leads to the tag archive ${archive}, not followed`);
-    const counts = perHeading.get(heading) ?? { pages: 0, tiles: 0 };
-    counts.pages += 1;
-    counts.tiles += tiles.length;
-    perHeading.set(heading, counts);
+    const tally = perHeading.get(heading) ?? { pages: 0, tiles: 0 };
+    tally.pages += 1;
+    tally.tiles += tiles.length;
+    perHeading.set(heading, tally);
     for (const tile of tiles) {
       const slug = tile.link.pathname.match(/^\/products\/([a-z0-9-]+)\/$/)?.[1];
       if (tile.link.origin !== site.origin || !slug) throw new Error(`A product tile on ${page.url} links ${tile.link.origin}${tile.link.pathname}, not a product page on ${site.host}; stopping.`);

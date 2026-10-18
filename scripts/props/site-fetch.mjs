@@ -96,7 +96,8 @@ export function createSiteFetcher({
       response = await send(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'manual', signal: AbortSignal.timeout(timeoutMs) });
       if ((response.status >= 200 && response.status <= 299) || (missingOk && MISSING.has(response.status))) body = Buffer.from(await response.arrayBuffer());
     } catch (error) {
-      stop(new FetchStopped(`${url} could not be fetched: ${error.message}`, { url, reason: 'network' }));
+      const cause = error.cause?.code ?? error.cause?.message;
+      stop(new FetchStopped(`${url} could not be fetched: ${error.message}${cause ? ` (${cause})` : ''}`, { url, reason: 'network' }));
     } finally {
       lastFinishedAt = now();
     }

@@ -104,8 +104,8 @@ test('other HTTP errors and network failures stop the run', async () => {
   const directory = await freshDirectory();
   const { fetcher } = harness({ [url('a')]: status(500) });
   await assert.rejects(fetcher.get(url('a'), directory), (error) => error instanceof FetchStopped && error.status === 500);
-  const broken = harness({ [url('a')]: () => { throw new TypeError('fetch failed'); } });
-  await assert.rejects(broken.fetcher.get(url('a'), directory), (error) => error instanceof FetchStopped && error.reason === 'network');
+  const broken = harness({ [url('a')]: () => { throw new TypeError('fetch failed', { cause: Object.assign(new Error('read ECONNRESET'), { code: 'ECONNRESET' }) }); } });
+  await assert.rejects(broken.fetcher.get(url('a'), directory), (error) => error instanceof FetchStopped && error.reason === 'network' && error.message.endsWith('fetch failed (ECONNRESET)'));
 });
 
 test('Retro on 8th and Shopify store hosts are refused before any request, whatever the allowlist says', async () => {

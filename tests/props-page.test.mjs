@@ -4,6 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { affiliation } from '../src/scripts/props-cards.js';
 import { compareByName, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -55,7 +56,8 @@ test('cards follow the spec format and carry the source link and inquiry route',
 test('/props states what it is not and how vendors can opt out', () => {
   assert.ok(text.includes('It does not book rentals or show live availability.'));
   assert.ok(text.includes('Always confirm availability, condition, sizes and price with the vendor.'));
-  assert.ok(text.includes(`Not affiliated with ${vendor.name}.`));
+  assert.ok(text.includes(affiliation(vendors.vendors)));
+  assert.ok(text.includes('Not affiliated with Steel City Props or Dezzign Central.'));
   assert.ok(text.includes('want your inventory listed, corrected or removed?'));
   assert.ok(html.includes('href="/#contact"'));
 });

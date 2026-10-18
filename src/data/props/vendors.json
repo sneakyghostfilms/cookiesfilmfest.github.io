@@ -64,6 +64,68 @@
           }
         }
       ]
+    },
+    {
+      "id": "dezzign-central",
+      "name": "Dezzign Central",
+      "keyPrefix": "dz",
+      "siteUrl": "https://dezzigncentralpgh.com/",
+      "sourceType": {
+        "value": "prop-house",
+        "source": "https://dezzigncentralpgh.com/ (page title \"Dezzign Central | Prop House\")"
+      },
+      "address": {
+        "label": "prop warehouse",
+        "street": "5501 butler street",
+        "city": "pittsburgh",
+        "state": "pa",
+        "zip": "15201",
+        "source": "https://dezzigncentralpgh.com/contact/"
+      },
+      "mailingAddress": {
+        "label": null,
+        "street": "p.o. box 10525",
+        "city": "pittsburgh",
+        "state": "pa",
+        "zip": "15235",
+        "source": "https://dezzigncentralpgh.com/contact/"
+      },
+      "hours": {
+        "text": "please call or email us to schedule an appointment",
+        "source": "https://dezzigncentralpgh.com/contact/"
+      },
+      "modes": {
+        "values": [
+          "inquire"
+        ],
+        "source": "https://dezzigncentralpgh.com/props/chairs/ (\"If you see something you are interested in please contact us to discuss further.\")"
+      },
+      "terms": null,
+      "contact": {
+        "formUrl": null,
+        "email": "dezzigncentral@gmail.com",
+        "phone": "412.801.3071",
+        "pageUrl": "https://dezzigncentralpgh.com/contact/",
+        "source": "https://dezzigncentralpgh.com/contact/"
+      },
+      "social": null,
+      "inquiryHint": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": [
+        {
+          "id": "dz-2026-10-17",
+          "type": "wordpress-pages",
+          "title": "Prop pages on dezzigncentralpgh.com",
+          "sourceUrl": "https://dezzigncentralpgh.com/wp-json/wp/v2/pages?parent=76&per_page=100&_fields=id,slug,link,title,modified,content",
+          "siteUrl": "https://dezzigncentralpgh.com/props/",
+          "itemLinkLabel": "Open vendor page",
+          "expected": {
+            "pages": 7,
+            "photos": 33,
+            "items": 23
+          }
+        }
+      ]
     }
   ]
 }

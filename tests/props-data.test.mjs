@@ -109,7 +109,7 @@ test('numbers the vendor reused for different items get distinct keys, and repea
 });
 
 test('multi-number cards keep every printed number', () => {
-  const multi = inventory.items.filter((item) => item.itemNumbers.length > 1).map((item) => item.key).sort();
+  const multi = inventory.items.filter((item) => item.itemNumbers?.length > 1).map((item) => item.key).sort();
   assert.deepEqual(multi, ['scp-015-017-016', 'scp-058-060-059', 'scp-062-063', 'scp-144-146']);
 });
 
@@ -141,5 +141,16 @@ test('reviewed tag removals stay removed', async () => {
     assert.ok(byKey.has(key), `exclusion for an unknown item: ${key}`);
     assert.ok(reason, key);
     for (const tag of drop) assert.ok(!(tagsFile.tags[key] ?? []).includes(tag), `${key} still has "${tag}"`);
+  }
+});
+
+test('every acceptable key in the scene fixtures names an indexed item', async () => {
+  const directory = new URL('../worker/test/fixtures/scenes/', import.meta.url);
+  const { readdir } = await import('node:fs/promises');
+  for (const file of (await readdir(directory)).filter((name) => name.endsWith('.json'))) {
+    const fixture = JSON.parse(await readFile(new URL(file, directory), 'utf8'));
+    for (const prop of fixture.required) {
+      for (const key of prop.acceptableKeys) assert.ok(byKey.has(key), `${fixture.id} ${prop.prop}: ${key}`);
+    }
   }
 });

@@ -197,6 +197,8 @@ test('scene ranking is the same keyword ranking, without a decade boost from the
 });
 
 test('the vendor filter keeps one vendor', () => {
-  assert.deepEqual(keys('', { vendor: 'steel-city-props' }).length, docs.length);
+  assert.deepEqual(keys('', { vendor: 'steel-city-props' }), docs.filter((doc) => doc.vendor === 'steel-city-props').sort(compareByName).map((doc) => doc.key));
+  assert.ok(keys('refrigerator', { vendor: 'dezzign-central' }).length > 0);
+  assert.deepEqual(keys('refrigerator', { vendor: 'steel-city-props' }).filter((key) => key.startsWith('dz-')), []);
   assert.deepEqual(keys('phone', { vendor: 'nobody' }), []);
 });

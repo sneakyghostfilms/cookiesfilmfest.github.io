@@ -165,6 +165,19 @@ test('a cache entry must belong to the URL asked for', async () => {
   assert.equal(calls.length, 0);
 });
 
+test('cacheOnly returns a cached entry and refuses a miss without a request, and the run stays stopped', async () => {
+  const directory = await freshDirectory();
+  const name = cacheName(url('sitemap.xml'));
+  await writeFile(path.join(directory, `${name}.body`), '<urlset></urlset>');
+  await writeFile(path.join(directory, `${name}.meta.json`), JSON.stringify({ url: url('sitemap.xml'), status: 200, contentType: 'text/xml', fetchedAt: '2026-10-17T12:00:00.000Z' }));
+  const { calls, fetcher } = harness({ [url('a')]: ok('a') });
+  const hit = await fetcher.get(url('sitemap.xml'), directory, { cacheOnly: true });
+  assert.deepEqual([hit.cached, hit.body.toString()], [true, '<urlset></urlset>']);
+  await assert.rejects(fetcher.get(url('other.xml'), directory, { cacheOnly: true }), (error) => error instanceof FetchStopped && error.reason === 'cache' && /is not in the cache, and this run reads it only from there; not requesting it/.test(error.message));
+  await assert.rejects(fetcher.get(url('a'), directory), FetchStopped, 'nothing is requested after the stop');
+  assert.equal(calls.length, 0);
+});
+
 test('a run can slow down to a declared delay, but never below the minimum gap', async () => {
   const directory = await freshDirectory();
   const { waits, fetcher } = harness({ [url('a')]: ok('a'), [url('b')]: ok('b'), [url('c')]: ok('c') });

@@ -107,13 +107,12 @@ async function main() {
   const rounds = Number(values.cpu);
   if (rounds > 0) {
     const timed = new Map([...arms.keys()].map((arm) => [arm, new Map(scenes.map((scene) => [scene.id, []]))]));
+    const runs = scenes.flatMap((scene) => [...arms.keys()].map((arm) => ({ scene, arm })));
     for (let round = -20; round < rounds; round += 1) {
-      for (const scene of scenes) {
-        for (const arm of arms.keys()) {
-          const started = process.hrtime.bigint();
-          lexicalList(indexes[arm], scene.text);
-          if (round >= 0) timed.get(arm).get(scene.id).push(Number(process.hrtime.bigint() - started) / 1e6);
-        }
+      for (const { scene, arm } of runs) {
+        const started = process.hrtime.bigint();
+        lexicalList(indexes[arm], scene.text);
+        if (round >= 0) timed.get(arm).get(scene.id).push(Number(process.hrtime.bigint() - started) / 1e6);
       }
     }
     lines.push(`\n### Time to rank and select, ms (median of ${rounds} runs; Node ${process.version})\n`, table(['Arm', ...scenes.map((scene) => scene.id)], [...arms].map(([arm, label]) => [label, ...scenes.map((scene) => median(timed.get(arm).get(scene.id)).toFixed(2))])));

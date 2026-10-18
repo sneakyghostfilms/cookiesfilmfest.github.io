@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { eraDecades } from './normalize.mjs';
 
 const ITEM_FIELDS = new Set(['key', 'vendor', 'catalog', 'name', 'description', 'categories', 'era', 'decades', 'url']);
-const PRICED_TYPES = new Set(['shopify-export', 'square-store', 'woocommerce-listing']);
+const PRICED_TYPES = new Set(['shopify-export', 'square-store', 'woocommerce-listing', 'weebly-gallery']);
 
 export function siteKey(prefix, input) {
   const digest = createHash('sha256').update(input, 'utf8').digest('hex');
@@ -13,6 +13,8 @@ function listingProblem(text) {
   if (typeof text !== 'string' || !text.trim()) return 'is empty';
   if (/[\u0000-\u001f\u007f]/.test(text)) return 'holds a control character or line break';
   if (text.includes(' | ')) return 'holds " | ", which would break a listing line';
+  const entity = text.match(/&(?:[a-z][a-z0-9]*|#\d+|#x[0-9a-f]+);/i);
+  if (entity) return `holds ${entity[0]}, an HTML entity that was not decoded`;
   return null;
 }
 

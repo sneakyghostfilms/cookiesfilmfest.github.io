@@ -14,7 +14,8 @@ const FIXTURES = join(WORKER, 'test/fixtures/scenes');
 const DAILY_BUDGET = Number(JSON.parse(await readFile(join(WORKER, 'wrangler.jsonc'), 'utf8')).vars.DAILY_NEURON_BUDGET);
 const FLOOR = { requiredShare: 0.7, invalidKeysPerScene: 1, wrongKeysPerScene: 1, scenesPerDay: 50 };
 const BASELINE_SCENES = ['diner', 'hospital', 'office', 'police'];
-const ABSENT_REPORTED_FLOOR = 4;
+// The absent props counted are the hospital's and the police scene's four; the target is all four.
+const ABSENT_REPORTED_FLOOR = 3;
 const { values } = parseArgs({
   options: {
     url: { type: 'string' },
@@ -125,7 +126,7 @@ const gate = [
   ['at most 1 misfiled key per scene', scored.every((row) => row.result.misfiled.length <= 1), scored.map((row) => `${row.fixture.id} ${row.result.misfiled.length}`).join(', ')],
   ['0 invalid keys', baseline.every((row) => row.body.ignoredSuggestions === 0), baseline.map((row) => `${row.fixture.id} ${row.body.ignoredSuggestions}`).join(', ')],
   ['no truncated output', baseline.every((row) => !row.truncated), baseline.filter((row) => row.truncated).map((row) => row.fixture.id).join(', ') || 'none'],
-  [`absent props reported as no match at least ${ABSENT_REPORTED_FLOOR} of 6 (target 5)`, sum((row) => row.result.honest, baselineFitting) >= ABSENT_REPORTED_FLOOR, `${sum((row) => row.result.honest, baselineFitting)}/${sum((row) => row.result.absent.length, baselineFitting)}`],
+  [`absent props reported as no match at least ${ABSENT_REPORTED_FLOOR} of 4 (target 4)`, sum((row) => row.result.honest, baselineFitting) >= ABSENT_REPORTED_FLOOR, `${sum((row) => row.result.honest, baselineFitting)}/${sum((row) => row.result.absent.length, baselineFitting)}`],
   ...others.map((row) => [`${row.fixture.id} meets the S1 floor (70% found, at most 1 wrong and 1 invalid key, no truncation)`,
     row.result.countable > 0 && row.result.counted / row.result.countable >= FLOOR.requiredShare && row.result.wrongKeys.length <= FLOOR.wrongKeysPerScene
       && row.body.ignoredSuggestions <= FLOOR.invalidKeysPerScene && !row.truncated,

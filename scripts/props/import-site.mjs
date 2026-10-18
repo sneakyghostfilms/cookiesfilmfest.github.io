@@ -12,6 +12,7 @@ import { robotsAllow, robotsRules, robotsTarget } from './robots.mjs';
 import { FetchStopped, createSiteFetcher } from './site-fetch.mjs';
 import { checkSiteItems } from './site-items.mjs';
 import { LISTING_PAGE_LIMIT, nextListingPage, parseListing } from './sites/construction-junction.mjs';
+import { galleryPages, parseGalleries } from './sites/cleveland-prop-shop.mjs';
 import { parseStore, storeListPage, storePageCount } from './sites/creative-reuse.mjs';
 import { parsePages } from './sites/dezzign-central.mjs';
 import { parseExport } from './sites/retro-on-8th.mjs';
@@ -21,7 +22,7 @@ const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
 const ITEM_EXCLUSIONS_FILE = join(ROOT, 'scripts/props/item-exclusions.json');
 export const ITEM_EXCLUSION_REASONS = new Set(["name or photo carries a private individual's name"]);
-const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store', 'woocommerce-listing']);
+const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store', 'woocommerce-listing', 'weebly-gallery']);
 const WORDPRESS_PAGE_SIZE = 10;
 
 const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
@@ -86,6 +87,19 @@ const SOURCES = {
       pages.push(body.toString('utf8'));
     }
     return { ...parseListing(pages, { vendor, catalog }), capturedAt: localDate(firstFetchedAt) };
+  },
+  async 'weebly-gallery'({ vendor, catalog, fetcher, cacheRoot }) {
+    const directory = join(cacheRoot, vendor.id, catalog.id);
+    const site = await robotsCheckedFetcher(fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.sourceUrl).hostname] }), catalog.sourceUrl, directory);
+    const home = (await site.get(catalog.sourceUrl, directory)).body.toString('utf8');
+    const pages = [];
+    for (const page of galleryPages(home, catalog.siteUrl)) {
+      const { body, meta } = await site.get(page.url, directory);
+      pages.push({ ...page, html: body.toString('utf8'), fetchedAt: meta.fetchedAt });
+    }
+    // The capture date is the earliest gallery page's, since a snapshot can mix pages seeded earlier with fresh ones.
+    const capturedAt = localDate(Math.min(...pages.map((page) => Date.parse(page.fetchedAt))));
+    return { ...parseGalleries(pages, { vendor, catalog }), capturedAt };
   },
   async 'shopify-export'({ catalog, vendor, exportPath }) {
     if (!exportPath) throw new Error(`${vendor.name} is imported from the vendor's Shopify product export: pass --export "<file.csv>".`);

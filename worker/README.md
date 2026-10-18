@@ -60,7 +60,7 @@ The model sees at most 100 items per scene, not the whole inventory, so a scene'
 - **Order and format.** The selected items are listed grouped by catalog section, in catalog order, in the same `key | name | era` lines as before.
 - **Validation.** Returned keys are checked against the list actually sent.
 - **Deterministic.** The list is a pure function of `inventory.json`, `tags.json`, the scene text and the period. `node scripts/shortlist.mjs --scene office [--period 1960s]` prints the list, the request size and its reservation; `node scripts/shortlist.mjs --recall` prints, for each fixture scene, how many required props keep an acceptable item in the list at each list size, and each acceptable item's rank in the plain ranking and whether it is listed. Neither calls the model.
-- **CPU.** Ranking a 4,000-character scene and selecting its list takes about 1–2 ms on a laptop (1.3 ms at 571 items, 1.7 ms at 1,239), under the Free plan's 10 ms per request. The index is built once when the Worker starts.
+- **CPU.** Ranking a 4,000-character scene and selecting its list takes about 1–3 ms on a laptop (1.3 ms at 571 items, 1.7 ms at 1,239, 2.5 ms at 1,856), under the Free plan's 10 ms per request. The index is built once when the Worker starts.
 
 ## Cost guard
 
@@ -73,7 +73,7 @@ One SQLite-backed Durable Object, `AiBudget`, controls every AI call. The defaul
 | `AI_PER_MINUTE_LIMIT` | `20` | requests per minute for everyone |
 | `AI_TIMEOUT_MS` | `30000` | how long to wait for the model; long scenes can take about 20 s |
 
-- **Pre-charge.** Before each call, the Worker reserves the worst case: input tokens are bounded by the UTF-8 byte length of everything sent plus 256, and output by `max_completion_tokens` (1,700). Real usage can't exceed the reservation. With gemma-4-26b-a4b-it and the shortlist, the four original fixture scenes reserve about 124–158 Neurons at 1,010 items (205–225 when the whole inventory was sent).
+- **Pre-charge.** Before each call, the Worker reserves the worst case: input tokens are bounded by the UTF-8 byte length of everything sent plus 256, and output by `max_completion_tokens` (1,700). Real usage can't exceed the reservation. With gemma-4-26b-a4b-it and the shortlist, the four original fixture scenes reserve about 126–159 Neurons at 1,856 items (205–225 when the whole inventory was sent).
 - **Settling.** After a successful answer whose usage is well formed, the Worker sends the object one settle request, and the object lowers the day's spend from the reservation to the actual cost: prompt tokens plus completion tokens (plus reasoning tokens, if reported) at the model's rates. It never lowers spend by more than the reservation or below zero, and it refunds only against the UTC day the reservation was charged to. Before the shortlist, a typical scene cost about 70–90 Neurons after settling, roughly 55–70 scenes a day; `scripts/eval-models.mjs` reports the current figures.
 - **Refunds only after success.** The charge is refunded down to actual usage only after a successful answer; never on failures (`ai_failed`, `ai_timeout`, `ai_busy`, `ai_bad_output`, `quota_exhausted`, `ai_not_configured`), and not when usage is missing or malformed. If the settle request fails or doesn't answer within 3 s, the worst-case charge stands and the answer is still returned. A Workers AI outage during heavy use can therefore use up the day's budget with nothing to show for it. When the budget is gone, scene matching shows "Today's AI matching budget is used up" until midnight UTC, and keyword search keeps working.
 - **Midnight and minute boundaries.** Requests can reach the object slightly out of order. One stamped just before midnight (or before a new minute) that arrives after the new day (or minute) has begun is counted in the newer one, so it can't reset the new day's spend or the minute counters.
@@ -104,7 +104,8 @@ node scripts/eval-models.mjs --url http://localhost:8788
 The output ends with the deploy gate, which must pass before a redeploy that changes the inventory or the tags:
 - On the four original scenes (diner, hospital, office, police): every counted required prop is found, with 0 wrong keys, 0 invalid keys and no truncated output.
 - Every scene has at most 1 misfiled key (see How an answer is scored, below).
-- At least 4 of the 6 props those scenes name that the catalogs lack are reported as "no match". The target is 5 of 6, the 2026-10-17 baseline. The floor is 4 because the baseline setup varies on its own: an identical 6,762-token office request left out both of that scene's absent props, where the baseline had reported one.
+- At least 3 of the 4 props those scenes name that the catalogs lack are reported as "no match": the hospital's IV pole and heart monitor, and the police scene's squad car and crime scene tape. The target is 4 of 4; the floor allows one miss because the model varies from run to run. The diner's absent props aren't counted, since that scene names more props than the lists hold.
+  - The office scene no longer lists a water cooler or a fax machine. The inventory now holds both, but from the 1980s and 1990s, and the scene is set in 1962, so the gate neither rewards nor penalizes what the model does with them.
 - Every other scene (today the morgue) meets the S1 floor: 70% of required props found, at most 1 wrong and 1 invalid key, and no truncation.
 
 When new items match a scene's required prop, add their keys to that prop's `acceptableKeys` before the run, so that a correct pick doesn't count as a wrong key.

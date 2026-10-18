@@ -8,7 +8,14 @@
         "scp-077",
         "scp-078",
         "scp-079",
-        "scp-331"
+        "scp-331",
+        "cps-mjd9el",
+        "cps-knzynf",
+        "cps-tsf04j",
+        "cps-1h747p",
+        "cps-6bv3u3",
+        "cps-1fyp6l",
+        "cps-6h9m67"
       ]
     },
     {
@@ -18,7 +25,33 @@
         "scp-054-1",
         "scp-054-2",
         "scp-055",
-        "scp-134"
+        "scp-134",
+        "cps-gyr0bc",
+        "cps-qil68u",
+        "cps-ppm6sj",
+        "cps-iyo67w",
+        "cps-ylvq8v",
+        "cps-92tjmh",
+        "cps-u7b5de",
+        "cps-yxsni9",
+        "cps-urg93u",
+        "cps-c9zgu9",
+        "cps-20wq7s",
+        "cps-xo5eqa",
+        "cps-g7vjqw",
+        "cps-q5o0iq",
+        "cps-c8qpw7",
+        "cps-p4kru1",
+        "cps-t3y7if",
+        "cps-9cu0mw",
+        "cps-8c3hvr",
+        "cps-zfdbd4",
+        "cps-ociv8c",
+        "cps-r9lun3",
+        "cps-d6a3ax",
+        "cps-0o8fuv",
+        "cps-skzw7q",
+        "cps-dhgf3x"
       ]
     },
     {
@@ -40,8 +73,5 @@
       ]
     }
   ],
-  "absent": [
-    "water cooler",
-    "fax machine"
-  ]
+  "absent": []
 }

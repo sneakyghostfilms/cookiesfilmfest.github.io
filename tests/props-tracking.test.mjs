@@ -22,6 +22,7 @@ test('tracking values in links, form actions, sources and inputs are replaced, a
   );
   assert.deepEqual(redacted('<img src="https://cdn.example/a.jpg?ttclid=x1"><meta property="og:url" content="https://shop.example/?twclid=x2">'), ['<img src="https://cdn.example/a.jpg?ttclid=REDACTED"><meta property="og:url" content="https://shop.example/?twclid=REDACTED">', ['ttclid', 'twclid']]);
   assert.deepEqual(redacted('<div style="background:url(/a.jpg?utm_source=x9)">'), ['<div style="background:url(/a.jpg?utm_source=REDACTED)">', ['utm_source']], 'a value ends at a closing parenthesis');
+  assert.deepEqual(redacted('<input type="hidden" name="_kx" data-value="kept" value="tok">'), ['<input type="hidden" name="_kx" data-value="kept" value="REDACTED">', ['_kx']], 'data-value is not the value');
 });
 
 test('a JSON-escaped ampersand and a percent-encoded query are read too', () => {
@@ -55,12 +56,20 @@ test('what is not a tracking value is left alone: empty values, longer names, pr
     '<a href="/p/?gclid=&amp;page=2">',
     '<input type="hidden" name="gclid" value=""><input type="hidden" name="fbclid">',
     '<a href="/p/?xgclid=abc&amp;gclidx=abc&amp;_gat=1&amp;_gac=2">',
+    '<input type="hidden" name="gclidx" value="kept"><input type="hidden" name="xgclid" value="kept">',
     '<p>We never use utm_source tags.</p>',
     '<input type="hidden" data-name="gclid" value="kept"><input type="hidden" name="page" value="2">',
     `<a href="/p/?_kx=${REDACTED}">`,
   ]) {
     const result = html(text);
     assert.deepEqual([result.body.toString('utf8'), result.redacted], [text, []], text);
+  }
+});
+
+test('a body without a content type is read as text', () => {
+  for (const type of [null, undefined, '']) {
+    const result = redactTracking(Buffer.from('<a href="/?gclid=v1">'), type);
+    assert.deepEqual([result.body.toString(), result.redacted], ['<a href="/?gclid=REDACTED">', ['gclid']], String(type));
   }
 });
 

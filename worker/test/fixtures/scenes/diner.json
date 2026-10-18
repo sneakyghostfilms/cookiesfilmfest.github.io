@@ -30,7 +30,8 @@
     {
       "prop": "mugs",
       "acceptableKeys": [
-        "scp-049"
+        "scp-049",
+        "cps-z7mglt"
       ]
     },
     {
@@ -48,7 +49,8 @@
     {
       "prop": "decanter",
       "acceptableKeys": [
-        "scp-031"
+        "scp-031",
+        "cps-78bq82"
       ]
     },
     {
@@ -106,7 +108,8 @@
       "prop": "pay phone",
       "acceptableKeys": [
         "scp-285",
-        "scp-149"
+        "scp-149",
+        "cps-p8xafv"
       ]
     },
     {
@@ -149,7 +152,8 @@
         "scp-037-2",
         "scp-342",
         "scp-345",
-        "pccr-xfb0i2"
+        "pccr-xfb0i2",
+        "cps-v42604"
       ]
     },
     {

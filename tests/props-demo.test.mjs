@@ -47,6 +47,7 @@ test('no vendor photo or catalog PDF is tracked, and the demo folder is ignored'
 });
 
 const TRACKED_CSV = ['comedy-festival-map.csv', 'festinfo.csv', 'tests/fixtures/props-shopify-export-current.csv', 'tests/fixtures/props-shopify-export-legacy.csv'];
+const TRACKED_HTML = ['tests/fixtures/props-vintage-alley.html'];
 
 test('raw vendor responses stay in the ignored cache, and only known CSV files are tracked', () => {
   assert.equal(git('ls-files', '.props-cache').stdout, '');
@@ -57,7 +58,7 @@ test('raw vendor responses stay in the ignored cache, and only known CSV files a
   }
   const tracked = git('ls-files').stdout.split('\n');
   assert.deepEqual(tracked.filter((file) => /\.csv$/i.test(file) && !TRACKED_CSV.includes(file)), [], 'a vendor export or other CSV is tracked');
-  assert.deepEqual(tracked.filter((file) => /\.html?$/i.test(file)), [], 'an HTML page is tracked');
+  assert.deepEqual(tracked.filter((file) => /\.html?$/i.test(file) && !TRACKED_HTML.includes(file)), [], 'a vendor HTML page is tracked');
 });
 
 class Response extends Writable {

@@ -118,7 +118,7 @@ const SOURCES = {
       for (let url = subcategory.url, number = 1; url; number += 1) {
         const { body, meta } = await site.get(url, directory);
         const html = body.toString('utf8');
-        pages.push({ url, html, fetchedAt: meta.fetchedAt, subcategory: subcategory.url });
+        pages.push({ url, html, fetchedAt: meta.fetchedAt, subcategory: subcategory.url, number });
         url = nextSubcategoryPage(html, subcategory.url, number);
       }
     }

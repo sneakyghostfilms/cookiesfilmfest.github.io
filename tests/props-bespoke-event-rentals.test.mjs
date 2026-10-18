@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { importSite } from '../scripts/props/import-site.mjs';
 import { checkSiteItems, siteKey } from '../scripts/props/site-items.mjs';
-import { PHOTO_BUCKET, PHOTO_HOST, nextSubcategoryPage, offSubcategoryPager, parseCatalog, photoProblem, subcategoryPages } from '../scripts/props/sites/bespoke-event-rentals.mjs';
+import { PHOTO_BUCKET, PHOTO_HOST, nextSubcategoryPage, parseCatalog, photoProblem, subcategoryPages, tagArchivePager } from '../scripts/props/sites/bespoke-event-rentals.mjs';
 
 const SITE = 'https://rentals.example/';
 const COLLECTION = `${SITE}categories/furniture-rentals-collection/`;
@@ -61,20 +61,20 @@ test('the same product on two subcategory pages is one item, with both categorie
   assert.match(parsed.report.join('\n'), /"SoHo Chair" appears on 2 subcategory pages \(SoHo Collection, Chairs\); one item/);
 });
 
-test("a subcategory page's next page is followed only to the same path plus page/N/, up to 10 pages; a pager leading off the subcategory is not followed", () => {
+test("a subcategory page's next page is followed only on its own path; its slug's tag archive is named and not followed; any other next link stops", () => {
   const first = `${COLLECTION}chairs/`;
-  assert.equal(nextSubcategoryPage(subcategoryPage('Chairs', [], null), first, 1), null);
-  assert.equal(nextSubcategoryPage(subcategoryPage('Chairs', [], `${first}page/2/`), first, 1), `${first}page/2/`);
-  assert.equal(nextSubcategoryPage(subcategoryPage('Chairs', [], `${first}page/3/`), first, 2), `${first}page/3/`);
-  assert.throws(() => nextSubcategoryPage(subcategoryPage('Chairs', [], `${first}page/3/`), first, 1), /names its next page as .*page\/3\/, not .*page\/2\//, 'a skipped number on its own path stops');
-  assert.throws(() => nextSubcategoryPage(subcategoryPage('Chairs', [], `${first}page/11/`), first, 10), /goes on past 10 pages/);
-  const offPaths = [[`${SITE}tags/chairs/page/2/`, '/tags/chairs/page/2/'], [`${COLLECTION}benches/page/2/`, '/categories/furniture-rentals-collection/benches/page/2/'], [`${first}page/2/?x=1`, '/categories/furniture-rentals-collection/chairs/page/2/?x=1'], ['https://other.example/x/', 'https://other.example/x/']];
-  for (const [next, named] of offPaths) {
-    const html = subcategoryPage('Chairs', [], next);
-    assert.equal(nextSubcategoryPage(html, first, 1), null, next);
-    assert.equal(offSubcategoryPager(html, first), named, next);
+  const next = (href, number = 1) => nextSubcategoryPage(subcategoryPage('Chairs', [], href), first, number);
+  assert.equal(next(null), null);
+  assert.equal(next(`${first}page/2/`), `${first}page/2/`);
+  assert.equal(next(`${first}page/3/`, 2), `${first}page/3/`);
+  assert.throws(() => next(`${first}page/11/`, 10), /goes on past 10 pages/);
+  assert.equal(next(`${SITE}tags/chairs/page/2/`), null, 'the tag archive is not followed');
+  assert.equal(tagArchivePager(subcategoryPage('Chairs', [], `${SITE}tags/chairs/page/2/`), first, 1), '/tags/chairs/page/2/');
+  assert.equal(tagArchivePager(subcategoryPage('Chairs', [], `${SITE}tags/chairs/page/4/`), first, 3), '/tags/chairs/page/4/');
+  for (const href of [`${first}page/3/`, `${SITE}tags/benches/page/2/`, `${SITE}tags/chairs/page/3/`, `${SITE}tags/chairs/page/2/?x=1`, `${SITE}tags/chairs/`, `https://other.example/tags/chairs/page/2/`, `${COLLECTION}benches/page/2/`, `${first}page/2/?x=1`]) {
+    assert.equal(tagArchivePager(subcategoryPage('Chairs', [], href), first, 1), null, href);
+    assert.throws(() => next(href), /names its next page as/, href);
   }
-  assert.equal(offSubcategoryPager(subcategoryPage('Chairs', [], `${first}page/2/`), first), null);
 });
 
 test("photos: only the vendor's bucket on the S3 host, with a query of digits alone", () => {
@@ -106,7 +106,7 @@ test('a product link off the host or with a query, a price for a caption, a miss
   assert.throws(() => parse([{ url: `${COLLECTION}chairs/`, html: changed }]), /has 1 tiles, 0 of them in the layout this import reads/);
 });
 
-test("the import reads robots.txt with its pre-group Crawl-delay, the collection page, then each subcategory page and its next pages; a pager leading off its subcategory is flagged and the import goes on", async () => {
+test("the import reads robots.txt with its pre-group Crawl-delay, the collection page, then each subcategory page and its next pages; its slug's tag-archive pager is flagged and the import goes on", async () => {
   const chairs = `${COLLECTION}chairs/`;
   const benches = `${COLLECTION}benches/`;
   const stools = `${COLLECTION}stools/`;
@@ -135,5 +135,26 @@ test("the import reads robots.txt with its pre-group Crawl-delay, the collection
   assert.deepEqual(items.map((item) => [item.name, item.categories[0]]), [['Ghost Chair', 'Chairs'], ['Wingback Chair', 'Chairs'], ['Bar Stool', 'Stools'], ['Church Pew Bench', 'Benches']]);
   assert.equal(parsed.capturedAt, '2026-10-18', 'the earliest page dates the snapshot');
   assert.deepEqual(parsed.counts, { pages: 4, tiles: 4, items: 4, merged: 0 });
-  assert.deepEqual(parsed.report.filter((line) => /pager/.test(line)), ['  Stools: pager leads off the subcategory: /tags/stools/page/2/, not followed']);
+  assert.deepEqual(parsed.report.filter((line) => /pager/.test(line)), ['  Stools: pager leads to the tag archive /tags/stools/page/2/, not followed']);
+});
+
+test("a next link of any other form stops the import as a layout change, before it is requested", async () => {
+  const stools = `${COLLECTION}stools/`;
+  const responses = new Map([
+    [`${SITE}robots.txt`, 'User-agent: *\nDisallow:\n'],
+    [COLLECTION, collectionPage([['stools', 'Stools'], ['benches', 'Benches']])],
+    [stools, subcategoryPage('Stools', [product('bar-stool', 'Bar Stool', 4)], `${SITE}tags/benches/page/2/`)],
+  ]);
+  const requested = [];
+  const fetcher = {
+    get: async (url) => {
+      requested.push(url);
+      return { body: Buffer.from(responses.get(url)), meta: { url, status: 200, fetchedAt: '2026-10-18T14:00:00.000Z' }, cached: false, missing: false };
+    },
+    raiseGap: () => {},
+  };
+  const directory = await mkdtemp(path.join(tmpdir(), 'props-tapgoods-'));
+  await assert.rejects(importSite({ vendorId: vendor.id, vendors: { vendors: [{ ...vendor, catalogs: [catalog] }] }, outFile: path.join(directory, 'inventory.json'), cacheRoot: directory, fetcher, exclusions: {}, log: () => {}, today: () => '2026-10-18' }),
+    /stools\/: page 1 names its next page as https:\/\/rentals\.example\/tags\/benches\/page\/2\/, not .*stools\/page\/2\/; stopping/);
+  assert.deepEqual(requested, [`${SITE}robots.txt`, COLLECTION, stools], 'nothing after the stop');
 });

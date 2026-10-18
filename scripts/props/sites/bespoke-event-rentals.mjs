@@ -56,24 +56,24 @@ export function subcategoryPages(html, catalog) {
   return pages;
 }
 
-// A page's pager when it leads off its subcategory, that is anywhere but the same path plus page/N/ (Chairs' leads to a
-// tag archive, /tags/chairs/page/2/); null when it has none or stays on the subcategory.
-export function offSubcategoryPager(html, firstUrl) {
+// The one pager off a subcategory's own path that is recognized: exactly the tag archive of the same slug on the same
+// host, /tags/<slug>/page/N+1/ (Bespoke's Chairs page has one). It is not followed; the subcategory keeps the pages read so
+// far, and the report names it. Returns that path, or null.
+export function tagArchivePager(html, firstUrl, number) {
   const href = nextLink(html);
   if (!href) return null;
   const first = new URL(firstUrl);
-  const link = new URL(href, firstUrl);
-  const pages = `${first.pathname}page/`;
-  const onPath = link.origin === first.origin && !link.search && !link.hash && link.pathname.startsWith(pages) && /^\d+\/$/.test(link.pathname.slice(pages.length));
-  return onPath ? null : `${link.origin === first.origin ? '' : link.origin}${link.pathname}${link.search}`;
+  const slug = first.pathname.split('/').filter(Boolean).at(-1);
+  const archive = `/tags/${slug}/page/${number + 1}/`;
+  return href === `${first.origin}${archive}` ? archive : null;
 }
 
 // A subcategory page's next page, followed only when it is the same path plus page/N/, N the next number, up to
-// SUBCATEGORY_PAGE_LIMIT pages. A pager leading off the subcategory is not followed: the subcategory keeps the pages read
-// so far, the report names it, and the import goes on. A wrong page number on the subcategory's own path stops it.
+// SUBCATEGORY_PAGE_LIMIT pages. The tag-archive pager above is not followed. Any other next link is a layout change and
+// stops the import.
 export function nextSubcategoryPage(html, firstUrl, number) {
   const href = nextLink(html);
-  if (!href || offSubcategoryPager(html, firstUrl)) return null;
+  if (!href || tagArchivePager(html, firstUrl, number)) return null;
   const expected = `${firstUrl}page/${number + 1}/`;
   if (href !== expected) throw new Error(`${firstUrl}: page ${number} names its next page as ${href}, not ${expected}; stopping.`);
   if (number + 1 > SUBCATEGORY_PAGE_LIMIT) throw new Error(`${firstUrl} goes on past ${SUBCATEGORY_PAGE_LIMIT} pages; stopping before page ${number + 1}.`);
@@ -94,8 +94,8 @@ export function parseCatalog({ collection, pages }, { vendor, catalog }) {
     if (!heading) throw new Error(`${page.url} has no subcategory heading; the page layout has changed.`);
     const tiles = tilesOf(page.html, page.url);
     tileCount += tiles.length;
-    const offPager = page.subcategory ? offSubcategoryPager(page.html, page.subcategory) : null;
-    if (offPager) flags.push(`${heading}: pager leads off the subcategory: ${offPager}, not followed`);
+    const archive = page.subcategory ? tagArchivePager(page.html, page.subcategory, page.number) : null;
+    if (archive) flags.push(`${heading}: pager leads to the tag archive ${archive}, not followed`);
     const counts = perHeading.get(heading) ?? { pages: 0, tiles: 0 };
     counts.pages += 1;
     counts.tiles += tiles.length;

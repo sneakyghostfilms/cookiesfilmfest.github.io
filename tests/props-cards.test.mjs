@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  NOT_AFFILIATED, cardFor, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, specialtiesLine, telHref, vendorBadges, vendorFacts, vendorSources,
+  NOT_AFFILIATED, cardFor, catalogLines, contactRoutes, inquiryHref, privateFacts, socialLinks, specialtiesLine, telHref, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources,
 } from '../src/scripts/props-cards.js';
 
 const pdfVendor = { id: 'steel-city-props', name: 'Steel City Props', contact: { formUrl: 'https://forms.example/form', email: 'shop@example.com', phone: null, pageUrl: null } };
@@ -76,6 +76,8 @@ test('notices and specialties are quoted as the vendor wrote them', () => {
   assert.equal(specialtiesLine(vendor), 'In their words: “Typewriters”, “Period and Modern Props”');
   assert.deepEqual(vendorFacts(vendor).slice(0, 2), ['Notice on their site: “We have moved!”', 'In their words: “Typewriters”, “Period and Modern Props”']);
   assert.equal(specialtiesLine(siteVendor), null);
+  assert.deepEqual(vendorSearchDoc(vendor, 3), { key: 'dezzign-central', name: 'Dezzign Central', description: 'Typewriters Period and Modern Props', categories: [], tags: [], decades: [], order: 3 });
+  assert.equal(vendorSearchDoc(siteVendor, 0).description, '', 'the source-type label is never search text');
 });
 
 test('contact routes and facts come only from what the vendor publishes', () => {

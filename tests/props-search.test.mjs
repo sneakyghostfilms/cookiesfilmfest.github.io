@@ -202,3 +202,18 @@ test('the vendor filter keeps one vendor', () => {
   assert.deepEqual(keys('refrigerator', { vendor: 'steel-city-props' }).filter((key) => key.startsWith('dz-')), []);
   assert.deepEqual(keys('phone', { vendor: 'nobody' }), []);
 });
+
+test('the vendor strip matches a vendor by its name or its own words, never by our type label', async () => {
+  const { vendorSearchDoc } = await import('../src/scripts/props-cards.js');
+  const { vendors } = JSON.parse(await readFile(new URL('../src/data/props/vendors.json', import.meta.url), 'utf8'));
+  const listed = vendors.filter((vendor) => !vendor.catalogs.length);
+  const vendorIndex = buildIndex(listed.map((vendor, order) => vendorSearchDoc(vendor, order)));
+  const ids = (query) => rankText(vendorIndex, query).map((doc) => doc.key);
+  assert.deepEqual(ids('antique'), ['wagon-wheel-antiques'], 'by its name, and not PCCR, whose type label says antiques');
+  assert.deepEqual(ids('costume'), ['public-theater-costumes']);
+  assert.deepEqual(ids('typewriters'), ['cleveland-prop-shop'], 'by its own gallery name');
+  assert.deepEqual(ids('film').sort(), ['pittsburgh-clo-construction-center', 'vintage-alley']);
+  assert.deepEqual(ids('the props'), [], 'stopwords alone match nothing');
+  assert.deepEqual(ids(''), []);
+  assert.ok(!ids('theater stock').includes('cleveland-play-house-props'), 'a type label is not search text');
+});

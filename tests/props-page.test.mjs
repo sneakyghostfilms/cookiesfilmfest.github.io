@@ -4,7 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { NOT_AFFILIATED, vendorBadges } from '../src/scripts/props-cards.js';
+import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
 import { compareByName, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -145,6 +145,20 @@ test('every vendor has one box with an anchor: vendors with searchable items fir
   assert.ok(html.includes(`<h2 id="prop-sources" class="props-sources-title">Prop sources (${vendors.vendors.length})</h2>`));
   for (const entry of vendors.vendors.filter((one) => !withItems.has(one.id))) {
     assert.ok(visibleText(vendorSection(entry.id)).includes('Inventory not indexed; contact the vendor.'), entry.id);
+  }
+});
+
+test('the vendor strip holds exactly the vendors without searchable items, hidden until a search matches their name or own words', () => {
+  const strip = html.match(/<section id="props-vendor-matches" class="vendor-matches" hidden>[\s\S]*?<\/section>/)?.[0];
+  assert.ok(strip, 'the strip is built and starts hidden');
+  assert.ok(visibleText(strip).includes('Prop sources that match this search; inventory not indexed'));
+  assert.doesNotMatch(visibleText(strip), /speciali[sz]e/i, 'a name-only match makes no specialty claim');
+  const cards = [...strip.matchAll(/<li class="vendor-match" data-vendor="([^"]+)" data-name="([^"]*)" data-specialties(?:="([^"]*)")? hidden>/g)];
+  const expected = vendors.vendors.filter((entry) => !withItems.has(entry.id)).sort(byName);
+  assert.deepEqual(cards.map(([, id]) => id), expected.map((entry) => entry.id));
+  for (const [[, id, name, specialties], entry] of cards.map((card, order) => [card, expected[order]])) {
+    const doc = vendorSearchDoc(entry, 0);
+    assert.deepEqual([decode(name), decode(specialties ?? '')], [doc.name, doc.description], id);
   }
 });
 

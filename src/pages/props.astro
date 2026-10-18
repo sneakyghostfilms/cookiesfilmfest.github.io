@@ -7,7 +7,7 @@ import inventory from "../data/props/inventory.json";
 import tagsData from "../data/props/tags.json";
 import propsConfig from "../data/props/config.json";
 import { DEMO_STYLES, privateVendorsFor, readDemoManifest } from "../../scripts/props/demo-links.mjs";
-import { NOT_AFFILIATED, cardFor, catalogLines, contactRoutes, privateFacts, socialLinks, vendorBadges, vendorFacts, vendorSources } from "../scripts/props-cards.js";
+import { NOT_AFFILIATED, cardFor, catalogLines, contactRoutes, privateFacts, socialLinks, specialtiesLine, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources } from "../scripts/props-cards.js";
 import { compareByName } from "../scripts/props-search.js";
 
 const { generator } = Astro;
@@ -47,6 +47,13 @@ const vendorBoxes = [...[...vendorsWithItems].sort(byName), ...vendorsWithoutIte
   sources: vendorSources(vendor),
   private: privateFacts(privateVendors?.[vendor.id]),
   catalogs: catalogLines(vendor, { indexed, itemCounts }),
+}));
+const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
+  vendor,
+  doc: vendorSearchDoc(vendor, order),
+  badges: vendorBadges(vendor),
+  specialties: specialtiesLine(vendor),
+  route: contactRoutes(vendor.contact)[0] ?? null,
 }));
 ---
 
@@ -129,6 +136,20 @@ const vendorBoxes = [...[...vendorsWithItems].sort(byName), ...vendorsWithoutIte
           <p id="scene-status" class="scene-status" aria-live="polite" hidden></p>
           <div id="scene-results" class="scene-results"></div>
         </details>
+        {vendorMatches.length > 0 && (
+          <section id="props-vendor-matches" class="vendor-matches" hidden>
+            <h2 class="vendor-matches-title">Prop sources that match this search; inventory not indexed</h2>
+            <ul class="vendor-match-list">
+              {vendorMatches.map(({ vendor, doc, badges, specialties, route }) => (
+                <li class="vendor-match" data-vendor={vendor.id} data-name={doc.name} data-specialties={doc.description} hidden>
+                  <p class="vendor-match-line"><a class="vendor-match-name" href={`#vendor-${vendor.id}`}>{vendor.name}</a>{badges.map((badge) => <span class:list={["props-badge", { "props-badge-regional": badge.regional }]}>{badge.text}</span>)}</p>
+                  {specialties && <p class="props-note">{specialties}</p>}
+                  <p class="props-note">Inventory not indexed; contact the vendor{route && <>: <a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>}.</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <p id="props-count" class="props-count" aria-live="polite">{cards.length} items, listed alphabetically</p>
         <noscript><p class="props-note">Search needs JavaScript. All {cards.length} items are listed below alphabetically.</p></noscript>
         <p id="props-empty" class="props-empty" hidden></p>

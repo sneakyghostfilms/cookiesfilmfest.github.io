@@ -100,6 +100,10 @@ export function vendorBadges(vendor) {
   return badges;
 }
 
+export function vendorSearchDoc(vendor, order) {
+  return { key: vendor.id, name: vendor.name, description: vendor.specialties?.values.join(' ') ?? '', categories: [], tags: [], decades: [], order };
+}
+
 const quoted = (texts) => texts.map((text) => `“${text}”`).join(', ');
 
 export function specialtiesLine(vendor) {

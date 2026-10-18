@@ -91,7 +91,7 @@ Festival coordinates are stored separately in `src/data/festival-locations.json`
 - **Note**: Coordinates are city-level approximations. Maps should include a disclaimer that locations are not venue-specific.
 
 ### Pittsburgh Prop Search (/props)
-`/props` searches the text of local prop rental catalogs and vendor websites. Keyword search runs entirely in the browser. The optional "Paste a scene" box calls a small Cloudflare Worker in `worker/`. The Worker sends the AI only the 100 items whose words best match the scene, ranked by the page's own keyword search. See `worker/README.md` for its API, cost guard, tests and deployment.
+`/props` searches the text of local prop rental catalogs and vendor websites. Keyword search runs entirely in the browser. The optional "Paste a scene" box calls a small Cloudflare Worker in `worker/`. The Worker sends the AI only 100 items, chosen with the page's own keyword ranking: each scene word's best match first, then the best overall. See `worker/README.md` for its API, cost guard, tests and deployment.
 
 - **Data** (`src/data/props/`):
   - `vendors.json`: hand-edited. It lists each vendor and its catalogs (see Vendor records below), with each catalog's `type` (`pdf`, `wordpress-pages`, `duda-gallery` or `shopify-export`) and the `expected` counts that `npm test` enforces.

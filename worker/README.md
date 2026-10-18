@@ -3,7 +3,7 @@
 This Cloudflare Worker powers the "Paste a scene" box on https://cookiesfilmfest.com/props.
 
 The keyword search on that page runs entirely in the browser and needs no Worker. This Worker adds only the AI step:
-1. It ranks the inventory against the scene text with the page's own keyword ranking and keeps the top 100 items: the shortlist (see Shortlist below).
+1. It ranks the inventory against the scene text with the page's own keyword ranking and keeps 100 items: each scene word's best match first, then the best overall. This is the shortlist (see Shortlist below).
 2. It sends the scene text and the shortlist to one Workers AI model, `@cf/google/gemma-4-26b-a4b-it`, with thinking off.
 3. It checks every item key the model returns against the shortlist it sent.
 4. It returns props found and not found, split into "required by the scene" (at most 12) and "optional set dressing" (at most 4).
@@ -53,10 +53,14 @@ The model sees at most 100 items per scene, not the whole inventory, so a scene'
 
 - **Ranking.** `rankText` in `src/scripts/props-search.js` scores the scene text with the page's own keyword scoring: the same tokenizer, stopwords, stemming, field weights (name 3, description 2, categories 1, AI tags 1), prefix matches and idf, and the same sum times the share of words matched. Scene text gives no decade boost, because screenplay ages such as "(40s)" are not periods. The Worker bundles `tags.json` for the tags field.
 - **Period.** When the period names decades (for example "1960s" or "sixties"), items whose stated decades are all different are left out. Items with no stated era stay. A period without decades, such as "WWII", leaves the list as it is.
-- **Order and format.** The top 100 by score are listed grouped by catalog section, in catalog order, in the same `key | name | era` lines as before.
+- **Selection.** Each scene word that matches any item, and each pair of adjacent scene words (stopwords skipped) that match the same item, first keeps its best-ranked item. The number per word or pair is `termQuota` in `src/scene.js`, 1 today. Words and pairs with fewer matches go first; the remaining places fill by score.
+  - So a prop named by one rare word, such as "stethoscope", keeps its place against items that match several common words, and a pair keeps "red chair" or "rotary phone" in the list.
+  - A character's name can bring in an item with a pet name the same way, for one place.
+  - For a long scene on a large inventory, the words and pairs can take every place, leaving none to fill by score.
+- **Order and format.** The selected items are listed grouped by catalog section, in catalog order, in the same `key | name | era` lines as before.
 - **Validation.** Returned keys are checked against the list actually sent.
-- **Deterministic.** The list is a pure function of `inventory.json`, `tags.json`, the scene text and the period. `node scripts/shortlist.mjs --scene office [--period 1960s]` prints the list, the request size and its reservation; `node scripts/shortlist.mjs --recall` prints, for each fixture scene, how many required props keep an acceptable item at each list size, and each acceptable item's rank. Neither calls the model.
-- **CPU.** Ranking a 4,000-character scene takes about 0.5 ms, under the Free plan's 10 ms per request. The index is built once when the Worker starts.
+- **Deterministic.** The list is a pure function of `inventory.json`, `tags.json`, the scene text and the period. `node scripts/shortlist.mjs --scene office [--period 1960s]` prints the list, the request size and its reservation; `node scripts/shortlist.mjs --recall` prints, for each fixture scene, how many required props keep an acceptable item in the list at each list size, and each acceptable item's rank in the plain ranking and whether it is listed. Neither calls the model.
+- **CPU.** Ranking a 4,000-character scene and selecting its list takes about 1–2 ms on a laptop (1.3 ms at 571 items, 1.7 ms at 1,239), under the Free plan's 10 ms per request. The index is built once when the Worker starts.
 
 ## Cost guard
 
@@ -99,10 +103,23 @@ node scripts/eval-models.mjs --url http://localhost:8788
 
 The output ends with the deploy gate, which must pass before a redeploy that changes the inventory or the tags:
 - On the four original scenes (diner, hospital, office, police): every counted required prop is found, with 0 wrong keys, 0 invalid keys and no truncated output.
+- Every scene has at most 1 misfiled key (see How an answer is scored, below).
 - At least 4 of the 6 props those scenes name that the catalogs lack are reported as "no match". The target is 5 of 6, the 2026-10-17 baseline. The floor is 4 because the baseline setup varies on its own: an identical 6,762-token office request left out both of that scene's absent props, where the baseline had reported one.
 - Every other scene (today the morgue) meets the S1 floor: 70% of required props found, at most 1 wrong and 1 invalid key, and no truncation.
 
 When new items match a scene's required prop, add their keys to that prop's `acceptableKeys` before the run, so that a correct pick doesn't count as a wrong key.
+
+How an answer is scored (`scripts/rubric.mjs`). A suggested prop "names" a fixture prop when it contains all of that prop's words; one shared word alone never matches.
+- **Absent prop named.** Every key is wrong: the catalog lacks that prop, so any item for it is a force-match. This holds even when the suggestion also names a required prop.
+- **One required prop named.** Its acceptable keys count as found. Every other key is wrong.
+- **Two or more required props named,** a merge such as "chef's coat and checkered pants".
+  - Keys acceptable for any of them count as found.
+  - A key acceptable only for another required prop of the scene is misfiled, listed with its item name. Misfiling doesn't make that prop found.
+  - Any other key is wrong.
+- **No prop named.** It is judged against the required prop whose acceptable keys it returned most of; every other key is wrong.
+- **Extras.** A required prop the fixture doesn't know, such as a desk or a door in an office scene, is listed as an extra with its item names and never counted wrong. Check by hand that each extra's items are that kind of object.
+
+The gate allows at most 1 misfiled key per scene.
 
 ## Local development without Cloudflare
 

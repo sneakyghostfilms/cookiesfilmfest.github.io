@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { handleRequest } from '../src/index.js';
-import { inventoryKeys, prepareScene, shortlist } from '../src/inventory.js';
+import { diversify, inventoryKeys, prepareScene, shortlist } from '../src/inventory.js';
 import { LIMITS } from '../src/scene.js';
 import { SCENE, answer, fakeAI, fixedClock, makeEnv, sceneRequest } from './helpers.mjs';
 
@@ -10,10 +10,11 @@ const directory = new URL('./fixtures/scenes/', import.meta.url);
 const fixtures = await Promise.all((await readdir(directory)).filter((file) => file.endsWith('.json')).sort()
   .map(async (file) => JSON.parse(await readFile(new URL(file, directory), 'utf8'))));
 const office = fixtures.find((fixture) => fixture.id === 'office').text;
-const UNREACHABLE = { diner: ['bills', 'magazines'] };
+const UNREACHABLE = { diner: ['bills'] };
 
 test('at the shortlist size, each fixture keeps exactly the required props it is pinned to', () => {
   assert.equal(LIMITS.shortlistSize, 100);
+  assert.equal(LIMITS.termQuota, 1);
   for (const fixture of fixtures) {
     const keys = new Set(shortlist(fixture.text).map((item) => item.key));
     assert.ok(keys.size <= LIMITS.shortlistSize, fixture.id);
@@ -78,4 +79,31 @@ test('a scene that matches nothing still reaches the model, with no items listed
   const { request, shortlistKeys } = prepareScene('qqqq zzzz xxxx vvvv wwww jjjj kkkk');
   assert.equal(shortlistKeys.size, 0);
   assert.match(request.messages[0].content, /grouped by catalog section:\n\n/);
+});
+
+const docsOf = (...keys) => keys.map((key) => ({ key }));
+const pick = (order, terms, size, quota = 1) => diversify(docsOf(...order), terms.map(([term, keys]) => ({ term, keys })), { size, quota }).map((doc) => doc.key);
+
+test('with no quota the list is the plain top of the ranking', () => {
+  assert.deepEqual(pick(['a', 'b', 'c', 'd', 'e'], [['rare', ['e']]], 3, 0), ['a', 'b', 'c']);
+});
+
+test("each scene word keeps its best-ranked item, however low it ranks, and the rest fills by rank, in ranking order", () => {
+  assert.deepEqual(pick(['a', 'b', 'c', 'd', 'e'], [['common', ['d', 'a', 'b', 'c']], ['rare', ['e']]], 3), ['a', 'b', 'e']);
+});
+
+test('words with fewer matches go first when the list runs out, ties in scene order', () => {
+  assert.deepEqual(pick(['a', 'b', 'c', 'd', 'e'], [['common', ['a', 'b']], ['rare', ['e']]], 1), ['e']);
+  assert.deepEqual(pick(['a', 'b', 'c', 'd'], [['first', ['c']], ['second', ['d']]], 1), ['c']);
+});
+
+test('a word pair keeps the best item matching both words, which neither word alone would reach', () => {
+  const terms = [['red', ['a', 'c']], ['chair', ['b', 'c']]];
+  assert.deepEqual(pick(['a', 'b', 'x', 'c'], terms, 2), ['a', 'b']);
+  assert.deepEqual(pick(['a', 'b', 'x', 'c'], [...terms, ['red chair', ['c']]], 2), ['a', 'c']);
+});
+
+test('items outside the ranking, such as those a period leaves out, are never picked, and the size is a hard cap', () => {
+  assert.deepEqual(pick(['a', 'b'], [['word', ['z', 'b']]], 1), ['b']);
+  assert.deepEqual(pick(['a', 'b', 'c', 'd'], [['w1', ['d']], ['w2', ['c']], ['w3', ['b']]], 2, 3).length, 2);
 });

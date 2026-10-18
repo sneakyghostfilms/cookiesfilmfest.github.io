@@ -83,6 +83,15 @@ test('every key returned for a prop the fixture names as absent is wrong, on eit
   }
 });
 
+test('among props named in full with names equally long, a required prop beats an absent one, then the one more keys fit', () => {
+  const office = { id: 'office', required: [{ prop: 'change machine', acceptableKeys: ['k-change'] }], absent: ['fax machine'] };
+  const both = score(office, { required: [prop('fax change machine', ['k-change'])], optional: [] });
+  assert.deepEqual([both.wrongKeys, both.required.map((entry) => entry.found)], [[], [true]]);
+  const kitchen = { id: 'kitchen', required: [{ prop: 'coffee pot', acceptableKeys: ['k-coffee'] }, { prop: 'tea pot', acceptableKeys: ['k-tea'] }], absent: [] };
+  const pots = score(kitchen, { required: [prop('tea pot and coffee pot', ['k-tea'])], optional: [] });
+  assert.deepEqual([pots.wrongKeys, pots.required.map((entry) => entry.found)], [[], [false, true]]);
+});
+
 test('absent props are reported, force-matched or left out by whole-name match', () => {
   assert.equal(score(fixture, { required: [prop('jukebox', [])], optional: [] }).absent[0].outcome, 'reported as no match');
   assert.equal(score(fixture, { required: [prop('old jukebox', ['scp-140'])], optional: [] }).absent[0].outcome, 'force-matched (scp-140)');

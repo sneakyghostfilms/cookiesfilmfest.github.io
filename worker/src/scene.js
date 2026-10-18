@@ -10,6 +10,7 @@ export const LIMITS = {
   maxKeysPerProp: 3,
   maxOutputTokens: 1700,
   shortlistSize: 100,
+  termQuota: 1,
   templateAllowanceTokens: 256,
 };
 

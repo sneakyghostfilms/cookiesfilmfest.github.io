@@ -221,7 +221,9 @@ test('the vendor strip matches a vendor by its name or its own words, never by o
 test('sceneTermMatches lists the items each scene word matches, then each pair of adjacent words that match the same item', () => {
   const names = { a: 'Red Chair', b: 'Blue Chair', c: 'Red Lamp', d: 'Rotary Phone', e: 'Office Phone' };
   const small = buildIndex(Object.entries(names).map(([key, name], order) => ({ key, name, description: name, categories: [], tags: [], decades: [], order })));
-  const matches = Object.fromEntries(sceneTermMatches(small, 'The red chair by the rotary phone. A red chair again, then a chair chair, 1957.').map(({ term, keys }) => [term, [...keys].sort()]));
+  const terms = sceneTermMatches(small, 'The red chair by the rotary phone. A red chair again, then a chair chair, 1957.');
+  assert.deepEqual(terms.map(({ term }) => term), ['red', 'chair', 'rotary', 'phone', 'again', 'then', 'red chair', 'chair rotary', 'rotary phone', 'phone red', 'chair again', 'again then', 'then chair'], 'words first, in scene order, then pairs in the order they first appear');
+  const matches = Object.fromEntries(terms.map(({ term, keys }) => [term, [...keys].sort()]));
   assert.deepEqual(matches, {
     red: ['a', 'c'],
     chair: ['a', 'b'],

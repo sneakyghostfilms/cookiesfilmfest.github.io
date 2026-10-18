@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import inventory from '../../src/data/props/inventory.json' with { type: 'json' };
-import { prepareScene, ranked } from '../src/inventory.js';
+import { prepareScene, ranked, shortlist } from '../src/inventory.js';
 import { LIMITS, estimateNeurons } from '../src/scene.js';
 
 const WORKER = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -22,17 +22,19 @@ if (values.scene) {
   if (!fixture) throw new Error(`No fixture "${values.scene}"; try ${fixtures.map((entry) => entry.id).join(', ')}.`);
   const { request, listingText, shortlistKeys } = prepareScene(fixture.text, values.period);
   console.log(listingText);
-  console.log(`\n${shortlistKeys.size} items (shortlist size ${LIMITS.shortlistSize}); request messages ${new TextEncoder().encode(JSON.stringify(request.messages)).length} bytes; reserves ${estimateNeurons(vars.AI_MODEL, request).toFixed(1)} Neurons with ${vars.AI_MODEL}`);
+  console.log(`\n${shortlistKeys.size} items (shortlist size ${LIMITS.shortlistSize}; each matching scene word and word pair keeps its best ${LIMITS.termQuota} first); request messages ${new TextEncoder().encode(JSON.stringify(request.messages)).length} bytes; reserves ${estimateNeurons(vars.AI_MODEL, request).toFixed(1)} Neurons with ${vars.AI_MODEL}`);
 } else if (values.recall) {
   console.log(`| Fixture | ${SIZES.map((size) => `N=${size}`).join(' | ')} |\n|---|${SIZES.map(() => '---').join('|')}|`);
   const details = [];
   for (const fixture of fixtures) {
     const rank = new Map(ranked(fixture.text).map((doc, index) => [doc.key, index + 1]));
-    const reach = (size) => fixture.required.filter((prop) => prop.acceptableKeys.some((key) => (rank.get(key) ?? Infinity) <= size)).length;
+    const lists = new Map([...SIZES, LIMITS.shortlistSize].map((size) => [size, new Set(shortlist(fixture.text, '', size).map((item) => item.key))]));
+    const reach = (size) => fixture.required.filter((prop) => prop.acceptableKeys.some((key) => lists.get(size).has(key))).length;
     console.log(`| ${fixture.id} (${fixture.required.length}) | ${SIZES.map((size) => reach(size)).join(' | ')} |`);
+    const sent = lists.get(LIMITS.shortlistSize);
     details.push(`\n${fixture.id}:`);
     for (const prop of fixture.required) {
-      const keys = prop.acceptableKeys.map((key) => `${key} "${names.get(key) ?? 'NOT IN INVENTORY'}" rank ${rank.get(key) ?? '-'}`);
+      const keys = prop.acceptableKeys.map((key) => `${key} "${names.get(key) ?? 'NOT IN INVENTORY'}" rank ${rank.get(key) ?? '-'}${sent.has(key) ? ', listed' : ''}`);
       details.push(`  ${prop.prop}: ${keys.join('; ')}`);
     }
     if (fixture.absent.length) details.push(`  absent: ${fixture.absent.join(', ')}`);

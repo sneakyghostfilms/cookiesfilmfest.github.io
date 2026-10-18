@@ -1,6 +1,6 @@
 import inventory from '../../src/data/props/inventory.json' with { type: 'json' };
 import tagsFile from '../../src/data/props/tags.json' with { type: 'json' };
-import { buildIndex, parseDecades, rankText } from '../../src/scripts/props-search.js';
+import { buildIndex, parseDecades, rankText, sceneTermMatches } from '../../src/scripts/props-search.js';
 import { LIMITS, buildRequest } from './scene.js';
 
 export const inventoryKeys = new Set(inventory.items.map((item) => item.key));
@@ -38,8 +38,25 @@ export function ranked(text, period = '') {
   return rankText(index, text).filter(fits);
 }
 
-export function shortlist(text, period = '') {
-  return ranked(text, period).slice(0, LIMITS.shortlistSize).map((doc) => doc.item);
+export function diversify(order, terms, { size, quota }) {
+  const rank = new Map(order.map((doc, position) => [doc.key, position]));
+  const queue = terms
+    .map(({ keys }, first) => ({ first, keys: keys.filter((key) => rank.has(key)).sort((a, b) => rank.get(a) - rank.get(b)) }))
+    .filter(({ keys }) => keys.length)
+    .sort((a, b) => a.keys.length - b.keys.length || a.first - b.first);
+  const picked = new Set();
+  for (let round = 0; round < quota; round += 1) {
+    for (const { keys } of queue) if (picked.size < size && keys[round]) picked.add(keys[round]);
+  }
+  for (const doc of order) {
+    if (picked.size >= size) break;
+    picked.add(doc.key);
+  }
+  return order.filter((doc) => picked.has(doc.key));
+}
+
+export function shortlist(text, period = '', size = LIMITS.shortlistSize) {
+  return diversify(ranked(text, period), sceneTermMatches(index, text), { size, quota: LIMITS.termQuota }).map((doc) => doc.item);
 }
 
 export function prepareScene(text, period = '') {

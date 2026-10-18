@@ -43,12 +43,13 @@ const textOf = (html) => decodeEntities(String(html).replace(/<[^>]*>/g, ' ')).r
 const tagsOf = (html, name) => [...html.matchAll(new RegExp(`<${name}\\b[^>]*>`, 'gi'))].map(([tag]) => tag);
 const classesOf = (tag) => (attribute(tag, 'class') ?? '').split(/\s+/).filter(Boolean);
 
+const RELATIVE_BASE = 'https://relative.invalid/';
 // Query values can identify someone (an email-click token baked into a cached page's links), so only names are shown.
-const queryNames = (href) => [...new Set(new URL(href, 'https://relative.invalid/').searchParams.keys())];
+const queryNames = (href) => [...new Set(new URL(href, RELATIVE_BASE).searchParams.keys())];
 function shownUrl(href) {
-  const url = new URL(href, 'https://relative.invalid/');
+  const url = new URL(href, RELATIVE_BASE);
   const names = queryNames(href);
-  return `${url.origin === 'https://relative.invalid' ? '' : url.origin}${url.pathname}${names.length ? `?${names.map((name) => `${name}=…`).join('&')}` : ''}`;
+  return `${url.origin === new URL(RELATIVE_BASE).origin ? '' : url.origin}${url.pathname}${names.length ? `?${names.map((name) => `${name}=…`).join('&')}` : ''}`;
 }
 const withoutQuery = (href) => (/^https?:\/\//.test(href) ? `${new URL(href).origin}${new URL(href).pathname}` : href);
 

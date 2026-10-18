@@ -32,6 +32,21 @@ test('a period with decades drops items whose stated era contradicts it and keep
   assert.deepEqual(shortlist(office, ''), all);
 });
 
+test('the request path applies the period: contradicting items are neither listed nor accepted back', async () => {
+  const { request, shortlistKeys } = prepareScene(office, '1990s');
+  const contradicting = shortlist(office).find((item) => item.decades.length && !item.decades.includes(1990));
+  assert.ok(contradicting, 'the office scene lists a dated item outside the 1990s without a period');
+  assert.ok(!shortlistKeys.has(contradicting.key));
+  assert.ok(!request.messages[0].content.includes(`\n${contradicting.key} | `));
+  const fitting = [...shortlistKeys][0];
+  const env = makeEnv({ AI: fakeAI(() => answer({ required: [{ prop: 'thing', reason: 'r', keys: [contradicting.key, fitting] }], optional: [] })) });
+  const response = await handleRequest(sceneRequest(undefined, { body: JSON.stringify({ text: office, period: '1990s' }) }), env, fixedClock());
+  const body = await response.json();
+  assert.deepEqual(body.required[0].keys, [fitting]);
+  assert.equal(body.ignoredSuggestions, 1);
+  assert.ok(!env.AI.calls[0].input.messages[0].content.includes(`\n${contradicting.key} | `));
+});
+
 test('the same scene always builds the same request', () => {
   for (const fixture of fixtures) {
     assert.equal(JSON.stringify(prepareScene(fixture.text).request), JSON.stringify(prepareScene(fixture.text).request), fixture.id);

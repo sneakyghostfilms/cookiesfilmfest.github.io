@@ -4,6 +4,7 @@ import { buildIndex, parseDecades, rankText } from '../../src/scripts/props-sear
 import { LIMITS, buildRequest } from './scene.js';
 
 export const inventoryKeys = new Set(inventory.items.map((item) => item.key));
+const catalogOrder = new Map(inventory.items.map((item, order) => [item.key, order]));
 
 export function listing(items) {
   const sections = new Map();
@@ -42,7 +43,7 @@ export function shortlist(text, period = '') {
 }
 
 export function prepareScene(text, period = '') {
-  const docs = ranked(text, period).slice(0, LIMITS.shortlistSize).sort((a, b) => a.order - b.order);
-  const listingText = listing(docs.map((doc) => doc.item));
-  return { request: buildRequest(listingText, text, period), listingText, shortlistKeys: new Set(docs.map((doc) => doc.key)) };
+  const items = shortlist(text, period).sort((a, b) => catalogOrder.get(a.key) - catalogOrder.get(b.key));
+  const listingText = listing(items);
+  return { request: buildRequest(listingText, text, period), listingText, shortlistKeys: new Set(items.map((item) => item.key)) };
 }

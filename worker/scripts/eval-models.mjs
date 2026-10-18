@@ -12,6 +12,8 @@ const WORKER = join(dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURES = join(WORKER, 'test/fixtures/scenes');
 const DAILY_BUDGET = Number(JSON.parse(await readFile(join(WORKER, 'wrangler.jsonc'), 'utf8')).vars.DAILY_NEURON_BUDGET);
 const FLOOR = { requiredShare: 0.7, invalidKeysPerScene: 1, wrongKeysPerScene: 1, scenesPerDay: 50 };
+const BASELINE_SCENES = ['diner', 'hospital', 'office', 'police'];
+const BASELINE_ABSENT_REPORTED = 5;
 const { values } = parseArgs({
   options: {
     url: { type: 'string' },
@@ -104,5 +106,22 @@ for (const row of rows) {
 }
 lines.push('\nQuality floor:');
 for (const [label, passed, detail] of checks) lines.push(`- ${passed ? 'PASS' : 'FAIL'} ${label}: ${detail}`);
+const baseline = scored.filter((row) => BASELINE_SCENES.includes(row.fixture.id));
+const others = scored.filter((row) => !BASELINE_SCENES.includes(row.fixture.id));
+const baselineFitting = baseline.filter((row) => !row.result.dense);
+const gate = [
+  ['the four original scenes all answered', baseline.length === BASELINE_SCENES.length, baseline.map((row) => row.fixture.id).join(', ')],
+  ['every counted required prop found (office 5/5, police 7/7, hospital 5/5, diner 12/12)', baseline.every((row) => row.result.counted === row.result.countable), baseline.map((row) => `${row.fixture.id} ${row.result.counted}/${row.result.countable}`).join(', ')],
+  ['0 wrong keys', baseline.every((row) => row.result.wrongKeys.length === 0), baseline.map((row) => `${row.fixture.id} ${row.result.wrongKeys.length}`).join(', ')],
+  ['0 invalid keys', baseline.every((row) => row.body.ignoredSuggestions === 0), baseline.map((row) => `${row.fixture.id} ${row.body.ignoredSuggestions}`).join(', ')],
+  ['no truncated output', baseline.every((row) => !row.truncated), baseline.filter((row) => row.truncated).map((row) => row.fixture.id).join(', ') || 'none'],
+  [`absent props reported as no match at least ${BASELINE_ABSENT_REPORTED} of 6`, sum((row) => row.result.honest, baselineFitting) >= BASELINE_ABSENT_REPORTED, `${sum((row) => row.result.honest, baselineFitting)}/${sum((row) => row.result.absent.length, baselineFitting)}`],
+  ...others.map((row) => [`${row.fixture.id} meets the S1 floor (70% found, at most 1 wrong key, no truncation)`,
+    row.result.countable > 0 && row.result.counted / row.result.countable >= FLOOR.requiredShare && row.result.wrongKeys.length <= FLOOR.wrongKeysPerScene && !row.truncated,
+    `${row.result.counted}/${row.result.countable} found, ${row.result.wrongKeys.length} wrong, ${row.truncated ? 'truncated' : 'not truncated'}`]),
+];
+lines.push('\nDeploy gate (lead, round 3):');
+for (const [label, passed, detail] of gate) lines.push(`- ${passed ? 'PASS' : 'FAIL'} ${label}: ${detail}`);
+lines.push(`GATE ${gate.every(([, passed]) => passed) ? 'PASS' : 'FAIL'}`);
 lines.push(`\nNeurons used by these ${scored.length} calls: ${sum((row) => row.used ?? 0).toFixed(1)}`);
 console.log(lines.join('\n'));

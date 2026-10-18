@@ -72,6 +72,7 @@ test('untitled photos are named by page and number and keyed by their file; phot
     { file: 'three', caption: 'Floor lamp' },
     { file: 'four', alt: 'an alt text' },
     { file: 'one', caption: '' },
+    { file: 'one_1', caption: '' },
   ] })));
   assert.deepEqual(parsed.items.map((item) => [item.key, item.name]), [
     [siteKey('gt', 'lamps|#one_orig.jpg'), 'Lamps item 1 (no title given)'],
@@ -79,9 +80,10 @@ test('untitled photos are named by page and number and keyed by their file; phot
     [siteKey('gt', 'lamps|#four_orig.jpg'), 'Lamps item 2 (no title given)'],
   ]);
   assert.deepEqual(parsed.images.get(siteKey('gt', 'lamps|Floor lamp')).urls, [`${SITE}uploads/9/9/two.jpg`, `${SITE}uploads/9/9/three.jpg`]);
-  assert.deepEqual(parsed.counts, { pages: 1, photos: 5, items: 3 });
+  assert.deepEqual(parsed.counts, { pages: 1, photos: 6, items: 3 });
+  assert.deepEqual(parsed.images.get(siteKey('gt', 'lamps|#one_orig.jpg')).urls.length, 3, 'a re-upload of an untitled photo is the same photo');
   assert.ok(parsed.report.some((line) => line.includes('(its image has alt text, which is not used)')));
-  assert.ok(parsed.report.some((line) => line.endsWith('5 photos, 2 captioned, 2 untitled items')), parsed.report.join('\n'));
+  assert.ok(parsed.report.some((line) => line.endsWith('6 photos, 2 captioned, 2 untitled items')), parsed.report.join('\n'));
 });
 
 test('the same caption and photo on two pages are one item with both categories and the first page\'s link', () => {

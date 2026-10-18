@@ -15,6 +15,7 @@ const byKey = new Map(inventory.items.map((item) => [item.key, item]));
 const SOURCE_TYPES = new Set(['prop-house', 'vintage-rental', 'event-rental', 'antique-reuse', 'theater-stock', 'specialty']);
 const MODES = new Set(['rent', 'sale', 'inquire']);
 const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint', 'specialties', 'notice'];
+const NAMED_ON_VENDOR_PAGES = [/\bPlunkett\b/, /sullivan/i, /\bRosenlieb\b/, /\bOcampo\b/, /\bCannon\b/, /\bCostanzo\b/, /\bStinebiser\b/, /dunhoff/i, /\bMia\b/];
 const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'shopify-export']);
 
 function keysOf(value, found = new Set()) {
@@ -45,6 +46,11 @@ test('vendors.json holds only facts each vendor publishes, every one with its so
     if (vendor.catalogs.length) assert.match(vendor.keyPrefix, /^[a-z0-9]+$/);
     else assert.ok(!inventory.items.some((item) => item.vendor === vendor.id), `${vendor.id} lists no catalog but has items`);
   }
+});
+
+test('vendors.json names no person: owners and staff named on vendor pages stay out, e-mail addresses included', async () => {
+  const raw = await readFile(new URL('../src/data/props/vendors.json', import.meta.url), 'utf8');
+  for (const name of NAMED_ON_VENDOR_PAGES) assert.doesNotMatch(raw, name);
 });
 
 test('each catalog passes the import invariants and matches its expected counts', () => {

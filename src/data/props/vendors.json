@@ -130,6 +130,750 @@
           }
         }
       ]
+    },
+    {
+      "id": "bespoke-event-rentals",
+      "name": "Bespoke Event Rentals",
+      "siteUrl": "https://bespokeeventrental.com/",
+      "sourceType": {
+        "value": "event-rental",
+        "source": "https://bespokeeventrental.com/catalog/ (\"your go-to resource for all your event and party rental needs in Pittsburgh\")"
+      },
+      "address": {
+        "label": null,
+        "street": "400 Graham Street",
+        "city": "McKees Rocks",
+        "state": "PA",
+        "zip": "15136",
+        "source": "https://bespokeeventrental.com/contact/"
+      },
+      "mailingAddress": null,
+      "hours": {
+        "text": "our office is open Monday through Friday from 9 AM to 5 PM for inquiries, bookings, and support",
+        "source": "https://bespokeeventrental.com/contact/"
+      },
+      "modes": {
+        "values": [
+          "rent"
+        ],
+        "source": "https://bespokeeventrental.com/catalog/ (\"event and party rental needs\")"
+      },
+      "terms": {
+        "text": "Contact us today for a free consultation or quote.",
+        "source": "https://bespokeeventrental.com/contact/"
+      },
+      "contact": {
+        "formUrl": null,
+        "email": "Info@BespokeEventRental.com",
+        "phone": "(412) 467-0880",
+        "pageUrl": "https://bespokeeventrental.com/contact/",
+        "source": "https://bespokeeventrental.com/contact/"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/bespokeeventrental",
+        "facebook": "https://www.facebook.com/BespokeEventRentalPA",
+        "linktree": null,
+        "source": "https://bespokeeventrental.com/contact/"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "elegant furniture and stylish decor",
+          "Furniture Rentals Collection",
+          "Chair Collection",
+          "Bar Collection",
+          "Event Accessories Collection",
+          "Linen Collection"
+        ],
+        "source": "https://bespokeeventrental.com/catalog/"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "cleveland-play-house-props",
+      "name": "Cleveland Play House Prop Shop",
+      "siteUrl": "https://www.clevelandplayhouse.com/tech-specs/production/props",
+      "sourceType": {
+        "value": "theater-stock",
+        "source": "https://www.clevelandplayhouse.com/tech-specs/production/props (\"available for rental to theatres, film companies, opera companies\")"
+      },
+      "address": {
+        "label": "Production Center",
+        "street": "7401 Shoreway Commerce Parkway",
+        "city": "Cleveland",
+        "state": "OH",
+        "zip": "44103",
+        "source": "https://www.clevelandplayhouse.com/tech-specs/production/props (footer; \"The Prop Shop and Prop Storage are located at the CPH Production Center\")"
+      },
+      "mailingAddress": null,
+      "hours": null,
+      "modes": {
+        "values": [
+          "rent"
+        ],
+        "source": "https://www.clevelandplayhouse.com/tech-specs/production/props (\"available for rental to theatres, film companies\")"
+      },
+      "terms": null,
+      "contact": {
+        "formUrl": null,
+        "email": "proprentals@clevelandplayhouse.com",
+        "phone": "(216) 862-5445 x4",
+        "pageUrl": "https://www.clevelandplayhouse.com/tech-specs/production/props",
+        "source": "https://www.clevelandplayhouse.com/tech-specs/production/props"
+      },
+      "social": {
+        "instagram": "http://instagram.com/cleveplayhouse",
+        "facebook": "http://www.facebook.com/ClevelandPlayHouse",
+        "linktree": null,
+        "source": "https://www.clevelandplayhouse.com/tech-specs/production/props"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "furniture, hand props and set dressing"
+        ],
+        "source": "https://www.clevelandplayhouse.com/tech-specs/production/props"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "cleveland-prop-shop",
+      "name": "Cleveland Prop Shop",
+      "siteUrl": "https://www.clevelandpropshop.com/",
+      "sourceType": {
+        "value": "prop-house",
+        "source": "https://www.clevelandpropshop.com/ (\"Period and Modern Props\")"
+      },
+      "address": {
+        "label": "by appointment",
+        "street": null,
+        "city": "Cleveland",
+        "state": "OH",
+        "zip": null,
+        "source": "https://www.clevelandpropshop.com/contact.html (\"a detailed address will be provided\")"
+      },
+      "mailingAddress": null,
+      "hours": {
+        "text": "By appointment only in Cleveland or Youngstown, Ohio",
+        "source": "https://www.clevelandpropshop.com/"
+      },
+      "modes": {
+        "values": [
+          "rent",
+          "sale"
+        ],
+        "source": "https://www.clevelandpropshop.com/ (\"For your prop rental needs\"); https://www.clevelandpropshop.com/httpswwwweeblycomeditormainphp.html (\"For Sale\")"
+      },
+      "terms": {
+        "text": "Not local? We can ship some items to you.",
+        "source": "https://www.clevelandpropshop.com/"
+      },
+      "contact": {
+        "formUrl": "https://www.clevelandpropshop.com/contact.html",
+        "email": "clevelandpropshop@gmail.com",
+        "phone": "216-832-9656",
+        "pageUrl": null,
+        "source": "https://www.clevelandpropshop.com/contact.html"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/clevelandpropshop/",
+        "facebook": "https://www.facebook.com/clevelandpropshop/",
+        "linktree": null,
+        "source": "https://www.clevelandpropshop.com/"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "Period and Modern Props",
+          "Typewriters",
+          "Telephones",
+          "Cameras Etc.",
+          "Luggage",
+          "Medical",
+          "Glassware",
+          "Lighting",
+          "Electronics",
+          "Birdcages",
+          "Breakaway glass"
+        ],
+        "source": "https://www.clevelandpropshop.com/; https://www.clevelandpropshop.com/httpswwwweeblycomeditormainphp.html"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "clicksburgh-retro-rentals",
+      "name": "Clicksburgh Retro Rentals",
+      "siteUrl": "https://www.clicksburghretrorentals.com/",
+      "sourceType": {
+        "value": "event-rental",
+        "source": "https://www.clicksburghretrorentals.com/ (\"Retro Rentals in Pittsburgh\")"
+      },
+      "address": {
+        "label": null,
+        "street": null,
+        "city": "Pittsburgh",
+        "state": "Pennsylvania",
+        "zip": null,
+        "source": "https://www.clicksburghretrorentals.com/contactus"
+      },
+      "mailingAddress": null,
+      "hours": null,
+      "modes": {
+        "values": [
+          "rent"
+        ],
+        "source": "https://www.clicksburghretrorentals.com/our-rental-collection (\"To book an item or inquire about pricing\")"
+      },
+      "terms": {
+        "text": "To book an item or inquire about pricing, visit the 'Contact Us' page and complete the form.",
+        "source": "https://www.clicksburghretrorentals.com/our-rental-collection"
+      },
+      "contact": {
+        "formUrl": null,
+        "email": "events@clicksburghretrorentals.com",
+        "phone": "412-709-7906",
+        "pageUrl": "https://www.clicksburghretrorentals.com/contactus",
+        "source": "https://www.clicksburghretrorentals.com/contactus"
+      },
+      "social": {
+        "instagram": "https://instagram.com/clicksburgh_retro_rentals",
+        "facebook": "https://www.facebook.com/profile.php?id=100091343917980",
+        "linktree": null,
+        "source": "https://www.clicksburghretrorentals.com/"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "Audio Guestbook Phones",
+          "Photo Booths",
+          "Fine China Rentals"
+        ],
+        "source": "https://www.clicksburghretrorentals.com/our-rental-collection"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "construction-junction",
+      "name": "Construction Junction",
+      "siteUrl": "https://cjreuse.org/",
+      "sourceType": {
+        "value": "antique-reuse",
+        "source": "https://cjreuse.org/ (\"Pittsburgh's reuse superstore\")"
+      },
+      "address": {
+        "label": null,
+        "street": "214 North Lexington Street",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zip": "15208",
+        "source": "https://cjreuse.org/contact/"
+      },
+      "mailingAddress": null,
+      "hours": {
+        "text": "Mon - Sat 9:00 - 5:00 / Sun 10:00 - 5:00",
+        "source": "https://cjreuse.org/contact/"
+      },
+      "modes": {
+        "values": [
+          "sale"
+        ],
+        "source": "https://cjreuse.org/faq/ (\"This is just a retail store, come shop with us any time we're open!\")"
+      },
+      "terms": {
+        "text": "All items are sold as-is. … We do not offer any holds or reserves.",
+        "source": "https://cjreuse.org/faq/"
+      },
+      "contact": {
+        "formUrl": null,
+        "email": "customerservice@cjreuse.org",
+        "phone": "(412) 243-5025",
+        "pageUrl": "https://cjreuse.org/contact/",
+        "source": "https://cjreuse.org/contact/"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/cjreuse",
+        "facebook": "https://www.facebook.com/cjreuse/",
+        "linktree": null,
+        "source": "https://cjreuse.org/contact/"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "reclaimed and surplus goods",
+          "historic building materials",
+          "Home & Office Furnishings",
+          "Lighting",
+          "Doors",
+          "Windows",
+          "Hardware & Tools",
+          "Appliances",
+          "Clothing"
+        ],
+        "source": "https://cjreuse.org/"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "event-source-pittsburgh",
+      "name": "Event Source (Pittsburgh)",
+      "siteUrl": "https://www.eventsource.com/",
+      "sourceType": {
+        "value": "event-rental",
+        "source": "https://www.eventsource.com/ (\"Event Rentals and Supplies\")"
+      },
+      "address": {
+        "label": "Pittsburgh location",
+        "street": "4047 Liberty Avenue",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zip": "15224",
+        "source": "https://www.eventsource.com/contact-us"
+      },
+      "mailingAddress": null,
+      "hours": null,
+      "modes": {
+        "values": [
+          "rent",
+          "sale"
+        ],
+        "source": "https://www.eventsource.com/ (\"Rental Products\"); https://forsale.eventsource.com/ (\"What's For Sale\")"
+      },
+      "terms": null,
+      "contact": {
+        "formUrl": "https://www.eventsource.com/contact-us",
+        "email": null,
+        "phone": "412.809.8100",
+        "pageUrl": null,
+        "source": "https://www.eventsource.com/contact-us"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/eventsourcerental/",
+        "facebook": "https://www.facebook.com/eventsource",
+        "linktree": null,
+        "source": "https://www.eventsource.com/contact-us"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "Furniture",
+          "Sofas + Loveseats",
+          "Lounge Chairs",
+          "Bars",
+          "Barstools",
+          "Area Rugs",
+          "Bookcases",
+          "Room Dividers",
+          "Linens",
+          "Dinnerware",
+          "Glassware"
+        ],
+        "source": "https://www.eventsource.com/"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "creative-reuse",
+      "name": "Pittsburgh Center for Creative Reuse",
+      "siteUrl": "https://pccr.org/",
+      "sourceType": {
+        "value": "antique-reuse",
+        "source": "https://pccr.org/ (\"Pittsburgh Center For Creative Reuse\")"
+      },
+      "address": {
+        "label": null,
+        "street": "214 N Lexington Street",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zip": "15208",
+        "source": "https://pccr.org/about-us/contact/"
+      },
+      "mailingAddress": null,
+      "hours": {
+        "text": "Visit us in our shop every day of the week 11 AM - 5 PM.",
+        "source": "https://pccr.org/about-us/contact/"
+      },
+      "modes": {
+        "values": [
+          "sale"
+        ],
+        "source": "https://pccr.org/shop-with-us/online-store/ (\"Shop anytime, anywhere!\")"
+      },
+      "terms": {
+        "text": "Each week, orders placed before 11:59 PM Sunday will be available for pickup beginning on Tuesday at 11 AM.",
+        "source": "https://pccr.org/shop-with-us/online-store/"
+      },
+      "contact": {
+        "formUrl": null,
+        "email": "shop@pccr.org",
+        "phone": "(412) 473-0100",
+        "pageUrl": "https://pccr.org/about-us/contact/",
+        "source": "https://pccr.org/about-us/contact/"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/creative_reuse/",
+        "facebook": "https://www.facebook.com/creativereusepittsburgh/",
+        "linktree": null,
+        "source": "https://pccr.org/about-us/contact/"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "fabric, yarn, sewing supplies, art supplies, vintage items"
+        ],
+        "source": "https://pccr.org/"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "pittsburgh-clo-construction-center",
+      "name": "Pittsburgh CLO Construction Center",
+      "siteUrl": "https://www.pittsburghclo.org/construction",
+      "sourceType": {
+        "value": "theater-stock",
+        "source": "https://www.pittsburghclo.org/construction (\"Full-Service Set Rental and Set Construction Facility\")"
+      },
+      "address": {
+        "label": "shop/warehouse",
+        "street": null,
+        "city": "Springdale",
+        "state": "PA",
+        "zip": null,
+        "source": "https://www.pittsburghclo.org/construction (\"Located in our own shop/warehouse facility in Springdale, PA\")"
+      },
+      "mailingAddress": null,
+      "hours": null,
+      "modes": {
+        "values": [
+          "rent",
+          "sale"
+        ],
+        "source": "https://www.pittsburghclo.org/construction/rental-policies (\"You are not required to rent an entire set\"); https://www.pittsburghclo.org/construction/set-rentals-and-inventory (\"all packages are available for purchase\")"
+      },
+      "terms": {
+        "text": "You are not required to rent an entire set; we do rent props packages, set pieces or drops separately.",
+        "source": "https://www.pittsburghclo.org/construction/rental-policies"
+      },
+      "contact": {
+        "formUrl": "https://pittsburgh_CLO.formstack.com/forms/construction_center_contact_form",
+        "email": null,
+        "phone": "724-558-1016",
+        "pageUrl": "https://www.pittsburghclo.org/construction/constructioncontact",
+        "source": "https://www.pittsburghclo.org/construction/set-rentals-and-inventory; https://www.pittsburghclo.org/construction/constructioncontact"
+      },
+      "social": {
+        "instagram": "https://instagram.com/pittsburghclo/",
+        "facebook": "https://www.facebook.com/PghCLO",
+        "linktree": null,
+        "source": "https://www.pittsburghclo.org/construction/constructioncontact"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "set pieces for the film and television industry",
+          "props packages, set pieces or drops"
+        ],
+        "source": "https://www.pittsburghclo.org/construction; https://www.pittsburghclo.org/construction/rental-policies"
+      },
+      "notice": {
+        "text": "We are currently in the process of clearing out our set inventory and all packages are available for purchase.",
+        "source": "https://www.pittsburghclo.org/construction/set-rentals-and-inventory"
+      },
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "public-theater-costumes",
+      "name": "Pittsburgh Public Theater costume rentals",
+      "siteUrl": "https://ppt.org/ppt_home/about/costume-rentals",
+      "sourceType": {
+        "value": "theater-stock",
+        "source": "https://ppt.org/ppt_home/about/costume-rentals (\"Pittsburgh Public Theater's extensive rental collection\")"
+      },
+      "address": {
+        "label": "organization's address; costume storage location not stated",
+        "street": "621 Penn Avenue",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zip": "15222",
+        "source": "https://ppt.org/ppt_home/about/contact-us"
+      },
+      "mailingAddress": null,
+      "hours": null,
+      "modes": {
+        "values": [
+          "rent"
+        ],
+        "source": "https://ppt.org/ppt_home/about/costume-rentals (\"Costume Rental Form\")"
+      },
+      "terms": {
+        "text": "Please complete the information below and someone will reply to your inquiry within 10 business days.",
+        "source": "https://pct.formstack.com/forms/costumerental"
+      },
+      "contact": {
+        "formUrl": "https://pct.formstack.com/forms/costumerental",
+        "email": "info@ppt.org",
+        "phone": "412.316.8200",
+        "pageUrl": "https://ppt.org/ppt_home/about/contact-us",
+        "source": "https://ppt.org/ppt_home/about/costume-rentals; https://ppt.org/ppt_home/about/contact-us"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/thepublicpgh",
+        "facebook": "https://www.facebook.com/pittsburghpublictheater",
+        "linktree": null,
+        "source": "https://ppt.org/ppt_home/about/contact-us"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "Period Costumes",
+          "Roaring Twenties",
+          "Victorian elegance",
+          "1950s charm",
+          "Fantasy & Adventure",
+          "Theatrical Attire"
+        ],
+        "source": "https://ppt.org/ppt_home/about/costume-rentals"
+      },
+      "notice": {
+        "text": "Pittsburgh Public Theater and Pittsburgh CLO have come together as Confluence Theater of Pittsburgh!",
+        "source": "https://ppt.org/ppt_home/about/costume-rentals"
+      },
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "route-30-retro",
+      "name": "Route 30 Retro",
+      "siteUrl": null,
+      "sourceType": null,
+      "address": {
+        "label": null,
+        "street": "6694 Lincoln Hwy",
+        "city": "Jeannette/Irwin",
+        "state": "PA",
+        "zip": null,
+        "source": "Route 30 Retro Facebook Page (About), as read on 2026-10-17; not fetched by our scripts"
+      },
+      "mailingAddress": null,
+      "hours": {
+        "text": "By Appointment Daily",
+        "source": "Route 30 Retro Facebook Page (About), as read on 2026-10-17; not fetched by our scripts"
+      },
+      "modes": {
+        "values": [
+          "sale"
+        ],
+        "source": "Route 30 Retro Facebook Page (About), as read on 2026-10-17; not fetched by our scripts"
+      },
+      "terms": {
+        "text": "Everything is sold as-is",
+        "source": "Route 30 Retro Facebook Page (About), as read on 2026-10-17; not fetched by our scripts"
+      },
+      "contact": {
+        "formUrl": null,
+        "email": "route30retro@gmail.com",
+        "phone": "412-999-4491",
+        "pageUrl": null,
+        "source": "Route 30 Retro Facebook Page (About), as read on 2026-10-17; not fetched by our scripts"
+      },
+      "social": {
+        "instagram": null,
+        "facebook": "https://www.facebook.com/p/Route-30-Retro-100063856903288",
+        "linktree": null,
+        "source": "Route 30 Retro Facebook Page (About), as read on 2026-10-17; not fetched by our scripts"
+      },
+      "inquiryHint": null,
+      "specialties": null,
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "vintage-alley",
+      "name": "Vintage Alley Rentals",
+      "siteUrl": "https://www.vintagealleypgh.com/",
+      "sourceType": {
+        "value": "vintage-rental",
+        "source": "https://www.vintagealleypgh.com/"
+      },
+      "address": {
+        "label": "warehouse",
+        "street": "60 Greenway Drive",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zip": "15204",
+        "source": "https://www.vintagealleypgh.com/contact"
+      },
+      "mailingAddress": null,
+      "hours": {
+        "text": "We are open by scheduled, private appointment.",
+        "source": "https://www.vintagealleypgh.com/details"
+      },
+      "modes": {
+        "values": [
+          "rent"
+        ],
+        "source": "https://www.vintagealleypgh.com/details (\"Our rentals are for a 24-hour period.\")"
+      },
+      "terms": {
+        "text": "Our rentals are for a 24-hour period. … In order to reserve your pieces, you will be required to fill out a contract and put down a 50% non-refundable deposit.",
+        "source": "https://www.vintagealleypgh.com/details"
+      },
+      "contact": {
+        "formUrl": "https://www.vintagealleypgh.com/contact",
+        "email": null,
+        "phone": "412-215-3918",
+        "pageUrl": null,
+        "source": "https://www.vintagealleypgh.com/contact"
+      },
+      "social": {
+        "instagram": "http://instagram.com/vintagealleyrentalspgh/",
+        "facebook": "https://facebook.com/VintageAlleyRentals",
+        "linktree": null,
+        "source": "https://www.vintagealleypgh.com/"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "vintage rentals for weddings, events, photo shoots and film sets"
+        ],
+        "source": "https://www.vintagealleypgh.com/"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "wagon-wheel-antiques",
+      "name": "Wagon Wheel Antiques",
+      "siteUrl": "https://wagonwheelantiques.us/",
+      "sourceType": {
+        "value": "antique-reuse",
+        "source": "https://wagonwheelantiques.us/ (\"home to over 20 antique dealers\")"
+      },
+      "address": {
+        "label": null,
+        "street": "1399 Pittsburgh Road",
+        "city": "Valencia",
+        "state": "PA",
+        "zip": "16059",
+        "source": "https://wagonwheelantiques.us/"
+      },
+      "mailingAddress": null,
+      "hours": {
+        "text": "Open 7 Days: Monday - Saturday 10:00am - 5:00pm Sunday 12:00 noon - 5:00pm",
+        "source": "https://wagonwheelantiques.us/"
+      },
+      "modes": {
+        "values": [
+          "sale"
+        ],
+        "source": "https://wagonwheelantiques.us/faqs/ (\"Depending on which dealer you purchase an item from\")"
+      },
+      "terms": {
+        "text": "Depending on which dealer you purchase an item from, they may be equipped to deliver your purchase themselves, or we have several delivery specialists that we will refer you to so you can make arrangements with them to deliver your purchase.",
+        "source": "https://wagonwheelantiques.us/faqs/"
+      },
+      "contact": {
+        "formUrl": "https://wagonwheelantiques.us/contact-info/",
+        "email": "wagonwheelpa@gmail.com",
+        "phone": "724-898-9974",
+        "pageUrl": null,
+        "source": "https://wagonwheelantiques.us/"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/wagonwheelantiques",
+        "facebook": "https://www.facebook.com/wagonwheelpa",
+        "linktree": null,
+        "source": "https://wagonwheelantiques.us/"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "movie props",
+          "quality antiques",
+          "fine furnishings"
+        ],
+        "source": "https://wagonwheelantiques.us/"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
+    },
+    {
+      "id": "windswept",
+      "name": "Windswept Party & Event Rentals",
+      "siteUrl": "https://www.windswept.com/",
+      "sourceType": {
+        "value": "event-rental",
+        "source": "https://www.windswept.com/ (\"Party & Event Rentals\")"
+      },
+      "address": {
+        "label": null,
+        "street": "4371 Route 30",
+        "city": "Latrobe",
+        "state": "PA",
+        "zip": "15650",
+        "source": "https://www.windswept.com/contact"
+      },
+      "mailingAddress": null,
+      "hours": {
+        "text": "Show Room Visits: By Appointment ONLY Mon - Fri: 9 AM - 5 PM Sat & Sun: By Appointment ONLY",
+        "source": "https://www.windswept.com/contact"
+      },
+      "modes": {
+        "values": [
+          "rent"
+        ],
+        "source": "https://www.windswept.com/FAQ (\"A signed rental contract along with a 50% deposit are required to reserve your rentals.\")"
+      },
+      "terms": {
+        "text": "A signed rental contract along with a 50% deposit are required to reserve your rentals.",
+        "source": "https://www.windswept.com/FAQ"
+      },
+      "contact": {
+        "formUrl": "https://www.windswept.com/contact",
+        "email": "info@windswept.com",
+        "phone": "724-539-1009",
+        "pageUrl": null,
+        "source": "https://www.windswept.com/contact"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/windswept_promotions/",
+        "facebook": "https://www.facebook.com/Windswept-Entertainment-Events-251676051000/",
+        "linktree": null,
+        "source": "https://www.windswept.com/contact"
+      },
+      "inquiryHint": null,
+      "specialties": {
+        "values": [
+          "Tents",
+          "Tables, Chairs & Bars",
+          "Lighting & Decor",
+          "Linens",
+          "Furniture",
+          "Staging & Flooring",
+          "Searchlights"
+        ],
+        "source": "https://www.windswept.com/"
+      },
+      "notice": null,
+      "lastVerified": "2026-10-17",
+      "catalogs": []
     }
   ]
 }

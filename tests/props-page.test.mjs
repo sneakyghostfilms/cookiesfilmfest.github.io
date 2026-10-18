@@ -4,7 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { NOT_AFFILIATED } from '../src/scripts/props-cards.js';
+import { NOT_AFFILIATED, vendorBadges } from '../src/scripts/props-cards.js';
 import { compareByName, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -146,6 +146,19 @@ test('every vendor has one box with an anchor: vendors with searchable items fir
   for (const entry of vendors.vendors.filter((one) => !withItems.has(one.id))) {
     assert.ok(visibleText(vendorSection(entry.id)).includes('Inventory not indexed; contact the vendor.'), entry.id);
   }
+});
+
+test('regional badges mark only the sources outside Pennsylvania', () => {
+  const regional = vendors.vendors.filter((entry) => vendorBadges(entry).some((badge) => badge.regional)).map((entry) => entry.id);
+  assert.deepEqual(regional.sort(), ['cleveland-play-house-props', 'cleveland-prop-shop']);
+  for (const id of regional) assert.ok(vendorSection(id).includes('<span class="props-badge props-badge-regional">Regional: Cleveland, OH</span>'), id);
+});
+
+test('Route 30 Retro shows only its Facebook Page facts, cited as read, with no type of our own', () => {
+  const box = vendorSection('route-30-retro');
+  assert.ok(visibleText(box).includes('Route 30 Retro Facebook Page (About), as read on 2026-10-17 · not fetched by our scripts'));
+  assert.ok(box.includes('href="https://www.facebook.com/p/Route-30-Retro-100063856903288"'));
+  assert.deepEqual([...box.matchAll(/<span class="props-badge">([^<]*)<\/span>/g)].map(([, label]) => label), ['Sales']);
 });
 
 test('the page builds its search documents from the cards the same way the Worker builds them from the inventory', async () => {

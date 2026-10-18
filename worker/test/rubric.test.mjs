@@ -41,10 +41,46 @@ test('a prop is judged against the expected prop its name describes, not one its
   assert.deepEqual(result.required.map((entry) => entry.found), [true, false]);
 });
 
-test('unexpected matches count as wrong in the required list but are only listed as set dressing', () => {
+test('a prop the fixture does not name is an extra in the required list and set dressing in the optional list, never wrong', () => {
   const result = score(fixture, { required: [prop('ashtray', ['scp-036'])], optional: [prop('globe decor', ['scp-038']), prop('pistol', ['scp-261', 'scp-999'])] });
-  assert.deepEqual(result.wrongKeys, ['ashtray: scp-036', 'pistol: scp-999']);
+  assert.deepEqual(result.wrongKeys, ['pistol: scp-999']);
+  assert.deepEqual(result.extras, [{ prop: 'ashtray', keys: ['scp-036'] }]);
   assert.deepEqual(result.setDressing, ['globe decor [scp-038]']);
+});
+
+test('a suggestion that only shares a word with a required prop is not judged against it', () => {
+  const morgue = { id: 'morgue', required: [{ prop: 'red chair', acceptableKeys: ['k-red-chair'] }], absent: [] };
+  const optional = score(morgue, { required: [], optional: [prop('side chairs', ['k-side-chairs'])] });
+  assert.deepEqual([optional.wrongKeys, optional.setDressing], [[], ['side chairs [k-side-chairs]']]);
+  const extra = score(morgue, { required: [prop('desk', ['k-desk'])], optional: [] });
+  assert.deepEqual([extra.wrongKeys, extra.extras], [[], [{ prop: 'desk', keys: ['k-desk'] }]]);
+});
+
+test('a suggestion under another name is judged by the acceptable keys it returned', () => {
+  const morgue = { id: 'morgue', required: [{ prop: 'fridge', acceptableKeys: ['k-fridge'] }], absent: [] };
+  const result = score(morgue, { required: [], optional: [prop('old refrigerator', ['k-fridge', 'k-freezer'])] });
+  assert.deepEqual(result.required.map((entry) => entry.found), [true]);
+  assert.deepEqual(result.wrongKeys, ['old refrigerator: k-freezer']);
+});
+
+test('every key returned for a prop the fixture names as absent is wrong, on either list', () => {
+  const office = { id: 'office', required: [{ prop: 'change machine', acceptableKeys: ['k-change'] }], absent: ['water cooler', 'fax machine'] };
+  const morgue = { id: 'morgue', required: [{ prop: 'bench', acceptableKeys: ['k-bench'] }], absent: ['bone saw', 'specimen jar'] };
+  const cases = [
+    [office, { required: [prop('fax machine', ['k-copier'])], optional: [] }, ['fax machine: k-copier'], 'fax machine'],
+    [office, { required: [], optional: [prop('fax machine', ['k-copier'])] }, ['fax machine: k-copier'], 'fax machine'],
+    [office, { required: [prop('fax machine', ['k-change'])], optional: [] }, ['fax machine: k-change'], 'fax machine'],
+    [office, { required: [prop('water cooler', ['k-cooler'])], optional: [] }, ['water cooler: k-cooler'], 'water cooler'],
+    [morgue, { required: [prop('bone saw', ['k-saw'])], optional: [] }, ['bone saw: k-saw'], 'bone saw'],
+    [morgue, { required: [prop('specimen jar on the bench', ['k-bench'])], optional: [] }, ['specimen jar on the bench: k-bench'], 'specimen jar'],
+  ];
+  for (const [scene, body, wrong, absentName] of cases) {
+    const result = score(scene, body);
+    const label = `${body.required[0]?.prop ?? body.optional[0].prop} ${JSON.stringify(body.required.length ? 'R' : 'O')}`;
+    assert.deepEqual(result.wrongKeys, wrong, label);
+    assert.deepEqual(result.extras, [], label);
+    assert.match(result.absent.find((entry) => entry.name === absentName).outcome, /^force-matched/, label);
+  }
 });
 
 test('absent props are reported, force-matched or left out by whole-name match', () => {

@@ -16,20 +16,31 @@ const namesAll = (prop, absentName) => {
   return words(absentName).every((word) => propWords.has(word));
 };
 
-function expectedFor(prop, fixture) {
+// A suggestion is judged against the fixture prop it names in full, required or absent: the longest name wins, then a
+// required prop over an absent one, then the one more of its keys fit. Otherwise it is judged against the required prop
+// whose acceptable keys it returned most of. A suggestion that does neither is an extra: listed, never counted wrong.
+function judge(prop, fixture) {
+  const fitting = (expected) => prop.keys.filter((key) => expected.acceptableKeys.includes(key)).length;
+  const named = [
+    ...fixture.required.filter((expected) => namesAll(prop.prop, expected.prop))
+      .map((expected) => ({ expected, length: words(expected.prop).length, absent: 0, fit: fitting(expected) })),
+    ...fixture.absent.filter((name) => namesAll(prop.prop, name))
+      .map((name) => ({ absentName: name, length: words(name).length, absent: 1, fit: 0 })),
+  ].sort((a, b) => b.length - a.length || a.absent - b.absent || b.fit - a.fit);
+  if (named.length) return named[0].expected ? { expected: named[0].expected } : { absentName: named[0].absentName };
   let best = null;
   for (const expected of fixture.required) {
-    const rank = [sharedWords(prop.prop, expected.prop), prop.keys.filter((key) => expected.acceptableKeys.includes(key)).length];
-    if (!rank[0] && !rank[1]) continue;
+    const rank = [fitting(expected), sharedWords(prop.prop, expected.prop)];
+    if (!rank[0]) continue;
     if (!best || rank[0] > best.rank[0] || (rank[0] === best.rank[0] && rank[1] > best.rank[1])) best = { expected, rank };
   }
-  return best?.expected ?? null;
+  return best ? { expected: best.expected } : {};
 }
 
 export function score(fixture, body) {
   const props = [...body.required.map((prop) => ({ ...prop, list: 'R' })), ...body.optional.map((prop) => ({ ...prop, list: 'O' }))]
     .filter((prop) => prop.keys.length)
-    .map((prop) => ({ ...prop, expected: expectedFor(prop, fixture) }));
+    .map((prop) => ({ ...prop, ...judge(prop, fixture) }));
   const dense = fixture.required.length + fixture.absent.length > SLOTS;
   const matches = (prop, expected) => prop.expected === expected && prop.keys.some((key) => expected.acceptableKeys.includes(key));
   const required = fixture.required.map((expected) => ({
@@ -38,13 +49,15 @@ export function score(fixture, body) {
     asRequired: props.some((prop) => prop.list === 'R' && matches(prop, expected)),
   }));
   const wrongKeys = [];
+  const extras = [];
   const setDressing = [];
   for (const prop of props) {
-    const { expected } = prop;
-    if (expected) {
-      for (const key of prop.keys) if (!expected.acceptableKeys.includes(key)) wrongKeys.push(`${prop.prop}: ${key}`);
-    } else if (prop.list === 'R') {
+    if (prop.expected) {
+      for (const key of prop.keys) if (!prop.expected.acceptableKeys.includes(key)) wrongKeys.push(`${prop.prop}: ${key}`);
+    } else if (prop.absentName) {
       for (const key of prop.keys) wrongKeys.push(`${prop.prop}: ${key}`);
+    } else if (prop.list === 'R') {
+      extras.push({ prop: prop.prop, keys: prop.keys });
     } else {
       setDressing.push(`${prop.prop} [${prop.keys.join(', ')}]`);
     }
@@ -65,6 +78,7 @@ export function score(fixture, body) {
     countable: dense ? Math.min(required.length, LIMITS.maxRequiredProps) : required.length,
     honest: absent.filter((entry) => entry.outcome === 'reported as no match').length,
     wrongKeys,
+    extras,
     setDressing,
     withKeys: props.length,
   };

@@ -126,7 +126,7 @@ test('serializeInventory writes one item per line and round-trips', () => {
 });
 
 test('cleanTags rejects era claims the caption does not make, denied words and malformed tags', () => {
-  const dated = { name: 'GREEN CHANGE MACHINE', description: 'GREEN CHANGE MACHINE 1960S' };
+  const dated = { name: 'GREEN CHANGE MACHINE', era: '1960S', description: 'GREEN CHANGE MACHINE 1960S' };
   const undated = { name: 'WHITE MEGA PHONE', description: 'WHITE MEGA PHONE' };
   const vintage = { name: 'VINTAGE STETHOSCOPE', description: 'VINTAGE STETHOSCOPE' };
   assert.deepEqual(cleanTags(['coin changer', '1960s office'], dated).tags, ['coin changer', '1960s office']);
@@ -140,8 +140,8 @@ test('cleanTags rejects era claims the caption does not make, denied words and m
 });
 
 test('cleanTags keeps printed matter from being tagged as blank stationery or a guessed genre', () => {
-  const book = { name: 'GRAY BOOK', description: 'GRAY BOOK 1960S' };
-  const notebook = { name: 'STENO SPIRAL NOTEBOOK', description: 'STENO SPIRAL NOTEBOOK 1990S' };
+  const book = { name: 'GRAY BOOK', era: '1960S', description: 'GRAY BOOK 1960S' };
+  const notebook = { name: 'STENO SPIRAL NOTEBOOK', era: '1990S', description: 'STENO SPIRAL NOTEBOOK 1990S' };
   assert.deepEqual(cleanTags(['notebook', 'reference book', 'novel', 'logbook', 'paperback'], book).tags, ['reference book']);
   assert.deepEqual(cleanTags(['steno pad', 'notebook'], notebook).tags, ['steno pad', 'notebook']);
 });

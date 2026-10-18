@@ -1,7 +1,7 @@
 // Tracking parameters whose values are replaced before a fetched page is cached. A value can identify a visitor (an
 // email-click token that a page cache baked into its links, or the client id in _gl and _ga), so only the names are
 // ever kept. utm_* stands for every name that starts with utm_.
-export const TRACKING_PARAMETERS = ['_kx', 'gad_source', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid', 'mc_eid', 'mc_cid', 'utm_*', 'yclid', 'ttclid', 'twclid', 'li_fat_id', 'igshid', '_hsenc', '_hsmi', 'vero_id', 'oly_enc_id', 'oly_anon_id', '_openstat', '_gl', '_ga'];
+export const TRACKING_PARAMETERS = ['_kx', 'gad_source', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid', 'mc_eid', 'mc_cid', 'utm_*', 'yclid', 'ttclid', 'twclid', 'li_fat_id', 'igshid', '_hsenc', '_hsmi', 'vero_id', 'oly_enc_id', 'oly_anon_id', '_openstat', '_gl', '_ga', 'srsltid', 'mibextid'];
 export const REDACTED = 'REDACTED';
 
 const NAME_PATTERN = TRACKING_PARAMETERS.map((name) => (name.endsWith('*') ? `${name.slice(0, -1)}[a-z0-9_]+` : name)).join('|');

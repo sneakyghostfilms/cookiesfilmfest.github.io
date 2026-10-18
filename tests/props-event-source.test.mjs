@@ -171,6 +171,9 @@ test('--fetch-sitemap fetches a sitemap the cache lacks once, after robots.txt, 
   const cached = await importWithCache({ pages: [SOFAS], responses, fetchSitemap: true });
   assert.equal(cached.error, undefined, String(cached.error?.message));
   assert.deepEqual(cached.requested, [`${SITE}robots.txt`, SOFAS], 'a cached sitemap is never requested, flag or not');
+  const unlisted = await importWithCache({ pages: [SOFAS, RUGS], responses, sitemap: sitemapOf([SOFAS]), fetchSitemap: true });
+  assert.match(String(unlisted.error?.message), /furniture\/rugs\.html is not in the sitemap; stopping before any page request/);
+  assert.deepEqual(unlisted.requested, [], 'with a cached sitemap the page list is still checked before any request, robots.txt included');
   const disallowed = await importWithCache({ pages: [SOFAS], responses: new Map([...responses, [`${SITE}robots.txt`, `${ROBOTS}Disallow: /media/\n`]]), sitemap: null, fetchSitemap: true });
   assert.match(String(disallowed.error?.message), /robots\.txt on store\.example disallows https:\/\/store\.example\/media\/sitemap\.xml; not requesting it/);
   assert.deepEqual(disallowed.requested, [`${SITE}robots.txt`], 'robots.txt is read before the sitemap is requested');

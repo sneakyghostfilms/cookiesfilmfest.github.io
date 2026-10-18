@@ -13,6 +13,9 @@ const vendorsWithItems = vendorsData.vendors.filter((vendor) => inventory.items.
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "en");
 const vendorsWithoutItems = vendorsData.vendors.filter((vendor) => !vendorsWithItems.includes(vendor)).sort(byName);
 const indexed = inventory.catalogs as Record<string, { indexedAt: string; capturedAt?: string }>;
+// A row names the place with capitals even where a vendor publishes it in lowercase; the details keep it verbatim.
+const cityCaps = (city: string) => city.replace(/(^|[\s/-])([a-z])/g, (_, before, letter) => before + letter.toUpperCase());
+const stateCaps = (state: string) => (/^[a-z]{2}$/i.test(state) ? state.toUpperCase() : state);
 // Each vendor's row names it, its type and modes, its place and how many of its items are searchable; the row opens to
 // the facts the vendor publishes.
 const vendorRows = [...[...vendorsWithItems].sort(byName), ...vendorsWithoutItems].map((vendor) => {
@@ -23,7 +26,7 @@ const vendorRows = [...[...vendorsWithItems].sort(byName), ...vendorsWithoutItem
     vendor,
     type: badges.filter((badge) => !badge.regional).map((badge) => badge.text).join(" · "),
     regional: badges.some((badge) => badge.regional),
-    place: place ? [place.city, place.state].filter(Boolean).join(", ") : "",
+    place: place ? [place.city && cityCaps(place.city), place.state && stateCaps(place.state)].filter(Boolean).join(", ") : "",
     items: items ? `${items.toLocaleString("en-US")} ${items === 1 ? "item" : "items"} searchable` : null,
     facts: vendorFactGroups(vendor),
     routes: contactRoutes(vendor.contact),

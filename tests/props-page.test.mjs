@@ -254,7 +254,8 @@ test('vendor rows show the published facts with their sources, and nothing priva
 test('each row names the vendor, its type and modes, its place and its searchable items, with no link inside', () => {
   const summaryText = (id) => visibleText(vendorSection(id).match(/<summary class="props-vendor-row">([\s\S]*?)<\/summary>/)?.[1] ?? '').trim();
   assert.equal(summaryText('steel-city-props'), 'Steel City Props Prop house · Rentals Pittsburgh, PA 353 items searchable');
-  assert.equal(summaryText('dezzign-central'), 'Dezzign Central Prop house · By inquiry pittsburgh, pa 23 items searchable', 'the place as published');
+  assert.equal(summaryText('dezzign-central'), 'Dezzign Central Prop house · By inquiry Pittsburgh, PA 23 items searchable', 'the row capitalizes a place the vendor publishes in lowercase');
+  assert.ok(visibleText(vendorSection('dezzign-central')).includes('pittsburgh, pa 15201'), "the row's details keep the address verbatim");
   assert.equal(summaryText('cleveland-prop-shop'), 'Cleveland Prop Shop Prop house · Rentals · Sales Cleveland, OH Regional 846 items searchable');
   assert.equal(summaryText('route-30-retro'), 'Route 30 Retro Sales Jeannette/Irwin, PA Not indexed');
   for (const entry of vendors.vendors) {

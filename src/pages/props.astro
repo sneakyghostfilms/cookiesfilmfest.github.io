@@ -179,7 +179,7 @@ const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
       <h2 id="prop-sources" class="props-sources-title">Prop sources ({vendorBoxes.length})</h2>
       {vendorBoxes.map(({ vendor, badges, facts, routes, social, sources, private: privateLines, catalogs: vendorCatalogs }) => (
         <section class="props-box props-vendor" id={`vendor-${vendor.id}`} data-vendor={vendor.id}>
-          <h2 class="props-vendor-name">{vendor.name}</h2>
+          <h3 class="props-vendor-name">{vendor.name}</h3>
           {badges.length > 0 && <p class="props-badges">{badges.map((badge) => <span class:list={["props-badge", { "props-badge-regional": badge.regional }]}>{badge.text}</span>)}</p>}
           {vendorCatalogs.map((line) => (
             <p class="props-catalog">{line.text}{line.href && <a href={line.href} target="_blank" rel="noopener noreferrer">{line.linkLabel}</a>}</p>

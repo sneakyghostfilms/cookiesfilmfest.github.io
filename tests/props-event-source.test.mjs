@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -102,7 +102,7 @@ test("every page in the catalog's list must be a plain page on the site's host t
 
 // The import through the real fetcher on a temporary cache: the sitemap seeded there, every other URL answered by a
 // stub network that records each request. No wait is real, and every page is fetched at noon UTC.
-async function importWithCache({ pages, responses, sitemap = sitemapOf(pages) }) {
+async function importWithCache({ pages, responses, sitemap = sitemapOf(pages), fetchSitemap = false }) {
   const cacheRoot = await mkdtemp(path.join(tmpdir(), 'props-magento-'));
   const directory = path.join(cacheRoot, vendor.id, 'mt-test');
   await mkdir(directory, { recursive: true });
@@ -116,12 +116,13 @@ async function importWithCache({ pages, responses, sitemap = sitemapOf(pages) })
     requested.push(String(url));
     const body = responses.get(String(url));
     if (body === undefined) return new Response('not found', { status: 404 });
-    return new Response(body, { status: 200, headers: { 'content-type': String(url).endsWith('robots.txt') ? 'text/plain' : 'text/html; charset=UTF-8' } });
+    const contentType = String(url).endsWith('robots.txt') ? 'text/plain' : String(url).endsWith('.xml') ? 'application/xml' : 'text/html; charset=UTF-8';
+    return new Response(body, { status: 200, headers: { 'content-type': contentType } });
   };
   const fetcher = createSiteFetcher({ allowHosts: ['store.example'], fetch: network, sleep: async () => {}, random: () => 0, now: () => Date.parse('2026-10-18T12:00:00.000Z'), guard: () => null });
-  const result = await importSite({ vendorId: vendor.id, vendors: { vendors: [{ ...vendor, catalogs: [catalogOf(pages)] }] }, outFile: path.join(cacheRoot, 'inventory.json'), cacheRoot, fetcher, exclusions: {}, log: () => {}, today: () => '2026-10-18' })
+  const result = await importSite({ vendorId: vendor.id, vendors: { vendors: [{ ...vendor, catalogs: [catalogOf(pages)] }] }, outFile: path.join(cacheRoot, 'inventory.json'), cacheRoot, fetcher, fetchSitemap, exclusions: {}, log: () => {}, today: () => '2026-10-18' })
     .catch((error) => ({ error }));
-  return { requested, stats: fetcher.stats(), ...result };
+  return { requested, stats: fetcher.stats(), directory, ...result };
 }
 
 const ROBOTS = 'User-agent: *\nDisallow: /index.php/\nDisallow: /*?\nDisallow: /catalog/\n';
@@ -152,6 +153,27 @@ test('a sitemap missing from the cache, or a listed page the sitemap lacks, stop
   const unlisted = await importWithCache({ pages: [SOFAS, RUGS], responses, sitemap: sitemapOf([SOFAS]) });
   assert.match(String(unlisted.error?.message), /furniture\/rugs\.html is not in the sitemap; stopping before any page request/);
   assert.deepEqual(unlisted.requested, []);
+});
+
+test('--fetch-sitemap fetches a sitemap the cache lacks once, after robots.txt, into the cache; a sitemap already cached is never requested', async () => {
+  const responses = new Map([
+    [`${SITE}robots.txt`, ROBOTS],
+    [SITEMAP_URL, sitemapOf([SOFAS, `${SITE}eden-sofa.html?srsltid=AfmBOop-tracking`])],
+    [SOFAS, categoryHtml('Sofas', [product('eden-sofa', 'Eden Sofa')], [items(1)])],
+  ]);
+  const fetched = await importWithCache({ pages: [SOFAS], responses, sitemap: null, fetchSitemap: true });
+  assert.equal(fetched.error, undefined, String(fetched.error?.message));
+  assert.deepEqual(fetched.requested, [`${SITE}robots.txt`, SITEMAP_URL, SOFAS], 'robots.txt first, the sitemap once, then each page');
+  const meta = JSON.parse(await readFile(path.join(fetched.directory, `${cacheName(SITEMAP_URL)}.meta.json`), 'utf8'));
+  assert.deepEqual([meta.url, meta.redacted], [SITEMAP_URL, ['srsltid']], "the sitemap is in the catalog's cache, redacted like any fetch");
+  assert.match(await readFile(path.join(fetched.directory, `${cacheName(SITEMAP_URL)}.body`), 'utf8'), /srsltid=REDACTED/);
+  assert.equal(fetched.stats.cacheHits, 1, 'the import then read the sitemap from the cache');
+  const cached = await importWithCache({ pages: [SOFAS], responses, fetchSitemap: true });
+  assert.equal(cached.error, undefined, String(cached.error?.message));
+  assert.deepEqual(cached.requested, [`${SITE}robots.txt`, SOFAS], 'a cached sitemap is never requested, flag or not');
+  const disallowed = await importWithCache({ pages: [SOFAS], responses: new Map([...responses, [`${SITE}robots.txt`, `${ROBOTS}Disallow: /media/\n`]]), sitemap: null, fetchSitemap: true });
+  assert.match(String(disallowed.error?.message), /robots\.txt on store\.example disallows https:\/\/store\.example\/media\/sitemap\.xml; not requesting it/);
+  assert.deepEqual(disallowed.requested, [`${SITE}robots.txt`], 'robots.txt is read before the sitemap is requested');
 });
 
 test('a page that fails its checks stops the import before the next request, and a page robots.txt disallows is never requested', async () => {

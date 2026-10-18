@@ -5,7 +5,7 @@
     "dz-2026-10-17": {"indexedAt":"2026-10-17","capturedAt":"2026-10-17","pages":7,"photos":33},
     "va-2026-10-17": {"indexedAt":"2026-10-17","capturedAt":"2026-10-17","sections":6,"photos":195},
     "pccr-2026-10-18": {"indexedAt":"2026-10-18","capturedAt":"2026-10-18","products":174,"excluded":{"not in the category":0,"not visible":0,"not physical":0,"sold out":2,"listed twice":0}},
-    "cj-2026-10-18": {"indexedAt":"2026-10-18","capturedAt":"2026-10-18","pages":29,"cards":344,"excluded":{"not in stock":0,"building material":76,"repeated":0}}
+    "cj-2026-10-18": {"indexedAt":"2026-10-18","capturedAt":"2026-10-18","pages":29,"cards":344,"excluded":{"not in stock":0,"building material":76,"repeated":0},"withheld":1}
   },
   "items": [
     {"key":"scp-056","vendor":"steel-city-props","catalog":"scp-2026-09-30","itemNumbers":["056"],"printedIds":["[056]"],"name":"GREEN CHANGE MACHINE","description":"GREEN CHANGE MACHINE 1960S","categories":["THE OFFICE"],"era":"1960S","decades":[1960],"pages":[5]},
@@ -993,7 +993,6 @@
     {"key":"cj-wmejci","vendor":"construction-junction","catalog":"cj-2026-10-18","name":"Reduced Specialty Reclaimed – Continental Counter Scale","description":null,"categories":["Specialty Reclaimed"],"era":null,"decades":[],"url":"https://cjreuse.org/shop/specialty-reclaimed-continental-counter-scale/","listedPrice":"75.99"},
     {"key":"cj-uqohpt","vendor":"construction-junction","catalog":"cj-2026-10-18","name":"Hardware – Chrome or Brass Plated Double Ball Catch","description":null,"categories":["Hardware"],"era":null,"decades":[],"url":"https://cjreuse.org/shop/hardware-chrome-or-brass-plated-double-ball-catch/","listedPrice":"3.00"},
     {"key":"cj-lby8jc","vendor":"construction-junction","catalog":"cj-2026-10-18","name":"Hardware Electrical – RCA Speaker Wall Plate (Surplus)","description":null,"categories":["Electrical Hardware"],"era":null,"decades":[],"url":"https://cjreuse.org/shop/hardware-electrical-rca-speaker-wall-plate-surplus/","listedPrice":"3.00"},
-    {"key":"cj-fpxrzj","vendor":"construction-junction","catalog":"cj-2026-10-18","name":"Hand Painted Sign – Salvaged (Vintage)","description":null,"categories":["Specialty Collectible"],"era":null,"decades":[],"url":"https://cjreuse.org/shop/hand-painted-sign-salvaged-vintage/","listedPrice":"150.00"},
     {"key":"cj-pbo4wo","vendor":"construction-junction","catalog":"cj-2026-10-18","name":"Hardware – Restor A Finish – Golden Oak","description":null,"categories":["Hardware"],"era":null,"decades":[],"url":"https://cjreuse.org/shop/new-retail-stock-hardware-restor-a-finish-golden-oak/","listedPrice":"10.00"},
     {"key":"cj-iua6y6","vendor":"construction-junction","catalog":"cj-2026-10-18","name":"Hardware – Restor A Finish – Dark Oak","description":null,"categories":["Hardware"],"era":null,"decades":[],"url":"https://cjreuse.org/shop/new-retail-stock-hardware-restor-a-finish-dark-oak/","listedPrice":"10.00"},
     {"key":"cj-t75nwv","vendor":"construction-junction","catalog":"cj-2026-10-18","name":"Lighting – Progress Lighting Teigen Farmhouse Geometric Pendant (Surplus) 223","description":null,"categories":["Specialty Cabinet or Accent Lighting"],"era":null,"decades":[],"url":"https://cjreuse.org/shop/lighting-progress-lighting-teigen-farmhouse-geometric-pendant-surplus/","listedPrice":"99.95"},

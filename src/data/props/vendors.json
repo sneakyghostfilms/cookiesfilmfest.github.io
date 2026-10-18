@@ -433,12 +433,13 @@
           "expected": {
             "pages": 29,
             "cards": 344,
-            "items": 268,
+            "items": 267,
             "excluded": {
               "not in stock": 0,
               "building material": 76,
               "repeated": 0
-            }
+            },
+            "withheld": 1
           }
         }
       ]

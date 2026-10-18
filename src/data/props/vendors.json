@@ -243,6 +243,7 @@
     {
       "id": "cleveland-prop-shop",
       "name": "Cleveland Prop Shop",
+      "keyPrefix": "cps",
       "siteUrl": "https://www.clevelandpropshop.com/",
       "sourceType": {
         "value": "prop-house",
@@ -304,7 +305,21 @@
       },
       "notice": null,
       "lastVerified": "2026-10-17",
-      "catalogs": []
+      "catalogs": [
+        {
+          "id": "cps-2026-10-17",
+          "type": "weebly-gallery",
+          "title": "Prop galleries on clevelandpropshop.com",
+          "sourceUrl": "https://www.clevelandpropshop.com/",
+          "siteUrl": "https://www.clevelandpropshop.com/",
+          "itemLinkLabel": "Open gallery page",
+          "expected": {
+            "pages": 23,
+            "photos": 879,
+            "items": 846
+          }
+        }
+      ]
     },
     {
       "id": "clicksburgh-retro-rentals",

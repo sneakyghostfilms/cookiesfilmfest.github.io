@@ -1,4 +1,9 @@
 {
   "va-tdb0dy": { "reason": "people in photo; vendor backdrop shown without its thumbnail" },
-  "va-x0ubrj": { "reason": "people in photo; vendor backdrop shown without its thumbnail" }
+  "va-x0ubrj": { "reason": "people in photo; vendor backdrop shown without its thumbnail" },
+  "cps-efadik": { "reason": "people in photo; item shown without its thumbnail" },
+  "cps-psmw3m": { "reason": "vendor photo shows a different object" },
+  "cps-ifgtjm": { "reason": "vendor photo shows a different object" },
+  "cps-j7cy82": { "reason": "private names in photo; item shown without its thumbnail" },
+  "cps-u233i0": { "reason": "people in photo; item shown without its thumbnail" }
 }

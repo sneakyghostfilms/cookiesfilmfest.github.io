@@ -10,7 +10,7 @@ const directory = new URL('./fixtures/scenes/', import.meta.url);
 const fixtures = await Promise.all((await readdir(directory)).filter((file) => file.endsWith('.json')).sort()
   .map(async (file) => JSON.parse(await readFile(new URL(file, directory), 'utf8'))));
 const office = fixtures.find((fixture) => fixture.id === 'office').text;
-const UNREACHABLE = { diner: ['bills'] };
+const UNREACHABLE = { diner: ['bills'], morgue: ['bench'] };
 
 test('at the shortlist size, each fixture keeps exactly the required props it is pinned to', () => {
   assert.equal(LIMITS.shortlistSize, 100);

@@ -57,18 +57,18 @@ test('keyword queries rank the matching items first', () => {
   assert.equal(keys('telephone book')[0], 'scp-051');
   assert.equal(keys('secretary handbook')[0], 'scp-024');
   assert.deepEqual(top('handcuffs', 2).sort(), ['scp-142', 'scp-280']);
-  assert.deepEqual(keys('santa').sort(), ['pccr-w9w5ab', 'scp-210', 'scp-370', 'va-lnoa73'], "Steel City's two Santa costumes, Vintage Alley's Santa's Chair and Creative Reuse's Santa tea towel");
-  assert.deepEqual(keys('wig'), ['scp-082']);
+  assert.deepEqual(keys('santa').sort(), ['cps-7o625i', 'pccr-w9w5ab', 'scp-210', 'scp-370', 'va-lnoa73'], "Steel City's two Santa costumes, Vintage Alley's Santa's Chair, Creative Reuse's Santa tea towel and Cleveland Prop Shop's Santa throne");
+  assert.deepEqual(keys('wig'), ['scp-082', 'cps-9tpny1', 'cps-cn4eli', 'cps-we3uxs']);
   assert.equal(keys('fake blood')[0], 'scp-057');
   for (const key of ['scp-204', 'scp-236', 'scp-237']) assert.ok(top('police jacket', 3).includes(key), key);
   for (const doc of search(index, 'gun').slice(0, 10)) assert.match(doc.name, /GUN/);
-  assert.deepEqual(top('cell phone', 2).sort(), ['scp-122', 'scp-135']);
+  assert.deepEqual(top('cell phone', 2).sort(), ['cps-7y9yme', 'cps-bu6xfl']);
   assert.ok(keys('secret').includes('scp-021'), 'prefix match');
   assert.deepEqual(keys('zzqx nonsense'), []);
 });
 
 test('AI tags extend keyword search to synonyms the vendor did not print', () => {
-  assert.deepEqual(keys('megaphone').sort(), ['scp-284', 'scp-372']);
+  assert.deepEqual(keys('megaphone').sort(), ['cps-aafudh', 'scp-284', 'scp-372'], 'the two MEGA PHONEs through their tags, and one that prints the word');
   assert.equal(keys('coin changer')[0], 'scp-056');
 });
 
@@ -99,9 +99,11 @@ test('filters narrow by section and stated decade', () => {
 
 test('a bare year finds its decade unless the year itself is printed', () => {
   const year = keys('1965');
+  const printing1965 = ['cps-9c731j', 'cps-xu219g'];
   assert.ok(year.length > 0);
-  assert.deepEqual(year, keys('60s'));
-  assert.deepEqual(top('1991', 4).sort(), ['pccr-1nfvei', 'scp-286-2', 'scp-342', 'scp-351']);
+  assert.deepEqual(year.slice(0, printing1965.length).sort(), printing1965, 'the items that print 1965 come first');
+  assert.deepEqual(year.slice(printing1965.length), keys('60s').filter((key) => !printing1965.includes(key)));
+  assert.deepEqual(top('1991', 4).sort(), ['cps-e1m182', 'cps-xiq7y4', 'pccr-1nfvei', 'scp-342'], 'the four items that print 1991');
   const printed = buildIndex([
     { key: 'calendar', name: 'PIN-UP CALENDAR 1991', description: 'PIN-UP CALENDAR 1991', categories: [], tags: [], decades: [], order: 0 },
     { key: 'phone', name: 'CORDLESS PHONE', description: 'CORDLESS PHONE 1990S', categories: [], tags: [], decades: [1990], order: 1 },
@@ -211,7 +213,8 @@ test('the vendor strip matches a vendor by its name or its own words, never by o
   const ids = (query) => rankText(vendorIndex, query).map((doc) => doc.key);
   assert.deepEqual(ids('antique'), ['wagon-wheel-antiques'], 'by its name, and not PCCR, whose type label says antiques');
   assert.deepEqual(ids('costume'), ['public-theater-costumes']);
-  assert.deepEqual(ids('typewriters'), ['cleveland-prop-shop'], 'by its own gallery name');
+  assert.deepEqual(ids('tents'), ['windswept'], 'by its own words');
+  assert.deepEqual(ids('typewriters'), [], 'Cleveland Prop Shop, now with searchable items, leaves the strip');
   assert.deepEqual(ids('film'), ['pittsburgh-clo-construction-center'], 'a vendor with searchable items leaves the strip');
   assert.deepEqual(ids('the props'), [], 'stopwords alone match nothing');
   assert.deepEqual(ids(''), []);

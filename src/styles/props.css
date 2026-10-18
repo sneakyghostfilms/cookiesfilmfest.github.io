@@ -759,28 +759,9 @@
   min-height: 44px;
 }
 
-@media (max-width: 900px) {
-  .props-page .props-controls,
-  .props-page .props-controls:has(#props-vendor) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .props-page .props-query {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 760px) {
+@media (max-width: 1023px) {
   .props-page .props-vendor-row {
     flex-wrap: wrap;
-    column-gap: 8px;
-    padding: 10px 4px 10px 20px;
-    font-size: 13px;
-  }
-
-  .props-page .props-vendor-row::before {
-    top: 15px;
-    left: 5px;
   }
 
   .props-page .props-vendor-row::after {
@@ -793,7 +774,6 @@
   .props-page .props-vendor-name {
     flex: 1 1 0;
     order: 1;
-    font-size: 18px;
   }
 
   .props-page .props-vendor-items {
@@ -809,6 +789,34 @@
   .props-page .props-vendor-place {
     flex: 0 1 auto;
     order: 5;
+  }
+}
+
+@media (max-width: 900px) {
+  .props-page .props-controls,
+  .props-page .props-controls:has(#props-vendor) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .props-page .props-query {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .props-page .props-vendor-row {
+    column-gap: 8px;
+    padding: 10px 4px 10px 20px;
+    font-size: 13px;
+  }
+
+  .props-page .props-vendor-row::before {
+    top: 15px;
+    left: 5px;
+  }
+
+  .props-page .props-vendor-name {
+    font-size: 18px;
   }
 
   .props-page .props-vendor-panel {

@@ -4,7 +4,7 @@ import { buildIndex, rankText, search } from "./props-search.js";
 import { queryFromHash } from "./props-search-link.js";
 
 const PAGE_SIZE = 24;
-const number = (value: number) => value.toLocaleString("en-US");
+const formatNumber = (value: number) => value.toLocaleString("en-US");
 const LOAD_FAILED = "The item list couldn't load. Reload the page to try again.";
 const list = document.getElementById("props-results") as HTMLOListElement;
 const query = document.getElementById("props-query") as HTMLInputElement;
@@ -44,10 +44,10 @@ function render() {
     ? `No catalog items matched “${text}”. Try fewer or simpler words, or clear the filters.`
     : "No items match these filters. Clear a filter to see more.";
   const filtered = text || category.value || decade.value || vendor?.value || kind.value;
-  const showing = results.length > shown ? `, showing ${number(shown)}` : "";
+  const showing = results.length > shown ? `, showing ${formatNumber(shown)}` : "";
   count.textContent = filtered
-    ? `${number(results.length)} matching ${results.length === 1 ? "item" : "items"}${showing}`
-    : `${number(docs.length)} items, listed alphabetically${showing}`;
+    ? `${formatNumber(results.length)} matching ${results.length === 1 ? "item" : "items"}${showing}`
+    : `${formatNumber(docs.length)} items, listed alphabetically${showing}`;
 }
 
 function showVendorMatches() {

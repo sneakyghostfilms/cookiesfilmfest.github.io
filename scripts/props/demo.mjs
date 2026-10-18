@@ -104,7 +104,8 @@ async function buildAssets(pdfPath) {
   console.log(`✅ ${items.length} thumbnails, the catalog PDF and manifest.json are in .props-demo/`);
 }
 
-async function buildSiteAssets(vendorId, exportPath) {
+// `load` is the cache-only import, replaceable for a test.
+export async function buildSiteAssets(vendorId, exportPath, { load = loadSite } = {}) {
   const vendors = JSON.parse(await readFile(VENDORS_FILE, 'utf8'));
   const { vendor, catalog } = findSiteCatalog(vendors, vendorId);
   const thumbs = join(DEMO_DIR, 'thumbs');
@@ -116,14 +117,19 @@ async function buildSiteAssets(vendorId, exportPath) {
       throw new Error(`not in the local cache; run npm run props:import-site -- --vendor ${vendor.id} first`);
     },
   });
-  const loaded = await loadSite({ vendor, catalog, cacheRoot: CACHE_ROOT, fetcher: cachedOnly, exportPath });
+  const loaded = await load({ vendor, catalog, cacheRoot: CACHE_ROOT, fetcher: cachedOnly, exportPath });
   const { images } = loaded;
   const items = demoPhotoItems(loaded.items);
+  const firstPhotos = items.map((item) => images.get(item.key)?.urls[0]).filter(Boolean).map(photoUrl);
+  // A catalog that keeps no photo, such as Event Source's text-only one, has nothing to fetch, so no host is contacted.
+  if (!firstPhotos.length) {
+    console.log(`No photo to fetch for ${vendor.name}: none of its ${items.length} items keeps one, so no request was made.`);
+    return;
+  }
   const photoHost = photoHostFor(catalog);
   const fetcher = createSiteFetcher({ allowHosts: [photoHost] });
   const robots = await fetcher.get(`https://${photoHost}/robots.txt`, originals, { missingOk: true });
   const rules = robotsRules(robots.missing ? '' : robots.body.toString('utf8'));
-  const firstPhotos = items.map((item) => images.get(item.key)?.urls[0]).filter(Boolean).map(photoUrl);
   const stopReason = robotsStopReason(rules, firstPhotos, photoHost);
   if (stopReason) throw new Error(stopReason);
   if (rules.crawlDelaySeconds) fetcher.raiseGap(rules.crawlDelaySeconds * 1000);

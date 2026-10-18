@@ -72,7 +72,8 @@ export function createSiteFetcher({
     throw error;
   }
 
-  async function get(url, directory, { missingOk = false } = {}) {
+  // cacheOnly reads a URL only from the cache: a miss stops the run instead of requesting it.
+  async function get(url, directory, { missingOk = false, cacheOnly = false } = {}) {
     const name = cacheName(url);
     const files = { body: join(directory, `${name}.body`), meta: join(directory, `${name}.meta.json`) };
     const problem = hostProblem(url, allowHosts);
@@ -83,6 +84,7 @@ export function createSiteFetcher({
       stats.cacheHits += 1;
       return cached;
     }
+    if (cacheOnly) stop(new FetchStopped(`${url} is not in the cache, and this run reads it only from there; not requesting it`, { url, reason: 'cache' }));
     if (stopped) throw stopped;
     const unsafe = guard(directory);
     if (unsafe) stop(new FetchStopped(`refusing to cache vendor content: ${unsafe}`, { url, reason: 'guard' }));

@@ -545,6 +545,7 @@
     {
       "id": "event-source-pittsburgh",
       "name": "Event Source (Pittsburgh)",
+      "keyPrefix": "esp",
       "siteUrl": "https://www.eventsource.com/",
       "sourceType": {
         "value": "event-rental",
@@ -600,7 +601,36 @@
       },
       "notice": null,
       "lastVerified": "2026-10-17",
-      "catalogs": []
+      "catalogs": [
+        {
+          "id": "esp-2026-10-18",
+          "type": "magento-category",
+          "title": "Furniture and decor pages on eventsource.com",
+          "siteUrl": "https://www.eventsource.com/",
+          "sitemapUrl": "https://www.eventsource.com/media/Sitemaps/Eventsource/sitemap.xml",
+          "pages": [
+            "https://www.eventsource.com/event-furniture/sofas.html",
+            "https://www.eventsource.com/event-furniture/event-furniture-chairs.html",
+            "https://www.eventsource.com/event-furniture/ottomans.html",
+            "https://www.eventsource.com/event-furniture/coffee-end-tables.html",
+            "https://www.eventsource.com/event-furniture/bookcases.html",
+            "https://www.eventsource.com/event-furniture/rugs.html",
+            "https://www.eventsource.com/event-furniture/room-dividers.html",
+            "https://www.eventsource.com/event-furniture/pillows.html",
+            "https://www.eventsource.com/event-furniture/outdoor.html",
+            "https://www.eventsource.com/bars/back-bars.html",
+            "https://www.eventsource.com/decor-accessories/room-decor.html",
+            "https://www.eventsource.com/decor-accessories/lighted-decor.html"
+          ],
+          "itemLinkLabel": "Open product page",
+          "expected": {
+            "pages": 12,
+            "products": 362,
+            "items": 270,
+            "merged": 92
+          }
+        }
+      ]
     },
     {
       "id": "creative-reuse",
@@ -974,7 +1004,28 @@
         "values": [
           "movie props",
           "quality antiques",
-          "fine furnishings"
+          "fine furnishings",
+          "Furniture",
+          "China",
+          "Primitives",
+          "Rugs",
+          "Lamps",
+          "Tools",
+          "Clocks",
+          "Linens",
+          "Pottery",
+          "Silver",
+          "Coins",
+          "Glassware",
+          "Jewelry",
+          "Art",
+          "Frames",
+          "Vases",
+          "Mirrors",
+          "Military",
+          "Mantles",
+          "Matchsafes",
+          "Collectibles"
         ],
         "source": "https://wagonwheelantiques.us/"
       },

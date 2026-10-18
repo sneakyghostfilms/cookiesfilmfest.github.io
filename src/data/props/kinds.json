@@ -39,6 +39,24 @@
     },
     "construction-junction": { "kind": "antique", "source": "sourceType antique-reuse" },
     "creative-reuse": { "kind": "antique", "source": "sourceType antique-reuse" },
+    "event-source-pittsburgh": {
+      "kind": "event-rental",
+      "source": "sourceType event-rental: a regional event rental catalog (linens, dinnerware, glassware, catering, staging, tables and chairs) that also rents furniture and decor",
+      "categories": {
+        "Sofas": { "kind": "set-dressing", "source": "PR #19: rental furniture, set dressing by the lead's ruling" },
+        "Chairs": { "kind": "set-dressing", "source": "PR #19: lounge, club and accent chairs, no banquet seating, set dressing by the lead's ruling" },
+        "Ottomans": { "kind": "set-dressing", "source": "PR #19: rental furniture, set dressing by the lead's ruling" },
+        "Coffee & End Tables": { "kind": "set-dressing", "source": "PR #19: rental furniture, set dressing by the lead's ruling" },
+        "Bookcases": { "kind": "set-dressing", "source": "PR #19: bookcases and shelving, set dressing by the lead's ruling" },
+        "Rugs": { "kind": "set-dressing", "source": "PR #19: area rugs, by majority; its carpet pads, carpet-deck tile and runner are event floor goods, set dressing by the lead's ruling" },
+        "Room Dividers": { "kind": "set-dressing", "source": "PR #19: partition walls, trees and hedges, by majority; its stanchions, sign holders, ropes and fence are event equipment, set dressing by the lead's ruling" },
+        "Pillows": { "kind": "set-dressing", "source": "PR #19: throw pillows, set dressing by the lead's ruling" },
+        "Outdoor Furniture": { "kind": "set-dressing", "source": "PR #19: patio furniture, umbrellas and picnic tables, set dressing by the lead's ruling" },
+        "Back Bars": { "kind": "set-dressing", "source": "PR #19: back bars and shelving displays, set dressing by the lead's ruling" },
+        "Room Decor": { "kind": "set-dressing", "source": "PR #19: trees, hedges, partitions, columns and decor, by majority; its patio heater, step-and-repeat banner and centerpiece vases are event goods, set dressing by the lead's ruling" },
+        "Lighted Decor": { "kind": "set-dressing", "source": "PR #19: lighted trees, columns and decor, by majority; its acrylic display risers are event goods, set dressing by the lead's ruling" }
+      }
+    },
     "vintage-alley": { "kind": "set-dressing", "source": "sourceType vintage-rental" }
   }
 }

@@ -68,7 +68,7 @@ test('keyword queries rank the matching items first', () => {
   assert.equal(keys('telephone book')[0], 'scp-051');
   assert.equal(keys('secretary handbook')[0], 'scp-024');
   assert.deepEqual(top('handcuffs', 2).sort(), ['scp-142', 'scp-280']);
-  assert.deepEqual(keys('santa').sort(), ['cps-7o625i', 'pccr-w9w5ab', 'scp-210', 'scp-370', 'va-lnoa73'], "Steel City's two Santa costumes, Vintage Alley's Santa's Chair, Creative Reuse's Santa tea towel and Cleveland Prop Shop's Santa throne");
+  assert.deepEqual(keys('santa').sort(), ['cps-7o625i', 'esp-qea7kf', 'pccr-w9w5ab', 'scp-210', 'scp-370', 'va-lnoa73'], "Steel City's two Santa costumes, Vintage Alley's Santa's Chair, Creative Reuse's Santa tea towel, Cleveland Prop Shop's Santa throne and Event Source's Santa Fe pillow");
   assert.deepEqual(keys('wig'), ['scp-082', 'cps-9tpny1', 'cps-cn4eli', 'cps-we3uxs']);
   assert.equal(keys('fake blood')[0], 'scp-057');
   for (const key of ['scp-204', 'scp-236', 'scp-237']) assert.ok(top('police jacket', 3).includes(key), key);
@@ -225,6 +225,7 @@ test('the vendor strip matches a vendor by its name or its own words, never by o
   assert.deepEqual(ids('antique'), ['wagon-wheel-antiques'], 'by its name, and not PCCR, whose type label says antiques');
   assert.deepEqual(ids('costume'), ['public-theater-costumes']);
   assert.deepEqual(ids('tents'), ['windswept'], 'by its own words');
+  assert.deepEqual(ids('furniture').sort(), ['cleveland-play-house-props', 'wagon-wheel-antiques', 'windswept'], "Wagon Wheel by its home page's stock list, beside the two vendors whose own words already say furniture");
   assert.deepEqual(ids('typewriters'), [], 'Cleveland Prop Shop, now with searchable items, leaves the strip');
   assert.deepEqual(ids('film'), ['pittsburgh-clo-construction-center'], 'a vendor with searchable items leaves the strip');
   assert.deepEqual(ids('the props'), [], 'stopwords alone match nothing');

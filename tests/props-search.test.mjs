@@ -57,7 +57,7 @@ test('keyword queries rank the matching items first', () => {
   assert.equal(keys('telephone book')[0], 'scp-051');
   assert.equal(keys('secretary handbook')[0], 'scp-024');
   assert.deepEqual(top('handcuffs', 2).sort(), ['scp-142', 'scp-280']);
-  assert.deepEqual(keys('santa').sort(), ['scp-210', 'scp-370']);
+  assert.deepEqual(keys('santa').sort(), ['scp-210', 'scp-370', 'va-lnoa73'], "Steel City's two Santa costumes and Vintage Alley's Santa's Chair");
   assert.deepEqual(keys('wig'), ['scp-082']);
   assert.equal(keys('fake blood')[0], 'scp-057');
   for (const key of ['scp-204', 'scp-236', 'scp-237']) assert.ok(top('police jacket', 3).includes(key), key);
@@ -212,7 +212,7 @@ test('the vendor strip matches a vendor by its name or its own words, never by o
   assert.deepEqual(ids('antique'), ['wagon-wheel-antiques'], 'by its name, and not PCCR, whose type label says antiques');
   assert.deepEqual(ids('costume'), ['public-theater-costumes']);
   assert.deepEqual(ids('typewriters'), ['cleveland-prop-shop'], 'by its own gallery name');
-  assert.deepEqual(ids('film').sort(), ['pittsburgh-clo-construction-center', 'vintage-alley']);
+  assert.deepEqual(ids('film'), ['pittsburgh-clo-construction-center'], 'a vendor with searchable items leaves the strip');
   assert.deepEqual(ids('the props'), [], 'stopwords alone match nothing');
   assert.deepEqual(ids(''), []);
   assert.ok(!ids('theater stock').includes('cleveland-play-house-props'), 'a type label is not search text');

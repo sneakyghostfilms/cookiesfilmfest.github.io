@@ -182,7 +182,9 @@ const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
           <h3 class="props-vendor-name">{vendor.name}</h3>
           {badges.length > 0 && <p class="props-badges">{badges.map((badge) => <span class:list={["props-badge", { "props-badge-regional": badge.regional }]}>{badge.text}</span>)}</p>}
           {vendorCatalogs.map((line) => (
-            <p class="props-catalog">{line.text}{line.href && <a href={line.href} target="_blank" rel="noopener noreferrer">{line.linkLabel}</a>}</p>
+            <p class="props-catalog">{line.text}{line.href && <a href={line.href} target="_blank" rel="noopener noreferrer">{line.linkLabel}</a>}{line.links?.map((link, position) => (
+              <>{position > 0 && " · "}<a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a></>
+            ))}</p>
           ))}
           <p class="props-contact">Inquiries: {routes.map((route, position) => (
             <>{position > 0 && " · "}<a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>

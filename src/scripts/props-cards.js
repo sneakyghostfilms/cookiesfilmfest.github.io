@@ -61,7 +61,7 @@ export function telHref(phone) {
 
 export function catalogLines(vendor, { indexed = {}, itemCounts = new Map() } = {}) {
   if (!vendor.catalogs.length) return [{ text: 'Inventory not indexed; contact the vendor.' }];
-  return vendor.catalogs.map((catalog) => {
+  return vendor.catalogs.flatMap((catalog) => {
     const entry = indexed[catalog.id] ?? {};
     const indexedAt = entry.indexedAt ? ` · indexed ${entry.indexedAt}` : '';
     if (catalog.type === 'pdf') {
@@ -69,7 +69,9 @@ export function catalogLines(vendor, { indexed = {}, itemCounts = new Map() } = 
     }
     const count = itemCounts.get(catalog.id) ?? 0;
     const captured = entry.capturedAt ? ` · captured ${entry.capturedAt}` : '';
-    return { text: `${catalog.title}${captured} · ${count} ${count === 1 ? 'item' : 'items'}${indexedAt} · `, href: catalog.siteUrl, linkLabel: 'Open site' };
+    const line = { text: `${catalog.title}${captured} · ${count} ${count === 1 ? 'item' : 'items'}${indexedAt} · `, href: catalog.siteUrl, linkLabel: 'Open site' };
+    if (!catalog.unindexedPages?.length) return [line];
+    return [line, { text: 'Also on their site, not indexed: ', links: catalog.unindexedPages.map((page) => ({ href: page.url, label: page.label })) }];
   });
 }
 

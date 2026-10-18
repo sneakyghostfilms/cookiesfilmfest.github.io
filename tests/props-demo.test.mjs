@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { demoCatalogHref, pdfBox, privateVendorsFor, readPrivateVendors } from '../scripts/props/demo-links.mjs';
 import { privateFacts } from '../src/scripts/props-cards.js';
-import { demoAssetHandler, propsDemo } from '../scripts/props/demo-server.mjs';
+import { DEMO_EXCLUDED_KEYS, demoAssetHandler, propsDemo } from '../scripts/props/demo-server.mjs';
 import { demoEnv, demoWarnings, mergeManifest, photoUrl, privateOutputProblem } from '../scripts/props/demo.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -90,6 +90,30 @@ test('the demo asset route serves only thumbnails and PDFs inside the demo folde
   for (const url of ['/manifest.json', '/thumbs/missing.webp', '/%2e%2e/escape.webp', '/thumbs/..%2f..%2fescape.pdf', '/%E0%A4%A']) {
     assert.equal(await request(url), 'next', url);
   }
+});
+
+test('photos listed in demo-exclusions.json are never thumbnailed or served, and each has a reason', async () => {
+  const exclusions = JSON.parse(await readFile(path.join(root, 'scripts/props/demo-exclusions.json'), 'utf8'));
+  const inventoryKeys = new Set(JSON.parse(await readFile(path.join(root, 'src/data/props/inventory.json'), 'utf8')).items.map((item) => item.key));
+  for (const [key, { reason }] of Object.entries(exclusions)) {
+    assert.ok(inventoryKeys.has(key), `${key} is an inventory item`);
+    assert.match(reason, /\S/, key);
+  }
+  assert.deepEqual([...DEMO_EXCLUDED_KEYS].sort(), Object.keys(exclusions).sort());
+  const directory = await mkdtemp(path.join(tmpdir(), 'props-demo-'));
+  await mkdir(path.join(directory, 'thumbs'));
+  const [excluded] = DEMO_EXCLUDED_KEYS;
+  for (const key of [excluded, 'scp-056']) await writeFile(path.join(directory, 'thumbs', `${key}.webp`), 'webp bytes');
+  const handler = demoAssetHandler(directory);
+  const request = (url) => new Promise((resolve) => {
+    const response = new Response();
+    response.on('finish', () => resolve('served'));
+    handler({ url }, response, () => resolve('next'));
+  });
+  assert.equal(await request(`/thumbs/${excluded}.webp`), 'next', 'an excluded thumbnail is not served even if the file exists');
+  assert.equal(await request('/thumbs/scp-056.webp'), 'served');
+  const { demoPhotoItems } = await import('../scripts/props/demo.mjs');
+  assert.deepEqual(demoPhotoItems([{ key: excluded }, { key: 'scp-056' }]).map((item) => item.key), ['scp-056'], 'the photo download skips excluded items before any request');
 });
 
 test('PROPS_DEMO=1 adds the asset route to dev only and makes astro build refuse to run', () => {

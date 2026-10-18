@@ -11,6 +11,7 @@ import { exportLocationProblem } from './private-output.mjs';
 import { robotsAllow, robotsRules, robotsTarget } from './robots.mjs';
 import { FetchStopped, createSiteFetcher } from './site-fetch.mjs';
 import { checkSiteItems } from './site-items.mjs';
+import { parseStore, storeListPage, storePageCount } from './sites/creative-reuse.mjs';
 import { parsePages } from './sites/dezzign-central.mjs';
 import { parseExport } from './sites/retro-on-8th.mjs';
 import { parseCollections } from './sites/vintage-alley.mjs';
@@ -19,7 +20,7 @@ const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
 const ITEM_EXCLUSIONS_FILE = join(ROOT, 'scripts/props/item-exclusions.json');
 export const ITEM_EXCLUSION_REASONS = new Set(["name or photo carries a private individual's name"]);
-const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export']);
+const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export', 'square-store']);
 const WORDPRESS_PAGE_SIZE = 10;
 
 const localDate = (moment) => new Date(moment).toLocaleDateString('en-CA');
@@ -54,6 +55,23 @@ const SOURCES = {
     const pageFetcher = fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.sourceUrl).hostname] });
     const { body, meta } = await pageFetcher.get(catalog.sourceUrl, join(cacheRoot, vendor.id, catalog.id));
     return { ...parseCollections(body.toString('utf8'), { vendor, catalog }), capturedAt: localDate(meta.fetchedAt) };
+  },
+  async 'square-store'({ vendor, catalog, fetcher, cacheRoot }) {
+    const directory = join(cacheRoot, vendor.id, catalog.id);
+    const site = await robotsCheckedFetcher(fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.sourceUrl).hostname] }), catalog.sourceUrl, directory);
+    const categoryPage = (await site.get(catalog.sourceUrl, directory)).body.toString('utf8');
+    const listings = [];
+    let firstFetchedAt;
+    for (let page = 1, pages = 1; page <= pages; page += 1) {
+      const { body, meta } = await site.get(storeListPage(catalog, page), directory);
+      const listing = JSON.parse(body.toString('utf8'));
+      if (page === 1) {
+        pages = storePageCount(listing);
+        firstFetchedAt = meta.fetchedAt;
+      }
+      listings.push(listing);
+    }
+    return { ...parseStore(categoryPage, listings, { vendor, catalog }), capturedAt: localDate(firstFetchedAt) };
   },
   async 'shopify-export'({ catalog, vendor, exportPath }) {
     if (!exportPath) throw new Error(`${vendor.name} is imported from the vendor's Shopify product export: pass --export "<file.csv>".`);

@@ -94,6 +94,11 @@ test('the same caption and photo on two pages are one item with both categories 
   assert.deepEqual(parsed.items.filter((item) => item.name === 'Tin lamp').map((item) => item.categories), [['Lamps'], ['At Work']], 'a different photo is another item');
   assert.deepEqual(parsed.counts, { pages: 2, photos: 4, items: 3 });
   assert.ok(parsed.report.some((line) => line.includes(`${brass.key} "Brass lamp" is also on ${SITE}office.html with the same photo`)));
+  const reuploaded = parse(
+    page('lamps', 'Lamps', galleryPage({ photos: [{ file: 'cooler', caption: 'Water jug' }] })),
+    page('office', 'At Work', galleryPage({ heading: 'At Work', photos: [{ file: 'cooler_1', caption: 'Water jug' }, { file: 'cooler_1', caption: 'Water jar' }] })),
+  );
+  assert.deepEqual(reuploaded.items.map((item) => [item.name, item.categories]), [['Water jug', ['Lamps', 'At Work']], ['Water jar', ['At Work']]], 'a second upload of the same file is the same photo; another caption is another item');
 });
 
 test('merges of both kinds are listed with their photo counts, untitled photos of one file merge across pages too, and an empty or zero-width caption is untitled', () => {
@@ -130,6 +135,7 @@ test('a caption ending in "$N each" keeps the amount as listedPrice; any other p
   for (const caption of ['Jug $12', 'Jug, $12 a day', 'Jug $ 5 each or two for $9']) {
     assert.throws(() => parse(page('sale-page', EXTRA_PAGES[0], galleryPage({ photos: [{ file: 'a', caption }] }))), /gives a price in a form this import doesn't read/, caption);
   }
+  assert.throws(() => parse(page('sale-page', EXTRA_PAGES[0], galleryPage({ photos: [{ file: 'a', caption: 'Two for $35, or $20 each' }] }))), /gives a second price, which would be shown/);
 });
 
 test('a round century written as a decade gets no era and is flagged; a plain decade or year is kept', () => {

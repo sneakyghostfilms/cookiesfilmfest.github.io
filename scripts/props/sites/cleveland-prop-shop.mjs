@@ -15,6 +15,9 @@ const ANY_PRICE = /\$\s*\d/;
 // read it as the decade, so such a caption gets no era (the lead's ruling, 2026-10-18).
 const ROUND_CENTURY = /\d\d00['’]?s/i;
 
+// Weebly names a second upload of a file "name_1_orig.jpg" beside "name_orig.jpg", so a trailing _N is set aside when
+// photos on two pages are compared (the lead's ruling, 2026-10-18).
+const sameFile = (file) => file.replace(/_\d+(?=(?:_orig)?\.[a-z0-9]+$)/i, '');
 const tidy = (text) => String(text).replace(/\p{Cf}/gu, '').replace(/\s+/g, ' ').trim();
 const tagsOf = (html, name) => [...html.matchAll(new RegExp(`<${name}\\b[^>]*>`, 'gi'))];
 const classesOf = (tag) => (attribute(tag, 'class') ?? '').split(/\s+/).filter(Boolean);
@@ -123,17 +126,18 @@ export function parseGalleries(pages, { vendor, catalog }) {
       }
       const price = photo.caption.match(EACH_PRICE)?.[1] ?? null;
       const name = price ? photo.caption.replace(EACH_PRICE, '') : photo.caption;
+      if (ANY_PRICE.test(name)) throw new Error(`A caption on ${page.url} gives a second price, which would be shown: "${photo.caption}"; stopping before the inventory is written.`);
       const same = groups.find((group) => (name ? group.name === name : !group.name && group.photos[0].file === photo.file));
       if (same) same.photos.push(photo);
       else groups.push({ name, price, photos: [photo] });
     }
     let untitled = 0;
     for (const group of groups) {
-      const files = new Set(group.photos.map((photo) => photo.file));
-      const earlier = items.find((item) => item.title === group.name && item.photos.some((photo) => files.has(photo.file)));
+      const files = new Set(group.photos.map((photo) => sameFile(photo.file)));
+      const earlier = items.find((item) => item.title === group.name && item.photos.some((photo) => files.has(sameFile(photo.file))));
       if (earlier) {
         if (!earlier.categories.includes(category)) earlier.categories.push(category);
-        for (const photo of group.photos) if (!earlier.photos.some((kept) => kept.file === photo.file)) earlier.photos.push(photo);
+        for (const photo of group.photos) if (!earlier.photos.some((kept) => sameFile(kept.file) === sameFile(photo.file))) earlier.photos.push(photo);
         earlier.sources.push({ category, photos: group.photos.length });
         if (earlier.price !== group.price) flags.push(`${earlier.key}: listed again on ${page.url} with another price; the first is kept`);
         flags.push(`${earlier.key} "${earlier.name}" is also on ${page.url} with the same photo: one item, categories ${earlier.categories.join(', ')}`);

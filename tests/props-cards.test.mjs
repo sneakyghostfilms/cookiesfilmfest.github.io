@@ -95,7 +95,7 @@ test('cards.json is the same text for the same inputs, and only the local demo p
   assert.equal(cardText(local.items.find((entry) => entry.key === 'dz-1nfqu2'), local).thumb.src, '/props-demo/thumbs/dz-1nfqu2.webp');
 });
 
-test('the page and the endpoint make cards.json in one call, which reads the demo manifest only for the local demo', async () => {
+test('both pages and the endpoint make cards.json in one call, which reads the demo manifest only for the local demo', async () => {
   let reads = 0;
   const manifest = () => {
     reads += 1;
@@ -105,7 +105,7 @@ test('the page and the endpoint make cards.json in one call, which reads the dem
   assert.doesNotMatch(cardsText({ PROPS_DEMO: 'true' }, manifest), /thumb/);
   assert.equal(reads, 0, 'the manifest is not even read outside the demo');
   assert.match(cardsText({ PROPS_DEMO: '1' }, manifest), /"key":"scp-056"[^}]*"link":\{"href":"\/props-demo\/catalogs\/scp-2026-09-30\.pdf#page=5/);
-  for (const file of ['../src/pages/props.astro', '../src/pages/props/cards.json.js']) {
+  for (const file of ['../src/pages/props.astro', '../src/pages/props/scene.astro', '../src/pages/props/cards.json.js']) {
     const source = await readFile(new URL(file, import.meta.url), 'utf8');
     assert.match(source, /cardsText\(process\.env\)/, `${file} makes cards.json through cardsText(process.env)`);
   }

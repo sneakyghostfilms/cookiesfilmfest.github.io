@@ -103,16 +103,23 @@ node scripts/eval-models.mjs --url http://localhost:8788
 
 The output ends with the deploy gate, which must pass before a redeploy that changes the inventory or the tags:
 - On the four original scenes (diner, hospital, office, police): every counted required prop is found, with 0 wrong keys, 0 invalid keys and no truncated output.
+- Every scene has at most 1 misfiled key (see How an answer is scored, below).
 - At least 4 of the 6 props those scenes name that the catalogs lack are reported as "no match". The target is 5 of 6, the 2026-10-17 baseline. The floor is 4 because the baseline setup varies on its own: an identical 6,762-token office request left out both of that scene's absent props, where the baseline had reported one.
 - Every other scene (today the morgue) meets the S1 floor: 70% of required props found, at most 1 wrong and 1 invalid key, and no truncation.
 
 When new items match a scene's required prop, add their keys to that prop's `acceptableKeys` before the run, so that a correct pick doesn't count as a wrong key.
 
-How an answer is scored (`scripts/rubric.mjs`):
-- **By name first.** A suggested prop is judged against the fixture prop whose words it names in full, required or absent. If several fit, the longest name wins, then a required prop over an absent one.
-- **Then by keys.** Otherwise it is judged against the required prop whose acceptable keys it returned. One shared word alone never matches a suggestion to a prop.
-- **Wrong keys.** Keys that aren't acceptable for that prop count as wrong. Every key returned for an absent prop counts as wrong.
-- **Extras.** A required prop the fixture doesn't know, such as a desk or a door in an office scene, is listed as an extra with its item names and is never counted wrong. Check by hand that each extra's items are that kind of object.
+How an answer is scored (`scripts/rubric.mjs`). A suggested prop "names" a fixture prop when it contains all of that prop's words; one shared word alone never matches.
+- **Absent prop named.** Every key is wrong: the catalog lacks that prop, so any item for it is a force-match. This holds even when the suggestion also names a required prop.
+- **One required prop named.** Its acceptable keys count as found. Every other key is wrong.
+- **Two or more required props named,** a merge such as "chef's coat and checkered pants".
+  - Keys acceptable for any of them count as found.
+  - A key acceptable only for another required prop of the scene is misfiled, listed with its item name. Misfiling doesn't make that prop found.
+  - Any other key is wrong.
+- **No prop named.** It is judged against the required prop whose acceptable keys it returned most of; every other key is wrong.
+- **Extras.** A required prop the fixture doesn't know, such as a desk or a door in an office scene, is listed as an extra with its item names and never counted wrong. Check by hand that each extra's items are that kind of object.
+
+The gate allows at most 1 misfiled key per scene.
 
 ## Local development without Cloudflare
 

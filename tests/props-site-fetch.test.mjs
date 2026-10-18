@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { FetchStopped, JITTER_MS, MIN_GAP_MS, USER_AGENT, cacheName, createSiteFetcher, hostProblem } from '../scripts/props/site-fetch.mjs';
+import { FetchStopped, JITTER_MS, MIN_GAP_MS, TIMEOUT_MS, USER_AGENT, cacheName, createSiteFetcher, hostProblem } from '../scripts/props/site-fetch.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const HOST = 'vendor.example.com';
@@ -21,7 +21,7 @@ function harness(responses, options = {}) {
       calls.push({ url: requested, init });
       const respond = responses[requested];
       if (!respond) throw new Error(`unexpected request for ${requested}`);
-      return respond();
+      return respond({ advance: (ms) => { clock += ms; } });
     },
     sleep: async (ms) => {
       waits.push(ms);
@@ -48,6 +48,8 @@ test('requests carry the honest User-Agent, never follow redirects, and are fetc
   assert.equal(calls[0].init.headers['user-agent'], USER_AGENT);
   assert.match(USER_AGENT, /^PittsburghPropSearch\/\S+ \(.*\+https:\/\/cookiesfilmfest\.com\/#contact\)$/);
   assert.equal(calls[0].init.redirect, 'manual');
+  assert.ok(calls[0].init.signal instanceof AbortSignal, 'every request has a timeout');
+  assert.ok(TIMEOUT_MS <= 60_000);
   assert.deepEqual((await readdir(directory)).sort(), [`${cacheName(url('a'))}.body`, `${cacheName(url('a'))}.meta.json`]);
   const again = await fetcher.get(url('a'), directory);
   assert.equal(again.cached, true);
@@ -63,6 +65,18 @@ test('requests are at least two seconds apart, plus jitter', async () => {
   for (const page of ['a', 'b', 'c']) await fetcher.get(url(page), directory);
   assert.ok(MIN_GAP_MS >= 2000);
   assert.deepEqual(waits, [MIN_GAP_MS + JITTER_MS / 2, MIN_GAP_MS + JITTER_MS / 2]);
+});
+
+test('the gap is measured from the end of the previous response, however slow it was', async () => {
+  const directory = await freshDirectory();
+  const slow = (body) => ({ advance }) => {
+    advance(5000);
+    return new Response(body, { status: 200 });
+  };
+  const { waits, fetcher } = harness({ [url('a')]: slow('a'), [url('b')]: slow('b') });
+  await fetcher.get(url('a'), directory);
+  await fetcher.get(url('b'), directory);
+  assert.deepEqual(waits, [MIN_GAP_MS + JITTER_MS / 2]);
 });
 
 test('a 429 or 403 stops the run at once, with no retry and nothing cached', async () => {
@@ -94,7 +108,7 @@ test('other HTTP errors and network failures stop the run', async () => {
 });
 
 test('Retro on 8th and Shopify store hosts are refused before any request, whatever the allowlist says', async () => {
-  for (const host of ['retroon8th.com', 'www.retroon8th.com', 'retro-on-8th.myshopify.com', 'another-store.myshopify.com']) {
+  for (const host of ['retroon8th.com', 'www.retroon8th.com', 'retroon8th.com.', 'RetroOn8th.com', 'retro-on-8th.myshopify.com', 'another-store.myshopify.com']) {
     assert.match(hostProblem(`https://${host}/products.json`, [host]), /never contacted/, host);
     const { calls, fetcher } = harness({}, { allowHosts: [host] });
     await assert.rejects(fetcher.get(`https://${host}/products.json`, await freshDirectory()), (error) => error.reason === 'refused');

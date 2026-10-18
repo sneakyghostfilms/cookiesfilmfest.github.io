@@ -7,6 +7,7 @@ import { privateOutputProblem } from './private-output.mjs';
 export const USER_AGENT = 'PittsburghPropSearch/0.1 (private research index for Pittsburgh filmmakers; +https://cookiesfilmfest.com/#contact)';
 export const MIN_GAP_MS = 2000;
 export const JITTER_MS = 1000;
+export const TIMEOUT_MS = 60_000;
 const NEVER_CONTACTED = [/(^|\.)retroon8th\.com$/, /(^|\.)myshopify\.com$/];
 
 export class FetchStopped extends Error {
@@ -29,7 +30,7 @@ export function hostProblem(url, allowHosts) {
     return `not a URL: ${url}`;
   }
   if (parsed.protocol !== 'https:') return `only https is fetched: ${url}`;
-  const host = parsed.hostname.toLowerCase();
+  const host = parsed.hostname.toLowerCase().replace(/\.$/, '');
   if (NEVER_CONTACTED.some((pattern) => pattern.test(host))) return `${host} is never contacted (see CLAUDE.md, Pittsburgh Prop Search)`;
   if (!allowHosts.includes(host)) return `${host} is not an allowed host for this run`;
   return null;
@@ -55,8 +56,9 @@ export function createSiteFetcher({
   random = Math.random,
   now = Date.now,
   guard = privateOutputProblem,
+  timeoutMs = TIMEOUT_MS,
 }) {
-  let lastRequestAt = null;
+  let lastFinishedAt = null;
   let stopped = null;
   let queue = Promise.resolve();
   const stats = { requests: 0, cacheHits: 0 };
@@ -79,23 +81,25 @@ export function createSiteFetcher({
     if (stopped) throw stopped;
     const unsafe = guard(directory);
     if (unsafe) stop(new FetchStopped(`refusing to cache vendor content: ${unsafe}`, { url, reason: 'guard' }));
-    if (lastRequestAt !== null) {
-      const wait = lastRequestAt + MIN_GAP_MS + Math.floor(random() * JITTER_MS) - now();
+    if (lastFinishedAt !== null) {
+      const wait = lastFinishedAt + MIN_GAP_MS + Math.floor(random() * JITTER_MS) - now();
       if (wait > 0) await sleep(wait);
     }
-    lastRequestAt = now();
     stats.requests += 1;
     let response;
+    let body;
     try {
-      response = await send(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'manual' });
+      response = await send(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'manual', signal: AbortSignal.timeout(timeoutMs) });
+      if (response.status >= 200 && response.status <= 299) body = Buffer.from(await response.arrayBuffer());
     } catch (error) {
       stop(new FetchStopped(`${url} could not be fetched: ${error.message}`, { url, reason: 'network' }));
+    } finally {
+      lastFinishedAt = now();
     }
-    if (response.status < 200 || response.status > 299) {
+    if (!body) {
       const details = { url, status: response.status, location: response.headers.get('location'), retryAfter: response.headers.get('retry-after') };
       stop(new FetchStopped(stopMessage(details), details));
     }
-    const body = Buffer.from(await response.arrayBuffer());
     const meta = { url, status: response.status, contentType: response.headers.get('content-type'), fetchedAt: new Date(now()).toISOString() };
     await mkdir(directory, { recursive: true });
     await writeFile(files.body, body);

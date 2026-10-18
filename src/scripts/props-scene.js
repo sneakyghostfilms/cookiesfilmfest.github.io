@@ -67,3 +67,29 @@ export function keepKnownKeys(state, knownKeys) {
   const optional = clean(state.optional);
   return { ...state, required, optional, ignored: state.ignored + dropped };
 }
+
+// A page's card data (/props/cards.json) loads once. trackCards notes when it has settled, so that a scene answer that
+// arrives first can say it is waiting; cardsForScene then waits for the cards, or reports that they failed to load.
+export function trackCards(promise) {
+  const tracked = { settled: false };
+  tracked.promise = promise.then(
+    (cards) => {
+      tracked.settled = true;
+      return cards;
+    },
+    (error) => {
+      tracked.settled = true;
+      throw error;
+    },
+  );
+  return tracked;
+}
+
+export async function cardsForScene(tracked, onWaiting) {
+  if (!tracked.settled) onWaiting();
+  try {
+    return { ok: true, cards: await tracked.promise };
+  } catch {
+    return { ok: false };
+  }
+}

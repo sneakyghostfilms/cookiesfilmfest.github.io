@@ -1,7 +1,10 @@
+import { searchDocFromCard } from "./props-card-text.js";
+import { type Card, loadCards, renderCard } from "./props-card-view.ts";
 import { buildIndex, rankText, search } from "./props-search.js";
-import { checkSceneText, keepKnownKeys, periodNote, requestScene } from "./props-scene.js";
+import { cardsForScene, checkSceneText, keepKnownKeys, periodNote, requestScene, trackCards } from "./props-scene.js";
 
 const PAGE_SIZE = 24;
+const LOAD_FAILED = "The item list couldn't load. Reload the page to try again.";
 const list = document.getElementById("props-results") as HTMLOListElement;
 const query = document.getElementById("props-query") as HTMLInputElement;
 const category = document.getElementById("props-category") as HTMLSelectElement;
@@ -12,22 +15,12 @@ const empty = document.getElementById("props-empty") as HTMLElement;
 const more = document.getElementById("props-more") as HTMLButtonElement;
 const form = document.getElementById("props-form") as HTMLFormElement;
 
-const docs = [...list.querySelectorAll<HTMLElement>(".prop-card")].map((card) => {
-  const name = card.querySelector(".prop-name")!.textContent ?? "";
-  const era = card.querySelector(".prop-era")?.textContent ?? "";
-  return {
-    card,
-    key: card.dataset.key!,
-    name,
-    description: `${name} ${era}`,
-    categories: card.dataset.categories ? card.dataset.categories.split("|") : [],
-    vendor: card.dataset.vendor!,
-    tags: card.querySelector(".prop-tag-list")?.textContent?.split(", ") ?? [],
-    decades: card.dataset.decades ? card.dataset.decades.split(" ").map(Number) : [],
-    order: Number(card.dataset.order),
-  };
-});
-const index = buildIndex(docs);
+type Doc = ReturnType<typeof searchDocFromCard> & { card: Card };
+let docs: Doc[] = [];
+let index: ReturnType<typeof buildIndex> | null = null;
+let results: Doc[] = [];
+let shown = PAGE_SIZE;
+const cardsByKey = new Map<string, Card>();
 const vendorMatches = document.getElementById("props-vendor-matches");
 const vendorDocs = [...(vendorMatches?.querySelectorAll<HTMLElement>(".vendor-match") ?? [])].map((card, order) => ({
   card,
@@ -40,14 +33,9 @@ const vendorDocs = [...(vendorMatches?.querySelectorAll<HTMLElement>(".vendor-ma
   order,
 }));
 const vendorIndex = buildIndex(vendorDocs);
-let results = docs;
-let shown = PAGE_SIZE;
 
 function render() {
-  const visible = new Set(results.slice(0, shown));
-  const matched = new Set(results);
-  list.replaceChildren(...results.map((doc) => doc.card), ...docs.filter((doc) => !matched.has(doc)).map((doc) => doc.card));
-  for (const doc of docs) doc.card.hidden = !visible.has(doc);
+  list.replaceChildren(...results.slice(0, shown).map((doc) => renderCard(doc.card)));
   more.hidden = results.length <= shown;
   const text = query.value.trim();
   empty.hidden = results.length > 0;
@@ -71,6 +59,7 @@ function showVendorMatches() {
 
 function update() {
   showVendorMatches();
+  if (!index) return;
   results = search(index, query.value, { category: category.value, decade: decade.value, vendor: vendor?.value ?? "" });
   shown = PAGE_SIZE;
   render();
@@ -89,7 +78,20 @@ more.addEventListener("click", () => {
   shown += PAGE_SIZE;
   render();
 });
-render();
+
+count.textContent = "Loading items…";
+const cards = trackCards(loadCards(list.dataset.cardsUrl!));
+cards.promise.then(
+  (loaded: Card[]) => {
+    for (const card of loaded) cardsByKey.set(card.key, card);
+    docs = loaded.map((card) => ({ ...searchDocFromCard(card), card }));
+    index = buildIndex(docs);
+    update();
+  },
+  () => {
+    count.textContent = LOAD_FAILED;
+  },
+);
 
 const sceneForm = document.getElementById("scene-form") as HTMLFormElement;
 const sceneText = document.getElementById("scene-text") as HTMLTextAreaElement;
@@ -99,7 +101,6 @@ const sceneSubmit = document.getElementById("scene-submit") as HTMLButtonElement
 const sceneStatus = document.getElementById("scene-status") as HTMLElement;
 const sceneResults = document.getElementById("scene-results") as HTMLElement;
 const apiUrl = sceneForm.dataset.apiUrl ?? "";
-const cardsByKey = new Map(docs.map((doc) => [doc.key, doc.card]));
 
 function showStatus(text: string) {
   sceneStatus.textContent = text;
@@ -129,9 +130,7 @@ function propBlock(entry: { prop: string; reason: string; keys: string[] }) {
   if (entry.keys.length) {
     const matches = element("ol", "props-results scene-matches");
     for (const key of entry.keys) {
-      const copy = cardsByKey.get(key)!.cloneNode(true) as HTMLElement;
-      copy.hidden = false;
-      matches.append(copy);
+      matches.append(renderCard(cardsByKey.get(key)!));
     }
     block.append(matches);
   } else {
@@ -181,7 +180,12 @@ sceneForm.addEventListener("submit", async (event) => {
   const state = await requestScene(apiUrl, sceneText.value, { period });
   sceneSubmit.disabled = false;
   if (state.kind === "ok") {
-    const kept = keepKnownKeys(state, new Set(cardsByKey.keys()));
+    const loaded = await cardsForScene(cards, () => showStatus("Matching props… waiting for the item list"));
+    if (!loaded.ok) {
+      showStatus("The item list couldn't load, so matches can't be shown. Reload the page to try again.");
+      return;
+    }
+    const kept = keepKnownKeys(state, new Set((loaded.cards as Card[]).map((card) => card.key)));
     if (!kept.required.length && !kept.optional.length) {
       showStatus("The AI didn't identify props in this text.");
       return;

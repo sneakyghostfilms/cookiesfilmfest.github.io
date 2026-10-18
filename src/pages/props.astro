@@ -4,31 +4,18 @@ import "@fontsource-variable/inter";
 import "../styles/props.css";
 import vendorsData from "../data/props/vendors.json";
 import inventory from "../data/props/inventory.json";
-import tagsData from "../data/props/tags.json";
 import propsConfig from "../data/props/config.json";
-import { DEMO_STYLES, privateVendorsFor, readDemoManifest } from "../../scripts/props/demo-links.mjs";
-import { NOT_AFFILIATED, cardFor, catalogLines, contactRoutes, privateFacts, socialLinks, specialtiesLine, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources } from "../scripts/props-cards.js";
-import { compareByName } from "../scripts/props-search.js";
+import { DEMO_STYLES, privateVendorsFor } from "../../scripts/props/demo-links.mjs";
+import { NOT_AFFILIATED, catalogLines, contactRoutes, privateFacts, socialLinks, specialtiesLine, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources } from "../scripts/props-cards.js";
+import { cardsText, cardsVersion } from "../scripts/props-cards-file.js";
 
 const { generator } = Astro;
 const apiUrl: string = import.meta.env.PUBLIC_PROPS_API_URL || propsConfig.apiUrl;
 const description = "Search Pittsburgh prop rental catalogs in plain English, with item numbers, catalog pages and how to inquire.";
 const demoMode = process.env.PROPS_DEMO === "1";
-const demo = demoMode ? readDemoManifest() : null;
 const privateVendors = privateVendorsFor(process.env);
-
-const catalogs = new Map(
-  vendorsData.vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { catalog, vendor }])),
-);
-const tags = tagsData.tags as Record<string, string[]>;
-
-const cards = inventory.items
-  .map((item, order) => ({ ...item, order }))
-  .sort(compareByName)
-  .map((item) => {
-    const { catalog, vendor } = catalogs.get(item.catalog)!;
-    return { ...cardFor(item, { vendor, catalog, tags: tags[item.key] ?? [], demoEntry: demo?.items?.[item.key] ?? null }), order: item.order };
-  });
+// The cards come from /props/cards.json, which the page script loads; the ?v= is that file's hash, from the same call.
+const cardsUrl = `/props/cards.json?v=${cardsVersion(cardsText(process.env))}`;
 
 const categories = [...new Set(inventory.items.flatMap((item) => item.categories))].sort();
 const decades = [...new Set(inventory.items.flatMap((item) => item.decades))].sort((a, b) => a - b);
@@ -150,29 +137,10 @@ const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
             </ul>
           </section>
         )}
-        <p id="props-count" class="props-count" aria-live="polite">{cards.length} items, listed alphabetically</p>
-        <noscript><p class="props-note">Search needs JavaScript. All {cards.length} items are listed below alphabetically.</p></noscript>
+        <p id="props-count" class="props-count" aria-live="polite"></p>
+        <noscript><p class="props-note">Search needs JavaScript, and so does the item list. The prop sources below, with their contact details, are listed without it.</p></noscript>
         <p id="props-empty" class="props-empty" hidden></p>
-        <ol id="props-results" class="props-results">
-          {cards.map((card) => (
-            <li class="prop-card" data-key={card.key} data-vendor={card.vendorId} data-categories={card.categories.join("|")} data-decades={card.decades.join(" ")} data-order={card.order}>
-              {card.thumb && <img class="prop-thumb" src={card.thumb.src} width={card.thumb.width} height={card.thumb.height} alt={card.alt} loading="lazy" decoding="async" />}
-              <p class="prop-line">
-                <span class="prop-vendor">{card.vendorName}</span>{card.ids && <> · <span class="prop-ids">{card.ids}</span></>} · <span class="prop-name">{card.name}</span>{card.era && <> · <span class="prop-era">{card.era}</span></>}{card.pages && <> · <span class="prop-page">{card.pages}</span></>}
-              </p>
-              {card.categories.length > 0 && <p class="prop-category">{card.categories.join(" · ")}</p>}
-              {card.tags.length > 0 && (
-                <p class="prop-tags">AI-suggested search terms: <span class="prop-tag-list">{card.tags.join(", ")}</span></p>
-              )}
-              {card.photoCredit && <p class="prop-photo">{card.photoCredit}</p>}
-              <p class="prop-actions">
-                <a href={card.link.href} target="_blank" rel="noopener noreferrer">{card.link.label}</a>
-                {card.inquire && <a href={card.inquire} target="_blank" rel="noopener noreferrer">Inquire</a>}
-              </p>
-              <p class="prop-cite">{card.cite}</p>
-            </li>
-          ))}
-        </ol>
+        <ol id="props-results" class="props-results" data-cards-url={cardsUrl}></ol>
         <button id="props-more" type="button" class="props-more" hidden>Show more</button>
       </section>
 

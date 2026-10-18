@@ -326,6 +326,13 @@
   list-style: none;
 }
 
+.props-page .vendor-match-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+}
+
 .props-page .vendor-match + .vendor-match {
   margin-top: 6px;
   padding-top: 6px;

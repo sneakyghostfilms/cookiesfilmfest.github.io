@@ -2,7 +2,7 @@ import inventory from '../../src/data/props/inventory.json' with { type: 'json' 
 
 export const inventoryKeys = new Set(inventory.items.map((item) => item.key));
 
-function listing(items) {
+export function listing(items) {
   const sections = new Map();
   for (const item of items) {
     const section = item.categories[0] ?? 'OTHER';

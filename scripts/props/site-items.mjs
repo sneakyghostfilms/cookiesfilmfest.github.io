@@ -29,7 +29,7 @@ export function checkSiteItems(items, { vendor, catalog }) {
     if (item.vendor !== vendor.id || item.catalog !== catalog.id) problems.push(`${label}: wrong vendor or catalog`);
     const nameProblem = listingProblem(item.name);
     if (nameProblem) problems.push(`${label}: name ${nameProblem}`);
-    if (!Array.isArray(item.categories) || !item.categories.length) problems.push(`${label}: no categories`);
+    if (!Array.isArray(item.categories)) problems.push(`${label}: categories is not a list`);
     for (const category of item.categories ?? []) {
       const categoryProblem = listingProblem(category);
       if (categoryProblem) problems.push(`${label}: category ${categoryProblem}`);

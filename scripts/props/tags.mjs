@@ -43,6 +43,10 @@ export function cleanTags(rawTags, item) {
   return { tags: kept.slice(0, MAX_TAGS), rejected: [...rejected, ...kept.slice(MAX_TAGS)] };
 }
 
+export function tagPayload(batch) {
+  return batch.map((item) => ({ key: item.key, name: item.name, section: item.categories.join(' / '), era: item.era }));
+}
+
 export function tagFingerprint(item) {
   return createHash('sha256').update(JSON.stringify([item.name, item.categories, item.era ?? null])).digest('hex').slice(0, 16);
 }

@@ -12,3 +12,11 @@ export function privateOutputProblem(path, root = ROOT) {
   if (check.status !== 0) return `git does not ignore ${resolved}`;
   return null;
 }
+
+export function exportLocationProblem(path, root = ROOT) {
+  const resolved = resolve(root, path);
+  const inside = relative(root, resolved);
+  if (inside.startsWith('..') || isAbsolute(inside)) return null;
+  const check = spawnSync('git', ['-C', root, 'check-ignore', '-q', resolved]);
+  return check.status === 0 ? null : `${resolved} is inside the repository and git does not ignore it; keep vendor exports outside the repository`;
+}

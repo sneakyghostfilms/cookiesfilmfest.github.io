@@ -86,7 +86,8 @@ test('checkSiteItems reports each kind of broken website item', () => {
   assert.match(broken({ key: 'dz-TOOLONG1' }), /malformed/);
   assert.match(broken({ name: 'lamp | brass' }), /would break a listing line/);
   assert.match(broken({ name: 'lamp\nbrass' }), /control character or line break/);
-  assert.match(broken({ categories: [] }), /no categories/);
+  assert.match(broken({ categories: 'chairs' }), /categories is not a list/);
+  assert.match(broken({ categories: ['chairs | stools'] }), /category holds " \| "/);
   assert.match(broken({ era: '1950s', decades: [] }), /decades/);
   assert.match(broken({ description: 'a vendor sentence' }), /no description/);
   assert.match(broken({ url: 'https://elsewhere.example/x' }), /not under/);

@@ -60,7 +60,7 @@ The model sees at most 100 items per scene, not the whole inventory, so a scene'
 - **Order and format.** The selected items are listed grouped by catalog section, in catalog order, in the same `key | name | era` lines as before.
 - **Validation.** Returned keys are checked against the list actually sent.
 - **Deterministic.** The list is a pure function of `inventory.json`, `tags.json`, the scene text and the period. `node scripts/shortlist.mjs --scene office [--period 1960s]` prints the list, the request size and its reservation; `node scripts/shortlist.mjs --recall` prints, for each fixture scene, how many required props keep an acceptable item in the list at each list size, and each acceptable item's rank in the plain ranking and whether it is listed. Neither calls the model.
-- **CPU.** Ranking a 4,000-character scene and selecting its list takes under 1 ms on a laptop at 571 items, under the Free plan's 10 ms per request. The index is built once when the Worker starts.
+- **CPU.** Ranking a 4,000-character scene and selecting its list takes about 1–2 ms on a laptop (1.3 ms at 571 items, 1.7 ms at 1,239), under the Free plan's 10 ms per request. The index is built once when the Worker starts.
 
 ## Cost guard
 

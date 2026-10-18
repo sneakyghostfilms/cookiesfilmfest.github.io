@@ -95,7 +95,7 @@ test('the same caption and photo on two pages are one item with both categories 
   assert.deepEqual([brass.key, brass.categories, brass.url], [siteKey('gt', 'lamps|Brass lamp'), ['Lamps', 'At Work'], `${SITE}lamps.html`]);
   assert.deepEqual(parsed.items.filter((item) => item.name === 'Tin lamp').map((item) => item.categories), [['Lamps'], ['At Work']], 'a different photo is another item');
   assert.deepEqual(parsed.counts, { pages: 2, photos: 4, items: 3 });
-  assert.ok(parsed.report.some((line) => line.includes(`${brass.key} "Brass lamp" is also on ${SITE}office.html with the same photo`)));
+  assert.ok(parsed.report.includes(`  ${brass.key} "Brass lamp": 1 on Lamps, 1 on At Work`), parsed.report.join('\n'));
   const reuploaded = parse(
     page('lamps', 'Lamps', galleryPage({ photos: [{ file: 'cooler', caption: 'Water jug' }] })),
     page('office', 'At Work', galleryPage({ heading: 'At Work', photos: [{ file: 'cooler_1', caption: 'Water jug' }, { file: 'cooler_1', caption: 'Water jar' }] })),
@@ -119,6 +119,23 @@ test('merges of both kinds are listed with their photo counts, untitled photos o
     `  ${siteKey('gt', 'lamps|Floor lamp')} "Floor lamp": 2 on Lamps, 1 on At Work`,
     `  ${siteKey('gt', 'lamps|#c_orig.jpg')} "Lamps item 1 (no title given)": 1 on Lamps, 1 on At Work`,
   ]);
+});
+
+test('an untitled photo that a captioned item also shows joins that item; a photo shared by two captions is flagged on both', () => {
+  const parsed = parse(
+    page('lamps', 'Lamps', galleryPage({ photos: [{ file: 'shade' }, { file: 'base' }, { file: 'desk', caption: 'Desk lamp' }] })),
+    page('office', 'At Work', galleryPage({ heading: 'At Work', photos: [{ file: 'shade_1', caption: 'Shade lamp, green' }, { file: 'desk', caption: 'Lamp for a desk' }] })),
+  );
+  assert.deepEqual(parsed.items.map((item) => [item.name, item.categories, item.url]), [
+    ['Lamps item 1 (no title given)', ['Lamps'], `${SITE}lamps.html`],
+    ['Desk lamp', ['Lamps'], `${SITE}lamps.html`],
+    ['Shade lamp, green', ['Lamps', 'At Work'], `${SITE}office.html`],
+    ['Lamp for a desk', ['At Work'], `${SITE}office.html`],
+  ], 'the untitled shade photo joins the captioned item, which keeps its own link and key and gains the page in menu order');
+  assert.equal(parsed.items[0].key, siteKey('gt', 'lamps|#base_orig.jpg'), 'untitled items are numbered after the merge');
+  assert.ok(parsed.report.includes(`  ${parsed.items[2].key} "Shade lamp, green": 1 on At Work, 1 on Lamps (untitled there)`), parsed.report.join('\n'));
+  assert.ok(parsed.report.some((line) => line.includes(`${parsed.items[1].key} "Desk lamp" shares its photo with ${parsed.items[3].key} "Lamp for a desk"`)));
+  assert.ok(parsed.report.some((line) => line.includes(`${parsed.items[3].key} "Lamp for a desk" shares its photo with ${parsed.items[1].key} "Desk lamp"`)));
 });
 
 test('a rel in double quotes counts, and a printed caption that differs from the title is flagged', () => {

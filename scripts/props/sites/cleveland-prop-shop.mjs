@@ -101,13 +101,16 @@ function otherContent(html) {
 
 const tally = (map, key) => map.set(key, (map.get(key) ?? 0) + 1);
 
+const sharesPhoto = (item, files) => item.photos.some((photo) => files.has(sameFile(photo.file)));
+const filesOf = (photos) => new Set(photos.map((photo) => sameFile(photo.file)));
+
 export function parseGalleries(pages, { vendor, catalog }) {
   const flags = [];
-  const pageLines = [];
   const variants = new Map();
   const items = [];
+  const pageInfo = [];
   let photoCount = 0;
-  for (const page of pages) {
+  pages.forEach((page, order) => {
     const { heading, title } = categoryOf(page.html);
     const category = heading || title;
     if (!category) throw new Error(`${page.url} has neither a heading nor a title; stopping before the inventory is written.`);
@@ -116,7 +119,7 @@ export function parseGalleries(pages, { vendor, catalog }) {
     else if (title && title !== heading) flags.push(`${page.url}: heading "${heading}", <title> "${title}"; the heading is the category`);
     if (page.label !== category) flags.push(`${page.url}: menu label "${page.label}", category "${category}"`);
     photoCount += photos.length;
-    const other = otherContent(page.html);
+    pageInfo.push({ page, category, photos, other: otherContent(page.html) });
     const groups = [];
     for (const photo of photos) {
       tally(variants, photo.variant);
@@ -131,40 +134,50 @@ export function parseGalleries(pages, { vendor, catalog }) {
       if (same) same.photos.push(photo);
       else groups.push({ name, price, photos: [photo] });
     }
-    let untitled = 0;
     for (const group of groups) {
-      const files = new Set(group.photos.map((photo) => sameFile(photo.file)));
-      const earlier = items.find((item) => item.title === group.name && item.sources.every((source) => source.url !== page.url) && item.photos.some((photo) => files.has(sameFile(photo.file))));
+      // The same caption and photo on two pages are one item: the first page gives its link and key.
+      const files = filesOf(group.photos);
+      const earlier = items.find((item) => item.title === group.name && item.sources.every((source) => source.url !== page.url) && sharesPhoto(item, files));
       if (earlier) {
-        if (!earlier.categories.includes(category)) earlier.categories.push(category);
-        for (const photo of group.photos) if (!earlier.photos.some((kept) => sameFile(kept.file) === sameFile(photo.file))) earlier.photos.push(photo);
-        earlier.sources.push({ url: page.url, category, photos: group.photos.length });
-        if (earlier.price !== group.price) flags.push(`${earlier.key}: listed again on ${page.url} with another price; the first is kept`);
-        flags.push(`${earlier.key} "${earlier.name}" is also on ${page.url} with the same photo: one item, categories ${earlier.categories.join(', ')}`);
+        if (earlier.price !== group.price) flags.push(`"${group.name}": listed again on ${page.url} with another price; the first is kept`);
+        merge(earlier, { category, order, url: page.url, photos: group.photos });
         continue;
       }
-      let name = group.name;
-      let key = siteKey(vendor.keyPrefix, `${page.slug}|${name}`);
-      if (!name) {
-        untitled += 1;
-        name = `${category} item ${untitled} (no title given)`;
-        key = siteKey(vendor.keyPrefix, `${page.slug}|#${group.photos[0].file}`);
-        flags.push(`${key} has no caption${group.photos[0].alt ? ' (its image has alt text, which is not used)' : ''}, named "${name}"`);
-      } else if (name.toLowerCase() === category.toLowerCase()) {
-        flags.push(`${key} "${name}" only repeats its category`);
-      }
-      let era = titleEra(name);
-      if (era && ROUND_CENTURY.test(era)) {
-        flags.push(`${key} "${name}": "${era}" may mean a century, so no era is kept`);
-        era = null;
-      }
-      items.push({ key, title: group.name, name, price: group.price, categories: [category], era, url: page.url, photos: group.photos, sources: [{ url: page.url, category, photos: group.photos.length }] });
+      items.push({ title: group.name, price: group.price, order, slug: page.slug, url: page.url, categories: [{ category, order }], photos: [...group.photos], sources: [{ url: page.url, category, photos: group.photos.length }] });
     }
-    pageLines.push(`  ${page.label} → ${category} (${page.url}): ${photos.length} photos, ${photos.filter((photo) => photo.caption).length} captioned, ${untitled} untitled items${other.images ? `, ${other.images} images outside galleries` : ''}${other.paragraphs ? `, ${other.paragraphs} text paragraphs` : ''}`);
+  });
+  // An untitled photo that a captioned item also shows is that item (the lead's ruling, 2026-10-18): it adds its page.
+  for (const untitled of items.filter((item) => !item.title)) {
+    const titled = items.find((item) => item.title && sharesPhoto(item, filesOf(untitled.photos)));
+    if (!titled) continue;
+    merge(titled, { category: untitled.categories[0].category, order: untitled.order, url: untitled.url, photos: untitled.photos, untitled: true });
+    items.splice(items.indexOf(untitled), 1);
+  }
+  const untitledCount = new Map();
+  for (const item of items) {
+    if (item.title) {
+      item.name = item.title;
+      item.key = siteKey(vendor.keyPrefix, `${item.slug}|${item.title}`);
+    } else {
+      const { category } = item.categories[0];
+      const number = (untitledCount.get(item.url) ?? 0) + 1;
+      untitledCount.set(item.url, number);
+      item.name = `${category} item ${number} (no title given)`;
+      item.key = siteKey(vendor.keyPrefix, `${item.slug}|#${item.photos[0].file}`);
+      flags.push(`${item.key} has no caption${item.photos[0].alt ? ' (its image has alt text, which is not used)' : ''}, named "${item.name}"`);
+    }
+    if (item.title && item.title.toLowerCase() === item.categories[0].category.toLowerCase()) flags.push(`${item.key} "${item.name}" only repeats its category`);
+    item.era = titleEra(item.name);
+    if (item.era && ROUND_CENTURY.test(item.era)) {
+      flags.push(`${item.key} "${item.name}": "${item.era}" may mean a century, so no era is kept`);
+      item.era = null;
+    }
   }
   for (const item of items) {
     const base = items.find((other) => other !== item && other.title && item.title?.startsWith(`${other.title} `));
     if (base) flags.push(`${item.key} "${item.name}" may be another view of "${base.name}"`);
+    const files = filesOf(item.photos);
+    for (const other of items.filter((candidate) => candidate !== item && sharesPhoto(candidate, files))) flags.push(`${item.key} "${item.name}" shares its photo with ${other.key} "${other.name}"`);
   }
   const result = items.map(({ key, name, price, categories, era, url }) => ({
     key,
@@ -172,7 +185,7 @@ export function parseGalleries(pages, { vendor, catalog }) {
     catalog: catalog.id,
     name,
     description: null,
-    categories,
+    categories: categories.map((entry) => entry.category),
     era,
     decades: eraDecades(era),
     url,
@@ -181,16 +194,26 @@ export function parseGalleries(pages, { vendor, catalog }) {
   const images = new Map(items.map((item) => [item.key, { urls: item.photos.map((photo) => photo.url) }]));
   const counts = { pages: pages.length, photos: photoCount, items: result.length };
   const report = [
-    `Pages: ${counts.pages}; photos: ${counts.photos}; items: ${counts.items} (photos with the same caption on a page are one item, and so are the same caption and photo on two pages)`,
-    ...pageLines,
+    `Pages: ${counts.pages}; photos: ${counts.photos}; items: ${counts.items} (photos with the same caption on a page are one item, and so are the same caption and photo on two pages, and an untitled photo a captioned item also shows)`,
+    ...pageInfo.map(({ page, category, photos, other }) => `  ${page.label} → ${category} (${page.url}): ${photos.length} photos, ${photos.filter((photo) => photo.caption).length} captioned, ${untitledCount.get(page.url) ?? 0} untitled items${other.images ? `, ${other.images} images outside galleries` : ''}${other.paragraphs ? `, ${other.paragraphs} text paragraphs` : ''}`),
     `Photo variant used: ${[...variants].map(([variant, count]) => `${variant} ${count}`).join(', ') || 'none'}`,
     `Prices kept as listedPrice (never shown): ${result.filter((item) => item.listedPrice).length}`,
     `Items with an era in their caption: ${result.filter((item) => item.era).length}`,
     ...(flags.length ? ['Flags:', ...flags.map((flag) => `  ${flag}`)] : ['Flags: none']),
     'Merged (one item from several photos, by page and photo count):',
-    ...(items.filter((item) => item.sources.reduce((sum, source) => sum + source.photos, 0) > 1).map((item) => `  ${item.key} "${item.name}": ${item.sources.map((source) => `${source.photos} on ${source.category}`).join(', ')}`)),
+    ...items.filter((item) => item.sources.reduce((sum, source) => sum + source.photos, 0) > 1).map((item) => `  ${item.key} "${item.name}": ${item.sources.map((source) => `${source.photos} on ${source.category}${source.untitled ? ' (untitled there)' : ''}`).join(', ')}`),
     'Items (key · name · categories · era · listed price · photos):',
     ...result.map((item) => `  ${item.key} · ${item.name} · ${item.categories.join(', ')} · ${item.era ?? 'no era'} · ${item.listedPrice ?? 'no price'} · ${images.get(item.key).urls.length}`),
   ];
   return { items: result, images, counts, report };
+}
+
+// Folds another page's photos into an item: its category joins in menu order, and its photos join unless already held.
+function merge(item, { category, order, url, photos, untitled = false }) {
+  if (!item.categories.some((entry) => entry.category === category)) {
+    item.categories.push({ category, order });
+    item.categories.sort((a, b) => a.order - b.order);
+  }
+  for (const photo of photos) if (!item.photos.some((kept) => sameFile(kept.file) === sameFile(photo.file))) item.photos.push(photo);
+  item.sources.push({ url, category, photos: photos.length, untitled });
 }

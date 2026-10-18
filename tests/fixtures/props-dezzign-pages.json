@@ -1,0 +1,41 @@
+[
+ {
+  "id": 901,
+  "modified": "2026-03-28T22:13:32",
+  "slug": "lamps",
+  "link": "https://dezzigncentralpgh.com/props/lamps/",
+  "title": {
+   "rendered": "lamps"
+  },
+  "content": {
+   "rendered": "<div class=\"et_pb_section et_section_regular\" id=\"interior-header\"><div class=\"et_pb_text_inner\"><h2>props</h2>\n<p>&nbsp;</p>\n</div></div><div class=\"et_pb_section et_section_regular\" id=\"interior-section\"><div class=\"et_pb_text_inner\"><h1>lamps</h1>\n<p>Test page: lamps in several styles.</p>\n</div><div class=\"et_pb_row et_block_row\"><div class=\"et_pb_column_0 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_0 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"//dezzigncentralpgh.com/wp-content/uploads/2015/02/lamp-green-01.jpg\" alt=\"green desk lamp\" /></span></div></div><div class=\"et_pb_column_1 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_1 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"//dezzigncentralpgh.com/wp-content/uploads/2015/02/lamp-green-02.jpg\" alt=\"green desk lamp\" /></span></div></div><div class=\"et_pb_column_2 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_2 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"//dezzigncentralpgh.com/wp-content/uploads/2015/02/lamp-green-side.jpg\" alt=\"green desk lamp side view\" /></span></div></div><div class=\"et_pb_column_3 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_3 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"//dezzigncentralpgh.com/wp-content/uploads/2015/02/lamp-generic.jpg\" alt=\"lamps\" /></span></div></div><div class=\"et_pb_column_4 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_4 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"//dezzigncentralpgh.com/wp-content/uploads/2015/02/lamp-mystery.jpg\" alt=\"\" /></span></div></div><div class=\"et_pb_column_5 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_5 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"//dezzigncentralpgh.com/wp-content/uploads/2015/02/IMG_2041.jpg\" alt=\"IMG_2041.jpg\" /></span></div></div></div></div>",
+   "protected": false
+  }
+ },
+ {
+  "id": 905,
+  "modified": "2026-03-28T22:13:32",
+  "slug": "iceboxes",
+  "link": "https://dezzigncentralpgh.com/props/iceboxes/",
+  "title": {
+   "rendered": "iceboxes &amp; coolers"
+  },
+  "content": {
+   "rendered": "<div class=\"et_pb_section et_section_regular\" id=\"interior-header\"><div class=\"et_pb_text_inner\"><h2>props</h2>\n<p>&nbsp;</p>\n</div></div><div class=\"et_pb_section et_section_regular\" id=\"interior-section\"><div class=\"et_pb_text_inner\"><h1>iceboxes &amp; coolers</h1>\n<p>Test page: iceboxes and coolers.</p>\n</div><div class=\"et_pb_row et_block_row\"><div class=\"et_pb_column_0 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_0 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"//dezzigncentralpgh.com/wp-content/uploads/2015/02/oak-icebox.jpg\" alt=\"oak icebox - era 1920\" /></span></div></div><div class=\"et_pb_column_1 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_1 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"/wp-content/uploads/2015/02/1955-steel-cooler-01.jpg\" alt=\"steel cooler\" /></span></div></div></div></div>",
+   "protected": false
+  }
+ },
+ {
+  "id": 899,
+  "modified": "2026-03-28T22:13:32",
+  "slug": "signs",
+  "link": "https://dezzigncentralpgh.com/props/signs/",
+  "title": {
+   "rendered": "signs"
+  },
+  "content": {
+   "rendered": "<div class=\"et_pb_section et_section_regular\" id=\"interior-header\"><div class=\"et_pb_text_inner\"><h2>props</h2>\n<p>&nbsp;</p>\n</div></div><div class=\"et_pb_section et_section_regular\" id=\"interior-section\"><div class=\"et_pb_text_inner\"><h1>signs</h1>\n<p>Test page: signs.</p>\n</div><div class=\"et_pb_row et_block_row\"><div class=\"et_pb_column_0 et_pb_column et_pb_column_1_4 et_block_column\"><div class=\"et_pb_image_0 et_pb_image et_pb_module\"><span class=\"et_pb_image_wrap\"><img decoding=\"async\" src=\"//dezzigncentralpgh.com/wp-content/uploads/2015/02/diner-sign.jpg\" alt=\"neon diner sign &#8211; red\" /></span></div></div></div></div>",
+   "protected": false
+  }
+ }
+]

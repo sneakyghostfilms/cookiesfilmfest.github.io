@@ -17,6 +17,7 @@
     "export-map:comedy": "node scripts/export-comedy-map-data.js",
     "props:import": "node scripts/props/import-catalog.mjs",
     "props:tags": "node scripts/props/enrich-tags.mjs",
+    "props:import-site": "node scripts/props/import-site.mjs",
     "props:demo": "node scripts/props/demo.mjs serve",
     "props:demo-assets": "node scripts/props/demo.mjs assets",
     "test": "npm run build && node --test tests/*.test.mjs worker/test/*.test.mjs"

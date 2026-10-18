@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { mkdtemp, readdir, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -79,6 +79,30 @@ test('the gap is measured from the end of the previous response, however slow it
   await fetcher.get(url('a'), directory);
   await fetcher.get(url('b'), directory);
   assert.deepEqual(waits, [MIN_GAP_MS + JITTER_MS / 2]);
+});
+
+test('tracking values are replaced before a page is cached, the meta file names only the parameters, and photos are stored as fetched', async () => {
+  const directory = await freshDirectory();
+  const page = '<a href="/list/?page=2&amp;_kx=made-up-token">next</a><input type="hidden" name="gclid" value="made-up">';
+  const typed = (type) => () => new Response(page, { status: 200, headers: { 'content-type': type } });
+  const { calls, fetcher } = harness({ [url('list')]: typed('text/html; charset=UTF-8'), [url('photo.jpg')]: typed('image/jpeg') });
+  const expected = '<a href="/list/?page=2&amp;_kx=REDACTED">next</a><input type="hidden" name="gclid" value="REDACTED">';
+  const fresh = await fetcher.get(url('list'), directory);
+  assert.equal(fresh.body.toString(), expected);
+  assert.deepEqual(fresh.meta.redacted, ['_kx', 'gclid']);
+  const stored = path.join(directory, cacheName(url('list')));
+  assert.equal(await readFile(`${stored}.body`, 'utf8'), expected);
+  const metaText = await readFile(`${stored}.meta.json`, 'utf8');
+  assert.deepEqual(JSON.parse(metaText).redacted, ['_kx', 'gclid']);
+  assert.ok(!metaText.includes('made-up'), 'the meta file holds no value');
+  const again = await fetcher.get(url('list'), directory);
+  assert.deepEqual([again.cached, again.body.toString()], [true, expected]);
+  const photo = await fetcher.get(url('photo.jpg'), directory);
+  assert.equal(photo.body.toString(), page, 'a photo is stored as fetched');
+  assert.ok(!('redacted' in photo.meta));
+  const clean = harness({ [url('plain')]: () => new Response('<a href="/?page=2">', { status: 200, headers: { 'content-type': 'text/html' } }) });
+  assert.ok(!('redacted' in (await clean.fetcher.get(url('plain'), directory)).meta), 'a clean page gets no note');
+  assert.equal(calls.length, 2);
 });
 
 test('a 429 or 403 stops the run at once, with no retry and nothing cached', async () => {

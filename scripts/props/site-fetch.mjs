@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { privateOutputProblem } from './private-output.mjs';
+import { redactTracking } from './tracking.mjs';
 
 export const USER_AGENT = 'PittsburghPropSearch/0.1 (private research index for Pittsburgh filmmakers; +https://cookiesfilmfest.com/#contact)';
 export const MIN_GAP_MS = 2000;
@@ -105,11 +106,14 @@ export function createSiteFetcher({
       const details = { url, status: response.status, location: response.headers.get('location'), retryAfter: response.headers.get('retry-after') };
       stop(new FetchStopped(stopMessage(details), details));
     }
-    const meta = { url, status: response.status, contentType: response.headers.get('content-type'), fetchedAt: new Date(now()).toISOString() };
+    const contentType = response.headers.get('content-type');
+    // Tracking values are replaced before anything is written; the meta file names the parameters, never the values.
+    const { body: stored, redacted } = redactTracking(body, contentType);
+    const meta = { url, status: response.status, contentType, fetchedAt: new Date(now()).toISOString(), ...(redacted.length ? { redacted } : {}) };
     await mkdir(directory, { recursive: true });
-    await writeFile(files.body, body);
+    await writeFile(files.body, stored);
     await writeFile(files.meta, `${JSON.stringify(meta, null, 1)}\n`);
-    return { body, meta, cached: false, missing: MISSING.has(response.status) };
+    return { body: stored, meta, cached: false, missing: MISSING.has(response.status) };
   }
 
   return {

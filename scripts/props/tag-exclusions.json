@@ -11,5 +11,17 @@
   "scp-250": { "drop": ["police radio"], "reason": "a police call box, not a radio" },
   "scp-260": { "drop": ["musket"], "reason": "the catalog lists a long rifle; a musket is a different weapon" },
   "scp-322": { "drop": ["wall clock"], "reason": "a miniature desk clock" },
-  "scp-335": { "drop": ["legal paper"], "reason": "a steno notebook, not legal paper" }
+  "scp-335": { "drop": ["legal paper"], "reason": "a steno notebook, not legal paper" },
+  "dz-30a5ea": { "drop": ["cooler"], "reason": "a refrigerator, not a cooler" },
+  "dz-myssj4": { "drop": ["cooler"], "reason": "a refrigerator, not a cooler" },
+  "dz-mts92r": { "drop": ["cooler"], "reason": "a refrigerator, not a cooler" },
+  "dz-0c77rb": { "drop": ["cooler"], "reason": "a refrigerator, not a cooler" },
+  "dz-urna7r": { "drop": ["cooler"], "reason": "a refrigerator, not a cooler" },
+  "dz-4s2yk7": { "drop": ["cooler"], "reason": "a refrigerator, not a cooler" },
+  "dz-7u38md": { "drop": ["cooler"], "reason": "a refrigerator, not a cooler" },
+  "dz-uwo8gc": { "drop": ["bike"], "reason": "an exercise bike, not a bicycle" },
+  "dz-x77baz": { "drop": ["window pane"], "reason": "the vendor calls it stained glass in a frame, not a window" },
+  "dz-eafo2u": { "drop": ["exam table"], "reason": "a morgue table, not a doctor's examination table" },
+  "dz-wfg3zg": { "drop": ["blow dryer"], "reason": "a salon hood dryer chair in the vendor's photo, not a handheld blow dryer" },
+  "dz-vmi74l": { "drop": ["skiff"], "reason": "the vendor's photo shows a two-masted sailing vessel, not a skiff" }
 }

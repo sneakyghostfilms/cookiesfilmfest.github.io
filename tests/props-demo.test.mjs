@@ -6,9 +6,10 @@ import path from 'node:path';
 import { Writable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { demoCatalogHref, pdfBox } from '../scripts/props/demo-links.mjs';
+import { demoCatalogHref, pdfBox, privateVendorsFor, readPrivateVendors } from '../scripts/props/demo-links.mjs';
+import { privateFacts } from '../src/scripts/props-cards.js';
 import { demoAssetHandler, propsDemo } from '../scripts/props/demo-server.mjs';
-import { privateOutputProblem } from '../scripts/props/demo.mjs';
+import { demoEnv, demoWarnings, mergeManifest, photoUrl, privateOutputProblem } from '../scripts/props/demo.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const git = (...args) => spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' });
@@ -43,6 +44,20 @@ test('no vendor photo or catalog PDF is tracked, and the demo folder is ignored'
   for (const file of ['.props-demo/thumbs/scp-056.webp', '.props-demo/catalogs/scp-2026-09-30.pdf', '.props-demo/manifest.json']) {
     assert.equal(git('check-ignore', '-q', file).status, 0, file);
   }
+});
+
+const TRACKED_CSV = ['comedy-festival-map.csv', 'festinfo.csv', 'tests/fixtures/props-shopify-export-current.csv', 'tests/fixtures/props-shopify-export-legacy.csv'];
+
+test('raw vendor responses stay in the ignored cache, and only known CSV files are tracked', () => {
+  assert.equal(git('ls-files', '.props-cache').stdout, '');
+  assert.equal(git('ls-files', '.props-private').stdout, '');
+  assert.equal(git('check-ignore', '-q', '.props-private/vendors.json').status, 0, '.props-private/vendors.json');
+  for (const file of ['.props-cache/dezzign-central/dz-2026-10-17/0123456789abcdef.body', '.props-demo/originals/dezzign-central/0123456789abcdef.body']) {
+    assert.equal(git('check-ignore', '-q', file).status, 0, file);
+  }
+  const tracked = git('ls-files').stdout.split('\n');
+  assert.deepEqual(tracked.filter((file) => /\.csv$/i.test(file) && !TRACKED_CSV.includes(file)), [], 'a vendor export or other CSV is tracked');
+  assert.deepEqual(tracked.filter((file) => /\.html?$/i.test(file)), [], 'an HTML page is tracked');
 });
 
 class Response extends Writable {
@@ -95,4 +110,55 @@ test('catalog links open the local PDF at the item page, zoomed to its photo', (
   const box = pdfBox([13.75, 1.2, 154.02, 141.47], 842.25);
   assert.deepEqual(box, { left: 13.75, top: 841.05, right: 154.02, bottom: 700.78 });
   assert.equal(demoCatalogHref({ catalog: 'scp-2026-09-30', page: 5, box }), '/props-demo/catalogs/scp-2026-09-30.pdf#page=5&zoom=150,1,854');
+});
+
+test('private vendor notes are read only from the ignored folder, and only for the local demo', async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'props-private-'));
+  assert.equal(readPrivateVendors(directory), null);
+  await writeFile(path.join(directory, 'vendors.json'), JSON.stringify({ 'steel-city-props': { notes: 'n' } }));
+  assert.deepEqual(readPrivateVendors(directory), { 'steel-city-props': { notes: 'n' } });
+  const page = await readFile(path.join(root, 'src/pages/props.astro'), 'utf8');
+  assert.match(page, /const privateVendors = privateVendorsFor\(process\.env\);/);
+  assert.doesNotMatch(page, /readPrivateVendors/, 'the page reads private notes only through privateVendorsFor');
+});
+
+test('private notes need both the demo and PROPS_SHOW_PRIVATE=1, which npm run props:demo never sets', async () => {
+  const SENTINEL = { 'steel-city-props': { permissions: { listing: 'declined', photos: 'asked', asOf: '2026-10-17' }, notes: 'SENTINEL-PRIVATE-NOTE' } };
+  let reads = 0;
+  const read = () => {
+    reads += 1;
+    return SENTINEL;
+  };
+  for (const env of [{}, { PROPS_DEMO: '1' }, { PROPS_SHOW_PRIVATE: '1' }, { PROPS_DEMO: '1', PROPS_SHOW_PRIVATE: 'true' }]) {
+    const shown = privateFacts(privateVendorsFor(env, read)?.['steel-city-props']);
+    assert.doesNotMatch(JSON.stringify(shown), /SENTINEL|declined/, JSON.stringify(env));
+  }
+  assert.equal(reads, 0, 'the private file is not even read');
+  const shown = privateFacts(privateVendorsFor({ PROPS_DEMO: '1', PROPS_SHOW_PRIVATE: '1' }, read)['steel-city-props']);
+  assert.deepEqual(shown, ['Listing permission: declined; photo permission: asked (as of 2026-10-17)', 'Notes: SENTINEL-PRIVATE-NOTE']);
+  assert.equal(demoEnv({}).PROPS_SHOW_PRIVATE, undefined, 'npm run props:demo never sets the flag');
+  assert.equal(demoEnv({}).PROPS_DEMO, '1');
+});
+
+test('website photos are fetched at a modest size where the CDN offers one, and the manifest keeps each catalog apart', () => {
+  assert.equal(photoUrl('https://cdn.shopify.com/s/files/1/0000/products/lamp.jpg?v=1'), 'https://cdn.shopify.com/s/files/1/0000/products/lamp.jpg?v=1&width=640');
+  assert.equal(photoUrl('https://dezzigncentralpgh.com/wp-content/uploads/2015/02/chair.jpg'), 'https://dezzigncentralpgh.com/wp-content/uploads/2015/02/chair.jpg');
+  const previous = {
+    schemaVersion: 1,
+    catalogs: { 'scp-2026-09-30': { sha256: 'x' }, 'dz-old': { type: 'wordpress-pages', photos: 1 } },
+    items: { 'scp-056': { catalog: 'scp-2026-09-30', page: 5 }, 'dz-aaaaaa': { catalog: 'dz-old' }, 'dz-bbbbbb': { catalog: 'dz-2026-10-17' } },
+  };
+  const merged = mergeManifest(previous, 'dz-2026-10-17', { type: 'wordpress-pages', photos: 1 }, [['dz-cccccc', { catalog: 'dz-2026-10-17', thumb: { width: 320, height: 240 }, image: 'https://example.com/a.jpg' }]]);
+  assert.deepEqual(Object.keys(merged.items).sort(), ['dz-aaaaaa', 'dz-cccccc', 'scp-056']);
+  assert.deepEqual(merged.catalogs['scp-2026-09-30'], { sha256: 'x' });
+});
+
+test('npm run props:demo warns about missing website photos and about visible private notes', () => {
+  const vendors = { vendors: [
+    { name: 'Steel City Props', id: 'steel-city-props', catalogs: [{ id: 'scp-2026-09-30', type: 'pdf' }] },
+    { name: 'Dezzign Central', id: 'dezzign-central', catalogs: [{ id: 'dz-2026-10-17', type: 'wordpress-pages' }] },
+  ] };
+  assert.deepEqual(demoWarnings({}, vendors, { catalogs: { 'dz-2026-10-17': { photos: 23 } } }), []);
+  assert.match(demoWarnings({}, vendors, null).join('\n'), /No local photos for Dezzign Central.*--vendor dezzign-central/);
+  assert.match(demoWarnings({ PROPS_SHOW_PRIVATE: '1' }, vendors, { catalogs: { 'dz-2026-10-17': {} } }).join('\n'), /private vendor notes are visible on the page\. Do not screenshare it\./);
 });

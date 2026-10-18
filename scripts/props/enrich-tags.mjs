@@ -5,7 +5,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { cleanTags, reusableTags, serializeTags, tagFingerprint } from './tags.mjs';
+import { cleanTags, reusableTags, serializeTags, tagFingerprint, tagPayload } from './tags.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
@@ -52,7 +52,7 @@ const RESPONSE_SCHEMA = {
 };
 
 async function askModel(batch) {
-  const payload = batch.map((item) => ({ key: item.key, name: item.name, section: item.categories.join(' / '), era: item.era }));
+  const payload = tagPayload(batch);
   const response = await fetch(`${OLLAMA_URL}/api/chat`, {
     method: 'POST',
     signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),

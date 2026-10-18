@@ -4,27 +4,54 @@ import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:net';
-import { isAbsolute, join, relative, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { ROOT, VENDORS_FILE, extractCatalog, findCatalog, sha256 } from './catalog-pdf.mjs';
 import { pdfBox, readDemoManifest } from './demo-links.mjs';
+import { CACHE_ROOT, findSiteCatalog, loadSite } from './import-site.mjs';
 import { buildItems, cardIdentity, identityOf } from './normalize.mjs';
+import { privateOutputProblem } from './private-output.mjs';
+import { createSiteFetcher } from './site-fetch.mjs';
+import { IMAGE_HOST as SHOPIFY_IMAGE_HOST } from './sites/retro-on-8th.mjs';
+
+export { privateOutputProblem };
 
 export const DEMO_DIR = join(ROOT, '.props-demo');
 const CROPPER = join(ROOT, 'scripts/props/crop_thumbs.py');
 const DEMO_PORT = 4321;
 const DEMO_API_URL = 'https://pgh-prop-search.sdanzig.workers.dev';
+const THUMB_WIDTH = 320;
 
-export function privateOutputProblem(path, root = ROOT) {
-  const resolved = resolve(root, path);
-  const inside = relative(root, resolved);
-  if (inside.startsWith('..') || isAbsolute(inside)) return `${resolved} is outside the repository`;
-  const top = inside.split(/[\\/]/)[0];
-  if (top === 'public' || top === 'src') return `${resolved} is under ${top}/`;
-  const check = spawnSync('git', ['-C', root, 'check-ignore', '-q', join(resolved, 'probe.webp')]);
-  if (check.status !== 0) return `git does not ignore ${resolved}`;
-  return null;
+export function photoUrl(url) {
+  const parsed = new URL(url);
+  if (parsed.hostname === SHOPIFY_IMAGE_HOST) parsed.searchParams.set('width', '640');
+  return parsed.href;
+}
+
+export function mergeManifest(previous, catalogId, catalogEntry, entries) {
+  return {
+    schemaVersion: 1,
+    catalogs: { ...previous?.catalogs, [catalogId]: catalogEntry },
+    items: Object.fromEntries([...Object.entries(previous?.items ?? {}).filter(([, entry]) => entry.catalog !== catalogId), ...entries]),
+  };
+}
+
+export function demoEnv(env) {
+  return { ...env, PROPS_DEMO: '1', PUBLIC_PROPS_API_URL: env.PUBLIC_PROPS_API_URL || DEMO_API_URL };
+}
+
+export function demoWarnings(env, vendors, manifest) {
+  const warnings = [];
+  for (const vendor of vendors.vendors) {
+    for (const catalog of vendor.catalogs) {
+      if (catalog.type !== 'pdf' && !manifest?.catalogs?.[catalog.id]) {
+        warnings.push(`No local photos for ${vendor.name}; its cards show without them. To add them: npm run props:demo-assets -- --vendor ${vendor.id}`);
+      }
+    }
+  }
+  if (env.PROPS_SHOW_PRIVATE === '1') warnings.push('PROPS_SHOW_PRIVATE=1 is set: private vendor notes are visible on the page. Do not screenshare it.');
+  return warnings;
 }
 
 function assertPrivate(directory) {
@@ -55,20 +82,48 @@ async function buildAssets(pdfPath) {
   if (run.status !== 0) throw new Error(`Cropping failed (exit ${run.status}):\n${run.stderr}`);
   const sizes = JSON.parse(run.stdout);
   await copyFile(pdfPath, join(catalogs, `${catalog.id}.pdf`));
-  const previous = readDemoManifest(DEMO_DIR);
   const items = [...cards].map(([key, card]) => [key, {
     catalog: catalog.id,
     page: card.page,
     box: pdfBox(card.box, card.pageHeight),
     thumb: { width: sizes[key][0], height: sizes[key][1] },
   }]);
-  const manifest = {
-    schemaVersion: 1,
-    catalogs: { ...previous?.catalogs, [catalog.id]: { sha256: digest } },
-    items: Object.fromEntries([...Object.entries(previous?.items ?? {}).filter(([, entry]) => entry.catalog !== catalog.id), ...items]),
-  };
+  const manifest = mergeManifest(readDemoManifest(DEMO_DIR), catalog.id, { sha256: digest }, items);
   await writeFile(join(DEMO_DIR, 'manifest.json'), `${JSON.stringify(manifest, null, 1)}\n`);
   console.log(`✅ ${items.length} thumbnails, the catalog PDF and manifest.json are in .props-demo/`);
+}
+
+async function buildSiteAssets(vendorId, exportPath) {
+  const vendors = JSON.parse(await readFile(VENDORS_FILE, 'utf8'));
+  const { vendor, catalog } = findSiteCatalog(vendors, vendorId);
+  const thumbs = join(DEMO_DIR, 'thumbs');
+  const originals = join(DEMO_DIR, 'originals', vendor.id);
+  for (const directory of [DEMO_DIR, thumbs, originals]) assertPrivate(directory);
+  const cachedOnly = createSiteFetcher({
+    allowHosts: [new URL(catalog.sourceUrl ?? catalog.siteUrl).hostname],
+    fetch: () => {
+      throw new Error(`not in the local cache; run npm run props:import-site -- --vendor ${vendor.id} first`);
+    },
+  });
+  const { items, images } = await loadSite({ vendor, catalog, cacheRoot: CACHE_ROOT, fetcher: cachedOnly, exportPath });
+  const photoHost = catalog.type === 'shopify-export' ? SHOPIFY_IMAGE_HOST : new URL(catalog.siteUrl).hostname;
+  const fetcher = createSiteFetcher({ allowHosts: [photoHost] });
+  const { default: sharp } = await import('sharp');
+  await mkdir(thumbs, { recursive: true });
+  const entries = [];
+  for (const item of items) {
+    const [image] = images.get(item.key)?.urls ?? [];
+    if (!image) continue;
+    const { body } = await fetcher.get(photoUrl(image), originals);
+    const { data, info } = await sharp(body).rotate().resize({ width: THUMB_WIDTH, withoutEnlargement: true }).webp({ quality: 80 }).toBuffer({ resolveWithObject: true });
+    await writeFile(join(thumbs, `${item.key}.webp`), data);
+    entries.push([item.key, { catalog: catalog.id, thumb: { width: info.width, height: info.height }, image }]);
+  }
+  const manifest = mergeManifest(readDemoManifest(DEMO_DIR), catalog.id, { type: catalog.type, photos: entries.length }, entries);
+  await writeFile(join(DEMO_DIR, 'manifest.json'), `${JSON.stringify(manifest, null, 1)}\n`);
+  const photos = [...images.values()].reduce((sum, entry) => sum + entry.urls.length, 0);
+  const { requests, cacheHits } = fetcher.stats();
+  console.log(`✅ ${entries.length} thumbnails for ${vendor.name} in .props-demo/thumbs (${requests} downloaded, ${cacheHits} from the local copy). ${photos - entries.length} more photos on their pages were not fetched; ${items.length - entries.length} items have no photo.`);
 }
 
 async function hasAssets(catalog) {
@@ -89,27 +144,28 @@ function assertPortFree(port) {
 async function serve(pdfPath) {
   const vendors = JSON.parse(await readFile(VENDORS_FILE, 'utf8'));
   const supplied = pdfPath ? await sha256(pdfPath) : null;
-  for (const catalog of vendors.vendors.flatMap((vendor) => vendor.catalogs)) {
+  for (const catalog of vendors.vendors.flatMap((vendor) => vendor.catalogs).filter((entry) => entry.type === 'pdf')) {
     if (await hasAssets(catalog)) continue;
     if (supplied !== catalog.sha256) {
       throw new Error(`No local demo assets for "${catalog.title}". Run: npm run props:demo -- --pdf "/path/to/that catalog.pdf"`);
     }
     await buildAssets(pdfPath);
   }
+  for (const warning of demoWarnings(process.env, vendors, readDemoManifest(DEMO_DIR))) console.warn(`⚠️  ${warning}`);
   await assertPortFree(DEMO_PORT);
-  const env = { ...process.env, PROPS_DEMO: '1', PUBLIC_PROPS_API_URL: process.env.PUBLIC_PROPS_API_URL || DEMO_API_URL };
-  const child = spawn('npx', ['astro', 'dev', '--port', String(DEMO_PORT)], { cwd: ROOT, stdio: 'inherit', env });
+  const child = spawn('npx', ['astro', 'dev', '--port', String(DEMO_PORT)], { cwd: ROOT, stdio: 'inherit', env: demoEnv(process.env) });
   child.on('exit', (code, signal) => process.exit(code ?? (signal ? 1 : 0)));
 }
 
 async function main() {
   const [mode, ...rest] = process.argv.slice(2);
-  const { values } = parseArgs({ args: rest, options: { pdf: { type: 'string' } } });
+  const { values } = parseArgs({ args: rest, options: { pdf: { type: 'string' }, vendor: { type: 'string' }, export: { type: 'string' } } });
   const pdf = values.pdf && resolve(values.pdf);
   if (pdf && !existsSync(pdf)) throw new Error(`No such file: ${pdf}`);
   if (mode === 'assets' && pdf) return buildAssets(pdf);
+  if (mode === 'assets' && values.vendor) return buildSiteAssets(values.vendor, values.export && resolve(values.export));
   if (mode === 'serve') return serve(pdf);
-  throw new Error('Usage: npm run props:demo [-- --pdf "<catalog.pdf>"]  or  npm run props:demo-assets -- --pdf "<catalog.pdf>"');
+  throw new Error('Usage: npm run props:demo [-- --pdf "<catalog.pdf>"]  or  npm run props:demo-assets -- --pdf "<catalog.pdf>"  or  npm run props:demo-assets -- --vendor <id> [--export "<file.csv>"]');
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

@@ -143,6 +143,12 @@
   border-radius: 2px;
 }
 
+@media (min-width: 641px) {
+  .props-page .props-controls:has(#props-vendor) {
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  }
+}
+
 .props-page .props-field {
   display: flex;
   flex-direction: column;
@@ -205,12 +211,6 @@
 
 .props-page .scene-period {
   max-width: 360px;
-}
-
-.props-page .scene-era-note {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--pp-ink);
 }
 
 .props-page .scene-off,

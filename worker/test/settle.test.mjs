@@ -2,12 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { settle } from '../src/budget.js';
 import { handleRequest } from '../src/index.js';
-import { inventoryText } from '../src/inventory.js';
-import { MODELS, buildRequest, estimateNeurons } from '../src/scene.js';
+import { prepareScene } from '../src/inventory.js';
+import { MODELS, estimateNeurons } from '../src/scene.js';
 import { MODEL, NOW, SCENE, answer, budgetNamespace, fakeAI, fixedClock, goodOutput, makeEnv, memoryStorage, sceneRequest } from './helpers.mjs';
 
-const USAGE = { prompt_tokens: 7000, completion_tokens: 450 };
-const RESERVED = estimateNeurons(MODEL, buildRequest(inventoryText, SCENE));
+const USAGE = { prompt_tokens: 3000, completion_tokens: 450 };
+const RESERVED = estimateNeurons(MODEL, prepareScene(SCENE).request);
 const DAY = new Date(NOW).toISOString().slice(0, 10);
 const priced = (input, output) => (input * MODELS[MODEL].inputNeuronsPerMillion + output * MODELS[MODEL].outputNeuronsPerMillion) / 1e6;
 const tenths = (value) => Math.round(value * 10) / 10;
@@ -23,8 +23,8 @@ test('a successful answer settles the reservation down to the reported usage', a
   const { status, body } = await send(env);
   assert.equal(status, 200);
   assert.deepEqual(env.AI_BUDGET.actions, ['/reserve', '/settle']);
-  assert.ok(Math.abs(spent(env) - priced(7000, 450)) < 1e-9);
-  assert.equal(body.chargedNeurons, tenths(priced(7000, 450)));
+  assert.ok(Math.abs(spent(env) - priced(3000, 450)) < 1e-9);
+  assert.equal(body.chargedNeurons, tenths(priced(3000, 450)));
   assert.ok(body.chargedNeurons < RESERVED);
 });
 
@@ -32,7 +32,7 @@ test('reported reasoning tokens are charged as output tokens', async () => {
   const usage = { ...USAGE, completion_tokens_details: { reasoning_tokens: 300 } };
   const env = makeEnv({ AI: fakeAI(() => answer(goodOutput(), usage)) });
   await send(env);
-  assert.ok(Math.abs(spent(env) - priced(7000, 750)) < 1e-9);
+  assert.ok(Math.abs(spent(env) - priced(3000, 750)) < 1e-9);
 });
 
 test('settled spend leaves room for more requests than the worst case would', async () => {
@@ -71,11 +71,11 @@ test('missing or malformed usage skips the settle', async () => {
   const usages = [
     undefined,
     {},
-    { prompt_tokens: 7000 },
+    { prompt_tokens: 3000 },
     { prompt_tokens: '7000', completion_tokens: 450 },
     { prompt_tokens: 0, completion_tokens: 450 },
     { prompt_tokens: -1, completion_tokens: 450 },
-    { prompt_tokens: 7000.5, completion_tokens: 450 },
+    { prompt_tokens: 3000.5, completion_tokens: 450 },
     { ...USAGE, completion_tokens_details: { reasoning_tokens: 'many' } },
   ];
   for (const usage of usages) {
@@ -135,7 +135,7 @@ test('a late request stamped before midnight is charged and settled on the new d
   assert.equal((await send(env, { ip: '192.0.2.2', now: midnight - 1 })).status, 200);
   const record = env.AI_BUDGET.storage.values.get('spend');
   assert.equal(record.day, '2026-10-18');
-  assert.ok(Math.abs(record.spent - 2 * priced(7000, 450)) < 1e-9, String(record.spent));
+  assert.ok(Math.abs(record.spent - 2 * priced(3000, 450)) < 1e-9, String(record.spent));
 });
 
 test('the budget object refuses malformed settle input and unknown actions without writing', async () => {

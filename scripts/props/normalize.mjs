@@ -40,6 +40,10 @@ export function decadesOf(era) {
   return [...new Set(decades)].sort((a, b) => a - b);
 }
 
+export function eraDecades(era) {
+  return era ? decadesOf(era.replace(/['’]/g, '').replace(/[–—]/g, '-').toUpperCase()) : [];
+}
+
 export function displayEra(era) {
   return era.replace(/(\d)S\b/g, "$1s");
 }

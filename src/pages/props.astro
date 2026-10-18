@@ -6,55 +6,44 @@ import vendorsData from "../data/props/vendors.json";
 import inventory from "../data/props/inventory.json";
 import tagsData from "../data/props/tags.json";
 import propsConfig from "../data/props/config.json";
-import { displayEra } from "../../scripts/props/normalize.mjs";
-import { DEMO_STYLES, DEMO_URL, demoCatalogHref, readDemoManifest } from "../../scripts/props/demo-links.mjs";
+import { DEMO_STYLES, privateVendorsFor, readDemoManifest } from "../../scripts/props/demo-links.mjs";
+import { affiliation, cardFor, catalogLines, contactRoutes, privateFacts, socialLinks, vendorFacts, vendorSources } from "../scripts/props-cards.js";
 import { compareByName } from "../scripts/props-search.js";
 
 const { generator } = Astro;
 const apiUrl: string = import.meta.env.PUBLIC_PROPS_API_URL || propsConfig.apiUrl;
 const description = "Search Pittsburgh prop rental catalogs in plain English, with item numbers, catalog pages and how to inquire.";
-const demo = process.env.PROPS_DEMO === "1" ? readDemoManifest() : null;
+const demoMode = process.env.PROPS_DEMO === "1";
+const demo = demoMode ? readDemoManifest() : null;
+const privateVendors = privateVendorsFor(process.env);
 
 const catalogs = new Map(
-  vendorsData.vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { ...catalog, vendor }])),
+  vendorsData.vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { catalog, vendor }])),
 );
-
-function idsLabel(itemNumbers: string[]) {
-  return itemNumbers.length ? itemNumbers.map((number) => `#${number}`).join(" / ") : "no item number printed";
-}
-
-function pagesLabel(pages: number[]) {
-  return pages.length > 1 ? `pages ${pages.join(", ")}` : `page ${pages[0]}`;
-}
+const tags = tagsData.tags as Record<string, string[]>;
 
 const cards = inventory.items
   .map((item, order) => ({ ...item, order }))
   .sort(compareByName)
   .map((item) => {
-    const catalog = catalogs.get(item.catalog)!;
-    const position = demo?.items?.[item.key];
-    return {
-      ...item,
-      vendorName: catalog.vendor.name,
-      ids: idsLabel(item.itemNumbers),
-      era: item.era ? displayEra(item.era) : null,
-      pageText: pagesLabel(item.pages),
-      catalogHref: position ? demoCatalogHref(position) : catalog.sourceUrl,
-      catalogLabel: position ? "Open catalog (local PDF)" : "Open catalog on Google Drive",
-      thumb: position ? { src: `${DEMO_URL}/thumbs/${item.key}.webp`, ...position.thumb } : null,
-      formUrl: catalog.vendor.contact.formUrl,
-      tags: (tagsData.tags as Record<string, string[]>)[item.key] ?? [],
-    };
+    const { catalog, vendor } = catalogs.get(item.catalog)!;
+    return { ...cardFor(item, { vendor, catalog, tags: tags[item.key] ?? [], demoEntry: demo?.items?.[item.key] ?? null }), order: item.order };
   });
 
 const categories = [...new Set(inventory.items.flatMap((item) => item.categories))].sort();
 const decades = [...new Set(inventory.items.flatMap((item) => item.decades))].sort((a, b) => a - b);
+const itemCounts = new Map<string, number>();
+for (const item of inventory.items) itemCounts.set(item.catalog, (itemCounts.get(item.catalog) ?? 0) + 1);
+const vendorsWithItems = vendorsData.vendors.filter((vendor) => inventory.items.some((item) => item.vendor === vendor.id));
+const indexed = inventory.catalogs as Record<string, { indexedAt: string; capturedAt?: string }>;
 const vendorBoxes = vendorsData.vendors.map((vendor) => ({
   vendor,
-  catalogs: vendor.catalogs.map((catalog) => ({
-    ...catalog,
-    indexedAt: (inventory.catalogs as Record<string, { indexedAt: string }>)[catalog.id]?.indexedAt,
-  })),
+  facts: vendorFacts(vendor),
+  routes: contactRoutes(vendor.contact),
+  social: socialLinks(vendor.social),
+  sources: vendorSources(vendor),
+  private: privateFacts(privateVendors?.[vendor.id]),
+  catalogs: catalogLines(vendor, { indexed, itemCounts }),
 }));
 ---
 
@@ -79,13 +68,16 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         <h1 class="props-title">Pittsburgh Prop Search</h1>
         <p class="props-subtitle">Search local prop rental catalogs in plain English.</p>
         <a href="/" class="props-back">Back to Main Site</a>
-        {demo && <p class="props-demo-marker"><span>Local demo, not public</span></p>}
+        {demoMode && <p class="props-demo-marker"><span>Local demo, not public</span></p>}
+        {privateVendors && <p class="props-demo-marker"><span>Private vendor notes visible: do not screenshare</span></p>}
       </header>
 
       <section class="props-box props-about">
-        <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> Item numbers, names, eras and page numbers are copied from each vendor's catalog. Not affiliated with {vendorsData.vendors.map((vendor) => vendor.name).join(", ")}. Keyword search runs in your browser.</p>
-        {vendorsData.vendors.map((vendor) => (
-          <p class="props-contact">To rent from {vendor.name}: <a href={vendor.contact.formUrl} target="_blank" rel="noopener noreferrer">official contact form</a> or <a href={`mailto:${vendor.contact.email}`}>{vendor.contact.email}</a>. Pricing is by quote.</p>
+        <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> Names, item numbers, eras and pages are copied from each vendor's catalog or website. {affiliation(vendorsData.vendors)} Keyword search runs in your browser.</p>
+        {vendorBoxes.map(({ vendor, routes }) => (
+          <p class="props-contact">{vendor.modes?.values.includes("rent") ? "To rent from" : "To inquire with"} {vendor.name}: {routes.map((route, position) => (
+            <>{position > 0 && " · "}<a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>
+          ))}.</p>
         ))}
       </section>
 
@@ -102,6 +94,15 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
               {categories.map((category) => <option value={category}>{category}</option>)}
             </select>
           </label>
+          {vendorsWithItems.length > 1 && (
+            <label class="props-field">
+              <span>Vendor</span>
+              <select id="props-vendor">
+                <option value="">All vendors</option>
+                {vendorsWithItems.map((vendor) => <option value={vendor.id}>{vendor.name}</option>)}
+              </select>
+            </label>
+          )}
           <label class="props-field">
             <span>Stated decade</span>
             <select id="props-decade">
@@ -122,7 +123,7 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
               <span>Time period or setting (optional)</span>
               <input id="scene-period" type="text" maxlength="40" placeholder="1960s, WWII, present day" autocomplete="off" disabled={!apiUrl} />
             </label>
-            <p class="props-note scene-disclosure">Your text is sent to Cloudflare Workers AI to pick props from this catalog. This site doesn't store or log it. AI can be wrong, so check each item in the catalog.</p>
+            <p class="props-note scene-disclosure">Your text is sent to Cloudflare Workers AI to pick props from these catalogs. This site doesn't store or log it. AI can be wrong, so check each item with its vendor.</p>
             {!apiUrl && <p class="scene-off">AI scene matching isn't switched on yet. Keyword search works.</p>}
             <button id="scene-submit" type="submit" class="props-button" disabled={!apiUrl}>Find props for this scene</button>
           </form>
@@ -134,35 +135,46 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
         <p id="props-empty" class="props-empty" hidden></p>
         <ol id="props-results" class="props-results">
           {cards.map((card) => (
-            <li class="prop-card" data-key={card.key} data-categories={card.categories.join("|")} data-decades={card.decades.join(" ")} data-order={card.order}>
-              {card.thumb && <img class="prop-thumb" src={card.thumb.src} width={card.thumb.width} height={card.thumb.height} alt={card.description} loading="lazy" decoding="async" />}
+            <li class="prop-card" data-key={card.key} data-vendor={card.vendorId} data-categories={card.categories.join("|")} data-decades={card.decades.join(" ")} data-order={card.order}>
+              {card.thumb && <img class="prop-thumb" src={card.thumb.src} width={card.thumb.width} height={card.thumb.height} alt={card.alt} loading="lazy" decoding="async" />}
               <p class="prop-line">
-                <span class="prop-vendor">{card.vendorName}</span> · <span class="prop-ids">{card.ids}</span> · <span class="prop-name">{card.name}</span>{card.era && <> · <span class="prop-era">{card.era}</span></>} · <span class="prop-page">{card.pageText}</span>
+                <span class="prop-vendor">{card.vendorName}</span>{card.ids && <> · <span class="prop-ids">{card.ids}</span></>} · <span class="prop-name">{card.name}</span>{card.era && <> · <span class="prop-era">{card.era}</span></>}{card.pages && <> · <span class="prop-page">{card.pages}</span></>}
               </p>
-              <p class="prop-category">{card.categories.join(" · ")}</p>
+              {card.categories.length > 0 && <p class="prop-category">{card.categories.join(" · ")}</p>}
               {card.tags.length > 0 && (
                 <p class="prop-tags">AI-suggested search terms: <span class="prop-tag-list">{card.tags.join(", ")}</span></p>
               )}
-              {card.thumb && <p class="prop-photo">Photo: {card.vendorName} catalog</p>}
+              {card.photoCredit && <p class="prop-photo">{card.photoCredit}</p>}
               <p class="prop-actions">
-                <a href={card.catalogHref} target="_blank" rel="noopener noreferrer">{card.catalogLabel}</a>
-                <a href={card.formUrl} target="_blank" rel="noopener noreferrer">Inquire</a>
+                <a href={card.link.href} target="_blank" rel="noopener noreferrer">{card.link.label}</a>
+                {card.inquire && <a href={card.inquire} target="_blank" rel="noopener noreferrer">Inquire</a>}
               </p>
-              <p class="prop-cite">When you inquire, cite {card.ids} · {card.name} · {card.pageText}</p>
+              <p class="prop-cite">{card.cite}</p>
             </li>
           ))}
         </ol>
         <button id="props-more" type="button" class="props-more" hidden>Show more</button>
       </section>
 
-      {vendorBoxes.map(({ vendor, catalogs: vendorCatalogs }) => (
-        <section class="props-box props-vendor">
+      {vendorBoxes.map(({ vendor, facts, routes, social, sources, private: privateLines, catalogs: vendorCatalogs }) => (
+        <section class="props-box props-vendor" data-vendor={vendor.id}>
           <h2 class="props-vendor-name">{vendor.name}</h2>
-          {vendorCatalogs.map((catalog) => (
-            <p class="props-catalog">{catalog.title} (version {catalog.version}, {catalog.pageCount} pages){catalog.indexedAt && ` · indexed ${catalog.indexedAt}`} · <a href={catalog.sourceUrl} target="_blank" rel="noopener noreferrer">Open catalog on Google Drive</a></p>
+          {vendorCatalogs.map((line) => (
+            <p class="props-catalog">{line.text}{line.href && <a href={line.href} target="_blank" rel="noopener noreferrer">{line.linkLabel}</a>}</p>
           ))}
-          <p class="props-contact">Rental inquiries: <a href={vendor.contact.formUrl} target="_blank" rel="noopener noreferrer">official contact form</a> · <a href={`mailto:${vendor.contact.email}`}>{vendor.contact.email}</a> · <a href={vendor.contact.hubUrl} target="_blank" rel="noopener noreferrer">vendor links</a></p>
-          <p class="props-note">{vendor.inquiryHint} Contact details as published in the catalog (page 3) and on the vendor's Linktree.</p>
+          <p class="props-contact">Inquiries: {routes.map((route, position) => (
+            <>{position > 0 && " · "}<a href={route.href} {...(route.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{route.label}</a></>
+          ))}{social.map((link) => <> · <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a></>)}</p>
+          {facts.map((fact) => <p class="props-note">{fact}</p>)}
+          <p class="props-note props-vendor-sources">Details as the vendor publishes them, last checked {vendor.lastVerified}: {sources.map((source, position) => (
+            <>{position > 0 && " · "}{source.href ? <a href={source.href} target="_blank" rel="noopener noreferrer">{source.label}</a> : source.label}</>
+          ))}.</p>
+          {privateLines.length > 0 && (
+            <div class="props-vendor-private">
+              <p class="props-note">Private, local demo only:</p>
+              {privateLines.map((line) => <p class="props-note">{line}</p>)}
+            </div>
+          )}
         </section>
       ))}
 
@@ -172,6 +184,6 @@ const vendorBoxes = vendorsData.vendors.map((vendor) => ({
 
     <script>import "../scripts/props-page.ts";</script>
 
-    {demo && <style is:inline set:html={DEMO_STYLES}></style>}
+    {demoMode && <style is:inline set:html={DEMO_STYLES}></style>}
   </body>
 </html>

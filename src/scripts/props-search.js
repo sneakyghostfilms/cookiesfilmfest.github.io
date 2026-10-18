@@ -38,7 +38,7 @@ export function parseDecades(query) {
   return decades;
 }
 
-function queryTerms(query) {
+export function queryTerms(query) {
   const tokens = wordsOf(query).filter((word) => !isDecadeWord(word)).map(stem);
   return [...new Set(tokens.filter((token) => !STOPWORDS.has(token) && !/^\d0s?$/.test(token)))];
 }
@@ -57,49 +57,97 @@ export function buildIndex(docs) {
     ])),
   }));
   const documentFrequency = new Map();
-  for (const entry of entries) {
-    const seen = new Set(Object.values(entry.fields).flatMap((tokens) => [...tokens]));
-    for (const token of seen) documentFrequency.set(token, (documentFrequency.get(token) ?? 0) + 1);
-  }
-  return { entries, documentFrequency, alphabetical: [...docs].sort(compareByName) };
-}
-
-function termScore(entry, term, index) {
-  let best = 0;
-  for (const [field, weight] of Object.entries(FIELD_WEIGHTS)) {
-    const tokens = entry.fields[field];
-    if (tokens.has(term)) best = Math.max(best, weight);
-    else if (term.length >= 4 && [...tokens].some((token) => token.startsWith(term))) best = Math.max(best, weight * PREFIX_FACTOR);
-  }
-  if (!best) return 0;
-  const matching = index.documentFrequency.get(term) ?? 1;
-  return best * Math.log(1 + index.entries.length / matching);
-}
-
-export function search(index, query = '', { category = '', decade = '' } = {}) {
-  const passes = (doc) => (!category || doc.categories.includes(category)) && (!decade || doc.decades.includes(Number(decade)));
-  const terms = queryTerms(query);
-  const isYear = (term) => /^(19|20)\d\d$/.test(term);
-  const words = terms.filter((term) => !isYear(term));
-  const years = terms.filter((term) => isYear(term) && index.documentFrequency.has(term));
-  const decades = parseDecades(query);
-  if (!words.length && !years.length && !decades.size) return index.alphabetical.filter(passes);
-  const scored = [];
-  for (const entry of index.entries) {
-    if (!passes(entry.doc)) continue;
-    let score = 0;
-    let matched = 0;
-    for (const term of words) {
-      const value = termScore(entry, term, index);
-      score += value;
-      if (value > 0) matched += 1;
+  const postings = new Map();
+  entries.forEach((entry, position) => {
+    const seen = new Set();
+    for (const [field, weight] of Object.entries(FIELD_WEIGHTS)) {
+      for (const token of entry.fields[field]) {
+        seen.add(token);
+        if (!postings.has(token)) postings.set(token, []);
+        postings.get(token).push([position, weight]);
+      }
     }
-    if (words.length) score *= matched / words.length;
-    for (const term of years) score += termScore(entry, term, index);
-    const inDecade = entry.doc.decades.some((value) => decades.has(value));
+    for (const token of seen) documentFrequency.set(token, (documentFrequency.get(token) ?? 0) + 1);
+  });
+  return { entries, documentFrequency, postings, vocabulary: [...postings.keys()].sort(), alphabetical: [...docs].sort(compareByName) };
+}
+
+function firstAtOrAfter(sorted, value) {
+  let low = 0;
+  let high = sorted.length;
+  while (low < high) {
+    const middle = (low + high) >> 1;
+    if (sorted[middle] < value) low = middle + 1;
+    else high = middle;
+  }
+  return low;
+}
+
+function termScores(index, term) {
+  const best = new Map();
+  const consider = (token, factor) => {
+    for (const [position, weight] of index.postings.get(token) ?? []) {
+      const value = weight * factor;
+      if (value > (best.get(position) ?? 0)) best.set(position, value);
+    }
+  };
+  consider(term, 1);
+  if (term.length >= 4) {
+    for (let at = firstAtOrAfter(index.vocabulary, term); at < index.vocabulary.length && index.vocabulary[at].startsWith(term); at += 1) {
+      if (index.vocabulary[at] !== term) consider(index.vocabulary[at], PREFIX_FACTOR);
+    }
+  }
+  const idf = Math.log(1 + index.entries.length / (index.documentFrequency.get(term) ?? 1));
+  return [...best].map(([position, value]) => [position, value * idf]);
+}
+
+const isYear = (term) => /^(19|20)\d\d$/.test(term);
+
+function splitTerms(index, terms) {
+  return {
+    words: terms.filter((term) => !isYear(term)),
+    years: terms.filter((term) => isYear(term) && index.documentFrequency.has(term)),
+  };
+}
+
+function rank(index, { words, years }, decades, passes) {
+  const count = index.entries.length;
+  const sums = new Float64Array(count);
+  const matched = new Uint32Array(count);
+  const touched = new Set();
+  for (const term of words) {
+    for (const [position, value] of termScores(index, term)) {
+      sums[position] += value;
+      if (value > 0) matched[position] += 1;
+      touched.add(position);
+    }
+  }
+  const yearScores = years.map((term) => new Map(termScores(index, term)));
+  for (const scores of yearScores) for (const position of scores.keys()) touched.add(position);
+  const scored = [];
+  for (const position of words.length ? touched : index.entries.keys()) {
+    const { doc } = index.entries[position];
+    if (!passes(doc)) continue;
+    let score = sums[position];
+    if (words.length) score *= matched[position] / words.length;
+    for (const scores of yearScores) score += scores.get(position) ?? 0;
+    const inDecade = doc.decades.some((value) => decades.has(value));
     if (!words.length) score += inDecade ? 1 : 0;
     else if (inDecade) score *= DECADE_BOOST;
-    if (score > 0) scored.push({ doc: entry.doc, score });
+    if (score > 0) scored.push({ doc, score });
   }
   return scored.sort((a, b) => b.score - a.score || a.doc.order - b.doc.order).map(({ doc }) => doc);
+}
+
+export function search(index, query = '', { category = '', decade = '', vendor = '' } = {}) {
+  const passes = (doc) => (!category || doc.categories.includes(category)) && (!decade || doc.decades.includes(Number(decade)))
+    && (!vendor || doc.vendor === vendor);
+  const terms = splitTerms(index, queryTerms(query));
+  const decades = parseDecades(query);
+  if (!terms.words.length && !terms.years.length && !decades.size) return index.alphabetical.filter(passes);
+  return rank(index, terms, decades, passes);
+}
+
+export function rankText(index, text) {
+  return rank(index, splitTerms(index, queryTerms(text)), new Set(), () => true);
 }

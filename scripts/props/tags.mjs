@@ -23,7 +23,7 @@ function wordsOf(text) {
 }
 
 export function cleanTags(rawTags, item) {
-  const captionWords = new Set(wordsOf(item.description));
+  const captionWords = new Set(wordsOf([item.name, item.era].filter(Boolean).join(' ')));
   const name = item.name.toLowerCase();
   const printed = [...captionWords].some((word) => PRINTED_MATTER.has(word));
   const imitation = [...captionWords].some((word) => IMITATION_WORDS.has(word));
@@ -41,6 +41,10 @@ export function cleanTags(rawTags, item) {
     (valid ? kept : rejected).push(tag || String(raw));
   }
   return { tags: kept.slice(0, MAX_TAGS), rejected: [...rejected, ...kept.slice(MAX_TAGS)] };
+}
+
+export function tagPayload(batch) {
+  return batch.map((item) => ({ key: item.key, name: item.name, section: item.categories.join(' / '), era: item.era }));
 }
 
 export function tagFingerprint(item) {

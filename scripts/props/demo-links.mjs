@@ -10,6 +10,15 @@ export function readDemoManifest(directory = resolve('.props-demo')) {
   return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null;
 }
 
+export function readPrivateVendors(directory = resolve('.props-private')) {
+  const file = join(directory, 'vendors.json');
+  return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null;
+}
+
+export function privateVendorsFor(env, read = readPrivateVendors) {
+  return env.PROPS_DEMO === '1' && env.PROPS_SHOW_PRIVATE === '1' ? read() : null;
+}
+
 const points = (value) => Math.round(value * 100) / 100;
 
 export function pdfBox([x0, top, x1, bottom], pageHeight) {
@@ -27,4 +36,5 @@ export const DEMO_STYLES = `
 .props-page .props-demo-marker span { display: inline-block; padding: 2px 8px; border: 1px dashed var(--pp-muted); border-radius: 2px; }
 .props-page .prop-thumb { display: block; width: 100%; height: auto; max-height: 200px; object-fit: contain; background-color: var(--pp-paper); border: 1px solid var(--pp-rule); border-radius: 2px; }
 .props-page .prop-photo { font-size: 12px; color: var(--pp-muted); }
+.props-page .props-vendor-private { margin-top: 8px; padding: 8px 12px; border: 1px dashed var(--pp-muted); border-radius: 2px; }
 `;

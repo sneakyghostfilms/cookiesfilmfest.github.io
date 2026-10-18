@@ -1,3 +1,5 @@
+import { parseDecades } from './props-search.js';
+
 export const SCENE_LIMITS = { minChars: 20, maxChars: 4000, maxPeriodChars: 40 };
 export const SCENE_TIMEOUT_MS = 40_000;
 const INVALID = new Set(['invalid_json', 'text_required', 'text_too_short', 'text_too_long', 'payload_too_large', 'period_invalid', 'period_too_long']);
@@ -10,9 +12,9 @@ export function checkSceneText(text, period = '') {
   return null;
 }
 
-export function eraNote(periodDecades, itemDecades) {
-  if (!periodDecades.size || !itemDecades.length || itemDecades.some((decade) => periodDecades.has(decade))) return null;
-  return `Stated era ${itemDecades.map((decade) => `${decade}s`).join(', ')} differs from your period.`;
+export function periodNote(period) {
+  const text = period.trim();
+  return text && parseDecades(text).size ? `Items whose stated era is outside ${text} were left out of AI matching.` : null;
 }
 
 function stateFor(response, body, now) {

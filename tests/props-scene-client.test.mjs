@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { SCENE_TIMEOUT_MS, checkSceneText, eraNote, keepKnownKeys, requestScene } from '../src/scripts/props-scene.js';
+import { SCENE_TIMEOUT_MS, checkSceneText, keepKnownKeys, periodNote, requestScene } from '../src/scripts/props-scene.js';
 import { parseDecades } from '../src/scripts/props-search.js';
 import { GUARD_TIMEOUT_MS } from '../worker/src/budget.js';
 
@@ -35,13 +35,12 @@ test('the period is sent trimmed, and only when it is not blank', async () => {
   }
 });
 
-test('a match whose stated era misses the given period gets a note; nothing is filtered', () => {
-  assert.equal(eraNote(parseDecades('1990s'), [1960]), 'Stated era 1960s differs from your period.');
-  assert.equal(eraNote(parseDecades('late 60s or 70s'), [1960, 1970]), null);
-  assert.equal(eraNote(parseDecades('1990s'), [1980, 1990, 2000]), null);
-  assert.equal(eraNote(parseDecades('1990s'), []), null, 'items with no stated era get no note');
-  assert.equal(eraNote(parseDecades('WWII'), [1960]), null, 'a period without decades gets no note');
-  assert.equal(eraNote(parseDecades('sixties'), [1990, 2000]), 'Stated era 1990s, 2000s differs from your period.');
+test('a period that names decades is disclosed as a filter on AI matching', () => {
+  assert.equal(periodNote(' 1990s '), 'Items whose stated era is outside 1990s were left out of AI matching.');
+  assert.equal(periodNote('late sixties'), 'Items whose stated era is outside late sixties were left out of AI matching.');
+  assert.equal(periodNote('WWII'), null, 'a period without decades filters nothing');
+  assert.equal(periodNote(''), null);
+  assert.ok(parseDecades('late sixties').size > 0);
 });
 
 test('a successful answer posts the trimmed scene once and returns its props', async () => {

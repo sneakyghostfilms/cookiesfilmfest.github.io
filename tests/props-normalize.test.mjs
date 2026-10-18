@@ -126,7 +126,7 @@ test('serializeInventory writes one item per line and round-trips', () => {
 });
 
 test('cleanTags rejects era claims the caption does not make, denied words and malformed tags', () => {
-  const dated = { name: 'GREEN CHANGE MACHINE', description: 'GREEN CHANGE MACHINE 1960S' };
+  const dated = { name: 'GREEN CHANGE MACHINE', era: '1960S', description: 'GREEN CHANGE MACHINE 1960S' };
   const undated = { name: 'WHITE MEGA PHONE', description: 'WHITE MEGA PHONE' };
   const vintage = { name: 'VINTAGE STETHOSCOPE', description: 'VINTAGE STETHOSCOPE' };
   assert.deepEqual(cleanTags(['coin changer', '1960s office'], dated).tags, ['coin changer', '1960s office']);
@@ -140,8 +140,8 @@ test('cleanTags rejects era claims the caption does not make, denied words and m
 });
 
 test('cleanTags keeps printed matter from being tagged as blank stationery or a guessed genre', () => {
-  const book = { name: 'GRAY BOOK', description: 'GRAY BOOK 1960S' };
-  const notebook = { name: 'STENO SPIRAL NOTEBOOK', description: 'STENO SPIRAL NOTEBOOK 1990S' };
+  const book = { name: 'GRAY BOOK', era: '1960S', description: 'GRAY BOOK 1960S' };
+  const notebook = { name: 'STENO SPIRAL NOTEBOOK', era: '1990S', description: 'STENO SPIRAL NOTEBOOK 1990S' };
   assert.deepEqual(cleanTags(['notebook', 'reference book', 'novel', 'logbook', 'paperback'], book).tags, ['reference book']);
   assert.deepEqual(cleanTags(['steno pad', 'notebook'], notebook).tags, ['steno pad', 'notebook']);
 });
@@ -152,6 +152,15 @@ test('cleanTags keeps imitation guns from being called firearms and rejects stat
   assert.deepEqual(cleanTags(['firearms', 'airsoft firearm'], { name: 'AIRSOFT AEG RIFLE', description: 'AIRSOFT AEG RIFLE' }).tags, ['airsoft firearm']);
   assert.deepEqual(cleanTags(['official cap', 'coroner cap', 'authentic badge', 'issued badge'], { name: 'BLACK CORONER BASEBALL CAP', description: 'BLACK CORONER BASEBALL CAP' }).tags, ['coroner cap']);
   assert.deepEqual(cleanTags(['training manual'], { name: 'POLICE TRAINING MANUAL', description: 'POLICE TRAINING MANUAL' }).tags, ['training manual']);
+});
+
+test('cleanTags checks claims against the name and stated era only, so a website description licenses nothing', () => {
+  const chair = { name: 'yellow chair', era: null, description: null, categories: ['chairs'] };
+  assert.deepEqual(cleanTags(['chair', 'seating', '1960s chair', 'vintage chair'], chair).tags, ['chair', 'seating']);
+  const lamp = { name: 'brass lamp', era: null, description: 'A 1960s brass lamp, vintage.', categories: ['Lighting'] };
+  assert.deepEqual(cleanTags(['1960s lamp', 'vintage lamp', 'table lamp'], lamp).tags, ['table lamp']);
+  const fridge = { name: 'stainless steel refrigerator', era: 'era 1950', description: null, categories: ['refrigerators'] };
+  assert.deepEqual(cleanTags(['1950 refrigerator', 'fridge', '1950s fridge'], fridge).tags, ['1950 refrigerator', 'fridge']);
 });
 
 test('serializeTags writes sorted keys, one per line, and round-trips', () => {

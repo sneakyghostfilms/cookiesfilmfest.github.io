@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { checkItems } from '../scripts/props/normalize.mjs';
+import { checkSiteItems } from '../scripts/props/site-items.mjs';
 import { cleanTags, tagFingerprint } from '../scripts/props/tags.mjs';
+import { contactRoutes } from '../src/scripts/props-cards.js';
 
 const read = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
 const vendors = await read('../src/data/props/vendors.json');
@@ -10,16 +12,59 @@ const inventory = await read('../src/data/props/inventory.json');
 const tagsFile = await read('../src/data/props/tags.json');
 const byKey = new Map(inventory.items.map((item) => [item.key, item]));
 
+const SOURCE_TYPES = new Set(['prop-house', 'vintage-rental', 'event-rental', 'antique-reuse', 'theater-stock', 'specialty']);
+const MODES = new Set(['rent', 'sale', 'inquire']);
+const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint'];
+const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'shopify-export']);
+
+function keysOf(value, found = new Set()) {
+  if (value && typeof value === 'object') {
+    for (const [key, nested] of Object.entries(value)) {
+      found.add(key);
+      keysOf(nested, found);
+    }
+  }
+  return found;
+}
+
+test('vendors.json holds only facts each vendor publishes, every one with its source', () => {
+  const keys = keysOf(vendors);
+  assert.ok(!keys.has('permissions') && !keys.has('notes'), 'our relationship with a vendor belongs in the ignored .props-private/vendors.json');
+  for (const vendor of vendors.vendors) {
+    for (const field of ['id', 'name', 'siteUrl', 'contact', 'lastVerified', 'catalogs', ...FACT_FIELDS]) assert.ok(field in vendor, `${vendor.id} has no ${field}`);
+    for (const field of FACT_FIELDS) {
+      if (vendor[field] !== null) assert.match(vendor[field].source ?? '', /\S/, `${vendor.id} ${field} has no source`);
+    }
+    if (vendor.sourceType) assert.ok(SOURCE_TYPES.has(vendor.sourceType.value), `${vendor.id} sourceType`);
+    if (vendor.modes) assert.ok(vendor.modes.values.length && vendor.modes.values.every((mode) => MODES.has(mode)), `${vendor.id} modes`);
+    assert.match(vendor.lastVerified, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(contactRoutes(vendor.contact).length > 0, `${vendor.id} publishes no contact route`);
+    assert.ok(Array.isArray(vendor.catalogs));
+    if (vendor.catalogs.length) assert.match(vendor.keyPrefix, /^[a-z0-9]+$/);
+    else assert.ok(!inventory.items.some((item) => item.vendor === vendor.id), `${vendor.id} lists no catalog but has items`);
+  }
+});
+
 test('each catalog passes the import invariants and matches its expected counts', () => {
   for (const vendor of vendors.vendors) {
     for (const catalog of vendor.catalogs) {
+      assert.ok(CATALOG_TYPES.has(catalog.type), `${catalog.id} type`);
       const entry = inventory.catalogs[catalog.id];
       assert.ok(entry, `inventory has no entry for ${catalog.id}`);
       const items = inventory.items.filter((item) => item.catalog === catalog.id);
-      const sectionTitles = entry.sections.map((section) => section.title);
-      assert.deepEqual(checkItems(items, { pageCount: catalog.pageCount, sectionTitles }), []);
-      assert.deepEqual({ cards: entry.cards, items: items.length, itemPages: entry.itemPages.length }, catalog.expected);
-      assert.deepEqual([...new Set(items.flatMap((item) => item.pages))].sort((a, b) => a - b), entry.itemPages);
+      if (catalog.type === 'pdf') {
+        const sectionTitles = entry.sections.map((section) => section.title);
+        assert.deepEqual(checkItems(items, { pageCount: catalog.pageCount, sectionTitles }), []);
+        assert.deepEqual({ cards: entry.cards, items: items.length, itemPages: entry.itemPages.length }, catalog.expected);
+        assert.deepEqual([...new Set(items.flatMap((item) => item.pages))].sort((a, b) => a - b), entry.itemPages);
+      } else {
+        assert.deepEqual(checkSiteItems(items, { vendor, catalog }), []);
+        const actual = catalog.type === 'wordpress-pages'
+          ? { pages: entry.pages, photos: entry.photos, items: items.length }
+          : { products: entry.products, items: items.length, excluded: entry.excluded };
+        assert.deepEqual(actual, catalog.expected, catalog.id);
+        assert.match(entry.capturedAt, /^\d{4}-\d{2}-\d{2}$/);
+      }
       for (const item of items) {
         assert.equal(item.vendor, vendor.id, item.key);
         assert.ok(item.key.startsWith(`${vendor.keyPrefix}-`), item.key);
@@ -64,7 +109,7 @@ test('numbers the vendor reused for different items get distinct keys, and repea
 });
 
 test('multi-number cards keep every printed number', () => {
-  const multi = inventory.items.filter((item) => item.itemNumbers.length > 1).map((item) => item.key).sort();
+  const multi = inventory.items.filter((item) => item.itemNumbers?.length > 1).map((item) => item.key).sort();
   assert.deepEqual(multi, ['scp-015-017-016', 'scp-058-060-059', 'scp-062-063', 'scp-144-146']);
 });
 
@@ -96,5 +141,16 @@ test('reviewed tag removals stay removed', async () => {
     assert.ok(byKey.has(key), `exclusion for an unknown item: ${key}`);
     assert.ok(reason, key);
     for (const tag of drop) assert.ok(!(tagsFile.tags[key] ?? []).includes(tag), `${key} still has "${tag}"`);
+  }
+});
+
+test('every acceptable key in the scene fixtures names an indexed item', async () => {
+  const directory = new URL('../worker/test/fixtures/scenes/', import.meta.url);
+  const { readdir } = await import('node:fs/promises');
+  for (const file of (await readdir(directory)).filter((name) => name.endsWith('.json'))) {
+    const fixture = JSON.parse(await readFile(new URL(file, directory), 'utf8'));
+    for (const prop of fixture.required) {
+      for (const key of prop.acceptableKeys) assert.ok(byKey.has(key), `${fixture.id} ${prop.prop}: ${key}`);
+    }
   }
 });

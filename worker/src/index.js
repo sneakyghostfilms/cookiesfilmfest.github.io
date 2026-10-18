@@ -1,6 +1,6 @@
 import { GUARD_TIMEOUT_MS } from './budget.js';
-import { inventoryKeys, inventoryText } from './inventory.js';
-import { LIMITS, MODELS, actualNeurons, buildRequest, estimateNeurons, plainText, readModelOutput, validateScene } from './scene.js';
+import { prepareScene } from './inventory.js';
+import { LIMITS, MODELS, actualNeurons, estimateNeurons, plainText, readModelOutput, validateScene } from './scene.js';
 
 export { AiBudget } from './budget.js';
 
@@ -186,7 +186,7 @@ export async function handleRequest(request, env, { now: clock = Date.now, guard
 
   const config = readConfig(env);
   if (!config) return failure(503, 'ai_not_configured', origin);
-  const aiRequest = buildRequest(inventoryText, text, period);
+  const { request: aiRequest, shortlistKeys } = prepareScene(text, period);
   const cost = estimateNeurons(config.model, aiRequest);
   const now = clock();
   let reservation;
@@ -214,7 +214,7 @@ export async function handleRequest(request, env, { now: clock = Date.now, guard
   }
   let scene;
   try {
-    scene = validateScene(readModelOutput(result), inventoryKeys);
+    scene = validateScene(readModelOutput(result), shortlistKeys);
   } catch {
     return failure(502, 'ai_bad_output', origin);
   }

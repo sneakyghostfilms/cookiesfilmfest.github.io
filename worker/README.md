@@ -2,7 +2,7 @@
 
 This Cloudflare Worker powers the "Paste a scene" box on https://cookiesfilmfest.com/props/scene.
 
-The keyword search on that page runs entirely in the browser and needs no Worker. This Worker adds only the AI step:
+The keyword search on https://cookiesfilmfest.com/props runs entirely in the browser and needs no Worker. This Worker adds only the AI step:
 1. It ranks the inventory against the scene text with the page's own keyword ranking and keeps 100 items: each scene word's best match first, then the best overall. This is the shortlist (see Shortlist below).
 2. It sends the scene text and the shortlist to one Workers AI model, `@cf/google/gemma-4-26b-a4b-it`, with thinking off.
 3. It checks every item key the model returns against the shortlist it sent.

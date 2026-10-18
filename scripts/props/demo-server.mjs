@@ -1,9 +1,9 @@
 import { createReadStream, statSync } from 'node:fs';
-import { extname, resolve, sep } from 'node:path';
+import { basename, dirname, extname, join, resolve, sep } from 'node:path';
 import exclusions from './demo-exclusions.json' with { type: 'json' };
 
 const TYPES = { '.webp': 'image/webp', '.pdf': 'application/pdf' };
-export const DEMO_EXCLUDED_KEYS = new Set(Object.keys(exclusions));
+export const DEMO_EXCLUDED_KEYS = new Set(Object.keys(exclusions).map((key) => key.toLowerCase()));
 
 export function demoAssetHandler(directory, excludedKeys = DEMO_EXCLUDED_KEYS) {
   const base = resolve(directory);
@@ -14,9 +14,8 @@ export function demoAssetHandler(directory, excludedKeys = DEMO_EXCLUDED_KEYS) {
     } catch {
       return next();
     }
-    const thumbKey = pathname.match(/^\/thumbs\/([^/]+)\.webp$/)?.[1];
-    if (thumbKey && excludedKeys.has(thumbKey)) return next();
     const file = resolve(base, `.${pathname}`);
+    if (dirname(file) === join(base, 'thumbs') && excludedKeys.has(basename(file, extname(file)).toLowerCase())) return next();
     const type = TYPES[extname(file).toLowerCase()];
     const stats = type && file.startsWith(`${base}${sep}`) ? statSync(file, { throwIfNoEntry: false }) : null;
     if (!stats?.isFile()) return next();

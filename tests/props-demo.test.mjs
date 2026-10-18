@@ -110,7 +110,9 @@ test('photos listed in demo-exclusions.json are never thumbnailed or served, and
     response.on('finish', () => resolve('served'));
     handler({ url }, response, () => resolve('next'));
   });
-  assert.equal(await request(`/thumbs/${excluded}.webp`), 'next', 'an excluded thumbnail is not served even if the file exists');
+  for (const url of [`/thumbs/${excluded}.webp`, `/thumbs//${excluded}.webp`, `/thumbs/${excluded.toUpperCase()}.webp`, `/thumbs/${excluded}.WEBP`]) {
+    assert.equal(await request(url), 'next', `${url}: an excluded thumbnail is not served even if the file exists`);
+  }
   assert.equal(await request('/thumbs/scp-056.webp'), 'served');
   const { demoPhotoItems } = await import('../scripts/props/demo.mjs');
   assert.deepEqual(demoPhotoItems([{ key: excluded }, { key: 'scp-056' }]).map((item) => item.key), ['scp-056'], 'the photo download skips excluded items before any request');

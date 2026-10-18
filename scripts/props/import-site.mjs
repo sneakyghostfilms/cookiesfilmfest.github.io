@@ -17,6 +17,8 @@ import { parseCollections } from './sites/vintage-alley.mjs';
 
 const INVENTORY_FILE = join(ROOT, 'src/data/props/inventory.json');
 export const CACHE_ROOT = join(ROOT, '.props-cache');
+const ITEM_EXCLUSIONS_FILE = join(ROOT, 'scripts/props/item-exclusions.json');
+export const ITEM_EXCLUSION_REASONS = new Set(["name or photo carries a private individual's name"]);
 const SITE_TYPES = new Set(['wordpress-pages', 'duda-gallery', 'shopify-export']);
 const WORDPRESS_PAGE_SIZE = 10;
 
@@ -65,8 +67,21 @@ const SOURCES = {
   },
 };
 
-export function loadSite({ vendor, catalog, cacheRoot = CACHE_ROOT, fetcher, exportPath }) {
-  return SOURCES[catalog.type]({ vendor, catalog, cacheRoot, fetcher, exportPath });
+export function withholdItems(parsed, exclusions, keyPrefix) {
+  const withheld = new Set(parsed.items.map((item) => item.key).filter((key) => Object.hasOwn(exclusions, key)));
+  const stale = Object.keys(exclusions).filter((key) => key.startsWith(`${keyPrefix}-`) && !parsed.items.some((item) => item.key === key));
+  return {
+    ...parsed,
+    items: parsed.items.filter((item) => !withheld.has(item.key)),
+    images: new Map([...parsed.images].filter(([key]) => !withheld.has(key))),
+    counts: withheld.size ? { ...parsed.counts, items: parsed.counts.items - withheld.size, withheld: withheld.size } : parsed.counts,
+    report: [...parsed.report, `Withheld by scripts/props/item-exclusions.json: ${withheld.size}${stale.length ? `; ${stale.length} listed for this vendor are not in this snapshot (sold or renamed)` : ''}`],
+  };
+}
+
+export async function loadSite({ vendor, catalog, cacheRoot = CACHE_ROOT, fetcher, exportPath, exclusions }) {
+  const parsed = await SOURCES[catalog.type]({ vendor, catalog, cacheRoot, fetcher, exportPath });
+  return withholdItems(parsed, exclusions ?? JSON.parse(await readFile(ITEM_EXCLUSIONS_FILE, 'utf8')), vendor.keyPrefix);
 }
 
 export function findSiteCatalog(vendors, vendorId) {
@@ -77,9 +92,9 @@ export function findSiteCatalog(vendors, vendorId) {
   return { vendor, catalog: catalogs[0] };
 }
 
-export async function importSite({ vendorId, vendors, outFile = INVENTORY_FILE, cacheRoot = CACHE_ROOT, fetcher, exportPath, log = console.log, today = () => localDate(Date.now()) }) {
+export async function importSite({ vendorId, vendors, outFile = INVENTORY_FILE, cacheRoot = CACHE_ROOT, fetcher, exportPath, exclusions, log = console.log, today = () => localDate(Date.now()) }) {
   const { vendor, catalog } = findSiteCatalog(vendors, vendorId);
-  const parsed = await loadSite({ vendor, catalog, cacheRoot, fetcher, exportPath });
+  const parsed = await loadSite({ vendor, catalog, cacheRoot, fetcher, exportPath, exclusions });
   const { items, counts, report, capturedAt } = parsed;
   log([`${vendor.name} · ${catalog.id} (captured ${capturedAt})`, ...report].join('\n'));
   const actual = { ...counts };

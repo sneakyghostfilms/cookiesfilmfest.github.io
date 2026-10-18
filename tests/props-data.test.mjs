@@ -164,6 +164,17 @@ test('reviewed tag removals stay removed', async () => {
   }
 });
 
+test('items withheld for naming a private individual stay out of the inventory, each with a generic reason', async () => {
+  const { ITEM_EXCLUSION_REASONS } = await import('../scripts/props/import-site.mjs');
+  const exclusions = JSON.parse(await readFile(new URL('../scripts/props/item-exclusions.json', import.meta.url), 'utf8'));
+  for (const [key, entry] of Object.entries(exclusions)) {
+    assert.match(key, /^[a-z0-9]+-[0-9a-z]{6}$/, key);
+    assert.ok(!byKey.has(key), `${key} is withheld but in the inventory`);
+    assert.deepEqual(Object.keys(entry), ['reason'], key);
+    assert.ok(ITEM_EXCLUSION_REASONS.has(entry.reason), `${key}: the reason must be one of the generic reasons, with no name`);
+  }
+});
+
 test('every acceptable key in the scene fixtures names an indexed item', async () => {
   const directory = new URL('../worker/test/fixtures/scenes/', import.meta.url);
   const { readdir } = await import('node:fs/promises');

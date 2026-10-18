@@ -104,7 +104,8 @@ node scripts/eval-models.mjs --url http://localhost:8788
 The output ends with the deploy gate, which must pass before a redeploy that changes the inventory or the tags:
 - On the four original scenes (diner, hospital, office, police): every counted required prop is found, with 0 wrong keys, 0 invalid keys and no truncated output.
 - Every scene has at most 1 misfiled key (see How an answer is scored, below).
-- At least 4 of the 6 props those scenes name that the catalogs lack are reported as "no match". The target is 5 of 6, the 2026-10-17 baseline. The floor is 4 because the baseline setup varies on its own: an identical 6,762-token office request left out both of that scene's absent props, where the baseline had reported one.
+- At least 3 of the 4 props those scenes name that the catalogs lack are reported as "no match": the hospital's IV pole and heart monitor, and the police scene's squad car and crime scene tape. The target is 4 of 4; the floor allows one miss because the model varies from run to run. The diner's absent props aren't counted, since that scene names more props than the lists hold.
+  - The office scene no longer lists a water cooler or a fax machine. The inventory now holds both, but from the 1980s and 1990s, and the scene is set in 1962, so the gate neither rewards nor penalizes what the model does with them.
 - Every other scene (today the morgue) meets the S1 floor: 70% of required props found, at most 1 wrong and 1 invalid key, and no truncation.
 
 When new items match a scene's required prop, add their keys to that prop's `acceptableKeys` before the run, so that a correct pick doesn't count as a wrong key.

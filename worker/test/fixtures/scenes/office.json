@@ -40,8 +40,5 @@
       ]
     }
   ],
-  "absent": [
-    "water cooler",
-    "fax machine"
-  ]
+  "absent": []
 }

@@ -23,7 +23,7 @@ function wordsOf(text) {
 }
 
 export function cleanTags(rawTags, item) {
-  const captionWords = new Set(wordsOf(item.description));
+  const captionWords = new Set(wordsOf([item.name, item.era].filter(Boolean).join(' ')));
   const name = item.name.toLowerCase();
   const printed = [...captionWords].some((word) => PRINTED_MATTER.has(word));
   const imitation = [...captionWords].some((word) => IMITATION_WORDS.has(word));

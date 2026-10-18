@@ -154,6 +154,15 @@ test('cleanTags keeps imitation guns from being called firearms and rejects stat
   assert.deepEqual(cleanTags(['training manual'], { name: 'POLICE TRAINING MANUAL', description: 'POLICE TRAINING MANUAL' }).tags, ['training manual']);
 });
 
+test('cleanTags checks claims against the name and stated era only, so a website description licenses nothing', () => {
+  const chair = { name: 'yellow chair', era: null, description: null, categories: ['chairs'] };
+  assert.deepEqual(cleanTags(['chair', 'seating', '1960s chair', 'vintage chair'], chair).tags, ['chair', 'seating']);
+  const lamp = { name: 'brass lamp', era: null, description: 'A 1960s brass lamp, vintage.', categories: ['Lighting'] };
+  assert.deepEqual(cleanTags(['1960s lamp', 'vintage lamp', 'table lamp'], lamp).tags, ['table lamp']);
+  const fridge = { name: 'stainless steel refrigerator', era: 'era 1950', description: null, categories: ['refrigerators'] };
+  assert.deepEqual(cleanTags(['1950 refrigerator', 'fridge', '1950s fridge'], fridge).tags, ['1950 refrigerator', 'fridge']);
+});
+
 test('serializeTags writes sorted keys, one per line, and round-trips', () => {
   const file = {
     schemaVersion: 2, generator: { tool: 'ollama', model: 'm', promptVersion: 1 }, generatedAt: '2026-10-17',

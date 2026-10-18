@@ -93,7 +93,7 @@
   outline-offset: 2px;
 }
 
-.props-page :is(.props-title, .props-nav, .props-about-title, .vendor-matches-title) {
+.props-page :is(.props-title, .props-nav, .props-about-title, .vendor-matches-title, .scene-title, .scene-group-title) {
   font-family: var(--pp-display);
   font-weight: 400;
   text-transform: uppercase;
@@ -260,6 +260,11 @@
 .props-page .props-field textarea::placeholder {
   color: var(--pp-muted);
   opacity: 1;
+}
+
+.props-page .props-field :disabled {
+  background-color: var(--pp-well);
+  cursor: not-allowed;
 }
 
 .props-page .props-button,
@@ -468,44 +473,74 @@
   min-height: 44px;
 }
 
+.props-page .scene-title {
+  margin-bottom: 16px;
+  font-size: 30px;
+}
+
 .props-page .scene-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 12px;
+  max-width: 760px;
 }
 
 .props-page .scene-form textarea {
+  min-height: 150px;
+  line-height: 1.5;
   resize: vertical;
 }
 
+.props-page .scene-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 20px;
+}
+
 .props-page .scene-period {
-  max-width: 360px;
+  width: 320px;
+  max-width: 100%;
+}
+
+.props-page .scene-count {
+  padding-bottom: 12px;
+}
+
+.props-page .scene-disclosure {
+  max-width: 70ch;
 }
 
 .props-page .scene-off,
 .props-page .scene-status {
-  margin: 8px 0 0;
   font-weight: 600;
 }
 
-.props-page .scene-results {
-  margin-top: 4px;
+.props-page .scene-status {
+  margin-top: 20px;
 }
 
-.props-page .scene-group {
-  margin-top: 16px;
+.props-page .scene-results:not(:empty) {
+  margin-top: 32px;
+}
+
+.props-page .scene-group + .scene-group {
+  margin-top: 28px;
 }
 
 .props-page .scene-group-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 0 4px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--pp-ink);
+  font-size: 26px;
+}
+
+.props-page .scene-group > .props-note {
+  margin-top: 10px;
 }
 
 .props-page .scene-prop {
-  border-top: 1px solid var(--pp-rule);
-  padding: 12px 0;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--pp-rule);
 }
 
 .props-page .scene-prop-name {
@@ -513,32 +548,36 @@
   font-weight: 700;
 }
 
-.props-page .scene-reason,
-.props-page .scene-missing {
-  margin: 4px 0 0;
+.props-page .scene-reason {
+  margin-top: 2px;
   font-size: 13px;
   color: var(--pp-muted);
 }
 
 .props-page .scene-matches {
-  margin-top: 8px;
+  margin-top: 14px;
+}
+
+.props-page .scene-missing {
+  margin-top: 6px;
+  font-size: 13.5px;
+  color: var(--pp-muted);
 }
 
 .props-page .scene-search-link {
-  all: unset;
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  cursor: pointer;
-  color: var(--pp-ink);
   font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
-.props-page .scene-search-link:focus-visible {
-  outline: 3px solid var(--pp-ink);
-  outline-offset: 2px;
+.props-page .scene-results > .props-note {
+  max-width: 78ch;
+  margin-top: 6px;
+}
+
+.props-page .scene-group + .props-note {
+  margin-top: 20px;
 }
 
 .props-page .props-vendor-name {
@@ -547,8 +586,7 @@
   margin: 0 0 8px;
 }
 
-.props-page .props-sources-title,
-.props-page .scene-title {
+.props-page .props-sources-title {
   font-size: 16px;
   font-weight: 700;
   margin: 0 0 8px;

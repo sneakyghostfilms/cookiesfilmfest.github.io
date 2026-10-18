@@ -34,7 +34,8 @@ export function checkSiteItems(items, { vendor, catalog }) {
       const categoryProblem = listingProblem(category);
       if (categoryProblem) problems.push(`${label}: category ${categoryProblem}`);
     }
-    if (item.era !== null && listingProblem(item.era)) problems.push(`${label}: era ${listingProblem(item.era)}`);
+    const eraProblem = item.era === null ? null : listingProblem(item.era);
+    if (eraProblem) problems.push(`${label}: era ${eraProblem}`);
     if (JSON.stringify(item.decades) !== JSON.stringify(eraDecades(item.era))) problems.push(`${label}: decades not derived from era`);
     if (item.description !== null) problems.push(`${label}: website items store no description`);
     if (typeof item.url !== 'string' || !item.url.startsWith(catalog.siteUrl)) problems.push(`${label}: url is not under ${catalog.siteUrl}`);

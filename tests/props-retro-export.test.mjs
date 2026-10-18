@@ -37,7 +37,7 @@ async function exportCopy(text, name = 'products_export.csv') {
 }
 
 test('the CSV reader follows RFC 4180: BOM, CRLF, quoted commas, doubled quotes and line breaks', () => {
-  assert.deepEqual(parseCsv('﻿a,b\r\n1,"x, y"\r\n2,"say ""hi"""\n3,"two\nlines"\n'), [['a', 'b'], ['1', 'x, y'], ['2', 'say "hi"'], ['3', 'two\nlines']]);
+  assert.deepEqual(parseCsv('\uFEFFa,b\r\n1,"x, y"\r\n2,"say ""hi"""\n3,"two\nlines"\n'), [['a', 'b'], ['1', 'x, y'], ['2', 'say "hi"'], ['3', 'two\nlines']]);
   assert.deepEqual(parseCsv('a,b\n1,""\n'), [['a', 'b'], ['1', '']]);
   assert.throws(() => parseCsv('a,b\n1,x"y\n'), /quote inside an unquoted field/);
   assert.throws(() => parseCsv('a,b\n1,"open\n'), /never closed/);

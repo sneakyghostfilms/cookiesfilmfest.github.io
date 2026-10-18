@@ -1,5 +1,5 @@
 export function parseCsv(text) {
-  const source = text.startsWith('﻿') ? text.slice(1) : text;
+  const source = text.startsWith('\uFEFF') ? text.slice(1) : text;
   const rows = [];
   let row = [];
   let field = '';

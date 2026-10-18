@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { buildIndex, compareByName, parseDecades, search, stem, tokenize } from '../src/scripts/props-search.js';
+import { buildIndex, compareByName, parseDecades, queryTerms, rankText, search, stem, tokenize } from '../src/scripts/props-search.js';
 
 const read = async (path) => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
 const inventory = await read('../src/data/props/inventory.json');
@@ -13,6 +13,7 @@ const docs = inventory.items.map((item, order) => ({
   categories: item.categories,
   tags: tagsFile.tags[item.key] ?? [],
   decades: item.decades,
+  vendor: item.vendor,
   order,
 }));
 const index = buildIndex(docs);
@@ -116,4 +117,86 @@ test('items matching every query word outrank stronger single-word matches', () 
     ...filler,
   ]);
   assert.deepEqual(search(local, 'police jacket').slice(0, 2).map((doc) => doc.key), ['uniform', 'nurse']);
+});
+
+const REFERENCE_WEIGHTS = { name: 3, description: 2, categories: 1, tags: 1 };
+
+function referenceTermScore(entry, term, index) {
+  let best = 0;
+  for (const [field, weight] of Object.entries(REFERENCE_WEIGHTS)) {
+    const tokens = entry.fields[field];
+    if (tokens.has(term)) best = Math.max(best, weight);
+    else if (term.length >= 4 && [...tokens].some((token) => token.startsWith(term))) best = Math.max(best, weight * 0.7);
+  }
+  if (!best) return 0;
+  const matching = index.documentFrequency.get(term) ?? 1;
+  return best * Math.log(1 + index.entries.length / matching);
+}
+
+function referenceSearch(index, query = '', { category = '', decade = '', vendor = '' } = {}, decades = parseDecades(query)) {
+  const passes = (doc) => (!category || doc.categories.includes(category)) && (!decade || doc.decades.includes(Number(decade)))
+    && (!vendor || doc.vendor === vendor);
+  const terms = queryTerms(query);
+  const isYear = (term) => /^(19|20)\d\d$/.test(term);
+  const words = terms.filter((term) => !isYear(term));
+  const years = terms.filter((term) => isYear(term) && index.documentFrequency.has(term));
+  if (!words.length && !years.length && !decades.size) return index.alphabetical.filter(passes);
+  const scored = [];
+  for (const entry of index.entries) {
+    if (!passes(entry.doc)) continue;
+    let score = 0;
+    let matched = 0;
+    for (const term of words) {
+      const value = referenceTermScore(entry, term, index);
+      score += value;
+      if (value > 0) matched += 1;
+    }
+    if (words.length) score *= matched / words.length;
+    for (const term of years) score += referenceTermScore(entry, term, index);
+    const inDecade = entry.doc.decades.some((value) => decades.has(value));
+    if (!words.length) score += inDecade ? 1 : 0;
+    else if (inDecade) score *= 1.5;
+    if (score > 0) scored.push({ doc: entry.doc, score });
+  }
+  return scored.sort((a, b) => b.score - a.score || a.doc.order - b.doc.order).map(({ doc }) => doc);
+}
+
+const scenes = await Promise.all(['diner', 'hospital', 'office', 'police'].map((id) => read(`../worker/test/fixtures/scenes/${id}.json`)));
+
+function fixedQueries(vocabulary, count) {
+  let seed = 20261017;
+  const next = () => {
+    seed = (seed * 1103515245 + 12345) % 2147483648;
+    return seed;
+  };
+  const extras = ['60s', '1991', 'sixties', 'the', 'phone', 'police jacket'];
+  return Array.from({ length: count }, () => {
+    const words = Array.from({ length: 2 + (next() % 2) }, () => vocabulary[next() % vocabulary.length]);
+    if (next() % 4 === 0) words.push(extras[next() % extras.length]);
+    return words.join(' ');
+  });
+}
+
+test('the inverted index returns exactly what the brute-force ranking returned', () => {
+  const keysOf = (results) => results.map((doc) => doc.key);
+  const queries = [...index.vocabulary, ...fixedQueries(index.vocabulary, 200), ...scenes.map((scene) => scene.text), '', '1965', 'sixties'];
+  for (const query of queries) assert.deepEqual(keysOf(search(index, query)), keysOf(referenceSearch(index, query)), query);
+  const categories = [...new Set(docs.flatMap((doc) => doc.categories))].slice(0, 3);
+  for (const query of index.vocabulary.filter((_, position) => position % 50 === 0)) {
+    for (const filters of [...categories.map((category) => ({ category })), { decade: '1960' }, { vendor: 'steel-city-props' }, { vendor: 'nobody' }]) {
+      assert.deepEqual(keysOf(search(index, query, filters)), keysOf(referenceSearch(index, query, filters)), `${query} ${JSON.stringify(filters)}`);
+    }
+  }
+});
+
+test('scene ranking is the same keyword ranking, without a decade boost from the scene text', () => {
+  for (const scene of scenes) {
+    assert.deepEqual(rankText(index, scene.text).map((doc) => doc.key), referenceSearch(index, scene.text, {}, new Set()).map((doc) => doc.key), scene.id);
+  }
+  assert.ok(parseDecades(scenes.find((scene) => scene.id === 'office').text).size > 0, 'screenplay ages like (40s) would otherwise boost decades');
+});
+
+test('the vendor filter keeps one vendor', () => {
+  assert.deepEqual(keys('', { vendor: 'steel-city-props' }).length, docs.length);
+  assert.deepEqual(keys('phone', { vendor: 'nobody' }), []);
 });

@@ -1,0 +1,58 @@
+---
+import "../styles/index.css";
+import "@fontsource-variable/inter";
+import "../styles/props.css";
+import { DEMO_STYLES } from "../../scripts/props/demo-links.mjs";
+import { NOT_AFFILIATED } from "../scripts/props-cards.js";
+
+// The frame both props pages share: the head, the header with the demo marker, the intro's disclosures, the vendor
+// opt-out line and the byline. A page adds its own header markers and intro lines through the named slots.
+export interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const { generator } = Astro;
+const demoMode = process.env.PROPS_DEMO === "1";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="generator" content={generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content="Pittsburgh Prop Search" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content={description} />
+
+  </head>
+  <body class="props-page">
+    <div class="props-wrap">
+      <header class="props-header">
+        <h1 class="props-title">Pittsburgh Prop Search</h1>
+        <p class="props-subtitle">Search local prop rental catalogs in plain English.</p>
+        <a href="/" class="props-back">Back to Main Site</a>
+        {demoMode && <p class="props-demo-marker"><span>Local demo, not public</span></p>}
+        <slot name="markers" />
+      </header>
+
+      <section class="props-box props-about">
+        <p>A discovery tool for Pittsburgh filmmakers. It does not book rentals or show live availability. <strong>Always confirm availability, condition, sizes and price with the vendor.</strong> Names, item numbers, eras and pages are copied from each vendor's catalog or website. {NOT_AFFILIATED} Keyword search runs in your browser.</p>
+        <slot name="about" />
+      </section>
+
+      <slot />
+
+      <p class="props-footer">Prop owners: want your inventory listed, corrected or removed? <a href="/#contact">Contact us</a>. Know another Pittsburgh prop source? <a href="/#contact">Let us know</a>.</p>
+      <p class="props-byline"><a href="/">A Cookies &amp; Comedy Film Festival project</a></p>
+    </div>
+
+    {demoMode && <style is:inline set:html={DEMO_STYLES}></style>}
+  </body>
+</html>

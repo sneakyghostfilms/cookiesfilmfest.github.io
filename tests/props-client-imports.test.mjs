@@ -71,11 +71,13 @@ test('import specifiers are found in every form the client code could use', () =
 });
 
 test("the walk starts at each props page's script and follows imports to the bottom", () => {
-  assert.deepEqual(PAGES, ['src/pages/props.astro']);
-  const { importer } = walk('src/pages/props.astro');
-  assert.equal(chain(importer, 'src/scripts/props-card-text.js'), 'src/pages/props.astro → src/scripts/props-page.ts → src/scripts/props-card-text.js');
-  assert.equal(chain(importer, 'src/scripts/props-search.js'), 'src/pages/props.astro → src/scripts/props-page.ts → src/scripts/props-search.js');
-  assert.ok(importer.has('src/scripts/props-card-view.ts') && importer.has('src/scripts/props-scene.js'));
+  assert.deepEqual(PAGES, ['src/pages/props.astro', 'src/pages/props/scene.astro']);
+  const keyword = walk('src/pages/props.astro').importer;
+  assert.equal(chain(keyword, 'src/scripts/props-card-text.js'), 'src/pages/props.astro → src/scripts/props-page.ts → src/scripts/props-card-text.js');
+  assert.ok(keyword.has('src/scripts/props-card-view.ts') && keyword.has('src/scripts/props-search.js') && keyword.has('src/scripts/props-search-link.js'));
+  const scene = walk('src/pages/props/scene.astro').importer;
+  assert.equal(chain(scene, 'src/scripts/props-card-text.js'), 'src/pages/props/scene.astro → src/scripts/props-scene-page.ts → src/scripts/props-card-view.ts → src/scripts/props-card-text.js');
+  assert.equal(chain(scene, 'src/scripts/props-search.js'), 'src/pages/props/scene.astro → src/scripts/props-scene-page.ts → src/scripts/props-scene.js → src/scripts/props-search.js');
 });
 
 test('no props page script reaches a Node module or build-side code, even code tree-shaking would drop', () => {

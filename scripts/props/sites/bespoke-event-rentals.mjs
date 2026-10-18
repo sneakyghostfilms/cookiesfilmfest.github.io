@@ -3,7 +3,7 @@ import { siteKey } from '../site-items.mjs';
 import { attribute, decodeEntities, visibleText } from './html-text.mjs';
 import { titleEra } from './retro-on-8th.mjs';
 
-// Bespoke Event Rentals' TapGoods catalog on WordPress: a collection page whose tiles link its subcategory pages, and
+// Bespoke Event Rentals' TapGoods catalog on WordPress: collection pages whose tiles link their subcategory pages, and
 // subcategory pages whose tiles are the products, with a name, a product link and a photo each.
 export const PHOTO_HOST = 's3.us-east-1.amazonaws.com';
 // The regional host serves every bucket, so the vendor's own bucket is pinned by the path.
@@ -41,19 +41,24 @@ const nextLink = (html) => {
   return tag ? attribute(tag, 'href') : null;
 };
 
-// The collection page's subcategory pages, as its tiles link them. A tile linking anything but a page directly under
-// the collection, on the same host, stops the import before any request.
-export function subcategoryPages(html, catalog) {
-  const collection = new URL(catalog.sourceUrl);
-  const pages = tilesOf(html, catalog.sourceUrl).map(({ link, name }) => {
-    const slug = link.pathname.startsWith(collection.pathname) ? link.pathname.slice(collection.pathname.length) : '';
-    if (link.origin !== collection.origin || !/^[a-z0-9-]+\/$/.test(slug) || link.search || link.hash) {
-      throw new Error(`A subcategory tile on ${catalog.sourceUrl} links ${link.href}, not a page directly under it; stopping before any request.`);
+// A collection page's subcategory pages, as its tiles link them, kept to the collection's list of slugs in vendors.json.
+// A tile linking anything but a page directly under the collection, on the same host, or a listed slug the page doesn't
+// link, stops the import before any subcategory request. The page followed is the tile's own link. Tiles not on the
+// list come back by name, for the report.
+export function subcategoryPages(html, collection) {
+  const base = new URL(collection.url);
+  const tiles = tilesOf(html, collection.url).map(({ link, name }) => {
+    const rest = link.pathname.startsWith(base.pathname) ? link.pathname.slice(base.pathname.length) : '';
+    if (link.origin !== base.origin || !/^[a-z0-9-]+\/$/.test(rest) || link.search || link.hash) {
+      throw new Error(`A subcategory tile on ${collection.url} links ${link.href}, not a page directly under it; stopping before any subcategory request.`);
     }
-    return { url: link.href, label: name };
+    return { url: link.href, label: name, slug: rest.slice(0, -1) };
   });
-  if (!pages.length) throw new Error(`${catalog.sourceUrl} links no subcategory pages; the page layout has changed.`);
-  return pages;
+  if (!tiles.length) throw new Error(`${collection.url} links no subcategory pages; the page layout has changed.`);
+  const missing = collection.subcategories.filter((slug) => !tiles.some((tile) => tile.slug === slug));
+  if (missing.length) throw new Error(`${collection.url} doesn't link ${missing.join(', ')}, on its list in vendors.json; stopping before any subcategory request.`);
+  const listed = (tile) => collection.subcategories.includes(tile.slug);
+  return { listed: tiles.filter(listed), skipped: tiles.filter((tile) => !listed(tile)).map((tile) => tile.label) };
 }
 
 // The one pager off a subcategory's own path that is recognized: exactly the tag archive of the same slug on the same
@@ -81,8 +86,9 @@ export function nextSubcategoryPage(html, firstUrl, number) {
 }
 
 // Items from the subcategory pages, in page order. The same product on two subcategory pages is one item, with both
-// categories in page order and the first page's link. The price under a name is never kept.
-export function parseCatalog({ collection, pages }, { vendor, catalog }) {
+// categories in page order and the first page's link; two product pages with one name stay two items. The price under
+// a name is never kept. `collections` are the catalog's collections, each with its page's html, for the report.
+export function parseCatalog({ collections, pages }, { vendor, catalog }) {
   const site = new URL(catalog.siteUrl);
   const flags = [];
   const products = new Map();
@@ -129,10 +135,18 @@ export function parseCatalog({ collection, pages }, { vendor, catalog }) {
     items.push({ key, vendor: vendor.id, catalog: catalog.id, name: product.name, description: null, categories: product.categories, era, decades: eraDecades(era), url: product.url });
     images.set(key, { urls: product.photo ? [product.photo] : [] });
   }
-  const collectionNext = nextLink(collection);
+  for (const [name, named] of Map.groupBy(items, (item) => item.name)) {
+    if (named.length > 1) flags.push(`"${name}" names ${named.length} product pages (${named.map((item) => item.key).join(', ')}); items merge by product page, so they stay ${named.length} items`);
+  }
   const counts = { pages: pages.length, tiles: tileCount, items: items.length, merged: tileCount - items.length };
   const report = [
-    `Collection page: ${subcategoryPages(collection, catalog).length} subcategory tiles${collectionNext ? `; its own next page (${collectionNext}) is not followed, since its first page lists every subcategory` : ''}`,
+    `Collection pages: ${collections.length}`,
+    ...collections.map((collection) => {
+      const { listed, skipped } = subcategoryPages(collection.html, collection);
+      const next = nextLink(collection.html);
+      const tiles = listed.length + skipped.length;
+      return `  ${collection.url}: ${tiles} subcategory ${tiles === 1 ? 'tile' : 'tiles'}, ${listed.length} on the list${skipped.length ? `; skipped: ${skipped.join(', ')}` : ''}${next ? `; its own next page (${next}) is not followed, since its first page lists every subcategory` : ''}`;
+    }),
     `Pages: ${pages.length}; tiles: ${tileCount}; items: ${items.length}; tiles merged into an item from an earlier page: ${counts.merged}`,
     ...[...perHeading].map(([heading, { pages: count, tiles }]) => `  ${heading}: ${tiles} tiles on ${count} page${count === 1 ? '' : 's'}`),
     `Photo hosts: ${[...photoHosts].map(([host, count]) => `${host} ${count}`).join(', ') || 'none'}`,

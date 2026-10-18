@@ -9,26 +9,45 @@ import { PHOTO_BUCKET, PHOTO_HOST, nextSubcategoryPage, parseCatalog, photoProbl
 
 const SITE = 'https://rentals.example/';
 const COLLECTION = `${SITE}categories/furniture-rentals-collection/`;
+const BAR = `${SITE}categories/bar-collection/`;
 const vendor = { id: 'tapgoods-test', name: 'Test Event Rentals', keyPrefix: 'te' };
-const catalog = { id: 'te-test', type: 'tapgoods-catalog', sourceUrl: COLLECTION, siteUrl: SITE, itemLinkLabel: 'Open product page', photoHost: PHOTO_HOST };
+const catalogOf = (collections) => ({ id: 'te-test', type: 'tapgoods-catalog', siteUrl: SITE, collections, itemLinkLabel: 'Open product page', photoHost: PHOTO_HOST });
+const catalog = catalogOf([{ url: COLLECTION, subcategories: ['sofa-loveseats'] }]);
 const photo = (number, query = '?1770128177') => `https://${PHOTO_HOST}${PHOTO_BUCKET}pictures/images/000/900/${number}/original/blob${query}`;
 const tile = (href, image, caption, price = '') => `<div class="catalog-item">\n  <a href="${href}">\n    <img src="${image}" alt="made-up alt">\n  </a>\n  <div class="caption font-bold">${caption}</div>${price ? `\n  <div class="product-price">${price} <span class="price-unit">/ Unit price</span></div>` : ''}\n</div>`;
 const product = (slug, name, number, price = '$349.99') => tile(`${SITE}products/${slug}/`, photo(number), name, price);
 const head = (next) => `<head>${next ? `<link rel="next" href="${next}" />` : ''}</head>`;
-const collectionPage = (subcategories, next = `${COLLECTION}page/2/`) => `<html>${head(next)}<body><h1 class="tag-title">Furniture Rentals Collection</h1><div class="row">${subcategories.map(([slug, label]) => tile(`${COLLECTION}${slug}/`, 'https://tapgoods-prod.imgix.net/pictures/images/000/1/original/blob?w=400&#038;h=400&#038;auto=format', label)).join('')}</div></body></html>`;
+const collectionPage = (subcategories, next = `${COLLECTION}page/2/`, base = COLLECTION) => `<html>${head(next)}<body><h1 class="category-title">A Collection</h1><div class="row">${subcategories.map(([slug, label]) => tile(`${base}${slug}/`, 'https://tapgoods-prod.imgix.net/pictures/images/000/1/original/blob?w=400&#038;h=400&#038;auto=format', label)).join('')}</div></body></html>`;
 const subcategoryPage = (heading, tiles, next = null) => `<html>${head(next)}<body><h1 class="tag-title">\n  ${heading}\n</h1><div class="row">${tiles.join('')}</div></body></html>`;
-const parse = (pages, collection = collectionPage([['sofa-loveseats', 'Sofa &amp; Loveseats']])) => parseCatalog({ collection, pages }, { vendor, catalog });
+const parse = (pages, collections = [{ url: COLLECTION, subcategories: ['sofa-loveseats'], html: collectionPage([['sofa-loveseats', 'Sofa &amp; Loveseats']]) }]) => parseCatalog({ collections, pages }, { vendor, catalog });
 
-test("the collection page's tiles give its subcategory pages; a tile linking anywhere else stops before any request", () => {
-  assert.deepEqual(subcategoryPages(collectionPage([['benches', 'Benches'], ['sofa-loveseats', 'Sofa &amp; Loveseats']]), catalog), [
-    { url: `${COLLECTION}benches/`, label: 'Benches' },
-    { url: `${COLLECTION}sofa-loveseats/`, label: 'Sofa & Loveseats' },
-  ]);
+test("a collection page's tiles give its subcategory pages; a tile linking anywhere else stops before any subcategory request", () => {
+  const furniture = { url: COLLECTION, subcategories: ['benches', 'sofa-loveseats'] };
+  assert.deepEqual(subcategoryPages(collectionPage([['benches', 'Benches'], ['sofa-loveseats', 'Sofa &amp; Loveseats']]), furniture), {
+    listed: [
+      { url: `${COLLECTION}benches/`, label: 'Benches', slug: 'benches' },
+      { url: `${COLLECTION}sofa-loveseats/`, label: 'Sofa & Loveseats', slug: 'sofa-loveseats' },
+    ],
+    skipped: [],
+  });
   for (const href of ['https://other.example/categories/furniture-rentals-collection/benches/', `${COLLECTION}benches/extra/`, `${COLLECTION}benches/?sort=1`, `${SITE}categories/linen-collection/`, `${COLLECTION}benches`]) {
     const html = collectionPage([]).replace('<div class="row">', `<div class="row">${tile(href, photo(1), 'Odd')}`);
-    assert.throws(() => subcategoryPages(html, catalog), /not a page directly under it; stopping before any request/, href);
+    assert.throws(() => subcategoryPages(html, furniture), /not a page directly under it; stopping before any subcategory request/, href);
   }
-  assert.throws(() => subcategoryPages(collectionPage([]), catalog), /links no subcategory pages/);
+  assert.throws(() => subcategoryPages(collectionPage([]), furniture), /links no subcategory pages/);
+});
+
+test("a tile not on its collection's list is skipped and named; a listed slug the page doesn't link stops, naming it", () => {
+  const page = collectionPage([['bar-back-collection', 'Bar Back Collection'], ['folding-bars', 'Folding Bars'], ['heritage-bar-collection', 'Heritage Bar Collection']], null, BAR);
+  assert.deepEqual(subcategoryPages(page, { url: BAR, subcategories: ['heritage-bar-collection', 'bar-back-collection'] }), {
+    listed: [
+      { url: `${BAR}bar-back-collection/`, label: 'Bar Back Collection', slug: 'bar-back-collection' },
+      { url: `${BAR}heritage-bar-collection/`, label: 'Heritage Bar Collection', slug: 'heritage-bar-collection' },
+    ],
+    skipped: ['Folding Bars'],
+  }, "the page's order, not the list's");
+  assert.throws(() => subcategoryPages(page, { url: BAR, subcategories: ['bar-back-collection', 'podiums', 'easels'] }),
+    /bar-collection\/ doesn't link podiums, easels, on its list in vendors\.json; stopping before any subcategory request/);
 });
 
 test('product tiles become items: the caption decoded as the name, the heading as the category, the product link; no price is kept', () => {
@@ -59,6 +78,13 @@ test('the same product on two subcategory pages is one item, with both categorie
   assert.deepEqual(parsed.items.map((item) => [item.name, item.categories]), [['SoHo Chair', ['SoHo Collection', 'Chairs']], ['SoHo Sofa', ['SoHo Collection']], ['Ghost Chair', ['Chairs']]]);
   assert.deepEqual(parsed.counts, { pages: 2, tiles: 4, items: 3, merged: 1 });
   assert.match(parsed.report.join('\n'), /"SoHo Chair" appears on 2 subcategory pages \(SoHo Collection, Chairs\); one item/);
+});
+
+test('two product pages with one name stay two items, and the report says so', () => {
+  const parsed = parse([{ url: `${COLLECTION}benches/`, html: subcategoryPage('Benches', [product('outdoor-bench-2', 'Outdoor Bench', 1), product('outdoor-bench-3', 'Outdoor Bench', 2)]) }]);
+  const keys = ['outdoor-bench-2', 'outdoor-bench-3'].map((slug) => siteKey('te', slug));
+  assert.deepEqual(parsed.items.map((item) => [item.key, item.name]), [[keys[0], 'Outdoor Bench'], [keys[1], 'Outdoor Bench']]);
+  assert.deepEqual(parsed.report.filter((line) => /names 2 product pages/.test(line)), [`  "Outdoor Bench" names 2 product pages (${keys.join(', ')}); items merge by product page, so they stay 2 items`]);
 });
 
 test("a subcategory page's next page is followed only on its own path; its slug's tag archive is named and not followed; any other next link stops", () => {
@@ -106,36 +132,63 @@ test('a product link off the host or with a query, a price for a caption, a miss
   assert.throws(() => parse([{ url: `${COLLECTION}chairs/`, html: changed }]), /has 1 tiles, 0 of them in the layout this import reads/);
 });
 
-test("the import reads robots.txt with its pre-group Crawl-delay, the collection page, then each subcategory page and its next pages; its slug's tag-archive pager is flagged and the import goes on", async () => {
-  const chairs = `${COLLECTION}chairs/`;
-  const benches = `${COLLECTION}benches/`;
-  const stools = `${COLLECTION}stools/`;
-  const responses = new Map([
-    [`${SITE}robots.txt`, '\tCrawl-delay: 10\n# START YOAST BLOCK\nUser-agent: *\nDisallow:\n'],
-    [COLLECTION, collectionPage([['chairs', 'Chairs'], ['stools', 'Stools'], ['benches', 'Benches']])],
-    [chairs, subcategoryPage('Chairs', [product('ghost-chair', 'Ghost Chair', 1)], `${chairs}page/2/`)],
-    [`${chairs}page/2/`, subcategoryPage('Chairs', [product('wingback-chair', 'Wingback Chair', 2)])],
-    [stools, subcategoryPage('Stools', [product('bar-stool', 'Bar Stool', 4)], `${SITE}tags/stools/page/2/`)],
-    [benches, subcategoryPage('Benches', [product('church-pew', 'Church Pew Bench', 3)])],
-  ]);
+// The import through a stub fetcher answering from `responses`, with every URL requested and every gap raised.
+async function importWith(responses, listed, fetchedAtOf = () => '2026-10-18T14:00:00.000Z') {
   const requested = [];
   const gaps = [];
   const fetcher = {
     get: async (url) => {
       requested.push(url);
-      const fetchedAt = url === benches ? '2026-10-18T12:00:00.000Z' : '2026-10-18T14:00:00.000Z';
-      return { body: Buffer.from(responses.get(url)), meta: { url, status: 200, fetchedAt }, cached: false, missing: false };
+      return { body: Buffer.from(responses.get(url)), meta: { url, status: 200, fetchedAt: fetchedAtOf(url) }, cached: false, missing: false };
     },
     raiseGap: (milliseconds) => gaps.push(milliseconds),
   };
   const directory = await mkdtemp(path.join(tmpdir(), 'props-tapgoods-'));
-  const { items, parsed } = await importSite({ vendorId: vendor.id, vendors: { vendors: [{ ...vendor, catalogs: [catalog] }] }, outFile: path.join(directory, 'inventory.json'), cacheRoot: directory, fetcher, exclusions: {}, log: () => {}, today: () => '2026-10-18' });
-  assert.deepEqual(requested, [`${SITE}robots.txt`, COLLECTION, chairs, `${chairs}page/2/`, stools, benches], 'the tag archive is never requested');
+  const result = await importSite({ vendorId: vendor.id, vendors: { vendors: [{ ...vendor, catalogs: [listed] }] }, outFile: path.join(directory, 'inventory.json'), cacheRoot: directory, fetcher, exclusions: {}, log: () => {}, today: () => '2026-10-18' })
+    .catch((error) => ({ error }));
+  return { requested, gaps, ...result };
+}
+
+test("the import reads robots.txt with its pre-group Crawl-delay, every collection page, then each listed subcategory page and its next pages; a skipped tile's page and the slug's tag archive are never requested", async () => {
+  const chairs = `${COLLECTION}chairs/`;
+  const benches = `${COLLECTION}benches/`;
+  const stools = `${COLLECTION}stools/`;
+  const backBars = `${BAR}bar-back-collection/`;
+  const responses = new Map([
+    [`${SITE}robots.txt`, '\tCrawl-delay: 10\n# START YOAST BLOCK\nUser-agent: *\nDisallow:\n'],
+    [COLLECTION, collectionPage([['chairs', 'Chairs'], ['stools', 'Stools'], ['benches', 'Benches']])],
+    [BAR, collectionPage([['bar-back-collection', 'Bar Back Collection'], ['folding-bars', 'Folding Bars']], `${BAR}page/2/`, BAR)],
+    [chairs, subcategoryPage('Chairs', [product('ghost-chair', 'Ghost Chair', 1)], `${chairs}page/2/`)],
+    [`${chairs}page/2/`, subcategoryPage('Chairs', [product('wingback-chair', 'Wingback Chair', 2)])],
+    [stools, subcategoryPage('Stools', [product('bar-stool', 'Bar Stool', 4)], `${SITE}tags/stools/page/2/`)],
+    [benches, subcategoryPage('Benches', [product('church-pew', 'Church Pew Bench', 3)])],
+    [backBars, subcategoryPage('Bar Back Collection', [product('mahogany-back-bar', 'Mahogany Back Bar', 5)])],
+  ]);
+  const listed = catalogOf([{ url: COLLECTION, subcategories: ['chairs', 'stools', 'benches'] }, { url: BAR, subcategories: ['bar-back-collection'] }]);
+  const { requested, gaps, items, parsed } = await importWith(responses, listed, (url) => (url === benches ? '2026-10-18T12:00:00.000Z' : '2026-10-18T14:00:00.000Z'));
+  assert.deepEqual(requested, [`${SITE}robots.txt`, COLLECTION, BAR, chairs, `${chairs}page/2/`, stools, benches, backBars]);
   assert.deepEqual(gaps, [10_000], "the pre-group Crawl-delay slows every request");
-  assert.deepEqual(items.map((item) => [item.name, item.categories[0]]), [['Ghost Chair', 'Chairs'], ['Wingback Chair', 'Chairs'], ['Bar Stool', 'Stools'], ['Church Pew Bench', 'Benches']]);
+  assert.deepEqual(items.map((item) => [item.name, item.categories[0]]), [['Ghost Chair', 'Chairs'], ['Wingback Chair', 'Chairs'], ['Bar Stool', 'Stools'], ['Church Pew Bench', 'Benches'], ['Mahogany Back Bar', 'Bar Back Collection']]);
   assert.equal(parsed.capturedAt, '2026-10-18', 'the earliest page dates the snapshot');
-  assert.deepEqual(parsed.counts, { pages: 4, tiles: 4, items: 4, merged: 0 });
+  assert.deepEqual(parsed.counts, { pages: 5, tiles: 5, items: 5, merged: 0 });
+  assert.deepEqual(parsed.report.slice(0, 3), [
+    'Collection pages: 2',
+    `  ${COLLECTION}: 3 subcategory tiles, 3 on the list; its own next page (${COLLECTION}page/2/) is not followed, since its first page lists every subcategory`,
+    `  ${BAR}: 2 subcategory tiles, 1 on the list; skipped: Folding Bars; its own next page (${BAR}page/2/) is not followed, since its first page lists every subcategory`,
+  ]);
   assert.deepEqual(parsed.report.filter((line) => /pager/.test(line)), ['  Stools: pager leads to the tag archive /tags/stools/page/2/, not followed']);
+});
+
+test('a listed slug a collection page no longer links stops the import after the collection pages, before any subcategory page', async () => {
+  const responses = new Map([
+    [`${SITE}robots.txt`, 'User-agent: *\nDisallow:\n'],
+    [COLLECTION, collectionPage([['chairs', 'Chairs']])],
+    [BAR, collectionPage([['folding-bars', 'Folding Bars']], null, BAR)],
+  ]);
+  const listed = catalogOf([{ url: COLLECTION, subcategories: ['chairs'] }, { url: BAR, subcategories: ['bar-back-collection'] }]);
+  const { requested, error } = await importWith(responses, listed);
+  assert.match(String(error?.message), /bar-collection\/ doesn't link bar-back-collection, on its list in vendors\.json; stopping before any subcategory request/);
+  assert.deepEqual(requested, [`${SITE}robots.txt`, COLLECTION, BAR], 'no subcategory page is requested');
 });
 
 test("a next link of any other form stops the import as a layout change, before it is requested", async () => {
@@ -145,16 +198,7 @@ test("a next link of any other form stops the import as a layout change, before 
     [COLLECTION, collectionPage([['stools', 'Stools'], ['benches', 'Benches']])],
     [stools, subcategoryPage('Stools', [product('bar-stool', 'Bar Stool', 4)], `${SITE}tags/benches/page/2/`)],
   ]);
-  const requested = [];
-  const fetcher = {
-    get: async (url) => {
-      requested.push(url);
-      return { body: Buffer.from(responses.get(url)), meta: { url, status: 200, fetchedAt: '2026-10-18T14:00:00.000Z' }, cached: false, missing: false };
-    },
-    raiseGap: () => {},
-  };
-  const directory = await mkdtemp(path.join(tmpdir(), 'props-tapgoods-'));
-  await assert.rejects(importSite({ vendorId: vendor.id, vendors: { vendors: [{ ...vendor, catalogs: [catalog] }] }, outFile: path.join(directory, 'inventory.json'), cacheRoot: directory, fetcher, exclusions: {}, log: () => {}, today: () => '2026-10-18' }),
-    /stools\/: page 1 names its next page as https:\/\/rentals\.example\/tags\/benches\/page\/2\/, not .*stools\/page\/2\/; stopping/);
+  const { requested, error } = await importWith(responses, catalogOf([{ url: COLLECTION, subcategories: ['stools', 'benches'] }]));
+  assert.match(String(error?.message), /stools\/: page 1 names its next page as https:\/\/rentals\.example\/tags\/benches\/page\/2\/, not .*stools\/page\/2\/; stopping/);
   assert.deepEqual(requested, [`${SITE}robots.txt`, COLLECTION, stools], 'nothing after the stop');
 });

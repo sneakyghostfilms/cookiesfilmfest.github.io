@@ -111,10 +111,15 @@ const SOURCES = {
   },
   async 'tapgoods-catalog'({ vendor, catalog, fetcher, cacheRoot }) {
     const directory = join(cacheRoot, vendor.id, catalog.id);
-    const site = await robotsCheckedFetcher(fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.sourceUrl).hostname] }), catalog.sourceUrl, directory);
-    const collection = (await site.get(catalog.sourceUrl, directory)).body.toString('utf8');
+    const site = await robotsCheckedFetcher(fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.siteUrl).hostname] }), catalog.siteUrl, directory);
+    // Every collection page is read, and its list checked against its tiles, before any subcategory page is requested.
+    const collections = [];
+    for (const collection of catalog.collections) {
+      const html = (await site.get(collection.url, directory)).body.toString('utf8');
+      collections.push({ ...collection, html, listed: subcategoryPages(html, collection).listed });
+    }
     const pages = [];
-    for (const subcategory of subcategoryPages(collection, catalog)) {
+    for (const subcategory of collections.flatMap((collection) => collection.listed)) {
       for (let url = subcategory.url, number = 1; url; number += 1) {
         const { body, meta } = await site.get(url, directory);
         const html = body.toString('utf8');
@@ -124,7 +129,7 @@ const SOURCES = {
     }
     // The capture date is the earliest page's, since a snapshot can mix pages seeded earlier with fresh ones.
     const capturedAt = localDate(Math.min(...pages.map((page) => Date.parse(page.fetchedAt))));
-    return { ...parseCatalog({ collection, pages }, { vendor, catalog }), capturedAt };
+    return { ...parseCatalog({ collections, pages }, { vendor, catalog }), capturedAt };
   },
   async 'shopify-export'({ catalog, vendor, exportPath }) {
     if (!exportPath) throw new Error(`${vendor.name} is imported from the vendor's Shopify product export: pass --export "<file.csv>".`);

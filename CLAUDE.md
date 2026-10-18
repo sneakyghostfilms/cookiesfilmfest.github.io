@@ -130,6 +130,7 @@ Each site has its own parser in `scripts/props/sites/`, behind one command: `npm
 - at least 2 s plus jitter between requests, one at a time, with a 60 s timeout
 - no redirects followed, and no retries: a 429, 403, redirect, refused host or any other error stops the run
 - each URL fetched once per snapshot into the gitignored `.props-cache/<vendor>/<catalog id>/`, so re-runs are offline and byte-identical
+- before a page is cached, the value of every known tracking parameter in it (`_kx`, `gclid`, `fbclid`, `utm_*`, `_ga` and the rest listed in `scripts/props/tracking.mjs`) is replaced with `REDACTED`, wherever it appears as a query parameter (plain, entity- or JSON-escaped, or percent-encoded inside another URL) or as a named input's value. The entry's meta file lists the parameter names, never the values. Photos are stored as fetched.
 - only the hosts allowed for that run; `retroon8th.com` and any `*.myshopify.com` host are always refused
 - before the demo downloads photos from a host, it reads that host's `robots.txt` once (`scripts/props/robots.mjs`). Only the group naming our product token `PittsburghPropSearch` exactly, or else `*`, applies, and groups naming the same agent merge. Rules are matched against the path and query as RFC 9309 says: `*` stands for any run of characters and a final `$` for the end. A rule it can't apply with certainty (a `$` before the end, a path without a leading slash, a Crawl-delay that isn't a number) or a Disallow covering any photo stops the run before any photo, and a Crawl-delay slows it. Allow lines are ignored, which can only stop more. Following RFC 9309, a 401, 403, 404 or 410 for `robots.txt` means no rules; a 429 or 5xx stops.
 - a store read straight from its own host (`square-store`, `woocommerce-listing`) gets the same `robots.txt` reading for that host before its first page: a rule it can't apply with certainty stops the import before any page, a Crawl-delay slows it, and a page the rules disallow is refused without being requested.
@@ -174,7 +175,7 @@ The import reads only the columns it needs: handle, title, type, tags, status, p
   1. Replace the catalog's id in `vendors.json` with a new dated one.
   2. Run the import with `--out` pointing at a scratch file.
   3. Compare the category names on the new pages with the last snapshot's, and add any new building-material category to the constant.
-  4. Check the cached pages for tracking values in links and hidden inputs, and redact any you find (replace the value with REDACTED and note it in the entry's meta file).
+  4. The new cache's tracking values are already redacted (see Vendor websites), and each page's meta file names the parameters. The first snapshot's cache was written before that change and redacted by hand.
   5. Re-run the import into the repository from the cache, review the report, update `expected`, then tag, test and commit, and redeploy the Worker.
 
 #### Updating a PDF catalog

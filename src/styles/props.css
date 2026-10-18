@@ -396,6 +396,38 @@
   margin: 0 0 8px;
 }
 
+.props-page .props-sources-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 28px 0 8px;
+}
+
+.props-page .props-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.props-page .props-badge {
+  padding: 1px 8px;
+  border: 1px solid var(--pp-rule);
+  border-radius: 2px;
+  font-size: 12px;
+  color: var(--pp-muted);
+}
+
+.props-page .props-badge-regional {
+  border-color: var(--pp-gold);
+  background-color: var(--pp-gold);
+  color: var(--pp-ink);
+  font-weight: 600;
+}
+
+.props-page .props-vendor {
+  overflow-wrap: anywhere;
+}
+
 .props-page .props-footer,
 .props-page .props-byline {
   margin: 0;

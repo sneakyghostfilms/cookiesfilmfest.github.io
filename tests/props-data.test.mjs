@@ -14,7 +14,7 @@ const byKey = new Map(inventory.items.map((item) => [item.key, item]));
 
 const SOURCE_TYPES = new Set(['prop-house', 'vintage-rental', 'event-rental', 'antique-reuse', 'theater-stock', 'specialty']);
 const MODES = new Set(['rent', 'sale', 'inquire']);
-const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint'];
+const FACT_FIELDS = ['sourceType', 'address', 'mailingAddress', 'hours', 'modes', 'terms', 'contact', 'social', 'inquiryHint', 'specialties', 'notice'];
 const CATALOG_TYPES = new Set(['pdf', 'wordpress-pages', 'shopify-export']);
 
 function keysOf(value, found = new Set()) {
@@ -37,6 +37,8 @@ test('vendors.json holds only facts each vendor publishes, every one with its so
     }
     if (vendor.sourceType) assert.ok(SOURCE_TYPES.has(vendor.sourceType.value), `${vendor.id} sourceType`);
     if (vendor.modes) assert.ok(vendor.modes.values.length && vendor.modes.values.every((mode) => MODES.has(mode)), `${vendor.id} modes`);
+    if (vendor.specialties) assert.ok(vendor.specialties.values.length && vendor.specialties.values.every((value) => /\S/.test(value)), `${vendor.id} specialties`);
+    if (vendor.notice) assert.match(vendor.notice.text, /\S/, `${vendor.id} notice`);
     assert.match(vendor.lastVerified, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(contactRoutes(vendor.contact).length > 0, `${vendor.id} publishes no contact route`);
     assert.ok(Array.isArray(vendor.catalogs));

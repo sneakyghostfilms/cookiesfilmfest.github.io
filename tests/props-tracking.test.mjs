@@ -43,12 +43,21 @@ test('a one-character value and a value full of regex characters are replaced wh
 });
 
 test('every listed parameter is replaced and listed under its own name; utm_ covers any utm_ name', () => {
-  assert.equal(TRACKING_PARAMETERS.length, 23);
+  assert.equal(TRACKING_PARAMETERS.length, 25);
   for (const listed of TRACKING_PARAMETERS) {
     for (const name of listed === 'utm_*' ? ['utm_source', 'utm_campaign', 'utm_source_platform'] : [listed]) {
       assert.deepEqual(redacted(`<a href="/p/?id=7&${name}=v1">`), [`<a href="/p/?id=7&${name}=REDACTED">`, [name]], name);
     }
   }
+});
+
+test("Google's srsltid and Facebook's mibextid are replaced in every form a page carries them", () => {
+  assert.deepEqual(redacted('<a href="https://shop.example/p/lamp?srsltid=made-up_1">'), ['<a href="https://shop.example/p/lamp?srsltid=REDACTED">', ['srsltid']]);
+  assert.deepEqual(redacted('<a href="https://www.facebook.com/share/?id=7&amp;mibextid=madeUp">'), ['<a href="https://www.facebook.com/share/?id=7&amp;mibextid=REDACTED">', ['mibextid']]);
+  assert.deepEqual(redacted('<input type="hidden" name="srsltid" value="made-up">'), ['<input type="hidden" name="srsltid" value="REDACTED">', ['srsltid']]);
+  const json = `{"u":"https:${BACKSLASH}/${BACKSLASH}/fb.example${BACKSLASH}/?a=1${JSON_AMPERSAND}mibextid=made-up"}`;
+  assert.equal(redactTracking(Buffer.from(json), 'application/json').body.toString(), json.replace('mibextid=made-up', 'mibextid=REDACTED'));
+  assert.deepEqual(redacted('?u=https%3A%2F%2Fshop.example%2F%3Fsrsltid%3Dmade-up%26page%3D2'), ['?u=https%3A%2F%2Fshop.example%2F%3Fsrsltid%3DREDACTED%26page%3D2', ['srsltid']]);
 });
 
 test('what is not a tracking value is left alone: empty values, longer names, prose, other inputs, and REDACTED itself', () => {

@@ -10,6 +10,7 @@ const query = document.getElementById("props-query") as HTMLInputElement;
 const category = document.getElementById("props-category") as HTMLSelectElement;
 const decade = document.getElementById("props-decade") as HTMLSelectElement;
 const vendor = document.getElementById("props-vendor") as HTMLSelectElement | null;
+const kind = document.getElementById("props-kind") as HTMLSelectElement;
 const count = document.getElementById("props-count") as HTMLElement;
 const empty = document.getElementById("props-empty") as HTMLElement;
 const more = document.getElementById("props-more") as HTMLButtonElement;
@@ -41,7 +42,7 @@ function render() {
   empty.textContent = text
     ? `No catalog items matched “${text}”. Try fewer or simpler words, or clear the filters.`
     : "No items match these filters. Clear a filter to see more.";
-  const filtered = text || category.value || decade.value || vendor?.value;
+  const filtered = text || category.value || decade.value || vendor?.value || kind.value;
   count.textContent = filtered
     ? `${results.length} matching ${results.length === 1 ? "item" : "items"}${results.length > shown ? `, showing ${shown}` : ""}`
     : `${docs.length} items, listed alphabetically${results.length > shown ? `, showing ${shown}` : ""}`;
@@ -59,7 +60,7 @@ function showVendorMatches() {
 function update() {
   showVendorMatches();
   if (!index) return;
-  results = search(index, query.value, { category: category.value, decade: decade.value, vendor: vendor?.value ?? "" });
+  results = search(index, query.value, { category: category.value, decade: decade.value, vendor: vendor?.value ?? "", kind: kind.value });
   shown = PAGE_SIZE;
   render();
 }
@@ -73,6 +74,7 @@ form.addEventListener("submit", (event) => event.preventDefault());
 category.addEventListener("change", update);
 decade.addEventListener("change", update);
 vendor?.addEventListener("change", update);
+kind.addEventListener("change", update);
 more.addEventListener("click", () => {
   shown += PAGE_SIZE;
   render();

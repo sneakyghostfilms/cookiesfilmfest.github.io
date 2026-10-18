@@ -68,10 +68,11 @@ export function keepKnownKeys(state, knownKeys) {
   return { ...state, required, optional, ignored: state.ignored + dropped };
 }
 
-// A page's card data (/props/cards.json) loads once. trackCards notes when it has settled, so that a scene answer that
-// arrives first can say it is waiting; cardsForScene then waits for the cards, or reports that they failed to load.
+// A page's card data (/props/cards.json) loads once. trackCards notes when it has settled, and whether it failed, so
+// that a scene answer that arrives first can say it is waiting; cardsForScene then waits for the cards, or reports that
+// they failed to load.
 export function trackCards(promise) {
-  const tracked = { settled: false };
+  const tracked = { settled: false, failed: false };
   tracked.promise = promise.then(
     (cards) => {
       tracked.settled = true;
@@ -79,10 +80,20 @@ export function trackCards(promise) {
     },
     (error) => {
       tracked.settled = true;
+      tracked.failed = true;
       throw error;
     },
   );
+  // A load can fail before anything awaits it, while the AI request is still out: mark the failure handled here, so
+  // the browser doesn't report it as uncaught. cardsForScene still sees it.
+  tracked.promise.catch(() => {});
   return tracked;
+}
+
+// The item list a scene submit uses: the load already made, or a new one when there is none yet or the last one
+// failed, so a failed load is tried again instead of being reported until the page reloads.
+export function cardsLoadForSubmit(tracked, load) {
+  return !tracked || tracked.failed ? trackCards(load()) : tracked;
 }
 
 export async function cardsForScene(tracked, onWaiting) {

@@ -1,5 +1,6 @@
 import { DEMO_URL, demoCatalogHref } from '../../scripts/props/demo-links.mjs';
 import { displayEra } from '../../scripts/props/normalize.mjs';
+import { kindOf } from './props-kinds.js';
 import { compareByName } from './props-search.js';
 
 const MODE_LABELS = { rent: 'Rentals', sale: 'Sales', inquire: 'By inquiry' };
@@ -58,9 +59,9 @@ export function cardFor(item, { vendor, catalog, tags = [], demoEntry = null }) 
 // The text of /props/cards.json, which the page loads and draws its cards from (through props-card-text.js). Each
 // vendor and catalog is listed once and each item points at its catalog; items are in the page's alphabetical order,
 // each with its inventory position for the ranking's ties. An item stores only what its card can't rebuild: the
-// citation is rebuilt, and the link only when the demo gives it a local PDF. The same inputs always give the same text,
-// which the page hashes for the file's ?v=.
-export function cardsFile({ items, vendors, tags = {}, demo = null }) {
+// citation is rebuilt, the link is stored only when the demo gives it a local PDF, and the kind (kinds.json) only when a
+// category overrides its vendor's. The same inputs always give the same text, which the page hashes for the file's ?v=.
+export function cardsFile({ items, vendors, kinds, tags = {}, demo = null }) {
   const catalogs = new Map(vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { catalog, vendor }])));
   const vendorIds = [...new Set(items.map((item) => item.vendor))];
   const catalogIds = [...new Set(items.map((item) => item.catalog))];
@@ -74,6 +75,7 @@ export function cardsFile({ items, vendors, tags = {}, demo = null }) {
     const card = cardFor(item, { vendor, catalog, tags: tags[item.key] ?? [], demoEntry: demo?.items?.[item.key] ?? null });
     const { website, link } = catalogTable[catalogIds.indexOf(item.catalog)];
     const ownLink = website ? card.link.href !== item.url : card.link.href !== link;
+    const kind = kindOf(item, kinds);
     return {
       key: card.key,
       catalog: catalogIds.indexOf(item.catalog),
@@ -87,12 +89,13 @@ export function cardsFile({ items, vendors, tags = {}, demo = null }) {
       ...(website ? { url: item.url } : {}),
       ...(ownLink ? { link: card.link } : {}),
       ...(card.thumb ? { thumb: card.thumb, alt: card.alt } : {}),
+      ...(kind !== kinds.vendors[item.vendor].kind ? { kind } : {}),
       order: item.order,
     };
   });
   const vendorTable = vendorIds.map((id) => {
     const { vendor } = [...catalogs.values()].find((entry) => entry.vendor.id === id);
-    return { id, name: vendor.name, inquire: inquiryHref(vendor.contact) };
+    return { id, name: vendor.name, inquire: inquiryHref(vendor.contact), kind: kinds.vendors[id].kind };
   });
   return JSON.stringify({ schemaVersion: 1, vendors: vendorTable, catalogs: catalogTable, items: entries });
 }

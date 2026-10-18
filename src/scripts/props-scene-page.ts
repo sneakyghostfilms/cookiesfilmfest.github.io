@@ -1,5 +1,5 @@
 import { type Card, loadCards, renderCard } from "./props-card-view.ts";
-import { cardsForScene, checkSceneText, keepKnownKeys, periodNote, requestScene, trackCards } from "./props-scene.js";
+import { cardsForScene, cardsLoadForSubmit, checkSceneText, keepKnownKeys, periodNote, requestScene, trackCards } from "./props-scene.js";
 import { keywordSearchHref } from "./props-search-link.js";
 
 type SceneEntry = { prop: string; reason: string; keys: string[] };
@@ -12,6 +12,7 @@ const sceneSubmit = document.getElementById("scene-submit") as HTMLButtonElement
 const sceneStatus = document.getElementById("scene-status") as HTMLElement;
 const sceneResults = document.getElementById("scene-results") as HTMLElement;
 const apiUrl = sceneForm.dataset.apiUrl ?? "";
+const ITEMS_FAILED = "The item list couldn't load, so matches can't be shown. Reload the page to try again.";
 // The item list loads with the first scene, alongside the AI request, so a visit that sends none downloads no item data.
 let cards: ReturnType<typeof trackCards> | undefined;
 
@@ -76,9 +77,16 @@ sceneForm.addEventListener("submit", async (event) => {
     showStatus(problem);
     return;
   }
-  const itemList = (cards ??= trackCards(loadCards(sceneForm.dataset.cardsUrl!)));
+  const retrying = Boolean(cards?.failed);
+  const itemList = (cards = cardsLoadForSubmit(cards, () => loadCards(sceneForm.dataset.cardsUrl!)));
   sceneSubmit.disabled = true;
   sceneResults.replaceChildren();
+  // After a failed load, the list loads again before the AI request, so failing twice spends no AI call.
+  if (retrying && !(await cardsForScene(itemList, () => showStatus("Matching props… waiting for the item list"))).ok) {
+    sceneSubmit.disabled = false;
+    showStatus(ITEMS_FAILED);
+    return;
+  }
   showStatus("Matching props… this can take up to about 30 seconds for long scenes.");
   const period = scenePeriod.value;
   const state = await requestScene(apiUrl, sceneText.value, { period });
@@ -86,7 +94,7 @@ sceneForm.addEventListener("submit", async (event) => {
   if (state.kind === "ok") {
     const loaded = await cardsForScene(itemList, () => showStatus("Matching props… waiting for the item list"));
     if (!loaded.ok) {
-      showStatus("The item list couldn't load, so matches can't be shown. Reload the page to try again.");
+      showStatus(ITEMS_FAILED);
       return;
     }
     const cardsByKey = new Map((loaded.cards as Card[]).map((card) => [card.key, card]));

@@ -20,6 +20,7 @@
     "props:import-site": "node scripts/props/import-site.mjs",
     "props:demo": "node scripts/props/demo.mjs serve",
     "props:demo-assets": "node scripts/props/demo.mjs assets",
+    "props:cache-scan": "node scripts/props/cache-scan.mjs",
     "test": "npm run build && node --test tests/*.test.mjs worker/test/*.test.mjs"
   },
   "devDependencies": {

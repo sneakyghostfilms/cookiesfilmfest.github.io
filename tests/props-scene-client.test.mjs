@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { SCENE_TIMEOUT_MS, cardsForScene, checkSceneText, keepKnownKeys, periodNote, requestScene, trackCards } from '../src/scripts/props-scene.js';
+import { SCENE_TIMEOUT_MS, cardsForScene, cardsLoadForSubmit, checkSceneText, keepKnownKeys, periodNote, requestScene, trackCards } from '../src/scripts/props-scene.js';
 import { parseDecades } from '../src/scripts/props-search.js';
 import { GUARD_TIMEOUT_MS } from '../worker/src/budget.js';
 
@@ -119,6 +119,40 @@ test('scene results wait for the card data: at once when it has loaded, with a w
   failed.promise.catch(() => {});
   assert.deepEqual(await cardsForScene(failed, () => waits.push('failed')), { ok: false });
   assert.deepEqual(waits, ['loading', 'failed'], 'the waiting line shows only while the data is not in yet');
+});
+
+test('a scene submit loads the item list again after a failed load, and keeps one that loaded or is still loading', async () => {
+  const loads = [];
+  const load = (outcome) => () => {
+    loads.push(outcome);
+    if (outcome === 'fails') return Promise.reject(new Error('HTTP 404'));
+    return outcome === 'loads' ? Promise.resolve(['card']) : new Promise(() => {});
+  };
+  const failed = cardsLoadForSubmit(undefined, load('fails'));
+  assert.deepEqual(await cardsForScene(failed, () => {}), { ok: false });
+  assert.deepEqual([failed.settled, failed.failed], [true, true]);
+  const retried = cardsLoadForSubmit(failed, load('loads'));
+  assert.notEqual(retried, failed);
+  assert.deepEqual(await cardsForScene(retried, () => {}), { ok: true, cards: ['card'] });
+  assert.equal(retried.failed, false);
+  assert.equal(cardsLoadForSubmit(retried, load('loads')), retried, 'a loaded list is kept');
+  const pending = cardsLoadForSubmit(undefined, load('hangs'));
+  assert.equal(cardsLoadForSubmit(pending, load('loads')), pending, 'a list still loading is kept');
+  assert.deepEqual(loads, ['fails', 'loads', 'hangs']);
+});
+
+test('an item list that fails while nothing awaits it yet is not reported as an unhandled rejection', async () => {
+  const unhandled = [];
+  const record = (reason) => unhandled.push(reason);
+  process.on('unhandledRejection', record);
+  try {
+    const failed = trackCards(Promise.reject(new Error('HTTP 404')));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.deepEqual(unhandled, []);
+    assert.deepEqual(await cardsForScene(failed, () => {}), { ok: false }, 'the scene still learns of the failure');
+  } finally {
+    process.off('unhandledRejection', record);
+  }
 });
 
 test('the page waits longer than the Worker can take to answer', async () => {

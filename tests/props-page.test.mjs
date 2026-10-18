@@ -7,7 +7,7 @@ import test from 'node:test';
 import { createHash } from 'node:crypto';
 import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
-import { compareByName, tokenize } from '../src/scripts/props-search.js';
+import { buildIndex, compareByName, rankText, search, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dist = path.join(root, 'dist');
@@ -91,6 +91,7 @@ test('both props pages state what the search is not and how vendors can opt out'
     assert.ok(pageText.includes('It does not book rentals or show live availability.'));
     assert.ok(pageText.includes('Always confirm availability, condition, sizes and price with the vendor.'));
     assert.ok(pageText.includes(NOT_AFFILIATED));
+    assert.ok(pageText.includes('Keyword search runs in your browser. Keyword search also matches search terms an AI suggested for each item.'), 'the intro discloses the AI-suggested search terms the cards no longer show');
     assert.ok(pageText.includes('want your inventory listed, corrected or removed?'));
     assert.ok(page.includes('href="/#contact"'));
   }
@@ -169,6 +170,27 @@ test('scene results tell the reader that unlisted props were not identified or h
   assert.ok(!pageScript.includes('Matched by AI'), 'the keyword page carries no scene code');
 });
 
+test('a Kind filter sits between Vendor and Decade, and each card draws its kind as a badge', () => {
+  assert.match(html, /<span>Vendor<\/span>[\s\S]*?<\/label><label class="props-field"><span>Kind<\/span><select id="props-kind"><option value="">All kinds<\/option><option value="film-prop">Film prop<\/option><option value="set-dressing">Set dressing<\/option><option value="event-rental">Event rental<\/option><option value="antique">Antiques and reuse<\/option><\/select><\/label><label class="props-field"><span>Stated decade<\/span>/);
+  for (const label of ['Film prop', 'Set dressing', 'Event rental', 'Antiques and reuse']) assert.ok(pageScript.includes(label), label);
+  assert.ok(pageScript.includes('props-badge'), 'the card view draws the badge');
+});
+
+test("on today's data the page's search keeps the ranking's order, and the Kind filter keeps that order within a kind", () => {
+  const index = buildIndex(cards.map((card) => searchDocFromCard(card)));
+  const keysOf = (docs) => docs.map((doc) => doc.key);
+  assert.equal(search(index, 'neon sign')[0].kind, 'event-rental', 'the two real neon signs, event rentals, lead "neon sign"');
+  for (const query of ['neon sign', 'table', 'camera']) {
+    const plain = rankText(index, query);
+    assert.deepEqual(keysOf(search(index, query)), keysOf(plain), query);
+    for (const kind of ['event-rental', 'film-prop']) {
+      const ofKind = plain.filter((doc) => doc.kind === kind);
+      assert.ok(ofKind.length, `${query} matches a ${kind}`);
+      assert.deepEqual(keysOf(search(index, query, { kind })), keysOf(ofKind), `${query}, ${kind}`);
+    }
+  }
+});
+
 test('every card names its vendor, and the vendor filter appears only with more than one vendor', () => {
   const vendorOf = new Map(inventory.items.map((item) => [item.key, item.vendor]));
   for (const card of cards) assert.equal(card.vendorId, vendorOf.get(card.key), card.key);
@@ -237,15 +259,16 @@ test('Route 30 Retro shows only its Facebook Page facts, cited as read, with no 
 test('the page builds its search documents from cards.json the same way the Worker builds them from the inventory', async () => {
   const { searchDocs } = await import('../worker/src/inventory.js');
   const tagsFile = JSON.parse(await read('src/data/props/tags.json'));
+  const kindsFile = JSON.parse(await read('src/data/props/kinds.json'));
   const fromPage = new Map(cards.map((card) => {
     const doc = searchDocFromCard(card);
-    return [doc.key, { name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, order: doc.order }];
+    return [doc.key, { name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, kind: doc.kind, order: doc.order }];
   }));
-  const workerDocs = searchDocs(inventory.items, tagsFile.tags);
+  const workerDocs = searchDocs(inventory.items, tagsFile.tags, kindsFile);
   assert.equal(fromPage.size, workerDocs.length);
   for (const doc of workerDocs) {
     assert.deepEqual(fromPage.get(doc.key), {
-      name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, order: doc.order,
+      name: tokenize(doc.name), description: tokenize(doc.description), categories: doc.categories, tags: doc.tags, decades: doc.decades, vendor: doc.vendor, kind: doc.kind, order: doc.order,
     }, doc.key);
   }
 });

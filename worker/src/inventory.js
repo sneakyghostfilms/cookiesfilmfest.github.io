@@ -1,5 +1,7 @@
 import inventory from '../../src/data/props/inventory.json' with { type: 'json' };
+import kindsFile from '../../src/data/props/kinds.json' with { type: 'json' };
 import tagsFile from '../../src/data/props/tags.json' with { type: 'json' };
+import { kindOf } from '../../src/scripts/props-kinds.js';
 import { buildIndex, parseDecades, rankText, sceneTermMatches } from '../../src/scripts/props-search.js';
 import { LIMITS, buildRequest } from './scene.js';
 
@@ -16,7 +18,7 @@ export function listing(items) {
   return [...sections].map(([section, lines]) => `## ${section}\n${lines.join('\n')}`).join('\n');
 }
 
-export function searchDocs(items, tags) {
+export function searchDocs(items, tags, kinds) {
   return items.map((item, order) => ({
     key: item.key,
     name: item.name,
@@ -25,12 +27,13 @@ export function searchDocs(items, tags) {
     tags: tags[item.key] ?? [],
     decades: item.decades,
     vendor: item.vendor,
+    kind: kindOf(item, kinds),
     order,
     item,
   }));
 }
 
-const index = buildIndex(searchDocs(inventory.items, tagsFile.tags));
+const index = buildIndex(searchDocs(inventory.items, tagsFile.tags, kindsFile));
 
 export function ranked(text, period = '') {
   const periodDecades = parseDecades(period);
@@ -40,8 +43,11 @@ export function ranked(text, period = '') {
 
 export function diversify(order, terms, { size, quota }) {
   const rank = new Map(order.map((doc, position) => [doc.key, position]));
+  // Event rentals take no word or pair slot, so bulk event stock can't crowd out the props a scene names. They still
+  // compete by rank in the fill.
+  const eventRentals = new Set(order.filter((doc) => doc.kind === 'event-rental').map((doc) => doc.key));
   const queue = terms
-    .map(({ keys }, first) => ({ first, keys: keys.filter((key) => rank.has(key)).sort((a, b) => rank.get(a) - rank.get(b)) }))
+    .map(({ keys }, first) => ({ first, keys: keys.filter((key) => rank.has(key) && !eventRentals.has(key)).sort((a, b) => rank.get(a) - rank.get(b)) }))
     .filter(({ keys }) => keys.length)
     .sort((a, b) => a.keys.length - b.keys.length || a.first - b.first);
   const picked = new Set();

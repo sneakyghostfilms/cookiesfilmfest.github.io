@@ -182,6 +182,11 @@ test('robots rules: our named group beats *, plain prefixes only, anything else 
     const rules = robotsRules(`User-agent: *\nDisallow: /\n\nUser-agent: ${name}\nDisallow:\n`);
     assert.deepEqual([rules.group, rules.disallow], ['*', ['/']], `"${name}" is not our product token`);
   }
+  const barred = (group) => robotsRules(`User-agent: *\nDisallow: /\n\n${group}`);
+  assert.deepEqual(barred('User-agent: search\nDisallow:').disallow, ['/'], 'reproduction 1');
+  assert.deepEqual(barred('User-agent: Pittsburgh\nDisallow:').disallow, ['/'], 'reproduction 2');
+  assert.deepEqual(barred('User-agent: p\nAllow: /').disallow, ['/'], 'reproduction 3');
+  assert.deepEqual(robotsRules('User-agent: PittsburghPropSearch/0.1\nDisallow: /x/').disallow, ['/x/'], 'a versioned token names us');
   for (const name of ['PittsburghPropSearch/0.1', 'pittsburghpropsearch']) {
     assert.deepEqual(robotsRules(`User-agent: *\nDisallow: /\n\nUser-agent: ${name}\nDisallow: /x/\n`).disallow, ['/x/'], `"${name}" names us`);
   }

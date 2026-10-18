@@ -7,7 +7,7 @@ const redacted = (text) => {
   const result = html(text);
   return [result.body.toString('utf8'), result.redacted];
 };
-// Built at run time, so this file never holds a literal backslash escape that an editor could turn into its character.
+// Built at run time: the tests need the six characters of a JSON escape (a backslash, then u0026), not the ampersand.
 const BACKSLASH = String.fromCharCode(92);
 const JSON_AMPERSAND = `${BACKSLASH}u0026`;
 

@@ -1,4 +1,5 @@
 import { cardText } from "./props-card-text.js";
+import { KIND_LABELS } from "./props-kinds.js";
 
 // Loading /props/cards.json and drawing its cards, for any page that shows items. Every card is built from elements
 // and text nodes, never from an HTML string, so no vendor text is ever parsed as markup.
@@ -56,7 +57,7 @@ export function renderCard(card: Card) {
   line.append(" · ", span("prop-name", card.name));
   if (card.era) line.append(" · ", span("prop-era", card.era));
   if (card.pages) line.append(" · ", span("prop-page", card.pages));
-  item.append(line);
+  item.append(line, paragraph("props-badges", span("props-badge", KIND_LABELS[card.kind])));
   if (card.categories.length) item.append(paragraph("prop-category", card.categories.join(" · ")));
   if (card.photoCredit) item.append(paragraph("prop-photo", card.photoCredit));
   const actions = paragraph("prop-actions", externalLink(card.link.href, card.link.label));

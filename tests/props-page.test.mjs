@@ -7,7 +7,7 @@ import test from 'node:test';
 import { createHash } from 'node:crypto';
 import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
-import { compareByName, tokenize } from '../src/scripts/props-search.js';
+import { buildIndex, compareByName, rankText, search, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dist = path.join(root, 'dist');
@@ -168,6 +168,24 @@ test('scene results tell the reader that unlisted props were not identified or h
   assert.ok(sceneScript.includes('were left out of AI matching.'), 'a period filter is disclosed');
   assert.ok(!sceneScript.includes('differs from your period'), 'the old era note is gone');
   assert.ok(!pageScript.includes('Matched by AI'), 'the keyword page carries no scene code');
+});
+
+test('a Kind filter sits between Vendor and Decade, and each card draws its kind as a badge', () => {
+  assert.match(html, /<span>Vendor<\/span>[\s\S]*?<\/label><label class="props-field"><span>Kind<\/span><select id="props-kind"><option value="">All kinds<\/option><option value="film-prop">Film prop<\/option><option value="set-dressing">Set dressing<\/option><option value="event-rental">Event rental<\/option><option value="antique">Antiques and reuse<\/option><\/select><\/label><label class="props-field"><span>Stated decade<\/span>/);
+  for (const label of ['Film prop', 'Set dressing', 'Event rental', 'Antiques and reuse']) assert.ok(pageScript.includes(label), label);
+  assert.ok(pageScript.includes('props-badge'), 'the card view draws the badge');
+});
+
+test("on today's data the page's search moves event rentals after every other match and keeps each group's order", () => {
+  const index = buildIndex(cards.map((card) => searchDocFromCard(card)));
+  const isEvent = (doc) => doc.kind === 'event-rental';
+  assert.ok(isEvent(rankText(index, 'neon sign')[0]), 'the plain ranking puts an event rental first for "neon sign"');
+  for (const query of ['neon sign', 'table', 'camera']) {
+    const plain = rankText(index, query);
+    const listed = search(index, query).map((doc) => doc.key);
+    assert.deepEqual(listed, [...plain.filter((doc) => !isEvent(doc)), ...plain.filter(isEvent)].map((doc) => doc.key), query);
+    assert.ok(plain.some(isEvent) && plain.some((doc) => !isEvent(doc)), `${query} matches both`);
+  }
 });
 
 test('every card names its vendor, and the vendor filter appears only with more than one vendor', () => {

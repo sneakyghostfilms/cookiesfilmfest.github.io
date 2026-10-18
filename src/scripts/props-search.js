@@ -139,13 +139,16 @@ function rank(index, { words, years }, decades, passes) {
   return scored.sort((a, b) => b.score - a.score || a.doc.order - b.doc.order).map(({ doc }) => doc);
 }
 
-export function search(index, query = '', { category = '', decade = '', vendor = '' } = {}) {
+export function search(index, query = '', { category = '', decade = '', vendor = '', kind = '' } = {}) {
   const passes = (doc) => (!category || doc.categories.includes(category)) && (!decade || doc.decades.includes(Number(decade)))
-    && (!vendor || doc.vendor === vendor);
+    && (!vendor || doc.vendor === vendor) && (!kind || doc.kind === kind);
   const terms = splitTerms(index, queryTerms(query));
   const decades = parseDecades(query);
   if (!terms.words.length && !terms.years.length && !decades.size) return index.alphabetical.filter(passes);
-  return rank(index, terms, decades, passes);
+  // Event rentals follow every other match, each group in score order, so bulk event stock can't crowd out the rest.
+  // rankText, which the Worker uses, keeps one order.
+  const matches = rank(index, terms, decades, passes);
+  return [...matches.filter((doc) => doc.kind !== 'event-rental'), ...matches.filter((doc) => doc.kind === 'event-rental')];
 }
 
 export function rankText(index, text) {

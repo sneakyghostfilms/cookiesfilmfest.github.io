@@ -135,7 +135,7 @@
 
 .props-page .props-controls {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
   gap: 12px;
   padding: 12px;
   margin: 0 0 12px;
@@ -146,7 +146,7 @@
 
 @media (min-width: 641px) {
   .props-page .props-controls:has(#props-vendor) {
-    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr));
   }
 }
 

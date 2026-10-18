@@ -2,9 +2,11 @@
 import PropsLayout from "../layouts/props-layout.astro";
 import vendorsData from "../data/props/vendors.json";
 import inventory from "../data/props/inventory.json";
+import kindsData from "../data/props/kinds.json";
 import { privateVendorsFor } from "../../scripts/props/demo-links.mjs";
 import { catalogLines, contactRoutes, privateFacts, socialLinks, specialtiesLine, vendorBadges, vendorFacts, vendorSearchDoc, vendorSources } from "../scripts/props-cards.js";
 import { cardsText, cardsVersion } from "../scripts/props-cards-file.js";
+import { KINDS, kindOf } from "../scripts/props-kinds.js";
 
 const description = "Search Pittsburgh prop rental catalogs in plain English, with item numbers, catalog pages and how to inquire.";
 const privateVendors = privateVendorsFor(process.env);
@@ -13,6 +15,8 @@ const cardsUrl = `/props/cards.json?v=${cardsVersion(cardsText(process.env))}`;
 
 const categories = [...new Set(inventory.items.flatMap((item) => item.categories))].sort();
 const decades = [...new Set(inventory.items.flatMap((item) => item.decades))].sort((a, b) => a - b);
+const kindsPresent = new Set(inventory.items.map((item) => kindOf(item, kindsData)));
+const kinds = KINDS.filter((kind) => kindsPresent.has(kind.id));
 const itemCounts = new Map<string, number>();
 for (const item of inventory.items) itemCounts.set(item.catalog, (itemCounts.get(item.catalog) ?? 0) + 1);
 const vendorsWithItems = vendorsData.vendors.filter((vendor) => inventory.items.some((item) => item.vendor === vendor.id));
@@ -64,6 +68,13 @@ const vendorMatches = vendorsWithoutItems.map((vendor, order) => ({
           </select>
         </label>
       )}
+      <label class="props-field">
+        <span>Kind</span>
+        <select id="props-kind">
+          <option value="">All kinds</option>
+          {kinds.map((kind) => <option value={kind.id}>{kind.label}</option>)}
+        </select>
+      </label>
       <label class="props-field">
         <span>Stated decade</span>
         <select id="props-decade">

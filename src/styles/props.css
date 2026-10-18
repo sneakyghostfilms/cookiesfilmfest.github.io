@@ -1,0 +1,438 @@
+.props-page {
+  --pp-paper: #f5f6f7;
+  --pp-surface: #ffffff;
+  --pp-ink: #000000;
+  --pp-muted: #4b5157;
+  --pp-rule: #d5d8dc;
+  --pp-field: #767c83;
+  --pp-gold: #ffb612;
+  margin: 0;
+  background-color: var(--pp-paper);
+  color: var(--pp-ink);
+  font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.props-page [hidden] {
+  display: none !important;
+}
+
+.props-page .props-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 32px 40px;
+}
+
+.props-page h1,
+.props-page h2,
+.props-page h3,
+.props-page h4 {
+  font-family: inherit;
+  color: var(--pp-ink);
+  letter-spacing: normal;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.props-page a {
+  color: var(--pp-ink);
+  font-weight: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: none;
+}
+
+.props-page a::after {
+  display: none;
+}
+
+.props-page strong {
+  color: var(--pp-ink);
+  font-weight: 700;
+}
+
+.props-page a:hover {
+  color: var(--pp-ink);
+  text-decoration-thickness: 2px;
+}
+
+.props-page :is(a, button, input, select, textarea, summary):focus {
+  box-shadow: none;
+}
+
+.props-page :is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--pp-ink);
+  outline-offset: 2px;
+}
+
+.props-page .props-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding: 0 0 16px;
+  margin: 0 0 20px;
+  border-bottom: 2px solid var(--pp-ink);
+}
+
+.props-page .props-title {
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.props-page .props-subtitle {
+  flex-basis: 100%;
+  order: 3;
+  margin: 0;
+  color: var(--pp-muted);
+}
+
+.props-page .props-back {
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.props-page .props-box {
+  background-color: var(--pp-surface);
+  border: 1px solid var(--pp-rule);
+  border-radius: 2px;
+  box-shadow: none;
+  padding: 16px 20px;
+  margin: 0 0 20px;
+  transition: none;
+}
+
+.props-page .props-box p {
+  margin: 0 0 8px;
+  max-width: 78ch;
+}
+
+.props-page .props-box p:last-child {
+  margin-bottom: 0;
+}
+
+.props-page .props-search.props-box {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+.props-page .props-note,
+.props-page .props-count {
+  color: var(--pp-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.props-page .props-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+  margin: 0 0 12px;
+  background-color: var(--pp-surface);
+  border: 1px solid var(--pp-rule);
+  border-radius: 2px;
+}
+
+.props-page .props-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pp-ink);
+}
+
+.props-page .props-field input,
+.props-page .props-field select,
+.props-page .props-field textarea {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--pp-field);
+  border-radius: 2px;
+  background-color: var(--pp-surface);
+  color: var(--pp-ink);
+}
+
+.props-page .props-field input::placeholder,
+.props-page .props-field textarea::placeholder {
+  color: var(--pp-muted);
+  opacity: 1;
+}
+
+.props-page .props-scene {
+  background-color: var(--pp-surface);
+  border: 1px solid var(--pp-rule);
+  border-radius: 2px;
+  padding: 0 16px;
+  margin: 0 0 16px;
+}
+
+.props-page .props-scene[open] {
+  padding-bottom: 16px;
+}
+
+.props-page .props-scene summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.props-page .scene-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.props-page .scene-form textarea {
+  resize: vertical;
+}
+
+.props-page .scene-period {
+  max-width: 360px;
+}
+
+.props-page .scene-era-note {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pp-ink);
+}
+
+.props-page .scene-off,
+.props-page .scene-status {
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+.props-page .props-button,
+.props-page .props-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--pp-ink);
+  border-radius: 2px;
+  background-color: var(--pp-ink);
+  color: var(--pp-surface);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.props-page .props-button {
+  align-self: flex-start;
+}
+
+.props-page .props-button:disabled {
+  border-color: var(--pp-rule);
+  background-color: #e3e5e8;
+  color: var(--pp-muted);
+  cursor: not-allowed;
+}
+
+.props-page .props-more {
+  margin: 16px auto 0;
+  display: flex;
+}
+
+.props-page .props-count {
+  margin: 0 0 8px;
+}
+
+.props-page .props-empty {
+  margin: 12px 0;
+  padding: 12px 16px;
+  background-color: var(--pp-surface);
+  border: 1px solid var(--pp-rule);
+  border-radius: 2px;
+}
+
+.props-page .props-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.props-page .prop-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background-color: var(--pp-surface);
+  border: 1px solid var(--pp-rule);
+  border-radius: 2px;
+}
+
+.props-page .prop-card p {
+  margin: 0;
+}
+
+.props-page .prop-line {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--pp-muted);
+}
+
+.props-page .prop-ids {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 2px;
+  background-color: var(--pp-gold);
+  color: var(--pp-ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.props-page .prop-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pp-ink);
+}
+
+.props-page .prop-page {
+  color: var(--pp-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.props-page .prop-category,
+.props-page .prop-tags,
+.props-page .prop-cite {
+  font-size: 13px;
+  color: var(--pp-muted);
+}
+
+.props-page .prop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 12px;
+  margin-top: auto;
+}
+
+.props-page .prop-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.props-page .scene-results {
+  margin-top: 4px;
+}
+
+.props-page .scene-group {
+  margin-top: 16px;
+}
+
+.props-page .scene-group-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.props-page .scene-prop {
+  border-top: 1px solid var(--pp-rule);
+  padding: 12px 0;
+}
+
+.props-page .scene-prop-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.props-page .scene-reason,
+.props-page .scene-missing {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--pp-muted);
+}
+
+.props-page .scene-matches {
+  margin-top: 8px;
+}
+
+.props-page .scene-search-link {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--pp-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.props-page .scene-search-link:focus-visible {
+  outline: 3px solid var(--pp-ink);
+  outline-offset: 2px;
+}
+
+.props-page .props-vendor-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.props-page .props-footer,
+.props-page .props-byline {
+  margin: 0;
+  font-size: 13px;
+  color: var(--pp-muted);
+}
+
+.props-page .props-byline {
+  margin-top: 24px;
+  padding-top: 4px;
+  border-top: 1px solid var(--pp-rule);
+}
+
+.props-page .props-byline a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+@media (max-width: 640px) {
+  .props-page .props-wrap {
+    padding: 16px 16px 32px;
+  }
+
+  .props-page .props-title {
+    font-size: 24px;
+  }
+
+  .props-page .props-back {
+    order: 4;
+  }
+
+  .props-page .props-box {
+    padding: 14px 16px;
+  }
+
+  .props-page .props-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

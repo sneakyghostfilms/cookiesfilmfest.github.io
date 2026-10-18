@@ -1,5 +1,5 @@
 import { createReadStream, statSync } from 'node:fs';
-import { basename, dirname, extname, join, resolve, sep } from 'node:path';
+import { basename, extname, resolve, sep } from 'node:path';
 import exclusions from './demo-exclusions.json' with { type: 'json' };
 
 const TYPES = { '.webp': 'image/webp', '.pdf': 'application/pdf' };
@@ -15,7 +15,7 @@ export function demoAssetHandler(directory, excludedKeys = DEMO_EXCLUDED_KEYS) {
       return next();
     }
     const file = resolve(base, `.${pathname}`);
-    if (dirname(file) === join(base, 'thumbs') && excludedKeys.has(basename(file, extname(file)).toLowerCase())) return next();
+    if (excludedKeys.has(basename(file, extname(file)).toLowerCase())) return next();
     const type = TYPES[extname(file).toLowerCase()];
     const stats = type && file.startsWith(`${base}${sep}`) ? statSync(file, { throwIfNoEntry: false }) : null;
     if (!stats?.isFile()) return next();

@@ -110,7 +110,7 @@ test('photos listed in demo-exclusions.json are never thumbnailed or served, and
     response.on('finish', () => resolve('served'));
     handler({ url }, response, () => resolve('next'));
   });
-  for (const url of [`/thumbs/${excluded}.webp`, `/thumbs//${excluded}.webp`, `/thumbs/${excluded.toUpperCase()}.webp`, `/thumbs/${excluded}.WEBP`]) {
+  for (const url of [`/thumbs/${excluded}.webp`, `/thumbs//${excluded}.webp`, `/thumbs/${excluded.toUpperCase()}.webp`, `/thumbs/${excluded}.WEBP`, `/THUMBS/${excluded}.webp`]) {
     assert.equal(await request(url), 'next', `${url}: an excluded thumbnail is not served even if the file exists`);
   }
   assert.equal(await request('/thumbs/scp-056.webp'), 'served');

@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import postcss from 'postcss';
 import { cardText, searchDocFromCard } from '../src/scripts/props-card-text.js';
 import { NOT_AFFILIATED, vendorBadges, vendorSearchDoc } from '../src/scripts/props-cards.js';
-import { filterValues } from '../src/scripts/props-results.js';
+import { filterValues, photosFirst } from '../src/scripts/props-results.js';
 import { buildIndex, compareByName, rankText, search, tokenize } from '../src/scripts/props-search.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -366,4 +366,11 @@ test("each filter offers the values found under the query and every other filter
   }
   const oneVendor = filterValues(pageIndex, 'phone', { ...NO_FILTERS, vendor: 'steel-city-props' }, search(pageIndex, 'phone', { ...NO_FILTERS, vendor: 'steel-city-props' }));
   assert.ok(oneVendor.vendor.size > 1, 'with a vendor chosen, the other vendors with matches stay in its list');
+});
+
+test('cards with a photo come first, each group in the ranking order, and production has no photo to move', () => {
+  const doc = (key, thumb) => ({ key, card: { thumb } });
+  assert.deepEqual(photosFirst([doc('a', null), doc('b', { src: 'b' }), doc('c', null), doc('d', { src: 'd' })]).map((one) => one.key), ['b', 'd', 'a', 'c']);
+  const ranked = search(pageIndex, 'rotary phone', NO_FILTERS);
+  assert.deepEqual(photosFirst(ranked).map((one) => one.key), ranked.map((one) => one.key), 'production cards have no photo, so the ranking order stands');
 });

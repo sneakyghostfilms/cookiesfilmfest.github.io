@@ -1,7 +1,7 @@
 import { searchDocFromCard } from "./props-card-text.js";
 import { type Card, loadCards, renderCard } from "./props-card-view.ts";
 import { buildIndex, rankText, search } from "./props-search.js";
-import { filterValues } from "./props-results.js";
+import { filterValues, photosFirst } from "./props-results.js";
 import { queryFromHash } from "./props-search-link.js";
 
 const PAGE_SIZE = 24;
@@ -57,7 +57,8 @@ function narrowFilters() {
 }
 
 function render() {
-  list.replaceChildren(...results.slice(0, shown).map((doc) => renderCard(doc.card)));
+  const ordered = photosFirst(results);
+  list.replaceChildren(...ordered.slice(0, shown).map((doc) => renderCard(doc.card)));
   more.hidden = results.length <= shown;
   const text = query.value.trim();
   empty.hidden = results.length > 0;
@@ -66,9 +67,11 @@ function render() {
     : "No items match these filters. Clear a filter to see more.";
   const filtered = text || category.value || decade.value || vendor?.value || kind.value;
   const showing = results.length > shown ? `, showing ${formatNumber(shown)}` : "";
+  // The photos lead only when some results have a photo and some don't; otherwise the ranking's order stands.
+  const photosLead = Boolean(ordered[0]?.card.thumb) && !ordered[ordered.length - 1].card.thumb;
   count.textContent = filtered
-    ? `${formatNumber(results.length)} matching ${results.length === 1 ? "item" : "items"}${showing}`
-    : `${formatNumber(docs.length)} items, listed alphabetically${showing}`;
+    ? `${formatNumber(results.length)} matching ${results.length === 1 ? "item" : "items"}${photosLead ? ", photos first" : ""}${showing}`
+    : `${formatNumber(docs.length)} items, ${photosLead ? "photos first" : "listed alphabetically"}${showing}`;
 }
 
 function showVendorMatches() {

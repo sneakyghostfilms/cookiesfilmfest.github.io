@@ -1,6 +1,6 @@
 import { search } from './props-search.js';
 
-// The keyword page's view of its search results: which filter values they hold.
+// The keyword page's view of its search results: which filter values they hold, and the order its cards are drawn in.
 
 const VALUES = {
   category: (doc) => doc.categories,
@@ -16,5 +16,10 @@ export function filterValues(index, query, filters, results) {
     const seen = filters[name] ? search(index, query, { ...filters, [name]: '' }) : results;
     return [name, new Set(seen.flatMap(valuesOf))];
   }));
+}
+
+// The cards with a photo first, each group in the ranking's order. Only the local demo has photos.
+export function photosFirst(docs) {
+  return [...docs.filter((doc) => doc.card.thumb), ...docs.filter((doc) => !doc.card.thumb)];
 }
 

@@ -1,4 +1,6 @@
-export const ROBOTS_AGENT = 'PittsburghPropSearch';
+import { USER_AGENT } from './site-fetch.mjs';
+
+const PRODUCT_TOKEN = USER_AGENT.split('/')[0];
 
 function linesOf(text) {
   return String(text).split(/\r?\n/).map((line) => line.replace(/#.*$/, '').trim()).filter(Boolean).map((line) => {
@@ -21,7 +23,7 @@ function groupsOf(text) {
   return groups;
 }
 
-export function robotsRules(text, agent = ROBOTS_AGENT) {
+export function robotsRules(text, agent = PRODUCT_TOKEN) {
   const groups = groupsOf(text);
   const named = groups.filter((group) => group.agents.includes(agent.toLowerCase()));
   const chosen = named.length ? named : groups.filter((group) => group.agents.includes('*'));

@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { buildSiteAssets } from '../scripts/props/demo.mjs';
 import { importSite } from '../scripts/props/import-site.mjs';
 import { cacheName, createSiteFetcher } from '../scripts/props/site-fetch.mjs';
 import { checkSiteItems, siteKey } from '../scripts/props/site-items.mjs';
@@ -166,4 +167,26 @@ test('a page that fails its checks stops the import before the next request, and
   const disallowed = await importWithCache({ pages: [SOFAS, BACK_BARS], responses: new Map([...responses, [`${SITE}robots.txt`, `${ROBOTS}Disallow: /bars/\n`]]) });
   assert.match(String(disallowed.error?.message), /robots\.txt on store\.example disallows https:\/\/store\.example\/bars\/back-bars\.html; not requesting it/);
   assert.deepEqual(disallowed.requested, [`${SITE}robots.txt`, SOFAS]);
+});
+
+test("the demo's photo step makes no request, not even for robots.txt, when no kept item has a photo", async () => {
+  const calls = [];
+  const lines = [];
+  const { fetch: realFetch } = globalThis;
+  const { log: realLog } = console;
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    throw new Error('no request may be made');
+  };
+  console.log = (line) => lines.push(String(line));
+  try {
+    // A real vendor's catalog record, with the cache-only import replaced by a text-only answer, so neither the cache nor
+    // the demo folder is read or written.
+    await buildSiteAssets('dezzign-central', undefined, { load: async () => ({ items: [{ key: 'dz-test01' }, { key: 'dz-test02' }], images: new Map([['dz-test01', { urls: [] }], ['dz-test02', { urls: [] }]]) }) });
+  } finally {
+    globalThis.fetch = realFetch;
+    console.log = realLog;
+  }
+  assert.deepEqual(calls, []);
+  assert.deepEqual(lines, ['No photo to fetch for Dezzign Central: none of its 2 items keeps one, so no request was made.']);
 });

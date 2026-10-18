@@ -13,6 +13,8 @@ function listingProblem(text) {
   if (typeof text !== 'string' || !text.trim()) return 'is empty';
   if (/[\u0000-\u001f\u007f]/.test(text)) return 'holds a control character or line break';
   if (text.includes(' | ')) return 'holds " | ", which would break a listing line';
+  const entity = text.match(/&(?:[a-z][a-z0-9]*|#\d+|#x[0-9a-f]+);/i);
+  if (entity) return `holds ${entity[0]}, an HTML entity that was not decoded`;
   return null;
 }
 

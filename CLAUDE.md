@@ -150,7 +150,7 @@ The import reads only the columns it needs: handle, title, type, tags, status, p
 2. `npm run props:import -- --pdf "/path/to/catalog.pdf" --sheets-dir /tmp/props-sheets`
 3. Review the overlay sheets and the report: item numbers, captions, photos, reused or malformed numbers. The import refuses to write when its structural checks fail.
 4. Copy the reported counts into the catalog's `expected` in `vendors.json`.
-5. `npm run props:tags`, then review the new tags, against the photos where you have them. Record any removal in `scripts/props/tag-exclusions.json`.
+5. `npm run props:tags`, then review the new tags, against the photos where you have them. Record any removal in `scripts/props/tag-exclusions.json`. If a batch fails because the model ran out of output, run `npm run props:tags -- --batch-size 10` (the default is 20); items already tagged are kept.
 6. `npm test`, then commit.
 7. Redeploy the Worker (`cd worker && npx wrangler deploy`), because it bundles the inventory and the tags. Redeploy it after any change to `tags.json` too, since its shortlist ranks with the tags.
 8. Push.

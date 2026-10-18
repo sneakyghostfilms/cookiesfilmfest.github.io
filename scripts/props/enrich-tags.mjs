@@ -71,7 +71,9 @@ async function askModel(batch) {
 }
 
 async function main() {
-  const { values } = parseArgs({ options: { force: { type: 'boolean', default: false } } });
+  const { values } = parseArgs({ options: { force: { type: 'boolean', default: false }, 'batch-size': { type: 'string', default: String(BATCH_SIZE) } } });
+  const batchSize = Number(values['batch-size']);
+  if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 50) throw new Error('--batch-size must be a whole number from 1 to 50.');
   const inventory = JSON.parse(await readFile(INVENTORY_FILE, 'utf8'));
   const exclusions = existsSync(EXCLUSIONS_FILE) ? JSON.parse(await readFile(EXCLUSIONS_FILE, 'utf8')) : {};
   const previous = existsSync(TAGS_FILE) ? JSON.parse(await readFile(TAGS_FILE, 'utf8')) : null;
@@ -87,8 +89,8 @@ async function main() {
   const pending = inventory.items.filter((item) => !(item.key in tags));
   console.log(`🏷️  Tagging ${pending.length} of ${inventory.items.length} items with ${MODEL} (prompt v${PROMPT_VERSION})`);
   let failedBatches = 0;
-  for (let start = 0; start < pending.length; start += BATCH_SIZE) {
-    const batch = pending.slice(start, start + BATCH_SIZE);
+  for (let start = 0; start < pending.length; start += batchSize) {
+    const batch = pending.slice(start, start + batchSize);
     const byKey = new Map(batch.map((item) => [item.key, item]));
     try {
       const answers = await askModel(batch);
@@ -101,10 +103,10 @@ async function main() {
         if (rejected.length) rejections.push(`${item.key}: ${rejected.join(' | ')}`);
       }
       const missing = batch.filter((item) => !(item.key in tags)).map((item) => item.key);
-      console.log(`   batch ${start / BATCH_SIZE + 1}: ${batch.length - missing.length}/${batch.length} tagged${missing.length ? `; missing ${missing.join(', ')}` : ''}`);
+      console.log(`   batch ${start / batchSize + 1}: ${batch.length - missing.length}/${batch.length} tagged${missing.length ? `; missing ${missing.join(', ')}` : ''}`);
     } catch (error) {
       failedBatches += 1;
-      console.error(`   batch ${start / BATCH_SIZE + 1} failed: ${error.message}`);
+      console.error(`   batch ${start / batchSize + 1} failed: ${error.message}`);
     }
   }
   for (const [key, { drop }] of Object.entries(exclusions)) {
@@ -121,7 +123,7 @@ async function main() {
   };
   await writeFile(TAGS_FILE, serializeTags(file), 'utf8');
   if (rejections.length) console.log(`Rejected tags (validation rules):\n  ${rejections.join('\n  ')}`);
-  console.log(`✅ ${Object.keys(tags).length} items tagged in src/data/props/tags.json${failedBatches ? `; ${failedBatches} batch(es) failed, re-run to fill them` : ''}`);
+  console.log(`✅ ${Object.keys(tags).length} items tagged in src/data/props/tags.json${failedBatches ? `; ${failedBatches} batch(es) failed, re-run to fill them (a smaller --batch-size helps when the model runs out of output)` : ''}`);
   if (failedBatches) process.exitCode = 1;
 }
 

@@ -45,6 +45,11 @@ function stopMessage({ url, status, location, retryAfter }) {
 
 const MISSING = new Set([401, 403, 404, 410]);
 
+function cacheFiles(url, directory) {
+  const name = cacheName(url);
+  return { body: join(directory, `${name}.body`), meta: join(directory, `${name}.meta.json`) };
+}
+
 async function readCached(url, files) {
   if (!existsSync(files.meta) || !existsSync(files.body)) return null;
   const meta = JSON.parse(await readFile(files.meta, 'utf8'));
@@ -74,8 +79,7 @@ export function createSiteFetcher({
 
   // cacheOnly reads a URL only from the cache: a miss stops the run instead of requesting it.
   async function get(url, directory, { missingOk = false, cacheOnly = false } = {}) {
-    const name = cacheName(url);
-    const files = { body: join(directory, `${name}.body`), meta: join(directory, `${name}.meta.json`) };
+    const files = cacheFiles(url, directory);
     const problem = hostProblem(url, allowHosts);
     if (problem) stop(new FetchStopped(problem, { url, reason: 'refused' }));
     const cached = await readCached(url, files);
@@ -127,6 +131,8 @@ export function createSiteFetcher({
     raiseGap(ms) {
       gapMs = Math.max(gapMs, Math.ceil(ms));
     },
+    // Whether a URL is in the cache; no request is made either way.
+    cached: async (url, directory) => (await readCached(url, cacheFiles(url, directory))) !== null,
     stats: () => ({ ...stats }),
   };
 }

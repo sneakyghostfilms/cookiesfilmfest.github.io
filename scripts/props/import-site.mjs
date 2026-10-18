@@ -132,14 +132,21 @@ const SOURCES = {
     const capturedAt = localDate(Math.min(...pages.map((page) => Date.parse(page.fetchedAt))));
     return { ...parseCatalog({ collections, pages }, { vendor, catalog }), capturedAt };
   },
-  async 'magento-category'({ vendor, catalog, fetcher, cacheRoot }) {
+  async 'magento-category'({ vendor, catalog, fetcher, cacheRoot, fetchSitemap }) {
     const directory = join(cacheRoot, vendor.id, catalog.id);
     const pageFetcher = fetcher ?? createSiteFetcher({ allowHosts: [new URL(catalog.siteUrl).hostname] });
-    // The sitemap is read only from the cache, where the snapshot was seeded, to check the page list; a miss stops the
-    // import before any request.
+    let site;
+    if (fetchSitemap && !(await pageFetcher.cached(catalog.sitemapUrl, directory))) {
+      // --fetch-sitemap makes the one request a new snapshot's cache needs, after robots.txt; a sitemap already cached
+      // is never requested again.
+      site = await robotsCheckedFetcher(pageFetcher, catalog.siteUrl, directory);
+      await site.get(catalog.sitemapUrl, directory);
+    }
+    // The sitemap is read only from the cache, where the snapshot was seeded or --fetch-sitemap put it, to check the
+    // page list; a miss stops the import before any request.
     const sitemap = (await pageFetcher.get(catalog.sitemapUrl, directory, { cacheOnly: true })).body.toString('utf8');
     checkPages(catalog.pages, sitemap, catalog.siteUrl);
-    const site = await robotsCheckedFetcher(pageFetcher, catalog.siteUrl, directory);
+    site ??= await robotsCheckedFetcher(pageFetcher, catalog.siteUrl, directory);
     const pages = [];
     for (const url of catalog.pages) {
       const { body, meta } = await site.get(url, directory);
@@ -174,8 +181,8 @@ export function withholdItems(parsed, exclusions, keyPrefix) {
   };
 }
 
-export async function loadSite({ vendor, catalog, cacheRoot = CACHE_ROOT, fetcher, exportPath, exclusions }) {
-  const parsed = await SOURCES[catalog.type]({ vendor, catalog, cacheRoot, fetcher, exportPath });
+export async function loadSite({ vendor, catalog, cacheRoot = CACHE_ROOT, fetcher, exportPath, fetchSitemap = false, exclusions }) {
+  const parsed = await SOURCES[catalog.type]({ vendor, catalog, cacheRoot, fetcher, exportPath, fetchSitemap });
   return withholdItems(parsed, exclusions ?? JSON.parse(await readFile(ITEM_EXCLUSIONS_FILE, 'utf8')), vendor.keyPrefix);
 }
 
@@ -187,9 +194,9 @@ export function findSiteCatalog(vendors, vendorId) {
   return { vendor, catalog: catalogs[0] };
 }
 
-export async function importSite({ vendorId, vendors, outFile = INVENTORY_FILE, cacheRoot = CACHE_ROOT, fetcher, exportPath, exclusions, log = console.log, today = () => localDate(Date.now()) }) {
+export async function importSite({ vendorId, vendors, outFile = INVENTORY_FILE, cacheRoot = CACHE_ROOT, fetcher, exportPath, fetchSitemap = false, exclusions, log = console.log, today = () => localDate(Date.now()) }) {
   const { vendor, catalog } = findSiteCatalog(vendors, vendorId);
-  const parsed = await loadSite({ vendor, catalog, cacheRoot, fetcher, exportPath, exclusions });
+  const parsed = await loadSite({ vendor, catalog, cacheRoot, fetcher, exportPath, fetchSitemap, exclusions });
   const { items, counts, report, capturedAt } = parsed;
   log([`${vendor.name} · ${catalog.id} (captured ${capturedAt})`, ...report].join('\n'));
   const actual = { ...counts };
@@ -218,14 +225,15 @@ export async function importSite({ vendorId, vendors, outFile = INVENTORY_FILE, 
 }
 
 async function main() {
-  const { values } = parseArgs({ options: { vendor: { type: 'string' }, export: { type: 'string' }, out: { type: 'string' } } });
-  if (!values.vendor) throw new Error('Usage: npm run props:import-site -- --vendor <vendor id> [--export "<file.csv>"] [--out file]');
+  const { values } = parseArgs({ options: { vendor: { type: 'string' }, export: { type: 'string' }, out: { type: 'string' }, 'fetch-sitemap': { type: 'boolean' } } });
+  if (!values.vendor) throw new Error('Usage: npm run props:import-site -- --vendor <vendor id> [--export "<file.csv>"] [--out file] [--fetch-sitemap]');
   const vendors = JSON.parse(await readFile(VENDORS_FILE, 'utf8'));
   await importSite({
     vendorId: values.vendor,
     vendors,
     ...(values.export ? { exportPath: resolve(values.export) } : {}),
     ...(values.out ? { outFile: resolve(values.out) } : {}),
+    ...(values['fetch-sitemap'] ? { fetchSitemap: true } : {}),
   });
 }
 

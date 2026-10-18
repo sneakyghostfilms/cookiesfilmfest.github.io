@@ -58,7 +58,6 @@ export function renderCard(card: Card) {
   if (card.pages) line.append(" · ", span("prop-page", card.pages));
   item.append(line);
   if (card.categories.length) item.append(paragraph("prop-category", card.categories.join(" · ")));
-  if (card.tags.length) item.append(paragraph("prop-tags", "AI-suggested search terms: ", span("prop-tag-list", card.tags.join(", "))));
   if (card.photoCredit) item.append(paragraph("prop-photo", card.photoCredit));
   const actions = paragraph("prop-actions", externalLink(card.link.href, card.link.label));
   if (card.inquire) actions.append(externalLink(card.inquire, "Inquire"));

@@ -13,7 +13,7 @@ const { vendors } = await readJson('../src/data/props/vendors.json');
 const { tags } = await readJson('../src/data/props/tags.json');
 const catalogsById = new Map(vendors.flatMap((vendor) => vendor.catalogs.map((catalog) => [catalog.id, { catalog, vendor }])));
 // The card fields the page draws; alt matters only beside a thumbnail.
-const drawn = ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, tags: cardTags, link, inquire, cite, thumb, alt, photoCredit }) => ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, tags: cardTags, link, inquire, cite, thumb, alt: thumb ? alt : null, photoCredit });
+const drawn = ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, link, inquire, cite, thumb, alt, photoCredit }) => ({ key, vendorId, vendorName, ids, name, era, pages, categories, decades, link, inquire, cite, thumb, alt: thumb ? alt : null, photoCredit });
 
 const pdfVendor = { id: 'steel-city-props', name: 'Steel City Props', contact: { formUrl: 'https://forms.example/form', email: 'shop@example.com', phone: null, pageUrl: null } };
 const pdfCatalog = { id: 'scp-2026-09-30', type: 'pdf', sourceUrl: 'https://drive.example/catalog' };
@@ -95,7 +95,7 @@ test('cards.json is the same text for the same inputs, and only the local demo p
   assert.equal(cardText(local.items.find((entry) => entry.key === 'dz-1nfqu2'), local).thumb.src, '/props-demo/thumbs/dz-1nfqu2.webp');
 });
 
-test('the page and the endpoint make cards.json in one call, which reads the demo manifest only for the local demo', async () => {
+test('both pages and the endpoint make cards.json in one call, which reads the demo manifest only for the local demo', async () => {
   let reads = 0;
   const manifest = () => {
     reads += 1;
@@ -105,7 +105,7 @@ test('the page and the endpoint make cards.json in one call, which reads the dem
   assert.doesNotMatch(cardsText({ PROPS_DEMO: 'true' }, manifest), /thumb/);
   assert.equal(reads, 0, 'the manifest is not even read outside the demo');
   assert.match(cardsText({ PROPS_DEMO: '1' }, manifest), /"key":"scp-056"[^}]*"link":\{"href":"\/props-demo\/catalogs\/scp-2026-09-30\.pdf#page=5/);
-  for (const file of ['../src/pages/props.astro', '../src/pages/props/cards.json.js']) {
+  for (const file of ['../src/pages/props.astro', '../src/pages/props/scene.astro', '../src/pages/props/cards.json.js']) {
     const source = await readFile(new URL(file, import.meta.url), 'utf8');
     assert.match(source, /cardsText\(process\.env\)/, `${file} makes cards.json through cardsText(process.env)`);
   }

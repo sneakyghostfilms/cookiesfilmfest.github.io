@@ -92,7 +92,8 @@
   color: var(--pp-muted);
 }
 
-.props-page .props-back {
+.props-page .props-back,
+.props-page .props-switch a {
   font-size: 14px;
   font-weight: 600;
   display: inline-flex;
@@ -176,26 +177,6 @@
 .props-page .props-field textarea::placeholder {
   color: var(--pp-muted);
   opacity: 1;
-}
-
-.props-page .props-scene {
-  background-color: var(--pp-surface);
-  border: 1px solid var(--pp-rule);
-  border-radius: 2px;
-  padding: 0 16px;
-  margin: 0 0 16px;
-}
-
-.props-page .props-scene[open] {
-  padding-bottom: 16px;
-}
-
-.props-page .props-scene summary {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  cursor: pointer;
-  font-weight: 650;
 }
 
 .props-page .scene-form {
@@ -317,7 +298,6 @@
 }
 
 .props-page .prop-category,
-.props-page .prop-tags,
 .props-page .prop-cite {
   font-size: 13px;
   color: var(--pp-muted);
@@ -397,7 +377,8 @@
 }
 
 .props-page .props-sources-title,
-.props-page .vendor-matches-title {
+.props-page .vendor-matches-title,
+.props-page .scene-title {
   font-size: 16px;
   font-weight: 700;
   margin: 0 0 8px;

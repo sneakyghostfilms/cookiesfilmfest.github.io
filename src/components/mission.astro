@@ -24,6 +24,19 @@ const testimonials = [
   },
 ];
 
+const videoTestimonials = [
+  {
+    videoId: "ODQBoQ5jIZw",
+    author: "Marco Falcucci",
+    context: "The Stool With Pants And Shoes On",
+  },
+  {
+    videoId: "4eNMQoukO_k",
+    author: "Bryn Berg",
+    context: "Middle Age Inappropriate",
+  },
+];
+
 ---
 
 <SectionLayout title="About" id="mission">
@@ -42,8 +55,8 @@ const testimonials = [
         <div class="mission-features">
           <div class="video-container">
             <iframe
-              src="https://www.youtube.com/embed/S_rOY4qJoyU"
-              title="Cookies & Comedy Film Festival Promo"
+              src="https://www.youtube.com/embed/UuoYdcPnNkU"
+              title="Cookies & Comedy Film Festival | Animated Commercial"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerpolicy="strict-origin-when-cross-origin"
@@ -158,17 +171,15 @@ const testimonials = [
         <div class="testimonial-section">
           <h3 class="testimonial-title">What Our Filmmakers Say</h3>
           <div class="testimonial-container">
+            <div class="testimonial-videos">
+              {videoTestimonials.map((t) => (
+                <Testimonial videoId={t.videoId} author={t.author} context={t.context} />
+              ))}
+            </div>
             <div class="testimonial-content">
               {testimonials.map((t) => (
                 <Testimonial quote={t.quote} author={t.author} context={t.context} />
               ))}
-            </div>
-            <div class="testimonial-image">
-              <img
-                src="/assets/2026-event-photos/audience-mood-close.jpg"
-                alt="Audience members smiling during a screening at the Harris Theater in 2026"
-                class="testimonial-img"
-              />
             </div>
           </div>
         </div>
@@ -503,33 +514,22 @@ const testimonials = [
   .testimonial-container {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    align-items: start;
-  }
-
-  .testimonial-image {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    gap: 1.25rem;
     width: 100%;
     max-width: 980px;
     margin: 0 auto;
   }
 
-  .testimonial-img {
-    width: 100%;
-    max-width: 980px;
-    height: auto;
-    border-radius: 0.75rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  .testimonial-videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
+    justify-content: center;
+    gap: 1.25rem;
   }
 
   .testimonial-content {
     display: grid;
     gap: 1.25rem;
-    width: 100%;
-    max-width: 980px;
-    margin: 0 auto;
   }
 
   @media (min-width: 900px) {

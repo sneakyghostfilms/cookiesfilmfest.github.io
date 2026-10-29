@@ -1,15 +1,28 @@
 ---
 interface Props {
-  quote: string;
+  quote?: string;
+  videoId?: string;
   author: string;
   context?: string;
 }
 
-const { quote, author, context } = Astro.props;
+const { quote, videoId, author, context } = Astro.props;
 ---
 
-<div class="testimonial">
-  <p class="testimonial-quote">"{quote}"</p>
+<div class:list={["testimonial", { "testimonial-with-video": videoId }]}>
+  {videoId && (
+    <div class="testimonial-video">
+      <iframe
+        src={`https://www.youtube.com/embed/${videoId}`}
+        title={`Interview with ${author}`}
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen
+      ></iframe>
+    </div>
+  )}
+  {quote && <p class="testimonial-quote">"{quote}"</p>}
   <div class="testimonial-footer">
     <p class="testimonial-attribution">{author}</p>
     {context && <p class="testimonial-context">{context}</p>}
@@ -27,6 +40,31 @@ const { quote, author, context } = Astro.props;
     border-radius: 1rem;
     background: rgba(255, 255, 255, 0.68);
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+  }
+
+  .testimonial-with-video {
+    padding: 0.75rem 0.75rem 1rem;
+  }
+
+  .testimonial-with-video .testimonial-footer {
+    margin-top: 0;
+    padding: 0 0.5rem;
+  }
+
+  .testimonial-video {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .testimonial-video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
   }
 
   .testimonial-quote {

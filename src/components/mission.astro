@@ -35,6 +35,11 @@ const videoTestimonials = [
     author: "Bryn Berg",
     context: "Middle Age Inappropriate",
   },
+  {
+    videoId: "uBW5TAI_H_0",
+    author: "Zach Aaron",
+    context: "Cookies",
+  },
 ];
 
 ---
@@ -521,10 +526,16 @@ const videoTestimonials = [
   }
 
   .testimonial-videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 1.25rem;
+  }
+
+  .testimonial-videos > :global(.testimonial) {
+    flex: 1 1 220px;
+    max-width: 280px;
+    height: auto;
   }
 
   .testimonial-content {

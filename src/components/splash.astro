@@ -385,8 +385,10 @@ import RotatingLogo from './RotatingLogo.astro';
 
 
   /* Hide on phones, and on short viewports where the column would run into
-     the nav at the bottom-left (it reaches ~480px down at its largest) */
-  @media (max-width: 640px), (max-height: 560px) {
+     the nav at the bottom-left (it reaches ~480px down at its largest).
+     The height limit is 560px at the default font size; em keeps it clear
+     of the nav when the browser's default font is larger. */
+  @media (max-width: 640px), (max-height: 35em) {
     .sponsors {
       display: none;
     }

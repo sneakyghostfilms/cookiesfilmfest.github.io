@@ -80,17 +80,10 @@ const { navItems } = Astro.props;
     width: 100%;
   }
 
-  /* Hide nav on narrow screens OR short screens */
-  @media (max-width: 1000px), (max-height: 900px) {
+  /* Narrow screens use the hamburger menu instead (width only, never height) */
+  @media (max-width: 1000px) {
     .nav-desktop {
-      display: none !important;
-    }
-  }
-
-  /* Only show nav if BOTH wide enough AND tall enough */
-  @media (min-width: 1001px) and (min-height: 901px) {
-    .nav-desktop {
-      display: block !important;
+      display: none;
     }
   }
 </style>

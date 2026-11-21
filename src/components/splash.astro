@@ -384,7 +384,9 @@ import RotatingLogo from './RotatingLogo.astro';
   }
 
 
-  @media (max-width: 640px) {
+  /* Hide on phones, and on short viewports where the column would run into
+     the nav at the bottom-left (it reaches ~480px down at its largest) */
+  @media (max-width: 640px), (max-height: 560px) {
     .sponsors {
       display: none;
     }

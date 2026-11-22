@@ -23,6 +23,17 @@ import RotatingLogo from './RotatingLogo.astro';
         />
       </a>
     </div>
+    <p class="model-credit">
+      Adapted{' '}
+      <a
+        href="https://sketchfab.com/3d-models/chocolate-chip-cookie-3d-735a99cccd2f490dae450167e46bf5c6"
+        target="_blank"
+        rel="noopener noreferrer">cookie</a
+      >{' '}
+      by{' '}
+      <a href="https://sketchfab.com/raheemstone0613" target="_blank" rel="noopener noreferrer">raheemstone0613</a>,{' '}
+      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>
+    </p>
   </div>
   <div class="splash-content">
     <div class="festival-loop" aria-label="Festival date and venue">
@@ -383,6 +394,21 @@ import RotatingLogo from './RotatingLogo.astro';
     margin-top: 2.4rem;
   }
 
+  .model-credit {
+    white-space: nowrap;
+    margin-top: 1.6rem;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 0.6rem;
+    line-height: 1.4;
+    color: #fbe3c4;
+    opacity: 0.6;
+  }
+
+  .model-credit a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
 
   /* Hide on phones, and on short viewports where the column would run into
      the nav at the bottom-left (it reaches ~480px down at its largest).
@@ -390,6 +416,14 @@ import RotatingLogo from './RotatingLogo.astro';
      larger than 16px and the nav row grows with it. */
   @media (max-width: 640px), (max-height: 560px), (max-height: 35em) {
     .sponsors {
+      display: none;
+    }
+  }
+
+  /* The credit is the lowest thing in the supporters column, so it is the
+     first to reach the nav row as the viewport gets shorter. */
+  @media (max-height: 680px), (max-height: 42.5em) {
+    .model-credit {
       display: none;
     }
   }

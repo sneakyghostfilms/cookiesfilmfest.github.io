@@ -16,7 +16,176 @@ const { size = 400, class: className = '' } = Astro.props;
 
 <script>
   import * as THREE from 'three';
+  import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
   import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+  import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+  import { Brush, Evaluator, INTERSECTION, SUBTRACTION } from 'three-bvh-csg';
+
+  const COOKIE_FILLS = ['#c69c6d', 'rgb(198, 156, 109)'];
+  const COOKIE_MODEL_PATH = '/assets/cookie-model';
+
+  // The scanned cookie is squashed to this share of its real thickness so the
+  // lettering that runs through it stays shallow.
+  const COOKIE_THICKNESS_SCALE = 0.4;
+
+  // The logo's cookie outline ends with the curves that draw the bite.
+  const BITE_CURVE_COUNT = 3;
+
+  // SVG units covered by one repeat of the crumb texture.
+  const CRUMB_TEXTURE_SPAN = 150;
+
+  // Points traced around each crumb's outline.
+  const CRUMB_RIM_POINTS = 48;
+
+  // Rings of a crumb's rounded surface, as shares of the way from its centre
+  // out to its outline. They bunch up near the outline, where it curves fastest.
+  const CRUMB_RING_SCALES = [1, 0.97, 0.9, 0.78, 0.6, 0.35];
+
+  // A crumb's thickness, as a share of its narrowest width, before the cookie cuts it down.
+  const CRUMB_THICKNESS_RATIO = 0.7;
+
+  // A crumb's back only breaks through the cookie's underside when the crumb reaches
+  // further back than this share of the cookie's thickness. A shallower one would pick
+  // up just a stray patch of the underside, so it stops at the second share instead,
+  // inside the cookie, and its back takes the plain crumb texture.
+  const CRUMB_UNDERSIDE_MIN_DEPTH_RATIO = 0.6;
+  const CRUMB_PLAIN_BACK_DEPTH_RATIO = 0.3;
+
+  async function loadCookieTextures(anisotropy: number) {
+    const loader = new THREE.TextureLoader();
+
+    const load = async (name: string, colorSpace: THREE.ColorSpace = THREE.NoColorSpace) => {
+      const texture = await loader.loadAsync(`${COOKIE_MODEL_PATH}/${name}.webp`);
+      texture.colorSpace = colorSpace;
+      texture.anisotropy = anisotropy;
+      return texture;
+    };
+
+    const [skinColor, skinNormal, crumbColor, crumbNormal] = await Promise.all([
+      load('color', THREE.SRGBColorSpace),
+      load('normal'),
+      load('crumb-color', THREE.SRGBColorSpace),
+      load('crumb-normal'),
+    ]);
+
+    [crumbColor, crumbNormal].forEach((texture) => {
+      texture.wrapS = THREE.MirroredRepeatWrapping;
+      texture.wrapT = THREE.MirroredRepeatWrapping;
+    });
+
+    return { skinColor, skinNormal, crumbColor, crumbNormal };
+  }
+
+  // Returns the scanned cookie lying flat and centred on the origin, top side facing +z.
+  async function loadCookieGeometry() {
+    const model = await new OBJLoader().loadAsync(`${COOKIE_MODEL_PATH}/cookie.obj`);
+    const geometry = (model.children[0] as THREE.Mesh).geometry;
+    geometry.rotateX(Math.PI / 2);
+    geometry.center();
+    return geometry;
+  }
+
+  function createCookieMaterial(map: THREE.Texture, normalMap: THREE.Texture) {
+    return new THREE.MeshStandardMaterial({ map, normalMap, metalness: 0, roughness: 0.85 });
+  }
+
+  function scaleUVs(geometry: THREE.BufferGeometry, factor: number) {
+    const uv = geometry.getAttribute('uv');
+    for (let i = 0; i < uv.count; i++) {
+      uv.setXY(i, uv.getX(i) * factor, uv.getY(i) * factor);
+    }
+  }
+
+  // Traces the bite along the cookie outline, then closes it `reach` units
+  // outside the cookie so it swallows everything beyond the bite.
+  function createBiteShape(cookieShape: THREE.Shape, reach: number) {
+    const points = cookieShape.curves
+      .slice(-BITE_CURVE_COUNT)
+      .flatMap((curve, index) => curve.getPoints(16).slice(index === 0 ? 0 : 1));
+    const first = points[0];
+    const last = points[points.length - 1];
+    const deepest = points[Math.floor(points.length / 2)];
+
+    const chord = last.clone().sub(first);
+    const outward = new THREE.Vector2(chord.y, -chord.x).normalize();
+    if (outward.dot(deepest.clone().sub(first)) > 0) outward.negate();
+
+    return new THREE.Shape([
+      ...points,
+      last.clone().addScaledVector(outward, reach),
+      first.clone().addScaledVector(outward, reach),
+    ]);
+  }
+
+  // Builds a pebble that fills the outline: thickest in the middle and rounding
+  // off to a thin edge at the outline, the way the cookie's own rim does.
+  function createPebbleGeometry(outline: THREE.Shape, cookieDepth: number) {
+    const rim = outline.getSpacedPoints(CRUMB_RIM_POINTS).slice(0, CRUMB_RIM_POINTS);
+    if (THREE.ShapeUtils.isClockWise(rim)) rim.reverse();
+
+    const box = new THREE.Box2().setFromPoints(rim);
+    const size = box.getSize(new THREE.Vector2());
+    const center = rim.reduce((sum, point) => sum.add(point), new THREE.Vector2()).divideScalar(rim.length);
+    const frontDepth = (Math.min(size.x, size.y) * CRUMB_THICKNESS_RATIO) / 2;
+    const backDepth =
+      frontDepth > cookieDepth * CRUMB_UNDERSIDE_MIN_DEPTH_RATIO
+        ? frontDepth
+        : Math.min(frontDepth, cookieDepth * CRUMB_PLAIN_BACK_DEPTH_RATIO);
+    const depthOf = (side: number) => (side === 1 ? frontDepth : backDepth);
+
+    // Vertices: the outline ring, shared by both halves, then each half's inner rings and centre point.
+    const positions: number[] = [];
+    const addRing = (scale: number, side: number) => {
+      const z = side * depthOf(side) * Math.sqrt(1 - scale * scale);
+      rim.forEach((point) => {
+        positions.push(center.x + (point.x - center.x) * scale, center.y + (point.y - center.y) * scale, z);
+      });
+    };
+    const innerScales = CRUMB_RING_SCALES.slice(1);
+    const halfVertexCount = innerScales.length * rim.length + 1;
+
+    addRing(1, 0);
+    [1, -1].forEach((side) => {
+      innerScales.forEach((scale) => addRing(scale, side));
+      positions.push(center.x, center.y, side * depthOf(side));
+    });
+
+    const indices: number[] = [];
+    const addHalf = (side: number, half: number) => {
+      const halfStart = rim.length + half * halfVertexCount;
+      const ringStart = (ring: number) => (ring === 0 ? 0 : halfStart + (ring - 1) * rim.length);
+      const centerIndex = halfStart + innerScales.length * rim.length;
+      const addTriangle = (a: number, b: number, c: number) => indices.push(a, side === 1 ? b : c, side === 1 ? c : b);
+
+      for (let i = 0; i < rim.length; i++) {
+        const next = (i + 1) % rim.length;
+        for (let ring = 0; ring < innerScales.length; ring++) {
+          const outer = ringStart(ring);
+          const inner = ringStart(ring + 1);
+          addTriangle(outer + i, outer + next, inner + next);
+          addTriangle(outer + i, inner + next, inner + i);
+        }
+        const innermost = ringStart(innerScales.length);
+        addTriangle(innermost + i, innermost + next, centerIndex);
+      }
+    };
+    addHalf(1, 0);
+    addHalf(-1, 1);
+
+    // The depth is mixed into the texture coordinates so the steep edge isn't streaked.
+    const uvs: number[] = [];
+    for (let i = 0; i < positions.length; i += 3) {
+      const z = positions[i + 2];
+      uvs.push((positions[i] + z) / CRUMB_TEXTURE_SPAN, (positions[i + 1] + z) / CRUMB_TEXTURE_SPAN);
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    return geometry;
+  }
 
   function initRotatingLogo() {
     const containers = document.querySelectorAll('.rotating-logo-container');
@@ -53,7 +222,7 @@ const { size = 400, class: className = '' } = Astro.props;
       frontLight.position.set(0, 0, 5);
       scene.add(frontLight);
 
-      const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      const backLight = new THREE.DirectionalLight(0xffffff, 0.8);
       backLight.position.set(0, 0, -5);
       scene.add(backLight);
 
@@ -70,62 +239,86 @@ const { size = 400, class: className = '' } = Astro.props;
       const logoGroup = new THREE.Group();
       scene.add(logoGroup);
 
-      // Load and parse SVG
-      const loader = new SVGLoader();
+      async function buildLogo() {
+        const [data, textures, cookieGeometry] = await Promise.all([
+          new SVGLoader().loadAsync('/assets/logo-full.svg'),
+          loadCookieTextures(renderer.capabilities.getMaxAnisotropy()),
+          loadCookieGeometry(),
+        ]);
 
-      loader.load('/assets/logo-full.svg', (data) => {
-        const paths = data.paths;
+        const skinMaterial = createCookieMaterial(textures.skinColor, textures.skinNormal);
+        const crumbMaterial = createCookieMaterial(textures.crumbColor, textures.crumbNormal);
 
-        // Extrusion settings for cookie base
-        const cookieExtrudeSettings = {
-          depth: 30, // thickness of the coin
-          bevelEnabled: true,
-          bevelThickness: 5,
-          bevelSize: 3,
-          bevelSegments: 3,
-        };
+        const isCookiePath = (path: THREE.ShapePath) => COOKIE_FILLS.includes(path.userData?.style?.fill);
+        const shapeArea = (shape: THREE.Shape) => Math.abs(THREE.ShapeUtils.area(shape.getPoints()));
 
-        // Total cookie thickness for reference
-        const cookieTotalDepth = cookieExtrudeSettings.depth + (cookieExtrudeSettings.bevelThickness * 2);
+        // The cookie fill covers the cookie itself and the loose crumbs beside the bite.
+        const cookieShapes = data.paths.filter(isCookiePath).flatMap((path) => SVGLoader.createShapes(path));
+        const cookieOutline = cookieShapes.reduce((largest, shape) =>
+          shapeArea(shape) > shapeArea(largest) ? shape : largest,
+        );
+        const crumbOutlines = cookieShapes.filter((shape) => shape !== cookieOutline);
+
+        // Size the scanned cookie to the logo's cookie outline and sit it in the same place
+        const outlineBox = new THREE.Box2().setFromPoints(cookieOutline.getPoints());
+        const outlineCenter = outlineBox.getCenter(new THREE.Vector2());
+        const outlineSize = outlineBox.getSize(new THREE.Vector2());
+        cookieGeometry.computeBoundingBox();
+        const scanSize = cookieGeometry.boundingBox!.getSize(new THREE.Vector3());
+        const cookieScale = Math.max(outlineSize.x, outlineSize.y) / Math.max(scanSize.x, scanSize.y);
+        const cookieDepth = scanSize.z * cookieScale * COOKIE_THICKNESS_SCALE;
+        cookieGeometry.scale(cookieScale, cookieScale, cookieScale * COOKIE_THICKNESS_SCALE);
+        cookieGeometry.translate(outlineCenter.x, outlineCenter.y, 0);
+
+        const evaluator = new Evaluator();
+        const cookieBrush = new Brush(cookieGeometry, skinMaterial);
+        cookieBrush.updateMatrixWorld();
+
+        // The bite is a prism punched through the whole cookie; the faces it cuts get the crumb texture.
+        const biteShape = createBiteShape(cookieOutline, Math.max(outlineSize.x, outlineSize.y) / 2);
+        const biteGeometry = new THREE.ExtrudeGeometry(biteShape, { depth: cookieDepth * 2, bevelEnabled: false });
+        biteGeometry.translate(0, 0, -cookieDepth);
+        scaleUVs(biteGeometry, 1 / CRUMB_TEXTURE_SPAN);
+        const biteCutter = new Brush(biteGeometry, crumbMaterial);
+        biteCutter.updateMatrixWorld();
+        logoGroup.add(evaluator.evaluate(cookieBrush, biteCutter, SUBTRACTION));
+
+        // The crumbs are pebbles carved from the scanned cookie: slid as a group onto
+        // the middle of the cookie, cut out, and slid back into place. A pebble taller
+        // than the cookie keeps the cookie's real surface on its faces.
+        const crumbsBox = new THREE.Box2().setFromPoints(crumbOutlines.flatMap((outline) => outline.getPoints()));
+        const toCookieCenter = outlineCenter.clone().sub(crumbsBox.getCenter(new THREE.Vector2()));
+        const pebbles = crumbOutlines.map((outline) => createPebbleGeometry(outline, cookieDepth));
+        const crumbCutter = new Brush(mergeGeometries(pebbles), crumbMaterial);
+        crumbCutter.position.set(toCookieCenter.x, toCookieCenter.y, 0);
+        crumbCutter.updateMatrixWorld();
+
+        const crumbs = evaluator.evaluate(cookieBrush, crumbCutter, INTERSECTION);
+        crumbs.position.set(-toCookieCenter.x, -toCookieCenter.y, 0);
+        logoGroup.add(crumbs);
 
         // Extrusion settings for text - goes all the way through cookie plus sticks out
         const textExtrudeSettings = {
-          depth: cookieTotalDepth + 20, // extends beyond cookie on both sides
+          depth: cookieDepth + 20, // extends beyond cookie on both sides
           bevelEnabled: true,
           bevelThickness: 2,
           bevelSize: 1,
           bevelSegments: 2,
         };
 
-        // Materials
-        const goldMaterial = new THREE.MeshStandardMaterial({
-          color: 0xd4a84b,
-          metalness: 0.8,
-          roughness: 0.2,
-          side: THREE.DoubleSide,
-        });
-
-        // Process each path from the SVG
-        paths.forEach((path) => {
+        // Process the lettering and decorations
+        data.paths.forEach((path) => {
           const fillColor = path.userData?.style?.fill;
 
-          // Skip paths with no fill or 'none'
-          if (!fillColor || fillColor === 'none' || fillColor === 'transparent') {
+          // Skip unfilled paths and the cookie shapes built above
+          if (!fillColor || fillColor === 'none' || fillColor === 'transparent' || isCookiePath(path)) {
             return;
           }
 
           // Create material based on fill color
           let material: THREE.MeshStandardMaterial;
 
-          if (fillColor === '#c69c6d' || fillColor === 'rgb(198, 156, 109)') {
-            // Cookie base color
-            material = new THREE.MeshStandardMaterial({
-              color: 0xc69c6d,
-              metalness: 0.1,
-              roughness: 0.6,
-              side: THREE.DoubleSide,
-            });
-          } else if (fillColor === '#ffffff' || fillColor === 'white' || fillColor === 'rgb(255, 255, 255)') {
+          if (fillColor === '#ffffff' || fillColor === 'white' || fillColor === 'rgb(255, 255, 255)') {
             // White text/decorations - FrontSide only to prevent see-through
             material = new THREE.MeshStandardMaterial({
               color: 0xffffff,
@@ -151,47 +344,37 @@ const { size = 400, class: className = '' } = Astro.props;
             });
           }
 
-          // Check if this is the cookie base (outer shape)
-          const isCookieBase = fillColor === '#c69c6d' || fillColor === 'rgb(198, 156, 109)';
-
           const shapes = SVGLoader.createShapes(path);
 
           shapes.forEach((shape) => {
-            if (isCookieBase) {
-              // Main extruded cookie shape
-              const geometry = new THREE.ExtrudeGeometry(shape, cookieExtrudeSettings);
-              const mesh = new THREE.Mesh(geometry, [material, goldMaterial]);
-              logoGroup.add(mesh);
-            } else {
-              // Offset white (shadow) elements behind dark blue text to prevent z-fighting
-              const isWhite = fillColor === '#ffffff' || fillColor === 'white' || fillColor === 'rgb(255, 255, 255)';
-              const isDarkBlue = fillColor === '#0c0a3a' || fillColor === 'rgb(12, 10, 58)';
+            // Offset white (shadow) elements behind dark blue text to prevent z-fighting
+            const isWhite = fillColor === '#ffffff' || fillColor === 'white' || fillColor === 'rgb(255, 255, 255)';
+            const isDarkBlue = fillColor === '#0c0a3a' || fillColor === 'rgb(12, 10, 58)';
 
-              // White shadow gets shorter extrusion so it doesn't overlap on back
-              const shadowExtrudeSettings = {
-                depth: cookieTotalDepth + 10, // less stick-out than main text
-                bevelEnabled: true,
-                bevelThickness: 1,
-                bevelSize: 0.5,
-                bevelSegments: 2,
-              };
+            // White shadow gets shorter extrusion so it doesn't overlap on back
+            const shadowExtrudeSettings = {
+              depth: cookieDepth + 10, // less stick-out than main text
+              bevelEnabled: true,
+              bevelThickness: 1,
+              bevelSize: 0.5,
+              bevelSegments: 2,
+            };
 
-              const extrudeOpts = isWhite ? shadowExtrudeSettings : textExtrudeSettings;
-              const geometry = new THREE.ExtrudeGeometry(shape, extrudeOpts);
-              const mesh = new THREE.Mesh(geometry, material);
+            const extrudeOpts = isWhite ? shadowExtrudeSettings : textExtrudeSettings;
+            const geometry = new THREE.ExtrudeGeometry(shape, extrudeOpts);
+            const mesh = new THREE.Mesh(geometry, material);
 
-              // Position so text is centered through the cookie
-              let startZ = -cookieExtrudeSettings.bevelThickness - 10; // 10 units stick out back
+            // Position so text is centered through the cookie
+            let startZ = -cookieDepth / 2 - 10; // 10 units stick out back
 
-              if (isWhite) {
-                startZ = -cookieExtrudeSettings.bevelThickness - 5; // shadow starts closer, ends shorter
-              } else if (isDarkBlue) {
-                startZ += 2; // Dark text slightly in front
-              }
-
-              mesh.position.z = startZ;
-              logoGroup.add(mesh);
+            if (isWhite) {
+              startZ = -cookieDepth / 2 - 5; // shadow starts closer, ends shorter
+            } else if (isDarkBlue) {
+              startZ += 2; // Dark text slightly in front
             }
+
+            mesh.position.z = startZ;
+            logoGroup.add(mesh);
           });
         });
 
@@ -214,10 +397,10 @@ const { size = 400, class: className = '' } = Astro.props;
 
         // Position camera to see the full object during rotation
         camera.position.z = 3;
-      },
-      undefined,
-      (error) => {
-        console.error('SVG load error:', error);
+      }
+
+      buildLogo().catch((error) => {
+        console.error('Logo load error:', error);
       });
 
       // Animation state

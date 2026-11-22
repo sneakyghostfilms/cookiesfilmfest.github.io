@@ -235,12 +235,14 @@ const { size = 400, class: className = '' } = Astro.props;
 
       animate();
 
-      // Handle resize
+      // Resizing clears the canvas, and this callback runs after the frame's
+      // requestAnimationFrame, so redraw here or the browser paints a blank frame.
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           const width = entry.contentRect.width;
           if (width > 0) {
             renderer.setSize(width, width);
+            renderer.render(scene, camera);
           }
         }
       });

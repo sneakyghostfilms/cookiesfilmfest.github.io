@@ -85,8 +85,20 @@ const { size = 400, class: className = '' } = Astro.props;
     return geometry;
   }
 
+  // No mirror-like reflection at all, which is what made the cookie look like plastic.
+  // The sheen adds a soft cookie-coloured glow where light skims the surface instead,
+  // the way a dry, crumbly surface catches it.
   function createCookieMaterial(map: THREE.Texture, normalMap: THREE.Texture) {
-    return new THREE.MeshStandardMaterial({ map, normalMap, metalness: 0, roughness: 0.85 });
+    return new THREE.MeshPhysicalMaterial({
+      map,
+      normalMap,
+      metalness: 0,
+      roughness: 1,
+      specularIntensity: 0,
+      sheen: 0.5,
+      sheenRoughness: 1,
+      sheenColor: 0xc98a4b,
+    });
   }
 
   function scaleUVs(geometry: THREE.BufferGeometry, factor: number) {

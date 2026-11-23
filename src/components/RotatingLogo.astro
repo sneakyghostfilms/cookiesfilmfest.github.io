@@ -54,6 +54,9 @@ const { size = 400, class: className = '' } = Astro.props;
   const CRUMB_UNDERSIDE_MIN_DEPTH_RATIO = 0.6;
   const CRUMB_PLAIN_BACK_DEPTH_RATIO = 0.3;
 
+  // How far the face drawn on a crumb reaches past the crumb, front and back, before its bevel.
+  const CRUMB_FACE_STICK_OUT = 12;
+
   async function loadCookieTextures(anisotropy: number) {
     const loader = new THREE.TextureLoader();
 
@@ -202,6 +205,22 @@ const { size = 400, class: className = '' } = Astro.props;
     return geometry;
   }
 
+  // Bounds of the part of a mesh that lies within a region of the logo, seen from the front.
+  function boundsWithin(mesh: THREE.Mesh, region: THREE.Box2) {
+    const column = new THREE.Box3(
+      new THREE.Vector3(region.min.x, region.min.y, -Infinity),
+      new THREE.Vector3(region.max.x, region.max.y, Infinity),
+    );
+    const positions = mesh.geometry.getAttribute('position');
+    const point = new THREE.Vector3();
+    const bounds = new THREE.Box3();
+    for (let i = 0; i < positions.count; i++) {
+      point.fromBufferAttribute(positions, i).add(mesh.position);
+      if (column.containsPoint(point)) bounds.expandByPoint(point);
+    }
+    return bounds;
+  }
+
   function initRotatingLogo() {
     const containers = document.querySelectorAll('.rotating-logo-container');
 
@@ -317,6 +336,11 @@ const { size = 400, class: className = '' } = Astro.props;
         crumbs.position.set(-toCookieCenter.x, -toCookieCenter.y, 0);
         logoGroup.add(crumbs);
 
+        const crumbRegions = crumbOutlines.map((outline) => {
+          const region = new THREE.Box2().setFromPoints(outline.getPoints());
+          return { region, bounds: boundsWithin(crumbs, region) };
+        });
+
         // Extrusion settings for text - goes all the way through cookie plus sticks out
         const textExtrudeSettings = {
           depth: cookieDepth + 20, // extends beyond cookie on both sides
@@ -380,9 +404,7 @@ const { size = 400, class: className = '' } = Astro.props;
               bevelSegments: 2,
             };
 
-            const extrudeOpts = isWhite ? shadowExtrudeSettings : textExtrudeSettings;
-            const geometry = new THREE.ExtrudeGeometry(shape, extrudeOpts);
-            const mesh = new THREE.Mesh(geometry, material);
+            let extrudeOpts = isWhite ? shadowExtrudeSettings : textExtrudeSettings;
 
             // Position so text is centered through the cookie
             let startZ = -cookieDepth / 2 - 10; // 10 units stick out back
@@ -392,6 +414,18 @@ const { size = 400, class: className = '' } = Astro.props;
             } else if (isDarkBlue) {
               startZ += 2; // Dark text slightly in front
             }
+
+            // A face drawn on a crumb runs through that crumb instead, which is shallower than the cookie
+            const shapeRegion = new THREE.Box2().setFromPoints(shape.getPoints());
+            const crumb = crumbRegions.find(({ region }) => region.containsBox(shapeRegion));
+            if (crumb) {
+              const crumbDepth = crumb.bounds.max.z - crumb.bounds.min.z;
+              extrudeOpts = { ...extrudeOpts, depth: crumbDepth + CRUMB_FACE_STICK_OUT * 2 };
+              startZ = crumb.bounds.min.z - CRUMB_FACE_STICK_OUT;
+            }
+
+            const geometry = new THREE.ExtrudeGeometry(shape, extrudeOpts);
+            const mesh = new THREE.Mesh(geometry, material);
 
             mesh.position.z = startZ;
             logoGroup.add(mesh);

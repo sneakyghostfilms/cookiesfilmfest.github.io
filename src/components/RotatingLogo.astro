@@ -57,6 +57,10 @@ const { size = 400, class: className = '' } = Astro.props;
   // How far the face drawn on a crumb reaches past the crumb, front and back, before its bevel.
   const CRUMB_FACE_STICK_OUT = 12;
 
+  // The logo first appears a sixth of a turn short of facing the viewer, bite side
+  // nearest them, so it swings round to face them before it turns away.
+  const START_ANGLE = -Math.PI / 3;
+
   async function loadCookieTextures(anisotropy: number) {
     const loader = new THREE.TextureLoader();
 
@@ -453,9 +457,18 @@ const { size = 400, class: className = '' } = Astro.props;
         camera.position.z = 3;
       }
 
-      buildLogo().catch((error) => {
-        console.error('Logo load error:', error);
-      });
+      // The turn waits for the logo to load, so the logo always appears at its starting angle.
+      // The group stays unturned until then, because buildLogo measures it to centre and size it.
+      let logoBuilt = false;
+
+      buildLogo()
+        .then(() => {
+          logoGroup.rotation.y = START_ANGLE;
+          logoBuilt = true;
+        })
+        .catch((error) => {
+          console.error('Logo load error:', error);
+        });
 
       // Animation state
       const rotationSpeed = 0.004;
@@ -465,7 +478,7 @@ const { size = 400, class: className = '' } = Astro.props;
         requestAnimationFrame(animate);
 
         // Rotate around Y axis
-        logoGroup.rotation.y += rotationSpeed;
+        if (logoBuilt) logoGroup.rotation.y += rotationSpeed;
 
         renderer.render(scene, camera);
       }

@@ -26,7 +26,10 @@ const { size = 400, class: className = '' } = Astro.props;
 
   // The scanned cookie is squashed to this share of its real thickness so the
   // lettering that runs through it stays shallow.
-  const COOKIE_THICKNESS_SCALE = 0.4;
+  const COOKIE_THICKNESS_SCALE = 0.6;
+
+  // The crumbs are carved from a flatter squash of the scan, which keeps them slight beside the cookie.
+  const CRUMB_SOURCE_THICKNESS_SCALE = 0.4;
 
   // The logo's cookie outline ends with the curves that draw the bite.
   const BITE_CURVE_COUNT = 3;
@@ -278,13 +281,18 @@ const { size = 400, class: className = '' } = Astro.props;
         cookieGeometry.computeBoundingBox();
         const scanSize = cookieGeometry.boundingBox!.getSize(new THREE.Vector3());
         const cookieScale = Math.max(outlineSize.x, outlineSize.y) / Math.max(scanSize.x, scanSize.y);
-        const cookieDepth = scanSize.z * cookieScale * COOKIE_THICKNESS_SCALE;
-        cookieGeometry.scale(cookieScale, cookieScale, cookieScale * COOKIE_THICKNESS_SCALE);
-        cookieGeometry.translate(outlineCenter.x, outlineCenter.y, 0);
+        const createCookieBrush = (thicknessScale: number) => {
+          const geometry = cookieGeometry.clone();
+          geometry.scale(cookieScale, cookieScale, cookieScale * thicknessScale);
+          geometry.translate(outlineCenter.x, outlineCenter.y, 0);
+          const brush = new Brush(geometry, skinMaterial);
+          brush.updateMatrixWorld();
+          return { brush, depth: scanSize.z * cookieScale * thicknessScale };
+        };
 
         const evaluator = new Evaluator();
-        const cookieBrush = new Brush(cookieGeometry, skinMaterial);
-        cookieBrush.updateMatrixWorld();
+        const { brush: cookieBrush, depth: cookieDepth } = createCookieBrush(COOKIE_THICKNESS_SCALE);
+        const { brush: crumbSourceBrush, depth: crumbSourceDepth } = createCookieBrush(CRUMB_SOURCE_THICKNESS_SCALE);
 
         // The bite is a prism punched through the whole cookie; the faces it cuts get the crumb texture.
         const biteShape = createBiteShape(cookieOutline, Math.max(outlineSize.x, outlineSize.y) / 2);
@@ -300,12 +308,12 @@ const { size = 400, class: className = '' } = Astro.props;
         // than the cookie keeps the cookie's real surface on its faces.
         const crumbsBox = new THREE.Box2().setFromPoints(crumbOutlines.flatMap((outline) => outline.getPoints()));
         const toCookieCenter = outlineCenter.clone().sub(crumbsBox.getCenter(new THREE.Vector2()));
-        const pebbles = crumbOutlines.map((outline) => createPebbleGeometry(outline, cookieDepth));
+        const pebbles = crumbOutlines.map((outline) => createPebbleGeometry(outline, crumbSourceDepth));
         const crumbCutter = new Brush(mergeGeometries(pebbles), crumbMaterial);
         crumbCutter.position.set(toCookieCenter.x, toCookieCenter.y, 0);
         crumbCutter.updateMatrixWorld();
 
-        const crumbs = evaluator.evaluate(cookieBrush, crumbCutter, INTERSECTION);
+        const crumbs = evaluator.evaluate(crumbSourceBrush, crumbCutter, INTERSECTION);
         crumbs.position.set(-toCookieCenter.x, -toCookieCenter.y, 0);
         logoGroup.add(crumbs);
 
